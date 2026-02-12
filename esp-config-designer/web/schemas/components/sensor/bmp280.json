@@ -1,0 +1,138 @@
+{
+  "id": "sensor.bmp280",
+  "domain": "sensor",
+  "platform": "bmp280_i2c",
+  "platformByBus": {
+    "i2c": "bmp280_i2c",
+    "spi": "bmp280_spi"
+  },
+  "requiresByBus": {
+    "i2c": [
+      "i2c"
+    ],
+    "spi": [
+      "spi"
+    ]
+  },
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/bmp280/",
+  "fields": [
+    {
+      "key": "bus",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "i2c",
+      "options": [
+        "i2c",
+        "spi"
+      ]
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [
+        {
+          "key": "oversampling",
+          "type": "select",
+          "required": false,
+          "lvl": "normal",
+          "default": "16x",
+          "options": [
+            "NONE",
+            "1x",
+            "2x",
+            "4x",
+            "8x",
+            "16x"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "pressure",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [
+        {
+          "key": "oversampling",
+          "type": "select",
+          "required": false,
+          "lvl": "normal",
+          "default": "16x",
+          "options": [
+            "NONE",
+            "1x",
+            "2x",
+            "4x",
+            "8x",
+            "16x"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "humidity",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [
+        {
+          "key": "oversampling",
+          "type": "select",
+          "required": false,
+          "lvl": "normal",
+          "default": "16x",
+          "options": [
+            "NONE",
+            "1x",
+            "2x",
+            "4x",
+            "8x",
+            "16x"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "iir_filter",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "OFF",
+      "options": [
+        "OFF",
+        "2x",
+        "4x",
+        "16x"
+      ]
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x77"
+    }
+  ]
+}

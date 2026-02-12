@@ -1,0 +1,65 @@
+{
+  "id": "display.ssd1331_spi",
+  "domain": "display",
+  "platform": "ssd1331_spi",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/display/ssd1331/",
+  "display_builder": true,
+  "displayType": "color",
+  "model_meta": {
+    "SSD1331 96x64": {
+      "w": 96,
+      "h": 64
+    }
+  },
+  "fields": [
+    {
+      "key": "dc_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "reset_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "5s"
+    },
+    {
+      "key": "lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

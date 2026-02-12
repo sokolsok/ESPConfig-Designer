@@ -1,0 +1,20 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /esp-builder/
+
+  # Blokada dostepu do katalogu data
+  RewriteRule ^data/ - [F,L]
+
+  # Nie rewrite'uj API (ma zwracac 404 gdy brak pliku)
+  RewriteRule ^api/ - [L]
+
+  # SPA fallback (bezpieczne dla Vue bez routingu)
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+AddType text/yaml .yaml .yml

@@ -1,0 +1,59 @@
+{
+  "id": "other.status_led",
+  "domain": "status_led",
+  "platform": "core",
+  "requires": [],
+  "fields": [
+    {
+      "key": "enabled",
+      "label": "Enable Status LED",
+      "type": "boolean",
+      "required": false,
+      "lvl": "simple",
+      "default": false,
+      "emitYAML": "never",
+      "helpUrl": "https://esphome.io/components/status_led/"
+    },
+    {
+      "key": "pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "inverted",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "status_led_id",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    }
+  ]
+}

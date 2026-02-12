@@ -1,0 +1,134 @@
+{
+  "id": "platform.esp8266",
+  "domain": "platform",
+  "platform": "esp8266",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/esp8266/",
+  "fields": [
+    {
+      "key": "board",
+      "type": "select",
+      "required": true,
+      "lvl": "normal",
+      "default": "esp01_1m",
+      "options": [
+        "agruminolemon",
+        "d1",
+        "d1_mini",
+        "d1_mini_lite",
+        "d1_mini_pro",
+        "d1_wroom_02",
+        "eduinowifi",
+        "esp01",
+        "esp01_1m",
+        "esp07",
+        "esp07s",
+        "esp12e",
+        "esp210",
+        "esp8285",
+        "esp_wroom_02",
+        "espduino",
+        "espectro",
+        "espino",
+        "espinotee",
+        "espmxdevkit",
+        "espresso_lite_v1",
+        "espresso_lite_v2",
+        "gen4iod",
+        "heltec_wifi_kit_8",
+        "huzzah",
+        "inventone",
+        "modwifi",
+        "nodemcu",
+        "nodemcuv2",
+        "oak",
+        "phoenix_v1",
+        "phoenix_v2",
+        "sonoff_basic",
+        "sonoff_s20",
+        "sonoff_sv",
+        "sonoff_th",
+        "sparkfunBlynk",
+        "thing",
+        "thingdev",
+        "wifi_slot",
+        "wifiduino",
+        "wifinfo",
+        "wio_link",
+        "wio_node",
+        "xinabox_cw01"
+      ]
+    },
+    {
+      "key": "restore_from_flash",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "board_flash_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "dout",
+      "options": [
+        "qio",
+        "qout",
+        "dio",
+        "dout"
+      ]
+    },
+    {
+      "key": "early_pin_init",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "enable_serial",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "enable_serial1",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "framework",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "version",
+          "type": "select",
+          "required": false,
+          "lvl": "advanced",
+          "default": "recommended",
+          "options": [
+            "dev",
+            "latest",
+            "recommended"
+          ]
+        },
+        {
+          "key": "source",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "platformio/framework-arduinoespressif8266"
+        },
+        {
+          "key": "platform_version",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "4.2.0"
+        }
+      ]
+    }
+  ]
+}

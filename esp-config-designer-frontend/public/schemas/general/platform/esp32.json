@@ -1,0 +1,410 @@
+{
+  "id": "platform.esp32",
+  "domain": "platform",
+  "platform": "esp32",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/esp32/",
+  "fields": [
+    {
+      "key": "variant",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "emitYAML": "always",
+      "default": "esp32",
+      "options": [
+        "esp32",
+        "esp32s2",
+        "esp32s3",
+        "esp32c2",
+        "esp32c3",
+        "esp32c5",
+        "esp32c6",
+        "esp32c61",
+        "esp32h2",
+        "esp32p4"
+      ]
+    },
+    {
+      "key": "framework",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "emitYAML": "always",
+      "default": "esp-idf",
+      "options": [
+        "esp-idf",
+        "arduino"
+      ],
+      "optionsBy": "variant",
+      "optionsMap": {
+        "esp32": [
+          "esp-idf",
+          "arduino"
+        ],
+        "esp32c3": [
+          "esp-idf",
+          "arduino"
+        ],
+        "esp32s2": [
+          "esp-idf",
+          "arduino"
+        ],
+        "esp32s3": [
+          "esp-idf",
+          "arduino"
+        ],
+        "esp32c2": [
+          "esp-idf"
+        ],
+        "esp32c5": [
+          "esp-idf"
+        ],
+        "esp32c6": [
+          "esp-idf"
+        ],
+        "esp32c61": [
+          "esp-idf"
+        ],
+        "esp32h2": [
+          "esp-idf"
+        ],
+        "esp32p4": [
+          "esp-idf"
+        ]
+      }
+    },
+    {
+      "key": "board",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "esp32dev",
+      "warning": "This setting is not recommended. Use variant instead."
+    },
+    {
+      "key": "flash_size",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "4MB",
+      "options": [
+        "2MB",
+        "4MB",
+        "8MB",
+        "16MB",
+        "32MB"
+      ]
+    },
+    {
+      "key": "cpu_frequency",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "160MHz",
+      "options": [
+        "40MHz",
+        "80MHz",
+        "160MHz",
+        "240MHz",
+        "360MHz",
+        "400MHz"
+      ]
+    },
+    {
+      "key": "partitions",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "partitions.csv"
+    },
+    {
+      "key": "framework_config",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "version",
+          "type": "select",
+          "required": false,
+          "lvl": "advanced",
+          "default": "recommended",
+          "options": [
+            "dev",
+            "latest",
+            "recommended"
+          ]
+        },
+        {
+          "key": "source",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "symlink:///path/to/esp-idf"
+        },
+        {
+          "key": "platform_version",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "6.5.0"
+        },
+        {
+          "key": "sdkconfig_options",
+          "type": "list",
+          "required": false,
+          "lvl": "advanced",
+          "item": {
+            "type": "object",
+            "fields": [
+              {
+                "key": "key",
+                "type": "text",
+                "required": true,
+                "lvl": "advanced",
+                "placeholder": "CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ"
+              },
+              {
+                "key": "value",
+                "type": "text",
+                "required": false,
+                "lvl": "advanced",
+                "placeholder": "240"
+              }
+            ]
+          }
+        },
+        {
+          "key": "sdkconfig_defaults",
+          "type": "list",
+          "required": false,
+          "lvl": "advanced",
+          "item": {
+            "type": "text"
+          }
+        }
+      ]
+    },
+    {
+      "key": "components",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "name",
+            "type": "text",
+            "required": true,
+            "lvl": "advanced",
+            "placeholder": "espressif/esp_hosted"
+          },
+          {
+            "key": "source",
+            "type": "text",
+            "required": false,
+            "lvl": "advanced",
+            "placeholder": "https://github.com/user/component.git"
+          },
+          {
+            "key": "ref",
+            "type": "text",
+            "required": false,
+            "lvl": "advanced",
+            "placeholder": "main"
+          },
+          {
+            "key": "path",
+            "type": "text",
+            "required": false,
+            "lvl": "advanced",
+            "placeholder": "components/custom"
+          }
+        ]
+      }
+    },
+    {
+      "key": "advanced",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "assertion_level",
+          "type": "select",
+          "required": false,
+          "lvl": "advanced",
+          "default": "ENABLE",
+          "options": [
+            "ENABLE",
+            "SILENT",
+            "DISABLE"
+          ]
+        },
+        {
+          "key": "compiler_optimization",
+          "type": "select",
+          "required": false,
+          "lvl": "advanced",
+          "default": "SIZE",
+          "options": [
+            "SIZE",
+            "PERF",
+            "NONE",
+            "DEBUG"
+          ]
+        },
+        {
+          "key": "enable_lwip_assert",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false
+        },
+        {
+          "key": "execute_from_psram",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false
+        },
+        {
+          "key": "ignore_efuse_custom_mac",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false
+        },
+        {
+          "key": "ignore_efuse_mac_crc",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false
+        },
+        {
+          "key": "minimum_chip_revision",
+          "type": "select",
+          "required": false,
+          "lvl": "advanced",
+          "default": "3.0",
+          "options": [
+            "0.0",
+            "1.0",
+            "1.1",
+            "2.0",
+            "3.0",
+            "3.1"
+          ]
+        },
+        {
+          "key": "enable_idf_experimental_features",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false
+        },
+        {
+          "key": "loop_task_stack_size",
+          "type": "number",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "8192"
+        },
+        {
+          "key": "enable_ota_rollback",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false
+        },
+        {
+          "key": "enable_lwip_dhcp_server",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false
+        },
+        {
+          "key": "enable_lwip_mdns_queries",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false
+        },
+        {
+          "key": "enable_lwip_bridge_interface",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false
+        },
+        {
+          "key": "enable_lwip_tcpip_core_locking",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false
+        },
+        {
+          "key": "enable_lwip_check_thread_safety",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false
+        },
+        {
+          "key": "disable_libc_locks_in_iram",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false
+        },
+        {
+          "key": "disable_vfs_support_termios",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false
+        },
+        {
+          "key": "disable_vfs_support_select",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false
+        },
+        {
+          "key": "disable_vfs_support_dir",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false
+        },
+        {
+          "key": "freertos_in_iram",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false
+        },
+        {
+          "key": "ringbuf_in_iram",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false
+        },
+        {
+          "key": "heap_in_iram",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,195 @@
+{
+  "id": "network.wifi",
+  "domain": "network",
+  "platform": "wifi",
+  "requires": [],
+  "fields": [
+    {
+      "key": "ssid",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "default": "!secret wifi_ssid",
+      "placeholder": "!secret wifi_ssid"
+    },
+    {
+      "key": "password",
+      "type": "password",
+      "required": true,
+      "lvl": "simple",
+      "default": "!secret wifi_password",
+      "settings": {
+        "format": "any",
+        "generator": {
+          "mode": "none"
+        }
+      },
+      "placeholder": "!secret wifi_password"
+    },
+    {
+      "key": "ap",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "emitYAML": "dependsOn",
+      "fields": [
+        {
+          "key": "enabled",
+          "label": "Access Point Enable",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal",
+          "default": true,
+          "emitYAML": "never"
+        },
+        {
+          "key": "ssid",
+          "type": "ssid",
+          "settings": {
+            "autoPath": "esphomeCore.friendly_name",
+            "fallbackText": "Fallback Hotspot",
+            "maxLength": 32
+          },
+          "required": true,
+          "lvl": "normal",
+          "emitYAML": "dependsOn",
+          "placeholder": "Fallback Hotspot",
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        },
+        {
+          "key": "password",
+          "type": "password",
+          "required": false,
+          "lvl": "normal",
+          "emitYAML": "dependsOn",
+          "settings": {
+            "format": "any",
+            "generator": {
+              "mode": "password",
+              "onEmpty": true,
+              "length": 12
+            }
+          },
+          "placeholder": "wNlddgVp5wrQ",
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        },
+        {
+          "key": "channel",
+          "type": "number",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "1",
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        },
+        {
+          "key": "ap_timeout",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "1min",
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        },
+        {
+          "key": "captive_portal",
+          "label": "Captive Portal",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal",
+          "default": true,
+          "emitYAML": "never",
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "fast_connect",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "power_save_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "NONE",
+      "options": [
+        "NONE",
+        "LIGHT",
+        "HIGH"
+      ]
+    },
+    {
+      "key": "reboot_timeout",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "15min"
+    },
+    {
+      "key": "domain",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": ".local"
+    },
+    {
+      "key": "manual_ip",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "static_ip",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "192.168.1.50"
+        },
+        {
+          "key": "gateway",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "192.168.1.1"
+        },
+        {
+          "key": "subnet",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "255.255.255.0"
+        },
+        {
+          "key": "dns1",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "1.1.1.1"
+        },
+        {
+          "key": "dns2",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "8.8.8.8"
+        }
+      ]
+    }
+  ]
+}

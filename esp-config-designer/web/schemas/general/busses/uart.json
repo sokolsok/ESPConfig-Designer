@@ -1,0 +1,154 @@
+{
+  "id": "busses.uart",
+  "domain": "uart",
+  "platform": "core",
+  "requires": [],
+  "fields": [
+    {
+      "key": "enabled",
+      "label": "Enable UART",
+      "type": "boolean",
+      "required": false,
+      "lvl": "simple",
+      "default": false,
+      "emitYAML": "never",
+      "helpUrl": "https://esphome.io/components/uart/"
+    },
+    {
+      "key": "baud_rate",
+      "type": "number",
+      "required": true,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "9600"
+    },
+    {
+      "key": "tx_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "rx_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "flow_control_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "port",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "/dev/ttyUSB0"
+    },
+    {
+      "key": "rx_buffer_size",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "256"
+    },
+    {
+      "key": "rx_full_threshold",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "114"
+    },
+    {
+      "key": "rx_timeout",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "2"
+    },
+    {
+      "key": "data_bits",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "8"
+    },
+    {
+      "key": "parity",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "options": [
+        "NONE",
+        "EVEN",
+        "ODD"
+      ],
+      "default": "NONE"
+    },
+    {
+      "key": "stop_bits",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "1"
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    }
+  ]
+}

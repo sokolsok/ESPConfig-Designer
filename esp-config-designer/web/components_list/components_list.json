@@ -1,0 +1,3704 @@
+{
+  "generatedAt": "2026-01-20T10:10:15.065Z",
+  "sources": {
+    "docsIndex": "https://raw.githubusercontent.com/esphome/esphome-docs/current/content/components/_index.md",
+    "esphomeRepo": null
+  },
+  "notes": [
+    "Items are grouped exactly as in ESPHome docs.",
+    "Components can appear in multiple categories in docs; flat list de-duplicates by id."
+  ],
+  "categories": [
+    {
+      "title": "Sensor Components",
+      "slug": "sensor-components",
+      "items": [],
+      "subcategories": [
+        {
+          "title": "Core",
+          "slug": "core",
+          "items": [
+            {
+              "name": "Template Sensor",
+              "path": "components/sensor/template",
+              "id": "sensor/template"
+            },
+            {
+              "name": "Home Assistant",
+              "path": "components/sensor/homeassistant",
+              "id": "sensor/homeassistant"
+            },
+            {
+              "name": "MQTT Subscribe",
+              "path": "components/sensor/mqtt_subscribe",
+              "id": "sensor/mqtt_subscribe"
+            },
+            {
+              "name": "Uptime Sensor",
+              "path": "components/sensor/uptime",
+              "id": "sensor/uptime"
+            },
+            {
+              "name": "WiFi Signal Strength",
+              "path": "components/sensor/wifi_signal",
+              "id": "sensor/wifi_signal"
+            }
+          ]
+        },
+        {
+          "title": "Air Quality",
+          "slug": "air-quality",
+          "items": [
+            {
+              "name": "AGS10",
+              "path": "components/sensor/ags10",
+              "id": "sensor/ags10"
+            },
+            {
+              "name": "AirThings BLE",
+              "path": "components/sensor/airthings_ble",
+              "id": "sensor/airthings_ble"
+            },
+            {
+              "name": "CCS811",
+              "path": "components/sensor/ccs811",
+              "id": "sensor/ccs811"
+            },
+            {
+              "name": "CM1106",
+              "path": "components/sensor/cm1106",
+              "id": "sensor/cm1106"
+            },
+            {
+              "name": "EE895",
+              "path": "components/sensor/ee895",
+              "id": "sensor/ee895"
+            },
+            {
+              "name": "ENS160",
+              "path": "components/sensor/ens160",
+              "id": "sensor/ens160"
+            },
+            {
+              "name": "GCJA5",
+              "path": "components/sensor/gcja5",
+              "id": "sensor/gcja5"
+            },
+            {
+              "name": "GP2Y1010AU0F",
+              "path": "components/sensor/gp2y1010au0f",
+              "id": "sensor/gp2y1010au0f"
+            },
+            {
+              "name": "Grove Multichannel Gas V2",
+              "path": "components/sensor/grove_gas_mc_v2",
+              "id": "sensor/grove_gas_mc_v2"
+            },
+            {
+              "name": "HC8",
+              "path": "components/sensor/hc8",
+              "id": "sensor/hc8"
+            },
+            {
+              "name": "HM3301",
+              "path": "components/sensor/hm3301",
+              "id": "sensor/hm3301"
+            },
+            {
+              "name": "iAQ-Core",
+              "path": "components/sensor/iaqcore",
+              "id": "sensor/iaqcore"
+            },
+            {
+              "name": "MH-Z19",
+              "path": "components/sensor/mhz19",
+              "id": "sensor/mhz19"
+            },
+            {
+              "name": "MiCS-4514",
+              "path": "components/sensor/mics_4514",
+              "id": "sensor/mics_4514"
+            },
+            {
+              "name": "PM1006 Sensor",
+              "path": "components/sensor/pm1006",
+              "id": "sensor/pm1006"
+            },
+            {
+              "name": "PM2005 Sensor",
+              "path": "components/sensor/pm2005",
+              "id": "sensor/pm2005"
+            },
+            {
+              "name": "PMSA003I",
+              "path": "components/sensor/pmsa003i",
+              "id": "sensor/pmsa003i"
+            },
+            {
+              "name": "PMSX003",
+              "path": "components/sensor/pmsx003",
+              "id": "sensor/pmsx003"
+            },
+            {
+              "name": "RadonEye BLE",
+              "path": "components/sensor/radon_eye_ble",
+              "id": "sensor/radon_eye_ble"
+            },
+            {
+              "name": "SCD30",
+              "path": "components/sensor/scd30",
+              "id": "sensor/scd30"
+            },
+            {
+              "name": "SCD4X",
+              "path": "components/sensor/scd4x",
+              "id": "sensor/scd4x"
+            },
+            {
+              "name": "SDS011 Sensor",
+              "path": "components/sensor/sds011",
+              "id": "sensor/sds011"
+            },
+            {
+              "name": "SEN0321",
+              "path": "components/sensor/sen0321",
+              "id": "sensor/sen0321"
+            },
+            {
+              "name": "SEN5x",
+              "path": "components/sensor/sen5x",
+              "id": "sensor/sen5x"
+            },
+            {
+              "name": "SenseAir",
+              "path": "components/sensor/senseair",
+              "id": "sensor/senseair"
+            },
+            {
+              "name": "SFA30",
+              "path": "components/sensor/sfa30",
+              "id": "sensor/sfa30"
+            },
+            {
+              "name": "SGP30",
+              "path": "components/sensor/sgp30",
+              "id": "sensor/sgp30"
+            },
+            {
+              "name": "SGP4x",
+              "path": "components/sensor/sgp4x",
+              "id": "sensor/sgp4x"
+            },
+            {
+              "name": "SM300D2",
+              "path": "components/sensor/sm300d2",
+              "id": "sensor/sm300d2"
+            },
+            {
+              "name": "SPS30",
+              "path": "components/sensor/sps30",
+              "id": "sensor/sps30"
+            },
+            {
+              "name": "T6613/15",
+              "path": "components/sensor/t6615",
+              "id": "sensor/t6615"
+            },
+            {
+              "name": "ZyAura",
+              "path": "components/sensor/zyaura",
+              "id": "sensor/zyaura"
+            }
+          ]
+        },
+        {
+          "title": "Analogue",
+          "slug": "analogue",
+          "items": [
+            {
+              "name": "ADC",
+              "path": "components/sensor/adc",
+              "id": "sensor/adc"
+            },
+            {
+              "name": "ADC128S102",
+              "path": "components/sensor/adc128s102",
+              "id": "sensor/adc128s102"
+            },
+            {
+              "name": "ADS1115",
+              "path": "components/sensor/ads1115",
+              "id": "sensor/ads1115"
+            },
+            {
+              "name": "ADS1118",
+              "path": "components/sensor/ads1118",
+              "id": "sensor/ads1118"
+            },
+            {
+              "name": "CD74HC4067",
+              "path": "components/sensor/cd74hc4067",
+              "id": "sensor/cd74hc4067"
+            },
+            {
+              "name": "MCP3008",
+              "path": "components/sensor/mcp3008",
+              "id": "sensor/mcp3008"
+            },
+            {
+              "name": "MCP3204 / MCP3208",
+              "path": "components/sensor/mcp3204",
+              "id": "sensor/mcp3204"
+            },
+            {
+              "name": "MCP3221",
+              "path": "components/sensor/mcp3221",
+              "id": "sensor/mcp3221"
+            },
+            {
+              "name": "NAU7802",
+              "path": "components/sensor/nau7802",
+              "id": "sensor/nau7802"
+            },
+            {
+              "name": "Resistance",
+              "path": "components/sensor/resistance",
+              "id": "sensor/resistance"
+            }
+          ]
+        },
+        {
+          "title": "Bluetooth Low Energy (BLE)",
+          "slug": "bluetooth-low-energy-ble",
+          "items": [
+            {
+              "name": "Alpha3",
+              "path": "components/sensor/alpha3",
+              "id": "sensor/alpha3"
+            },
+            {
+              "name": "AM43",
+              "path": "components/sensor/am43",
+              "id": "sensor/am43"
+            },
+            {
+              "name": "BLE Client Sensor",
+              "path": "components/sensor/ble_client",
+              "id": "sensor/ble_client"
+            },
+            {
+              "name": "BLE RSSI",
+              "path": "components/sensor/ble_rssi",
+              "id": "sensor/ble_rssi"
+            },
+            {
+              "name": "HHCCJCY10 (MiFlora Pink)",
+              "path": "components/sensor/xiaomi_hhccjcy10",
+              "id": "sensor/xiaomi_hhccjcy10"
+            },
+            {
+              "name": "Inkbird IBS-TH1 Mini",
+              "path": "components/sensor/inkbird_ibsth1_mini",
+              "id": "sensor/inkbird_ibsth1_mini"
+            },
+            {
+              "name": "Mopeka Pro Check LP",
+              "path": "components/sensor/mopeka_pro_check",
+              "id": "sensor/mopeka_pro_check"
+            },
+            {
+              "name": "Mopeka Standard Check LP",
+              "path": "components/sensor/mopeka_std_check",
+              "id": "sensor/mopeka_std_check"
+            },
+            {
+              "name": "RuuviTag",
+              "path": "components/sensor/ruuvitag",
+              "id": "sensor/ruuvitag"
+            },
+            {
+              "name": "ThermoPro BLE",
+              "path": "components/sensor/thermopro_ble",
+              "id": "sensor/thermopro_ble"
+            },
+            {
+              "name": "Xiaomi BLE",
+              "path": "components/sensor/xiaomi_ble",
+              "id": "sensor/xiaomi_ble"
+            }
+          ]
+        },
+        {
+          "title": "Digital Signals",
+          "slug": "digital-signals",
+          "items": [
+            {
+              "name": "Duty Cycle",
+              "path": "components/sensor/duty_cycle",
+              "id": "sensor/duty_cycle"
+            },
+            {
+              "name": "Pulse Counter",
+              "path": "components/sensor/pulse_counter",
+              "id": "sensor/pulse_counter"
+            },
+            {
+              "name": "Pulse Meter",
+              "path": "components/sensor/pulse_meter",
+              "id": "sensor/pulse_meter"
+            },
+            {
+              "name": "Pulse Width",
+              "path": "components/sensor/pulse_width",
+              "id": "sensor/pulse_width"
+            }
+          ]
+        },
+        {
+          "title": "Distance",
+          "slug": "distance",
+          "items": [
+            {
+              "name": "A01NYUB",
+              "path": "components/sensor/a01nyub",
+              "id": "sensor/a01nyub"
+            },
+            {
+              "name": "A02YYUW",
+              "path": "components/sensor/a02yyuw",
+              "id": "sensor/a02yyuw"
+            },
+            {
+              "name": "GL-R01 Time of Flight Sensor",
+              "path": "components/sensor/gl_r01",
+              "id": "sensor/gl_r01"
+            },
+            {
+              "name": "HRXL MaxSonar WR",
+              "path": "components/sensor/hrxl_maxsonar_wr",
+              "id": "sensor/hrxl_maxsonar_wr"
+            },
+            {
+              "name": "JSN-SR04T",
+              "path": "components/sensor/jsn_sr04t",
+              "id": "sensor/jsn_sr04t"
+            },
+            {
+              "name": "TOF10120",
+              "path": "components/sensor/tof10120",
+              "id": "sensor/tof10120"
+            },
+            {
+              "name": "Ultrasonic Sensor",
+              "path": "components/sensor/ultrasonic",
+              "id": "sensor/ultrasonic"
+            },
+            {
+              "name": "VL53L0x",
+              "path": "components/sensor/vl53l0x",
+              "id": "sensor/vl53l0x"
+            },
+            {
+              "name": "Zio Ultrasonic Sensor",
+              "path": "components/sensor/zio_ultrasonic",
+              "id": "sensor/zio_ultrasonic"
+            }
+          ]
+        },
+        {
+          "title": "Electricity",
+          "slug": "electricity",
+          "items": [
+            {
+              "name": "ADE7880",
+              "path": "components/sensor/ade7880",
+              "id": "sensor/ade7880"
+            },
+            {
+              "name": "ADE7953",
+              "path": "components/sensor/ade7953",
+              "id": "sensor/ade7953"
+            },
+            {
+              "name": "ATM90E26",
+              "path": "components/sensor/atm90e26",
+              "id": "sensor/atm90e26"
+            },
+            {
+              "name": "ATM90E32",
+              "path": "components/sensor/atm90e32",
+              "id": "sensor/atm90e32"
+            },
+            {
+              "name": "BL0906",
+              "path": "components/sensor/bl0906",
+              "id": "sensor/bl0906"
+            },
+            {
+              "name": "BL0939",
+              "path": "components/sensor/bl0939",
+              "id": "sensor/bl0939"
+            },
+            {
+              "name": "BL0940",
+              "path": "components/sensor/bl0940",
+              "id": "sensor/bl0940"
+            },
+            {
+              "name": "BL0942",
+              "path": "components/sensor/bl0942",
+              "id": "sensor/bl0942"
+            },
+            {
+              "name": "CS5460A",
+              "path": "components/sensor/cs5460a",
+              "id": "sensor/cs5460a"
+            },
+            {
+              "name": "CSE7761",
+              "path": "components/sensor/cse7761",
+              "id": "sensor/cse7761"
+            },
+            {
+              "name": "CSE7766",
+              "path": "components/sensor/cse7766",
+              "id": "sensor/cse7766"
+            },
+            {
+              "name": "CT Clamp",
+              "path": "components/sensor/ct_clamp",
+              "id": "sensor/ct_clamp"
+            },
+            {
+              "name": "Daly BMS",
+              "path": "components/sensor/daly_bms",
+              "id": "sensor/daly_bms"
+            },
+            {
+              "name": "DSMR",
+              "path": "components/sensor/dsmr",
+              "id": "sensor/dsmr"
+            },
+            {
+              "name": "HLW8012",
+              "path": "components/sensor/hlw8012",
+              "id": "sensor/hlw8012"
+            },
+            {
+              "name": "HLW8032",
+              "path": "components/sensor/hlw8032",
+              "id": "sensor/hlw8032"
+            },
+            {
+              "name": "INA219",
+              "path": "components/sensor/ina219",
+              "id": "sensor/ina219"
+            },
+            {
+              "name": "INA226",
+              "path": "components/sensor/ina226",
+              "id": "sensor/ina226"
+            },
+            {
+              "name": "INA228",
+              "path": "components/sensor/ina2xx",
+              "id": "sensor/ina2xx"
+            },
+            {
+              "name": "INA229",
+              "path": "components/sensor/ina2xx",
+              "id": "sensor/ina2xx"
+            },
+            {
+              "name": "INA237",
+              "path": "components/sensor/ina2xx",
+              "id": "sensor/ina2xx"
+            },
+            {
+              "name": "INA238",
+              "path": "components/sensor/ina2xx",
+              "id": "sensor/ina2xx"
+            },
+            {
+              "name": "INA239",
+              "path": "components/sensor/ina2xx",
+              "id": "sensor/ina2xx"
+            },
+            {
+              "name": "INA260",
+              "path": "components/sensor/ina260",
+              "id": "sensor/ina260"
+            },
+            {
+              "name": "INA3221",
+              "path": "components/sensor/ina3221",
+              "id": "sensor/ina3221"
+            },
+            {
+              "name": "Kamstrup KMP",
+              "path": "components/sensor/kamstrup_kmp",
+              "id": "sensor/kamstrup_kmp"
+            },
+            {
+              "name": "MAX9611",
+              "path": "components/sensor/max9611",
+              "id": "sensor/max9611"
+            },
+            {
+              "name": "PZEM AC",
+              "path": "components/sensor/pzemac",
+              "id": "sensor/pzemac"
+            },
+            {
+              "name": "PZEM DC",
+              "path": "components/sensor/pzemdc",
+              "id": "sensor/pzemdc"
+            },
+            {
+              "name": "PZEM004T",
+              "path": "components/sensor/pzem004t",
+              "id": "sensor/pzem004t"
+            },
+            {
+              "name": "SDM Meter",
+              "path": "components/sensor/sdm_meter",
+              "id": "sensor/sdm_meter"
+            },
+            {
+              "name": "Selec Meter",
+              "path": "components/sensor/selec_meter",
+              "id": "sensor/selec_meter"
+            },
+            {
+              "name": "Teleinfo",
+              "path": "components/sensor/teleinfo",
+              "id": "sensor/teleinfo"
+            },
+            {
+              "name": "Total Daily Energy",
+              "path": "components/sensor/total_daily_energy",
+              "id": "sensor/total_daily_energy"
+            }
+          ]
+        },
+        {
+          "title": "Environmental",
+          "slug": "environmental",
+          "items": [
+            {
+              "name": "Absolute Humidity",
+              "path": "components/sensor/absolute_humidity",
+              "id": "sensor/absolute_humidity"
+            },
+            {
+              "name": "AHT10 / AHT20 / AHT21 / DHT20",
+              "path": "components/sensor/aht10",
+              "id": "sensor/aht10"
+            },
+            {
+              "name": "AirThings BLE",
+              "path": "components/sensor/airthings_ble",
+              "id": "sensor/airthings_ble"
+            },
+            {
+              "name": "AM2315C",
+              "path": "components/sensor/am2315c",
+              "id": "sensor/am2315c"
+            },
+            {
+              "name": "AM2320",
+              "path": "components/sensor/am2320",
+              "id": "sensor/am2320"
+            },
+            {
+              "name": "b-parasite",
+              "path": "components/sensor/b_parasite",
+              "id": "sensor/b_parasite"
+            },
+            {
+              "name": "BH1900NUX",
+              "path": "components/sensor/bh1900nux",
+              "id": "sensor/bh1900nux"
+            },
+            {
+              "name": "BME280",
+              "path": "components/sensor/bme280",
+              "id": "sensor/bme280"
+            },
+            {
+              "name": "BME68x via BSEC2",
+              "path": "components/sensor/bme68x_bsec2",
+              "id": "sensor/bme68x_bsec2"
+            },
+            {
+              "name": "BME680 via BSEC",
+              "path": "components/sensor/bme680_bsec",
+              "id": "sensor/bme680_bsec"
+            },
+            {
+              "name": "BME680",
+              "path": "components/sensor/bme680",
+              "id": "sensor/bme680"
+            },
+            {
+              "name": "BMP085",
+              "path": "components/sensor/bmp085",
+              "id": "sensor/bmp085"
+            },
+            {
+              "name": "BMP280",
+              "path": "components/sensor/bmp280",
+              "id": "sensor/bmp280"
+            },
+            {
+              "name": "BMP388 and BMP390",
+              "path": "components/sensor/bmp3xx",
+              "id": "sensor/bmp3xx"
+            },
+            {
+              "name": "BMP581",
+              "path": "components/sensor/bmp581",
+              "id": "sensor/bmp581"
+            },
+            {
+              "name": "Dallas DS18B20",
+              "path": "components/sensor/dallas_temp",
+              "id": "sensor/dallas_temp"
+            },
+            {
+              "name": "DHT",
+              "path": "components/sensor/dht",
+              "id": "sensor/dht"
+            },
+            {
+              "name": "DHT12",
+              "path": "components/sensor/dht12",
+              "id": "sensor/dht12"
+            },
+            {
+              "name": "DPS310",
+              "path": "components/sensor/dps310",
+              "id": "sensor/dps310"
+            },
+            {
+              "name": "EMC2101",
+              "path": "components/emc2101",
+              "id": "emc2101"
+            },
+            {
+              "name": "ENS160",
+              "path": "components/sensor/ens160",
+              "id": "sensor/ens160"
+            },
+            {
+              "name": "ENS210",
+              "path": "components/sensor/ens210",
+              "id": "sensor/ens210"
+            },
+            {
+              "name": "HC8",
+              "path": "components/sensor/hc8",
+              "id": "sensor/hc8"
+            },
+            {
+              "name": "HDC1080",
+              "path": "components/sensor/hdc1080",
+              "id": "sensor/hdc1080"
+            },
+            {
+              "name": "HDC2010",
+              "path": "components/sensor/hdc2010",
+              "id": "sensor/hdc2010"
+            },
+            {
+              "name": "HHCCJCY10 (MiFlora Pink)",
+              "path": "components/sensor/xiaomi_hhccjcy10",
+              "id": "sensor/xiaomi_hhccjcy10"
+            },
+            {
+              "name": "Honeywell ABP",
+              "path": "components/sensor/honeywellabp",
+              "id": "sensor/honeywellabp"
+            },
+            {
+              "name": "Honeywell ABP2 I2C",
+              "path": "components/sensor/honeywellabp2_i2c",
+              "id": "sensor/honeywellabp2_i2c"
+            },
+            {
+              "name": "Honeywell HIH I2C",
+              "path": "components/sensor/honeywell_hih_i2c",
+              "id": "sensor/honeywell_hih_i2c"
+            },
+            {
+              "name": "HTE501",
+              "path": "components/sensor/hte501",
+              "id": "sensor/hte501"
+            },
+            {
+              "name": "HTU21D / Si7021 / SHT21",
+              "path": "components/sensor/htu21d",
+              "id": "sensor/htu21d"
+            },
+            {
+              "name": "HTU31D",
+              "path": "components/sensor/htu31d",
+              "id": "sensor/htu31d"
+            },
+            {
+              "name": "Hydreon Rain Sensor",
+              "path": "components/sensor/hydreon_rgxx",
+              "id": "sensor/hydreon_rgxx"
+            },
+            {
+              "name": "HYT271",
+              "path": "components/sensor/hyt271",
+              "id": "sensor/hyt271"
+            },
+            {
+              "name": "Inkbird IBS-TH1 Mini",
+              "path": "components/sensor/inkbird_ibsth1_mini",
+              "id": "sensor/inkbird_ibsth1_mini"
+            },
+            {
+              "name": "Internal Temperature",
+              "path": "components/sensor/internal_temperature",
+              "id": "sensor/internal_temperature"
+            },
+            {
+              "name": "LM75B",
+              "path": "components/sensor/lm75b",
+              "id": "sensor/lm75b"
+            },
+            {
+              "name": "LPS22",
+              "path": "components/sensor/lps22",
+              "id": "sensor/lps22"
+            },
+            {
+              "name": "MCP9808",
+              "path": "components/sensor/mcp9808",
+              "id": "sensor/mcp9808"
+            },
+            {
+              "name": "MH-Z19",
+              "path": "components/sensor/mhz19",
+              "id": "sensor/mhz19"
+            },
+            {
+              "name": "MLX90614",
+              "path": "components/sensor/mlx90614",
+              "id": "sensor/mlx90614"
+            },
+            {
+              "name": "MPL3115A2",
+              "path": "components/sensor/mpl3115a2",
+              "id": "sensor/mpl3115a2"
+            },
+            {
+              "name": "MS5611",
+              "path": "components/sensor/ms5611",
+              "id": "sensor/ms5611"
+            },
+            {
+              "name": "MS8607",
+              "path": "components/sensor/ms8607",
+              "id": "sensor/ms8607"
+            },
+            {
+              "name": "NPI-19",
+              "path": "components/sensor/npi19",
+              "id": "sensor/npi19"
+            },
+            {
+              "name": "NTC Thermistor",
+              "path": "components/sensor/ntc",
+              "id": "sensor/ntc"
+            },
+            {
+              "name": "PMWCS3",
+              "path": "components/sensor/pmwcs3",
+              "id": "sensor/pmwcs3"
+            },
+            {
+              "name": "QMP6988",
+              "path": "components/sensor/qmp6988",
+              "id": "sensor/qmp6988"
+            },
+            {
+              "name": "RadonEye BLE",
+              "path": "components/sensor/radon_eye_ble",
+              "id": "sensor/radon_eye_ble"
+            },
+            {
+              "name": "RuuviTag",
+              "path": "components/sensor/ruuvitag",
+              "id": "sensor/ruuvitag"
+            },
+            {
+              "name": "SCD30",
+              "path": "components/sensor/scd30",
+              "id": "sensor/scd30"
+            },
+            {
+              "name": "SCD4X",
+              "path": "components/sensor/scd4x",
+              "id": "sensor/scd4x"
+            },
+            {
+              "name": "SDP3x / SDP800 Series",
+              "path": "components/sensor/sdp3x",
+              "id": "sensor/sdp3x"
+            },
+            {
+              "name": "SFA30",
+              "path": "components/sensor/sfa30",
+              "id": "sensor/sfa30"
+            },
+            {
+              "name": "SHT3X-D",
+              "path": "components/sensor/sht3xd",
+              "id": "sensor/sht3xd"
+            },
+            {
+              "name": "SHT4X",
+              "path": "components/sensor/sht4x",
+              "id": "sensor/sht4x"
+            },
+            {
+              "name": "SHTCx",
+              "path": "components/sensor/shtcx",
+              "id": "sensor/shtcx"
+            },
+            {
+              "name": "SMT100",
+              "path": "components/sensor/smt100",
+              "id": "sensor/smt100"
+            },
+            {
+              "name": "STS3X",
+              "path": "components/sensor/sts3x",
+              "id": "sensor/sts3x"
+            },
+            {
+              "name": "STTS22H",
+              "path": "components/sensor/stts22h",
+              "id": "sensor/stts22h"
+            },
+            {
+              "name": "TC74",
+              "path": "components/sensor/tc74",
+              "id": "sensor/tc74"
+            },
+            {
+              "name": "TEE501",
+              "path": "components/sensor/tee501",
+              "id": "sensor/tee501"
+            },
+            {
+              "name": "TE-M3200",
+              "path": "components/sensor/tem3200",
+              "id": "sensor/tem3200"
+            },
+            {
+              "name": "TMP102",
+              "path": "components/sensor/tmp102",
+              "id": "sensor/tmp102"
+            },
+            {
+              "name": "TMP1075",
+              "path": "components/sensor/tmp1075",
+              "id": "sensor/tmp1075"
+            },
+            {
+              "name": "TMP117",
+              "path": "components/sensor/tmp117",
+              "id": "sensor/tmp117"
+            },
+            {
+              "name": "WTS01",
+              "path": "components/sensor/wts01",
+              "id": "sensor/wts01"
+            },
+            {
+              "name": "XGZP68xx Series",
+              "path": "components/sensor/xgzp68xx",
+              "id": "sensor/xgzp68xx"
+            }
+          ]
+        },
+        {
+          "title": "Health/Safety",
+          "slug": "health-safety",
+          "items": [
+            {
+              "name": "Seeed Studio MR60BHA2 mmWave",
+              "path": "components/seeed_mr60bha2",
+              "id": "seeed_mr60bha2"
+            },
+            {
+              "name": "Seeed Studio MR60FDA2 mmWave",
+              "path": "components/seeed_mr60fda2",
+              "id": "seeed_mr60fda2"
+            }
+          ]
+        },
+        {
+          "title": "Light",
+          "slug": "light",
+          "items": [
+            {
+              "name": "AM43",
+              "path": "components/sensor/am43",
+              "id": "sensor/am43"
+            },
+            {
+              "name": "APDS9306",
+              "path": "components/sensor/apds9306",
+              "id": "sensor/apds9306"
+            },
+            {
+              "name": "APDS9960",
+              "path": "components/sensor/apds9960",
+              "id": "sensor/apds9960"
+            },
+            {
+              "name": "AS7341",
+              "path": "components/sensor/as7341",
+              "id": "sensor/as7341"
+            },
+            {
+              "name": "BH1750",
+              "path": "components/sensor/bh1750",
+              "id": "sensor/bh1750"
+            },
+            {
+              "name": "LTR301",
+              "path": "components/sensor/ltr501",
+              "id": "sensor/ltr501"
+            },
+            {
+              "name": "LTR303",
+              "path": "components/sensor/ltr_als_ps",
+              "id": "sensor/ltr_als_ps"
+            },
+            {
+              "name": "LTR329",
+              "path": "components/sensor/ltr_als_ps",
+              "id": "sensor/ltr_als_ps"
+            },
+            {
+              "name": "LTR390",
+              "path": "components/sensor/ltr390",
+              "id": "sensor/ltr390"
+            },
+            {
+              "name": "LTR501",
+              "path": "components/sensor/ltr501",
+              "id": "sensor/ltr501"
+            },
+            {
+              "name": "LTR553",
+              "path": "components/sensor/ltr_als_ps",
+              "id": "sensor/ltr_als_ps"
+            },
+            {
+              "name": "LTR556",
+              "path": "components/sensor/ltr_als_ps",
+              "id": "sensor/ltr_als_ps"
+            },
+            {
+              "name": "LTR558",
+              "path": "components/sensor/ltr501",
+              "id": "sensor/ltr501"
+            },
+            {
+              "name": "LTR559",
+              "path": "components/sensor/ltr_als_ps",
+              "id": "sensor/ltr_als_ps"
+            },
+            {
+              "name": "LTR659",
+              "path": "components/sensor/ltr_als_ps",
+              "id": "sensor/ltr_als_ps"
+            },
+            {
+              "name": "MAX44009",
+              "path": "components/sensor/max44009",
+              "id": "sensor/max44009"
+            },
+            {
+              "name": "OPT3001",
+              "path": "components/sensor/opt3001",
+              "id": "sensor/opt3001"
+            },
+            {
+              "name": "TCS34725",
+              "path": "components/sensor/tcs34725",
+              "id": "sensor/tcs34725"
+            },
+            {
+              "name": "TSL2561",
+              "path": "components/sensor/tsl2561",
+              "id": "sensor/tsl2561"
+            },
+            {
+              "name": "TSL2591",
+              "path": "components/sensor/tsl2591",
+              "id": "sensor/tsl2591"
+            },
+            {
+              "name": "VEML3235",
+              "path": "components/sensor/veml3235",
+              "id": "sensor/veml3235"
+            },
+            {
+              "name": "VEML6030",
+              "path": "components/sensor/veml7700",
+              "id": "sensor/veml7700"
+            },
+            {
+              "name": "VEML7700",
+              "path": "components/sensor/veml7700",
+              "id": "sensor/veml7700"
+            }
+          ]
+        },
+        {
+          "title": "Magnetic",
+          "slug": "magnetic",
+          "items": [
+            {
+              "name": "AS5600",
+              "path": "components/sensor/as5600",
+              "id": "sensor/as5600"
+            },
+            {
+              "name": "HMC5883L",
+              "path": "components/sensor/hmc5883l",
+              "id": "sensor/hmc5883l"
+            },
+            {
+              "name": "MLX90393",
+              "path": "components/sensor/mlx90393",
+              "id": "sensor/mlx90393"
+            },
+            {
+              "name": "MMC5603",
+              "path": "components/sensor/mmc5603",
+              "id": "sensor/mmc5603"
+            },
+            {
+              "name": "MMC5983",
+              "path": "components/sensor/mmc5983",
+              "id": "sensor/mmc5983"
+            },
+            {
+              "name": "QMC5883L",
+              "path": "components/sensor/qmc5883l",
+              "id": "sensor/qmc5883l"
+            }
+          ]
+        },
+        {
+          "title": "Miscellaneous",
+          "slug": "miscellaneous",
+          "items": [
+            {
+              "name": "AS3935",
+              "path": "components/sensor/as3935",
+              "id": "sensor/as3935"
+            },
+            {
+              "name": "b-parasite",
+              "path": "components/sensor/b_parasite",
+              "id": "sensor/b_parasite"
+            },
+            {
+              "name": "Binary Sensor Map",
+              "path": "components/sensor/binary_sensor_map",
+              "id": "sensor/binary_sensor_map"
+            },
+            {
+              "name": "Combination",
+              "path": "components/sensor/combination",
+              "id": "sensor/combination"
+            },
+            {
+              "name": "Duty Time",
+              "path": "components/sensor/duty_time",
+              "id": "sensor/duty_time"
+            },
+            {
+              "name": "EZO sensor circuits",
+              "path": "components/sensor/ezo",
+              "id": "sensor/ezo"
+            },
+            {
+              "name": "FS3000",
+              "path": "components/sensor/fs3000",
+              "id": "sensor/fs3000"
+            },
+            {
+              "name": "GDK101",
+              "path": "components/sensor/gdk101",
+              "id": "sensor/gdk101"
+            },
+            {
+              "name": "Growatt Solar",
+              "path": "components/sensor/growatt_solar",
+              "id": "sensor/growatt_solar"
+            },
+            {
+              "name": "Havells Solar",
+              "path": "components/sensor/havells_solar",
+              "id": "sensor/havells_solar"
+            },
+            {
+              "name": "Integration",
+              "path": "components/sensor/integration",
+              "id": "sensor/integration"
+            },
+            {
+              "name": "Kuntze pool sensor",
+              "path": "components/sensor/kuntze",
+              "id": "sensor/kuntze"
+            },
+            {
+              "name": "LC709203F",
+              "path": "components/sensor/lc709203f",
+              "id": "sensor/lc709203f"
+            },
+            {
+              "name": "LVGL widget",
+              "path": "components/sensor/lvgl",
+              "id": "sensor/lvgl"
+            },
+            {
+              "name": "M5Stack Unit 8 Angle",
+              "path": "components/sensor/m5stack_8angle",
+              "id": "sensor/m5stack_8angle"
+            },
+            {
+              "name": "MAX17043",
+              "path": "components/sensor/max17043",
+              "id": "sensor/max17043"
+            },
+            {
+              "name": "MicroNova pellet stove",
+              "path": "components/micronova",
+              "id": "micronova"
+            },
+            {
+              "name": "Modbus Sensor",
+              "path": "components/sensor/modbus_controller",
+              "id": "sensor/modbus_controller"
+            },
+            {
+              "name": "Nextion",
+              "path": "components/sensor/nextion",
+              "id": "sensor/nextion"
+            },
+            {
+              "name": "Person Sensor (SEN21231)",
+              "path": "components/sensor/sen21231",
+              "id": "sensor/sen21231"
+            },
+            {
+              "name": "Resol VBus",
+              "path": "components/vbus",
+              "id": "vbus"
+            },
+            {
+              "name": "Rotary Encoder",
+              "path": "components/sensor/rotary_encoder",
+              "id": "sensor/rotary_encoder"
+            },
+            {
+              "name": "SMT100",
+              "path": "components/sensor/smt100",
+              "id": "sensor/smt100"
+            },
+            {
+              "name": "Sound Level",
+              "path": "components/sensor/sound_level",
+              "id": "sensor/sound_level"
+            },
+            {
+              "name": "Tuya Sensor",
+              "path": "components/sensor/tuya",
+              "id": "sensor/tuya"
+            },
+            {
+              "name": "TX20",
+              "path": "components/sensor/tx20",
+              "id": "sensor/tx20"
+            },
+            {
+              "name": "uFire EC sensor",
+              "path": "components/sensor/ufire_ec",
+              "id": "sensor/ufire_ec"
+            },
+            {
+              "name": "uFire ISE sensor",
+              "path": "components/sensor/ufire_ise",
+              "id": "sensor/ufire_ise"
+            },
+            {
+              "name": "WireGuard",
+              "path": "components/wireguard",
+              "id": "wireguard"
+            }
+          ]
+        },
+        {
+          "title": "Motion",
+          "slug": "motion",
+          "items": [
+            {
+              "name": "APDS9960",
+              "path": "components/sensor/apds9960",
+              "id": "sensor/apds9960"
+            },
+            {
+              "name": "BMI160",
+              "path": "components/sensor/bmi160",
+              "id": "sensor/bmi160"
+            },
+            {
+              "name": "LD2410",
+              "path": "components/sensor/ld2410",
+              "id": "sensor/ld2410"
+            },
+            {
+              "name": "LD2412",
+              "path": "components/sensor/ld2412",
+              "id": "sensor/ld2412"
+            },
+            {
+              "name": "LD2420",
+              "path": "components/sensor/ld2420",
+              "id": "sensor/ld2420"
+            },
+            {
+              "name": "LD2450",
+              "path": "components/sensor/ld2450",
+              "id": "sensor/ld2450"
+            },
+            {
+              "name": "MPU6050",
+              "path": "components/sensor/mpu6050",
+              "id": "sensor/mpu6050"
+            },
+            {
+              "name": "MPU6886",
+              "path": "components/sensor/mpu6886",
+              "id": "sensor/mpu6886"
+            },
+            {
+              "name": "MSA301",
+              "path": "components/sensor/msa3xx",
+              "id": "sensor/msa3xx"
+            },
+            {
+              "name": "MSA311",
+              "path": "components/sensor/msa3xx",
+              "id": "sensor/msa3xx"
+            },
+            {
+              "name": "RuuviTag",
+              "path": "components/sensor/ruuvitag",
+              "id": "sensor/ruuvitag"
+            },
+            {
+              "name": "Seeed Studio MR24HPC1 mmWave",
+              "path": "components/seeed_mr24hpc1",
+              "id": "seeed_mr24hpc1"
+            }
+          ]
+        },
+        {
+          "title": "Thermocouple",
+          "slug": "thermocouple",
+          "items": [
+            {
+              "name": "KMeterISO",
+              "path": "components/sensor/kmeteriso",
+              "id": "sensor/kmeteriso"
+            },
+            {
+              "name": "MAX31855",
+              "path": "components/sensor/max31855",
+              "id": "sensor/max31855"
+            },
+            {
+              "name": "MAX31856",
+              "path": "components/sensor/max31856",
+              "id": "sensor/max31856"
+            },
+            {
+              "name": "MAX31865",
+              "path": "components/sensor/max31865",
+              "id": "sensor/max31865"
+            },
+            {
+              "name": "MAX6675",
+              "path": "components/sensor/max6675",
+              "id": "sensor/max6675"
+            },
+            {
+              "name": "MCP9600",
+              "path": "components/sensor/mcp9600",
+              "id": "sensor/mcp9600"
+            }
+          ]
+        },
+        {
+          "title": "Weight",
+          "slug": "weight",
+          "items": [
+            {
+              "name": "HX711",
+              "path": "components/sensor/hx711",
+              "id": "sensor/hx711"
+            },
+            {
+              "name": "Xiaomi Miscale",
+              "path": "components/sensor/xiaomi_miscale",
+              "id": "sensor/xiaomi_miscale"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Binary Sensor Components",
+      "slug": "binary-sensor-components",
+      "items": [],
+      "subcategories": [
+        {
+          "title": "Core",
+          "slug": "core",
+          "items": [
+            {
+              "name": "Template Binary Sensor",
+              "path": "components/binary_sensor/template",
+              "id": "binary_sensor/template"
+            },
+            {
+              "name": "GPIO",
+              "path": "components/binary_sensor/gpio",
+              "id": "binary_sensor/gpio"
+            },
+            {
+              "name": "Home Assistant",
+              "path": "components/binary_sensor/homeassistant",
+              "id": "binary_sensor/homeassistant"
+            },
+            {
+              "name": "Status",
+              "path": "components/binary_sensor/status",
+              "id": "binary_sensor/status"
+            },
+            {
+              "name": "Switch",
+              "path": "components/binary_sensor/switch",
+              "id": "binary_sensor/switch"
+            },
+            {
+              "name": "Host SDL2",
+              "path": "components/binary_sensor/sdl",
+              "id": "binary_sensor/sdl"
+            }
+          ]
+        },
+        {
+          "title": "Capacitive Touch",
+          "slug": "capacitive-touch",
+          "items": [
+            {
+              "name": "CAP1188 Capacitive Touch Sensor",
+              "path": "components/binary_sensor/cap1188",
+              "id": "binary_sensor/cap1188"
+            },
+            {
+              "name": "ESP32 Touch Pad",
+              "path": "components/binary_sensor/esp32_touch",
+              "id": "binary_sensor/esp32_touch"
+            },
+            {
+              "name": "MPR121 Capacitive Touch Sensor",
+              "path": "components/binary_sensor/mpr121",
+              "id": "binary_sensor/mpr121"
+            },
+            {
+              "name": "TTP229",
+              "path": "components/binary_sensor/ttp229",
+              "id": "binary_sensor/ttp229"
+            }
+          ]
+        },
+        {
+          "title": "Mechanical",
+          "slug": "mechanical",
+          "items": [
+            {
+              "name": "Matrix Keypad",
+              "path": "components/matrix_keypad",
+              "id": "matrix_keypad"
+            },
+            {
+              "name": "TM1637",
+              "path": "components/display/tm1637",
+              "id": "display/tm1637"
+            },
+            {
+              "name": "TM1638",
+              "path": "components/display/tm1638",
+              "id": "display/tm1638"
+            }
+          ]
+        },
+        {
+          "title": "NFC/RFID",
+          "slug": "nfc-rfid",
+          "items": [
+            {
+              "name": "NFC Tag",
+              "path": "components/binary_sensor/nfc",
+              "id": "binary_sensor/nfc"
+            },
+            {
+              "name": "PN532",
+              "path": "components/binary_sensor/pn532",
+              "id": "binary_sensor/pn532"
+            },
+            {
+              "name": "PN7150",
+              "path": "components/pn7150",
+              "id": "pn7150"
+            },
+            {
+              "name": "PN716X",
+              "path": "components/pn7160",
+              "id": "pn7160"
+            },
+            {
+              "name": "RC522",
+              "path": "components/binary_sensor/rc522",
+              "id": "binary_sensor/rc522"
+            },
+            {
+              "name": "RDM6300",
+              "path": "components/binary_sensor/rdm6300",
+              "id": "binary_sensor/rdm6300"
+            },
+            {
+              "name": "Wiegand Reader",
+              "path": "components/wiegand",
+              "id": "wiegand"
+            }
+          ]
+        },
+        {
+          "title": "Touchscreen",
+          "slug": "touchscreen",
+          "items": [
+            {
+              "name": "FT5X06",
+              "path": "components/touchscreen/ft5x06",
+              "id": "touchscreen/ft5x06"
+            },
+            {
+              "name": "GT911",
+              "path": "components/touchscreen/gt911",
+              "id": "touchscreen/gt911"
+            },
+            {
+              "name": "Nextion Binary Sensor",
+              "path": "components/binary_sensor/nextion",
+              "id": "binary_sensor/nextion"
+            },
+            {
+              "name": "TT21100",
+              "path": "components/touchscreen/tt21100",
+              "id": "touchscreen/tt21100"
+            },
+            {
+              "name": "LVGL widget",
+              "path": "components/binary_sensor/lvgl",
+              "id": "binary_sensor/lvgl"
+            }
+          ]
+        },
+        {
+          "title": "Presence Detection",
+          "slug": "presence-detection",
+          "items": [
+            {
+              "name": "AT581X",
+              "path": "components/at581x",
+              "id": "at581x"
+            },
+            {
+              "name": "DFRobot mmWave Radar",
+              "path": "components/dfrobot_sen0395",
+              "id": "dfrobot_sen0395"
+            },
+            {
+              "name": "LD2410",
+              "path": "components/sensor/ld2410",
+              "id": "sensor/ld2410"
+            },
+            {
+              "name": "LD2412",
+              "path": "components/sensor/ld2412",
+              "id": "sensor/ld2412"
+            },
+            {
+              "name": "LD2420",
+              "path": "components/sensor/ld2420",
+              "id": "sensor/ld2420"
+            },
+            {
+              "name": "LD2450",
+              "path": "components/sensor/ld2450",
+              "id": "sensor/ld2450"
+            },
+            {
+              "name": "Seeed Studio MR24HPC1 mmWave",
+              "path": "components/seeed_mr24hpc1",
+              "id": "seeed_mr24hpc1"
+            }
+          ]
+        },
+        {
+          "title": "Miscellaneous",
+          "slug": "miscellaneous",
+          "items": [
+            {
+              "name": "Analog Threshold",
+              "path": "components/binary_sensor/analog_threshold",
+              "id": "binary_sensor/analog_threshold"
+            },
+            {
+              "name": "ESP32 BLE Presence",
+              "path": "components/binary_sensor/ble_presence",
+              "id": "binary_sensor/ble_presence"
+            },
+            {
+              "name": "Hydreon Rain Sensor Binary Sensor",
+              "path": "components/binary_sensor/hydreon_rgxx",
+              "id": "binary_sensor/hydreon_rgxx"
+            },
+            {
+              "name": "Modbus Binary Sensor",
+              "path": "components/binary_sensor/modbus_controller",
+              "id": "binary_sensor/modbus_controller"
+            },
+            {
+              "name": "PipSolar - compatible PV Inverter",
+              "path": "components/pipsolar",
+              "id": "pipsolar"
+            },
+            {
+              "name": "Pylontech Batteries",
+              "path": "components/pylontech",
+              "id": "pylontech"
+            },
+            {
+              "name": "Qwiic PIR Motion",
+              "path": "components/binary_sensor/qwiic_pir",
+              "id": "binary_sensor/qwiic_pir"
+            },
+            {
+              "name": "Resol VBus",
+              "path": "components/vbus",
+              "id": "vbus"
+            },
+            {
+              "name": "Tuya Binary Sensor",
+              "path": "components/binary_sensor/tuya",
+              "id": "binary_sensor/tuya"
+            },
+            {
+              "name": "WireGuard",
+              "path": "components/wireguard",
+              "id": "wireguard"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Alarm Control Panel Components",
+      "slug": "alarm-control-panel-components",
+      "items": [
+        {
+          "name": "Template Alarm Control Panel",
+          "path": "components/alarm_control_panel/template",
+          "id": "alarm_control_panel/template"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Audio ADC Components",
+      "slug": "audio-adc-components",
+      "items": [
+        {
+          "name": "ES7210",
+          "path": "components/audio_adc/es7210",
+          "id": "audio_adc/es7210"
+        },
+        {
+          "name": "ES7243E",
+          "path": "components/audio_adc/es7243e",
+          "id": "audio_adc/es7243e"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Audio DAC Components",
+      "slug": "audio-dac-components",
+      "items": [
+        {
+          "name": "AIC3204",
+          "path": "components/audio_dac/aic3204",
+          "id": "audio_dac/aic3204"
+        },
+        {
+          "name": "ES8156",
+          "path": "components/audio_dac/es8156",
+          "id": "audio_dac/es8156"
+        },
+        {
+          "name": "ES8311",
+          "path": "components/audio_dac/es8311",
+          "id": "audio_dac/es8311"
+        },
+        {
+          "name": "ES8388",
+          "path": "components/audio_dac/es8388",
+          "id": "audio_dac/es8388"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Button Components",
+      "slug": "button-components",
+      "items": [
+        {
+          "name": "Template Button",
+          "path": "components/button/template",
+          "id": "button/template"
+        },
+        {
+          "name": "Factory Reset Button",
+          "path": "components/button/factory_reset",
+          "id": "button/factory_reset"
+        },
+        {
+          "name": "Generic Output Button",
+          "path": "components/button/output",
+          "id": "button/output"
+        },
+        {
+          "name": "Restart Button",
+          "path": "components/button/restart",
+          "id": "button/restart"
+        },
+        {
+          "name": "Safe Mode Button",
+          "path": "components/button/safe_mode",
+          "id": "button/safe_mode"
+        },
+        {
+          "name": "Shutdown Button",
+          "path": "components/button/shutdown",
+          "id": "button/shutdown"
+        },
+        {
+          "name": "UART Button",
+          "path": "components/button/uart",
+          "id": "button/uart"
+        },
+        {
+          "name": "Wake-on-LAN",
+          "path": "components/button/wake_on_lan",
+          "id": "button/wake_on_lan"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Climate Components",
+      "slug": "climate-components",
+      "items": [
+        {
+          "name": "Anova Cooker",
+          "path": "components/climate/anova",
+          "id": "climate/anova"
+        },
+        {
+          "name": "Bang Bang Controller",
+          "path": "components/climate/bang_bang",
+          "id": "climate/bang_bang"
+        },
+        {
+          "name": "BedJet Climate System",
+          "path": "components/climate/bedjet",
+          "id": "climate/bedjet"
+        },
+        {
+          "name": "Haier Climate",
+          "path": "components/climate/haier",
+          "id": "climate/haier"
+        },
+        {
+          "name": "IR Remote Climate",
+          "path": "components/climate/climate_ir",
+          "id": "climate/climate_ir"
+        },
+        {
+          "name": "Midea",
+          "path": "components/climate/midea",
+          "id": "climate/midea"
+        },
+        {
+          "name": "PID Controller",
+          "path": "components/climate/pid",
+          "id": "climate/pid"
+        },
+        {
+          "name": "Thermostat Controller",
+          "path": "components/climate/thermostat",
+          "id": "climate/thermostat"
+        },
+        {
+          "name": "Tuya Climate",
+          "path": "components/climate/tuya",
+          "id": "climate/tuya"
+        },
+        {
+          "name": "Uponor Smatrix Base Pulse Underfloor Heating",
+          "path": "components/uponor_smatrix",
+          "id": "uponor_smatrix"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Cover Components",
+      "slug": "cover-components",
+      "items": [
+        {
+          "name": "Template Cover",
+          "path": "components/cover/template",
+          "id": "cover/template"
+        },
+        {
+          "name": "AM43 Cover",
+          "path": "components/cover/am43",
+          "id": "cover/am43"
+        },
+        {
+          "name": "Current-Based Cover",
+          "path": "components/cover/current_based",
+          "id": "cover/current_based"
+        },
+        {
+          "name": "Endstop Cover",
+          "path": "components/cover/endstop",
+          "id": "cover/endstop"
+        },
+        {
+          "name": "Feedback Cover",
+          "path": "components/cover/feedback",
+          "id": "cover/feedback"
+        },
+        {
+          "name": "HE60R Cover",
+          "path": "components/cover/he60r",
+          "id": "cover/he60r"
+        },
+        {
+          "name": "Time-Based Cover",
+          "path": "components/cover/time_based",
+          "id": "cover/time_based"
+        },
+        {
+          "name": "Tormatic/Novoferm Cover",
+          "path": "components/cover/tormatic",
+          "id": "cover/tormatic"
+        },
+        {
+          "name": "Tuya Cover",
+          "path": "components/cover/tuya",
+          "id": "cover/tuya"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Datetime Components",
+      "slug": "datetime-components",
+      "items": [
+        {
+          "name": "Template Datetime",
+          "path": "components/datetime/template",
+          "id": "datetime/template"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Display Components",
+      "slug": "display-components",
+      "items": [
+        {
+          "name": "Font Renderer",
+          "path": "components/font",
+          "id": "font"
+        },
+        {
+          "name": "Graph",
+          "path": "components/graph",
+          "id": "graph"
+        },
+        {
+          "name": "QR Code",
+          "path": "components/qr_code",
+          "id": "qr_code"
+        },
+        {
+          "name": "Image",
+          "path": "components/image",
+          "id": "image"
+        },
+        {
+          "name": "Animation",
+          "path": "components/animation",
+          "id": "animation"
+        },
+        {
+          "name": "Online Image",
+          "path": "components/online_image",
+          "id": "online_image"
+        },
+        {
+          "name": "Graphical Display Menu",
+          "path": "components/display_menu/graphical_display_menu",
+          "id": "display_menu/graphical_display_menu"
+        },
+        {
+          "name": "LCD Menu",
+          "path": "components/display_menu/lcd_menu",
+          "id": "display_menu/lcd_menu"
+        },
+        {
+          "name": "LVGL Graphics",
+          "path": "components/lvgl/index",
+          "id": "lvgl"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Display Hardware Platforms",
+      "slug": "display-hardware-platforms",
+      "items": [
+        {
+          "name": "Addressable Light",
+          "path": "components/display/addressable_light",
+          "id": "display/addressable_light"
+        },
+        {
+          "name": "MIPI DSI Displays",
+          "path": "components/display/mipi_dsi",
+          "id": "display/mipi_dsi"
+        },
+        {
+          "name": "MIPI RGB Displays",
+          "path": "components/display/mipi_rgb",
+          "id": "display/mipi_rgb"
+        },
+        {
+          "name": "MIPI SPI Displays",
+          "path": "components/display/mipi_spi",
+          "id": "display/mipi_spi"
+        },
+        {
+          "name": "ePaper SPI Displays",
+          "path": "components/display/epaper_spi",
+          "id": "display/epaper_spi"
+        },
+        {
+          "name": "ILI9xxx",
+          "path": "components/display/ili9xxx",
+          "id": "display/ili9xxx"
+        },
+        {
+          "name": "ILI9341",
+          "path": "components/display/ili9xxx",
+          "id": "display/ili9xxx"
+        },
+        {
+          "name": "ILI9342",
+          "path": "components/display/ili9xxx",
+          "id": "display/ili9xxx"
+        },
+        {
+          "name": "ILI9481",
+          "path": "components/display/ili9xxx",
+          "id": "display/ili9xxx"
+        },
+        {
+          "name": "ILI9486",
+          "path": "components/display/ili9xxx",
+          "id": "display/ili9xxx"
+        },
+        {
+          "name": "ILI9488",
+          "path": "components/display/ili9xxx",
+          "id": "display/ili9xxx"
+        },
+        {
+          "name": "WSPICOLCD",
+          "path": "components/display/ili9xxx",
+          "id": "display/ili9xxx"
+        },
+        {
+          "name": "HUB75 LED Matrix",
+          "path": "components/display/hub75",
+          "id": "display/hub75"
+        },
+        {
+          "name": "Inkplate",
+          "path": "components/display/inkplate",
+          "id": "display/inkplate"
+        },
+        {
+          "name": "LCD Display",
+          "path": "components/display/lcd_display",
+          "id": "display/lcd_display"
+        },
+        {
+          "name": "MAX7219 Dot Matrix",
+          "path": "components/display/max7219digit",
+          "id": "display/max7219digit"
+        },
+        {
+          "name": "MAX7219",
+          "path": "components/display/max7219",
+          "id": "display/max7219"
+        },
+        {
+          "name": "Nextion",
+          "path": "components/display/nextion",
+          "id": "display/nextion"
+        },
+        {
+          "name": "PCD8544 (Nokia 5110/ 3310)",
+          "path": "components/display/pcd8544",
+          "id": "display/pcd8544"
+        },
+        {
+          "name": "PVVX MiThermometer",
+          "path": "components/display/pvvx_mithermometer",
+          "id": "display/pvvx_mithermometer"
+        },
+        {
+          "name": "Quad SPI Displays",
+          "path": "components/display/qspi_dbi",
+          "id": "display/qspi_dbi"
+        },
+        {
+          "name": "RPI_DPI_RGB",
+          "path": "components/display/rpi_dpi_rgb",
+          "id": "display/rpi_dpi_rgb"
+        },
+        {
+          "name": "SSD1306",
+          "path": "components/display/ssd1306",
+          "id": "display/ssd1306"
+        },
+        {
+          "name": "SSD1322",
+          "path": "components/display/ssd1322",
+          "id": "display/ssd1322"
+        },
+        {
+          "name": "SSD1325",
+          "path": "components/display/ssd1325",
+          "id": "display/ssd1325"
+        },
+        {
+          "name": "SSD1327",
+          "path": "components/display/ssd1327",
+          "id": "display/ssd1327"
+        },
+        {
+          "name": "SSD1331",
+          "path": "components/display/ssd1331",
+          "id": "display/ssd1331"
+        },
+        {
+          "name": "SSD1351",
+          "path": "components/display/ssd1351",
+          "id": "display/ssd1351"
+        },
+        {
+          "name": "ST7567",
+          "path": "components/display/st7567",
+          "id": "display/st7567"
+        },
+        {
+          "name": "ST7701S",
+          "path": "components/display/st7701s",
+          "id": "display/st7701s"
+        },
+        {
+          "name": "ST7735",
+          "path": "components/display/st7735",
+          "id": "display/st7735"
+        },
+        {
+          "name": "ST7789V",
+          "path": "components/display/st7789v",
+          "id": "display/st7789v"
+        },
+        {
+          "name": "ST7796",
+          "path": "components/display/ili9xxx",
+          "id": "display/ili9xxx"
+        },
+        {
+          "name": "ST7920",
+          "path": "components/display/st7920",
+          "id": "display/st7920"
+        },
+        {
+          "name": "TM1621",
+          "path": "components/display/tm1621",
+          "id": "display/tm1621"
+        },
+        {
+          "name": "TM1637",
+          "path": "components/display/tm1637",
+          "id": "display/tm1637"
+        },
+        {
+          "name": "TM1638",
+          "path": "components/display/tm1638",
+          "id": "display/tm1638"
+        },
+        {
+          "name": "TM1651 Battery Display",
+          "path": "components/tm1651",
+          "id": "tm1651"
+        },
+        {
+          "name": "Waveshare E-Paper",
+          "path": "components/display/waveshare_epaper",
+          "id": "display/waveshare_epaper"
+        },
+        {
+          "name": "Host SDL2 display",
+          "path": "components/display/sdl",
+          "id": "display/sdl"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Electromechanical",
+      "slug": "electromechanical",
+      "items": [
+        {
+          "name": "Atlas Scientific Peristaltic Pump",
+          "path": "components/ezo_pmp",
+          "id": "ezo_pmp"
+        },
+        {
+          "name": "Grove TB6612FNG",
+          "path": "components/grove_tb6612fng",
+          "id": "grove_tb6612fng"
+        },
+        {
+          "name": "Matrix Keypad",
+          "path": "components/matrix_keypad",
+          "id": "matrix_keypad"
+        },
+        {
+          "name": "RTTTL Buzzer",
+          "path": "components/rtttl",
+          "id": "rtttl"
+        },
+        {
+          "name": "Servo",
+          "path": "components/servo",
+          "id": "servo"
+        },
+        {
+          "name": "Stepper",
+          "path": "components/stepper/index",
+          "id": "stepper"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Energy/Solar Management",
+      "slug": "energy-solar-management",
+      "items": [
+        {
+          "name": "Growatt Solar",
+          "path": "components/sensor/growatt_solar",
+          "id": "sensor/growatt_solar"
+        },
+        {
+          "name": "Havells Solar",
+          "path": "components/sensor/havells_solar",
+          "id": "sensor/havells_solar"
+        },
+        {
+          "name": "PipSolar-compatible PV Inverter",
+          "path": "components/pipsolar",
+          "id": "pipsolar"
+        },
+        {
+          "name": "Power Supply",
+          "path": "components/power_supply",
+          "id": "power_supply"
+        },
+        {
+          "name": "Resol VBus",
+          "path": "components/vbus",
+          "id": "vbus"
+        },
+        {
+          "name": "SML",
+          "path": "components/sml",
+          "id": "sml"
+        },
+        {
+          "name": "SUN-GTIL2 inverter",
+          "path": "components/sun_gtil2",
+          "id": "sun_gtil2"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Event Components",
+      "slug": "event-components",
+      "items": [
+        {
+          "name": "Template Event",
+          "path": "components/event/template",
+          "id": "event/template"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Fan Components",
+      "slug": "fan-components",
+      "items": [
+        {
+          "name": "Template Fan",
+          "path": "components/fan/template",
+          "id": "fan/template"
+        },
+        {
+          "name": "Binary Fan",
+          "path": "components/fan/binary",
+          "id": "fan/binary"
+        },
+        {
+          "name": "H-bridge Fan",
+          "path": "components/fan/hbridge",
+          "id": "fan/hbridge"
+        },
+        {
+          "name": "Speed Fan",
+          "path": "components/fan/speed",
+          "id": "fan/speed"
+        },
+        {
+          "name": "Tuya Fan",
+          "path": "components/fan/tuya",
+          "id": "fan/tuya"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Home Assistant Components",
+      "slug": "home-assistant-components",
+      "items": [
+        {
+          "name": "Binary Sensor",
+          "path": "components/binary_sensor/homeassistant",
+          "id": "binary_sensor/homeassistant"
+        },
+        {
+          "name": "Bluetooth Proxy",
+          "path": "components/bluetooth_proxy",
+          "id": "bluetooth_proxy"
+        },
+        {
+          "name": "micro Wake Word",
+          "path": "components/micro_wake_word",
+          "id": "micro_wake_word"
+        },
+        {
+          "name": "Number",
+          "path": "components/number/homeassistant",
+          "id": "number/homeassistant"
+        },
+        {
+          "name": "Sensor",
+          "path": "components/sensor/homeassistant",
+          "id": "sensor/homeassistant"
+        },
+        {
+          "name": "Switch",
+          "path": "components/switch/homeassistant",
+          "id": "switch/homeassistant"
+        },
+        {
+          "name": "Text Sensor",
+          "path": "components/text_sensor/homeassistant",
+          "id": "text_sensor/homeassistant"
+        },
+        {
+          "name": "Voice Assistant",
+          "path": "components/voice_assistant",
+          "id": "voice_assistant"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Light Components",
+      "slug": "light-components",
+      "items": [
+        {
+          "name": "Beken SPI",
+          "path": "components/light/beken_spi_led_strip",
+          "id": "light/beken_spi_led_strip"
+        },
+        {
+          "name": "Binary Light",
+          "path": "components/light/binary",
+          "id": "light/binary"
+        },
+        {
+          "name": "Cold+Warm White Light",
+          "path": "components/light/cwww",
+          "id": "light/cwww"
+        },
+        {
+          "name": "Color Temperature Light",
+          "path": "components/light/color_temperature",
+          "id": "light/color_temperature"
+        },
+        {
+          "name": "ESP32 RMT",
+          "path": "components/light/esp32_rmt_led_strip",
+          "id": "light/esp32_rmt_led_strip"
+        },
+        {
+          "name": "FastLED Light",
+          "path": "components/light/fastled",
+          "id": "light/fastled"
+        },
+        {
+          "name": "H-bridge Light",
+          "path": "components/light/hbridge",
+          "id": "light/hbridge"
+        },
+        {
+          "name": "Light Partition",
+          "path": "components/light/partition",
+          "id": "light/partition"
+        },
+        {
+          "name": "LightWaveRF",
+          "path": "components/lightwaverf",
+          "id": "lightwaverf"
+        },
+        {
+          "name": "LVGL widget",
+          "path": "components/light/lvgl",
+          "id": "light/lvgl"
+        },
+        {
+          "name": "Monochromatic Light",
+          "path": "components/light/monochromatic",
+          "id": "light/monochromatic"
+        },
+        {
+          "name": "NeoPixelBus Light",
+          "path": "components/light/neopixelbus",
+          "id": "light/neopixelbus"
+        },
+        {
+          "name": "RGB Light",
+          "path": "components/light/rgb",
+          "id": "light/rgb"
+        },
+        {
+          "name": "RGBCT Light",
+          "path": "components/light/rgbct",
+          "id": "light/rgbct"
+        },
+        {
+          "name": "RGBW Light",
+          "path": "components/light/rgbw",
+          "id": "light/rgbw"
+        },
+        {
+          "name": "RGBWW Light",
+          "path": "components/light/rgbww",
+          "id": "light/rgbww"
+        },
+        {
+          "name": "RP2040 PIO",
+          "path": "components/light/rp2040_pio_led_strip",
+          "id": "light/rp2040_pio_led_strip"
+        },
+        {
+          "name": "Shelly Dimmer",
+          "path": "components/light/shelly_dimmer",
+          "id": "light/shelly_dimmer"
+        },
+        {
+          "name": "Sonoff D1 Dimmer",
+          "path": "components/light/sonoff_d1",
+          "id": "light/sonoff_d1"
+        },
+        {
+          "name": "SPI LED Strips",
+          "path": "components/light/spi_led_strip",
+          "id": "light/spi_led_strip"
+        },
+        {
+          "name": "Status Led",
+          "path": "components/light/status_led",
+          "id": "light/status_led"
+        },
+        {
+          "name": "Tuya Dimmer",
+          "path": "components/light/tuya",
+          "id": "light/tuya"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Lock Components",
+      "slug": "lock-components",
+      "items": [
+        {
+          "name": "Template Lock",
+          "path": "components/lock/template",
+          "id": "lock/template"
+        },
+        {
+          "name": "Generic Output Lock",
+          "path": "components/lock/output",
+          "id": "lock/output"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Media Player Components",
+      "slug": "media-player-components",
+      "items": [
+        {
+          "name": "DFPlayer",
+          "path": "components/dfplayer",
+          "id": "dfplayer"
+        },
+        {
+          "name": "I2S Audio",
+          "path": "components/media_player/i2s_audio",
+          "id": "media_player/i2s_audio"
+        },
+        {
+          "name": "Speaker",
+          "path": "components/media_player/speaker",
+          "id": "media_player/speaker"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Microphone Components",
+      "slug": "microphone-components",
+      "items": [
+        {
+          "name": "I2S Microphone",
+          "path": "components/microphone/i2s_audio",
+          "id": "microphone/i2s_audio"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Number Components",
+      "slug": "number-components",
+      "items": [
+        {
+          "name": "Template Number",
+          "path": "components/number/template",
+          "id": "number/template"
+        },
+        {
+          "name": "Home Assistant",
+          "path": "components/number/homeassistant",
+          "id": "number/homeassistant"
+        },
+        {
+          "name": "LVGL widget Number",
+          "path": "components/number/lvgl",
+          "id": "number/lvgl"
+        },
+        {
+          "name": "Modbus Number",
+          "path": "components/number/modbus_controller",
+          "id": "number/modbus_controller"
+        },
+        {
+          "name": "Tuya Number",
+          "path": "components/number/tuya",
+          "id": "number/tuya"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Output Components",
+      "slug": "output-components",
+      "items": [
+        {
+          "name": "Template Output",
+          "path": "components/output/template",
+          "id": "output/template"
+        },
+        {
+          "name": "AC Dimmer",
+          "path": "components/output/ac_dimmer",
+          "id": "output/ac_dimmer"
+        },
+        {
+          "name": "BLE Binary Output",
+          "path": "components/output/ble_client",
+          "id": "output/ble_client"
+        },
+        {
+          "name": "BP1658CJ",
+          "path": "components/output/bp1658cj",
+          "id": "output/bp1658cj"
+        },
+        {
+          "name": "BP5758D",
+          "path": "components/output/bp5758d",
+          "id": "output/bp5758d"
+        },
+        {
+          "name": "DAC7678",
+          "path": "components/output/dac7678",
+          "id": "output/dac7678"
+        },
+        {
+          "name": "EMC2101",
+          "path": "components/emc2101",
+          "id": "emc2101"
+        },
+        {
+          "name": "ESP32 DAC",
+          "path": "components/output/esp32_dac",
+          "id": "output/esp32_dac"
+        },
+        {
+          "name": "ESP32 LEDC",
+          "path": "components/output/ledc",
+          "id": "output/ledc"
+        },
+        {
+          "name": "ESP8266 Software PWM",
+          "path": "components/output/esp8266_pwm",
+          "id": "output/esp8266_pwm"
+        },
+        {
+          "name": "GP8403",
+          "path": "components/output/gp8403",
+          "id": "output/gp8403"
+        },
+        {
+          "name": "GPIO Output",
+          "path": "components/output/gpio",
+          "id": "output/gpio"
+        },
+        {
+          "name": "LibreTiny PWM",
+          "path": "components/output/libretiny_pwm",
+          "id": "output/libretiny_pwm"
+        },
+        {
+          "name": "MCP4661",
+          "path": "components/output/mcp4461",
+          "id": "output/mcp4461"
+        },
+        {
+          "name": "MCP4725",
+          "path": "components/output/mcp4725",
+          "id": "output/mcp4725"
+        },
+        {
+          "name": "MCP4728",
+          "path": "components/output/mcp4728",
+          "id": "output/mcp4728"
+        },
+        {
+          "name": "MCP47A1",
+          "path": "components/output/mcp47a1",
+          "id": "output/mcp47a1"
+        },
+        {
+          "name": "Modbus Output",
+          "path": "components/output/modbus_controller",
+          "id": "output/modbus_controller"
+        },
+        {
+          "name": "MY9231/MY9291",
+          "path": "components/output/my9231",
+          "id": "output/my9231"
+        },
+        {
+          "name": "PCA9685",
+          "path": "components/output/pca9685",
+          "id": "output/pca9685"
+        },
+        {
+          "name": "Sigma-Delta Output",
+          "path": "components/output/sigma_delta_output",
+          "id": "output/sigma_delta_output"
+        },
+        {
+          "name": "Slow PWM",
+          "path": "components/output/slow_pwm",
+          "id": "output/slow_pwm"
+        },
+        {
+          "name": "SM16716",
+          "path": "components/output/sm16716",
+          "id": "output/sm16716"
+        },
+        {
+          "name": "SM2135",
+          "path": "components/output/sm2135",
+          "id": "output/sm2135"
+        },
+        {
+          "name": "SM2235",
+          "path": "components/output/sm2235",
+          "id": "output/sm2235"
+        },
+        {
+          "name": "SM2335",
+          "path": "components/output/sm2335",
+          "id": "output/sm2335"
+        },
+        {
+          "name": "TLC59208F",
+          "path": "components/output/tlc59208f",
+          "id": "output/tlc59208f"
+        },
+        {
+          "name": "TLC5947",
+          "path": "components/output/tlc5947",
+          "id": "output/tlc5947"
+        },
+        {
+          "name": "TLC5971",
+          "path": "components/output/tlc5971",
+          "id": "output/tlc5971"
+        },
+        {
+          "name": "X9C Potentiometer",
+          "path": "components/output/x9c",
+          "id": "output/x9c"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Select Components",
+      "slug": "select-components",
+      "items": [
+        {
+          "name": "Template Select",
+          "path": "components/select/template",
+          "id": "select/template"
+        },
+        {
+          "name": "LVGL widget Select",
+          "path": "components/select/lvgl",
+          "id": "select/lvgl"
+        },
+        {
+          "name": "Modbus Select",
+          "path": "components/select/modbus_controller",
+          "id": "select/modbus_controller"
+        },
+        {
+          "name": "Tuya Select",
+          "path": "components/select/tuya",
+          "id": "select/tuya"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Speaker Components",
+      "slug": "speaker-components",
+      "items": [
+        {
+          "name": "I2S Speaker",
+          "path": "components/speaker/i2s_audio",
+          "id": "speaker/i2s_audio"
+        },
+        {
+          "name": "Mixer Speaker",
+          "path": "components/speaker/mixer",
+          "id": "speaker/mixer"
+        },
+        {
+          "name": "Resampler Speaker",
+          "path": "components/speaker/resampler",
+          "id": "speaker/resampler"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Switch Components",
+      "slug": "switch-components",
+      "items": [
+        {
+          "name": "Template Switch",
+          "path": "components/switch/template",
+          "id": "switch/template"
+        },
+        {
+          "name": "BLE Client Switch",
+          "path": "components/switch/ble_client",
+          "id": "switch/ble_client"
+        },
+        {
+          "name": "Factory Reset Switch",
+          "path": "components/switch/factory_reset",
+          "id": "switch/factory_reset"
+        },
+        {
+          "name": "Generic Output Switch",
+          "path": "components/switch/output",
+          "id": "switch/output"
+        },
+        {
+          "name": "GPIO Switch",
+          "path": "components/switch/gpio",
+          "id": "switch/gpio"
+        },
+        {
+          "name": "H-bridge Switch",
+          "path": "components/switch/hbridge",
+          "id": "switch/hbridge"
+        },
+        {
+          "name": "LVGL Widget",
+          "path": "components/switch/lvgl",
+          "id": "switch/lvgl"
+        },
+        {
+          "name": "Modbus Switch",
+          "path": "components/switch/modbus_controller",
+          "id": "switch/modbus_controller"
+        },
+        {
+          "name": "Nextion Switch",
+          "path": "components/switch/nextion",
+          "id": "switch/nextion"
+        },
+        {
+          "name": "Restart Switch",
+          "path": "components/switch/restart",
+          "id": "switch/restart"
+        },
+        {
+          "name": "Safe Mode Switch",
+          "path": "components/switch/safe_mode",
+          "id": "switch/safe_mode"
+        },
+        {
+          "name": "Shutdown Switch",
+          "path": "components/switch/shutdown",
+          "id": "switch/shutdown"
+        },
+        {
+          "name": "Tuya Switch",
+          "path": "components/switch/tuya",
+          "id": "switch/tuya"
+        },
+        {
+          "name": "UART Switch",
+          "path": "components/switch/uart",
+          "id": "switch/uart"
+        },
+        {
+          "name": "Home Assistant",
+          "path": "components/switch/homeassistant",
+          "id": "switch/homeassistant"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Text Components",
+      "slug": "text-components",
+      "items": [
+        {
+          "name": "Template Text",
+          "path": "components/text/template",
+          "id": "text/template"
+        },
+        {
+          "name": "LVGL textarea Text",
+          "path": "components/text/lvgl",
+          "id": "text/lvgl"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Text Sensor Components",
+      "slug": "text-sensor-components",
+      "items": [
+        {
+          "name": "Template Text Sensor",
+          "path": "components/text_sensor/template",
+          "id": "text_sensor/template"
+        },
+        {
+          "name": "BLE Scanner",
+          "path": "components/text_sensor/ble_scanner",
+          "id": "text_sensor/ble_scanner"
+        },
+        {
+          "name": "Ethernet Info",
+          "path": "components/text_sensor/ethernet_info",
+          "id": "text_sensor/ethernet_info"
+        },
+        {
+          "name": "Home Assistant",
+          "path": "components/text_sensor/homeassistant",
+          "id": "text_sensor/homeassistant"
+        },
+        {
+          "name": "LibreTiny",
+          "path": "components/text_sensor/libretiny",
+          "id": "text_sensor/libretiny"
+        },
+        {
+          "name": "LVGL textarea Text Sensor",
+          "path": "components/text_sensor/lvgl",
+          "id": "text_sensor/lvgl"
+        },
+        {
+          "name": "Modbus Text Sensor",
+          "path": "components/text_sensor/modbus_controller",
+          "id": "text_sensor/modbus_controller"
+        },
+        {
+          "name": "MQTT Subscribe Text",
+          "path": "components/text_sensor/mqtt_subscribe",
+          "id": "text_sensor/mqtt_subscribe"
+        },
+        {
+          "name": "Nextion Text Sensor",
+          "path": "components/text_sensor/nextion",
+          "id": "text_sensor/nextion"
+        },
+        {
+          "name": "OpenThread Info",
+          "path": "components/text_sensor/openthread_info",
+          "id": "text_sensor/openthread_info"
+        },
+        {
+          "name": "Tuya Text Sensor",
+          "path": "components/text_sensor/tuya",
+          "id": "text_sensor/tuya"
+        },
+        {
+          "name": "Version",
+          "path": "components/text_sensor/version",
+          "id": "text_sensor/version"
+        },
+        {
+          "name": "WiFi Info",
+          "path": "components/text_sensor/wifi_info",
+          "id": "text_sensor/wifi_info"
+        },
+        {
+          "name": "WireGuard",
+          "path": "components/wireguard",
+          "id": "wireguard"
+        },
+        {
+          "name": "WL-134 Pet Tag Sensor",
+          "path": "components/text_sensor/wl_134",
+          "id": "text_sensor/wl_134"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Time Components",
+      "slug": "time-components",
+      "items": [
+        {
+          "name": "BM8563 RTC",
+          "path": "components/time/bm8563",
+          "id": "time/bm8563"
+        },
+        {
+          "name": "DS1307 RTC",
+          "path": "components/time/ds1307",
+          "id": "time/ds1307"
+        },
+        {
+          "name": "RX8130 RTC",
+          "path": "components/time/rx8130",
+          "id": "time/rx8130"
+        },
+        {
+          "name": "GPS Time",
+          "path": "components/time/gps",
+          "id": "time/gps"
+        },
+        {
+          "name": "Home Assistant Time",
+          "path": "components/time/homeassistant",
+          "id": "time/homeassistant"
+        },
+        {
+          "name": "PCF85063 RTC",
+          "path": "components/time/pcf85063",
+          "id": "time/pcf85063"
+        },
+        {
+          "name": "PCF8563 RTC",
+          "path": "components/time/pcf8563",
+          "id": "time/pcf8563"
+        },
+        {
+          "name": "SNTP",
+          "path": "components/time/sntp",
+          "id": "time/sntp"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Touchscreen Components",
+      "slug": "touchscreen-components",
+      "items": [
+        {
+          "name": "AXS15231",
+          "path": "components/touchscreen/axs15231",
+          "id": "touchscreen/axs15231"
+        },
+        {
+          "name": "CST226",
+          "path": "components/touchscreen/cst226",
+          "id": "touchscreen/cst226"
+        },
+        {
+          "name": "CST816",
+          "path": "components/touchscreen/cst816",
+          "id": "touchscreen/cst816"
+        },
+        {
+          "name": "CHSC6X",
+          "path": "components/touchscreen/chsc6x",
+          "id": "touchscreen/chsc6x"
+        },
+        {
+          "name": "EKTF2232",
+          "path": "components/touchscreen/ektf2232",
+          "id": "touchscreen/ektf2232"
+        },
+        {
+          "name": "FT63X6",
+          "path": "components/touchscreen/ft63x6",
+          "id": "touchscreen/ft63x6"
+        },
+        {
+          "name": "GT911",
+          "path": "components/touchscreen/gt911",
+          "id": "touchscreen/gt911"
+        },
+        {
+          "name": "TT21100",
+          "path": "components/touchscreen/tt21100",
+          "id": "touchscreen/tt21100"
+        },
+        {
+          "name": "XPT2046",
+          "path": "components/touchscreen/xpt2046",
+          "id": "touchscreen/xpt2046"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Valve Components",
+      "slug": "valve-components",
+      "items": [
+        {
+          "name": "Template Valve",
+          "path": "components/valve/template",
+          "id": "valve/template"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Wireless Communication",
+      "slug": "wireless-communication",
+      "items": [
+        {
+          "name": "CC1101",
+          "path": "components/cc1101",
+          "id": "cc1101"
+        },
+        {
+          "name": "IR Remote Climate",
+          "path": "components/climate/climate_ir",
+          "id": "climate/climate_ir"
+        },
+        {
+          "name": "Remote Receiver",
+          "path": "components/remote_receiver",
+          "id": "remote_receiver"
+        },
+        {
+          "name": "Remote Transmitter",
+          "path": "components/remote_transmitter",
+          "id": "remote_transmitter"
+        },
+        {
+          "name": "RF Bridge",
+          "path": "components/rf_bridge",
+          "id": "rf_bridge"
+        },
+        {
+          "name": "SIM800L",
+          "path": "components/sim800l",
+          "id": "sim800l"
+        },
+        {
+          "name": "SX126x",
+          "path": "components/sx126x",
+          "id": "sx126x"
+        },
+        {
+          "name": "SX127x",
+          "path": "components/sx127x",
+          "id": "sx127x"
+        }
+      ],
+      "subcategories": []
+    },
+    {
+      "title": "Miscellaneous Components",
+      "slug": "miscellaneous-components",
+      "items": [
+        {
+          "name": "Camera Encoder",
+          "path": "components/camera/camera_encoder",
+          "id": "camera/camera_encoder"
+        },
+        {
+          "name": "ESP32 Camera",
+          "path": "components/esp32_camera",
+          "id": "esp32_camera"
+        },
+        {
+          "name": "Exposure Notifications",
+          "path": "components/exposure_notifications",
+          "id": "exposure_notifications"
+        },
+        {
+          "name": "GPS",
+          "path": "components/gps",
+          "id": "gps"
+        },
+        {
+          "name": "Grow Fingerprint Reader",
+          "path": "components/fingerprint_grow",
+          "id": "fingerprint_grow"
+        },
+        {
+          "name": "HLK-FM22x Face Recognition Module",
+          "path": "components/hlk_fm22x",
+          "id": "hlk_fm22x"
+        },
+        {
+          "name": "Modbus Controller",
+          "path": "components/modbus_controller",
+          "id": "modbus_controller"
+        },
+        {
+          "name": "Sprinkler",
+          "path": "components/sprinkler",
+          "id": "sprinkler"
+        },
+        {
+          "name": "Status LED",
+          "path": "components/status_led",
+          "id": "status_led"
+        },
+        {
+          "name": "Sun",
+          "path": "components/sun",
+          "id": "sun"
+        },
+        {
+          "name": "Tuya MCU",
+          "path": "components/tuya",
+          "id": "tuya"
+        },
+        {
+          "name": "Z-Wave Proxy",
+          "path": "components/zwave_proxy",
+          "id": "zwave_proxy"
+        }
+      ],
+      "subcategories": []
+    }
+  ],
+  "flatComponentIds": [
+    "alarm_control_panel",
+    "alarm_control_panel/template",
+    "animation",
+    "api",
+    "at581x",
+    "audio_adc",
+    "audio_adc/es7210",
+    "audio_adc/es7243e",
+    "audio_dac",
+    "audio_dac/aic3204",
+    "audio_dac/es8156",
+    "audio_dac/es8311",
+    "audio_dac/es8388",
+    "binary_sensor",
+    "binary_sensor/analog_threshold",
+    "binary_sensor/ble_presence",
+    "binary_sensor/cap1188",
+    "binary_sensor/esp32_touch",
+    "binary_sensor/gpio",
+    "binary_sensor/homeassistant",
+    "binary_sensor/hydreon_rgxx",
+    "binary_sensor/lvgl",
+    "binary_sensor/modbus_controller",
+    "binary_sensor/mpr121",
+    "binary_sensor/nextion",
+    "binary_sensor/nfc",
+    "binary_sensor/pn532",
+    "binary_sensor/qwiic_pir",
+    "binary_sensor/rc522",
+    "binary_sensor/rdm6300",
+    "binary_sensor/sdl",
+    "binary_sensor/status",
+    "binary_sensor/switch",
+    "binary_sensor/template",
+    "binary_sensor/ttp229",
+    "binary_sensor/tuya",
+    "ble_client",
+    "ble_nus",
+    "bluetooth_proxy",
+    "button",
+    "button/factory_reset",
+    "button/output",
+    "button/restart",
+    "button/safe_mode",
+    "button/shutdown",
+    "button/template",
+    "button/uart",
+    "button/wake_on_lan",
+    "camera/camera_encoder",
+    "canbus",
+    "canbus/esp32_can",
+    "canbus/mcp2515",
+    "captive_portal",
+    "cc1101",
+    "ch422g",
+    "climate",
+    "climate/anova",
+    "climate/bang_bang",
+    "climate/bedjet",
+    "climate/climate_ir",
+    "climate/haier",
+    "climate/midea",
+    "climate/pid",
+    "climate/thermostat",
+    "climate/tuya",
+    "copy",
+    "cover",
+    "cover/am43",
+    "cover/current_based",
+    "cover/endstop",
+    "cover/feedback",
+    "cover/he60r",
+    "cover/template",
+    "cover/time_based",
+    "cover/tormatic",
+    "cover/tuya",
+    "datetime",
+    "datetime/template",
+    "debug",
+    "deep_sleep",
+    "demo",
+    "dfplayer",
+    "dfrobot_sen0395",
+    "display",
+    "display/addressable_light",
+    "display/epaper_spi",
+    "display/hub75",
+    "display/ili9xxx",
+    "display/inkplate",
+    "display/lcd_display",
+    "display/max7219",
+    "display/max7219digit",
+    "display/mipi_dsi",
+    "display/mipi_rgb",
+    "display/mipi_spi",
+    "display/nextion",
+    "display/pcd8544",
+    "display/pvvx_mithermometer",
+    "display/qspi_dbi",
+    "display/rpi_dpi_rgb",
+    "display/sdl",
+    "display/ssd1306",
+    "display/ssd1322",
+    "display/ssd1325",
+    "display/ssd1327",
+    "display/ssd1331",
+    "display/ssd1351",
+    "display/st7567",
+    "display/st7701s",
+    "display/st7735",
+    "display/st7789v",
+    "display/st7920",
+    "display/tm1621",
+    "display/tm1637",
+    "display/tm1638",
+    "display/waveshare_epaper",
+    "display_menu",
+    "display_menu/graphical_display_menu",
+    "display_menu/lcd_menu",
+    "emc2101",
+    "esp32",
+    "esp32_ble_beacon",
+    "esp32_ble_server",
+    "esp32_ble_tracker",
+    "esp32_camera",
+    "esp32_camera_web_server",
+    "esp32_hosted",
+    "esp32_improv",
+    "esp8266",
+    "esp_ldo",
+    "esphome",
+    "espnow",
+    "ethernet",
+    "event",
+    "event/template",
+    "exposure_notifications",
+    "external_components",
+    "ezo_pmp",
+    "factory_reset",
+    "fan",
+    "fan/binary",
+    "fan/hbridge",
+    "fan/speed",
+    "fan/template",
+    "fan/tuya",
+    "fingerprint_grow",
+    "font",
+    "globals",
+    "gps",
+    "graph",
+    "grove_tb6612fng",
+    "hlk_fm22x",
+    "host",
+    "http_request",
+    "i2c",
+    "i2s_audio",
+    "image",
+    "improv_serial",
+    "interval",
+    "json",
+    "libretiny",
+    "light",
+    "light/beken_spi_led_strip",
+    "light/binary",
+    "light/color_temperature",
+    "light/cwww",
+    "light/esp32_rmt_led_strip",
+    "light/fastled",
+    "light/hbridge",
+    "light/lvgl",
+    "light/monochromatic",
+    "light/neopixelbus",
+    "light/partition",
+    "light/rgb",
+    "light/rgbct",
+    "light/rgbw",
+    "light/rgbww",
+    "light/rp2040_pio_led_strip",
+    "light/shelly_dimmer",
+    "light/sonoff_d1",
+    "light/spi_led_strip",
+    "light/status_led",
+    "light/tuya",
+    "lightwaverf",
+    "lock",
+    "lock/output",
+    "lock/template",
+    "logger",
+    "lvgl",
+    "mapping",
+    "matrix_keypad",
+    "max6956",
+    "mcp230xx",
+    "mcp23Sxx",
+    "mdns",
+    "media_player",
+    "media_player/i2s_audio",
+    "media_player/speaker",
+    "micro_wake_word",
+    "micronova",
+    "microphone",
+    "microphone/i2s_audio",
+    "modbus_controller",
+    "mqtt",
+    "network",
+    "nrf52",
+    "number",
+    "number/homeassistant",
+    "number/lvgl",
+    "number/modbus_controller",
+    "number/template",
+    "number/tuya",
+    "one_wire",
+    "one_wire/ds2484",
+    "one_wire/gpio",
+    "online_image",
+    "opentherm",
+    "openthread",
+    "ota",
+    "ota/esphome",
+    "ota/http_request",
+    "output",
+    "output/ac_dimmer",
+    "output/ble_client",
+    "output/bp1658cj",
+    "output/bp5758d",
+    "output/dac7678",
+    "output/esp32_dac",
+    "output/esp8266_pwm",
+    "output/gp8403",
+    "output/gpio",
+    "output/ledc",
+    "output/libretiny_pwm",
+    "output/mcp4461",
+    "output/mcp4725",
+    "output/mcp4728",
+    "output/mcp47a1",
+    "output/modbus_controller",
+    "output/my9231",
+    "output/pca9685",
+    "output/sigma_delta_output",
+    "output/slow_pwm",
+    "output/sm16716",
+    "output/sm2135",
+    "output/sm2235",
+    "output/sm2335",
+    "output/template",
+    "output/tlc59208f",
+    "output/tlc5947",
+    "output/tlc5971",
+    "output/x9c",
+    "packages",
+    "packet_transport",
+    "pca6416a",
+    "pca9554",
+    "pcf8574",
+    "pi4ioe5v6408",
+    "pipsolar",
+    "pn7150",
+    "pn7160",
+    "power_supply",
+    "prometheus",
+    "psram",
+    "pylontech",
+    "qr_code",
+    "remote_receiver",
+    "remote_transmitter",
+    "rf_bridge",
+    "rp2040",
+    "rtttl",
+    "safe_mode",
+    "script",
+    "seeed_mr24hpc1",
+    "seeed_mr60bha2",
+    "seeed_mr60fda2",
+    "select",
+    "select/lvgl",
+    "select/modbus_controller",
+    "select/template",
+    "select/tuya",
+    "sensor",
+    "sensor/a01nyub",
+    "sensor/a02yyuw",
+    "sensor/absolute_humidity",
+    "sensor/adc",
+    "sensor/adc128s102",
+    "sensor/ade7880",
+    "sensor/ade7953",
+    "sensor/ads1115",
+    "sensor/ads1118",
+    "sensor/ags10",
+    "sensor/aht10",
+    "sensor/airthings_ble",
+    "sensor/alpha3",
+    "sensor/am2315c",
+    "sensor/am2320",
+    "sensor/am43",
+    "sensor/apds9306",
+    "sensor/apds9960",
+    "sensor/as3935",
+    "sensor/as5600",
+    "sensor/as7341",
+    "sensor/atm90e26",
+    "sensor/atm90e32",
+    "sensor/b_parasite",
+    "sensor/bh1750",
+    "sensor/bh1900nux",
+    "sensor/binary_sensor_map",
+    "sensor/bl0906",
+    "sensor/bl0939",
+    "sensor/bl0940",
+    "sensor/bl0942",
+    "sensor/ble_client",
+    "sensor/ble_rssi",
+    "sensor/bme280",
+    "sensor/bme680",
+    "sensor/bme680_bsec",
+    "sensor/bme68x_bsec2",
+    "sensor/bmi160",
+    "sensor/bmp085",
+    "sensor/bmp280",
+    "sensor/bmp3xx",
+    "sensor/bmp581",
+    "sensor/ccs811",
+    "sensor/cd74hc4067",
+    "sensor/cm1106",
+    "sensor/combination",
+    "sensor/cs5460a",
+    "sensor/cse7761",
+    "sensor/cse7766",
+    "sensor/ct_clamp",
+    "sensor/dallas_temp",
+    "sensor/daly_bms",
+    "sensor/dht",
+    "sensor/dht12",
+    "sensor/dps310",
+    "sensor/dsmr",
+    "sensor/duty_cycle",
+    "sensor/duty_time",
+    "sensor/ee895",
+    "sensor/ens160",
+    "sensor/ens210",
+    "sensor/ezo",
+    "sensor/fs3000",
+    "sensor/gcja5",
+    "sensor/gdk101",
+    "sensor/gl_r01",
+    "sensor/gp2y1010au0f",
+    "sensor/grove_gas_mc_v2",
+    "sensor/growatt_solar",
+    "sensor/havells_solar",
+    "sensor/hc8",
+    "sensor/hdc1080",
+    "sensor/hdc2010",
+    "sensor/hlw8012",
+    "sensor/hlw8032",
+    "sensor/hm3301",
+    "sensor/hmc5883l",
+    "sensor/homeassistant",
+    "sensor/honeywell_hih_i2c",
+    "sensor/honeywellabp",
+    "sensor/honeywellabp2_i2c",
+    "sensor/hrxl_maxsonar_wr",
+    "sensor/hte501",
+    "sensor/htu21d",
+    "sensor/htu31d",
+    "sensor/hx711",
+    "sensor/hydreon_rgxx",
+    "sensor/hyt271",
+    "sensor/iaqcore",
+    "sensor/ina219",
+    "sensor/ina226",
+    "sensor/ina260",
+    "sensor/ina2xx",
+    "sensor/ina3221",
+    "sensor/inkbird_ibsth1_mini",
+    "sensor/integration",
+    "sensor/internal_temperature",
+    "sensor/jsn_sr04t",
+    "sensor/kamstrup_kmp",
+    "sensor/kmeteriso",
+    "sensor/kuntze",
+    "sensor/lc709203f",
+    "sensor/ld2410",
+    "sensor/ld2412",
+    "sensor/ld2420",
+    "sensor/ld2450",
+    "sensor/lm75b",
+    "sensor/lps22",
+    "sensor/ltr390",
+    "sensor/ltr501",
+    "sensor/ltr_als_ps",
+    "sensor/lvgl",
+    "sensor/m5stack_8angle",
+    "sensor/max17043",
+    "sensor/max31855",
+    "sensor/max31856",
+    "sensor/max31865",
+    "sensor/max44009",
+    "sensor/max6675",
+    "sensor/max9611",
+    "sensor/mcp3008",
+    "sensor/mcp3204",
+    "sensor/mcp3221",
+    "sensor/mcp9600",
+    "sensor/mcp9808",
+    "sensor/mhz19",
+    "sensor/mics_4514",
+    "sensor/mlx90393",
+    "sensor/mlx90614",
+    "sensor/mmc5603",
+    "sensor/mmc5983",
+    "sensor/modbus_controller",
+    "sensor/mopeka_pro_check",
+    "sensor/mopeka_std_check",
+    "sensor/mpl3115a2",
+    "sensor/mpu6050",
+    "sensor/mpu6886",
+    "sensor/mqtt_subscribe",
+    "sensor/ms5611",
+    "sensor/ms8607",
+    "sensor/msa3xx",
+    "sensor/nau7802",
+    "sensor/nextion",
+    "sensor/npi19",
+    "sensor/ntc",
+    "sensor/opt3001",
+    "sensor/pm1006",
+    "sensor/pm2005",
+    "sensor/pmsa003i",
+    "sensor/pmsx003",
+    "sensor/pmwcs3",
+    "sensor/pulse_counter",
+    "sensor/pulse_meter",
+    "sensor/pulse_width",
+    "sensor/pzem004t",
+    "sensor/pzemac",
+    "sensor/pzemdc",
+    "sensor/qmc5883l",
+    "sensor/qmp6988",
+    "sensor/radon_eye_ble",
+    "sensor/resistance",
+    "sensor/rotary_encoder",
+    "sensor/ruuvitag",
+    "sensor/scd30",
+    "sensor/scd4x",
+    "sensor/sdm_meter",
+    "sensor/sdp3x",
+    "sensor/sds011",
+    "sensor/selec_meter",
+    "sensor/sen0321",
+    "sensor/sen21231",
+    "sensor/sen5x",
+    "sensor/senseair",
+    "sensor/sfa30",
+    "sensor/sgp30",
+    "sensor/sgp4x",
+    "sensor/sht3xd",
+    "sensor/sht4x",
+    "sensor/shtcx",
+    "sensor/sm300d2",
+    "sensor/smt100",
+    "sensor/sound_level",
+    "sensor/sps30",
+    "sensor/sts3x",
+    "sensor/stts22h",
+    "sensor/t6615",
+    "sensor/tc74",
+    "sensor/tcs34725",
+    "sensor/tee501",
+    "sensor/teleinfo",
+    "sensor/tem3200",
+    "sensor/template",
+    "sensor/thermopro_ble",
+    "sensor/tmp102",
+    "sensor/tmp1075",
+    "sensor/tmp117",
+    "sensor/tof10120",
+    "sensor/total_daily_energy",
+    "sensor/tsl2561",
+    "sensor/tsl2591",
+    "sensor/tuya",
+    "sensor/tx20",
+    "sensor/ufire_ec",
+    "sensor/ufire_ise",
+    "sensor/ultrasonic",
+    "sensor/uptime",
+    "sensor/veml3235",
+    "sensor/veml7700",
+    "sensor/vl53l0x",
+    "sensor/wifi_signal",
+    "sensor/wts01",
+    "sensor/xgzp68xx",
+    "sensor/xiaomi_ble",
+    "sensor/xiaomi_hhccjcy10",
+    "sensor/xiaomi_miscale",
+    "sensor/zio_ultrasonic",
+    "sensor/zyaura",
+    "servo",
+    "sim800l",
+    "sml",
+    "sn74hc165",
+    "sn74hc595",
+    "speaker",
+    "speaker/i2s_audio",
+    "speaker/mixer",
+    "speaker/resampler",
+    "spi",
+    "sprinkler",
+    "statsd",
+    "status_led",
+    "stepper",
+    "substitutions",
+    "sun",
+    "sun_gtil2",
+    "switch",
+    "switch/ble_client",
+    "switch/factory_reset",
+    "switch/gpio",
+    "switch/hbridge",
+    "switch/homeassistant",
+    "switch/lvgl",
+    "switch/modbus_controller",
+    "switch/nextion",
+    "switch/output",
+    "switch/restart",
+    "switch/safe_mode",
+    "switch/shutdown",
+    "switch/template",
+    "switch/tuya",
+    "switch/uart",
+    "sx126x",
+    "sx127x",
+    "sx1509",
+    "syslog",
+    "tca9548a",
+    "tca9555",
+    "text",
+    "text/lvgl",
+    "text/template",
+    "text_sensor",
+    "text_sensor/ble_scanner",
+    "text_sensor/ethernet_info",
+    "text_sensor/homeassistant",
+    "text_sensor/libretiny",
+    "text_sensor/lvgl",
+    "text_sensor/modbus_controller",
+    "text_sensor/mqtt_subscribe",
+    "text_sensor/nextion",
+    "text_sensor/openthread_info",
+    "text_sensor/template",
+    "text_sensor/tuya",
+    "text_sensor/version",
+    "text_sensor/wifi_info",
+    "text_sensor/wl_134",
+    "time",
+    "time/bm8563",
+    "time/ds1307",
+    "time/gps",
+    "time/homeassistant",
+    "time/pcf85063",
+    "time/pcf8563",
+    "time/rx8130",
+    "time/sntp",
+    "tinyusb",
+    "tm1651",
+    "touchscreen",
+    "touchscreen/axs15231",
+    "touchscreen/chsc6x",
+    "touchscreen/cst226",
+    "touchscreen/cst816",
+    "touchscreen/ektf2232",
+    "touchscreen/ft5x06",
+    "touchscreen/ft63x6",
+    "touchscreen/gt911",
+    "touchscreen/tt21100",
+    "touchscreen/xpt2046",
+    "tuya",
+    "uart",
+    "udp",
+    "update",
+    "update/http_request",
+    "uponor_smatrix",
+    "usb_cdc_acm",
+    "usb_host",
+    "usb_uart",
+    "valve",
+    "valve/template",
+    "vbus",
+    "voice_assistant",
+    "web_server",
+    "weikai",
+    "wiegand",
+    "wifi",
+    "wireguard",
+    "xl9535",
+    "xxtea",
+    "zwave_proxy"
+  ],
+  "coreComponentIds": [],
+  "diff": {
+    "missingFromDocs": [],
+    "missingFromCore": []
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "id": "other.time",
+  "domain": "time",
+  "platform": "core",
+  "requires": [],
+  "fields": [
+    {
+      "key": "time",
+      "type": "list",
+      "required": false,
+      "lvl": "simple",
+      "helpUrl": "https://esphome.io/components/time/",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "platform",
+            "type": "select",
+            "required": true,
+            "lvl": "simple",
+            "options": [
+              "sntp",
+              "homeassistant"
+            ],
+            "default": "sntp"
+          },
+          {
+            "key": "timezone",
+            "type": "select",
+            "required": false,
+            "lvl": "simple",
+            "suppressQuotes": true,
+            "placeholder": "Europe/Warsaw",
+            "optionsFrom": "general/automation/timezones.json",
+            "searchable": true,
+            "dependsOn": {
+              "key": "platform",
+              "value": "sntp"
+            }
+          },
+          {
+            "key": "id",
+            "type": "id",
+            "required": false,
+            "lvl": "simple",
+            "placeholder": "time_id"
+          },
+          {
+            "key": "servers",
+            "type": "list",
+            "required": false,
+            "lvl": "simple",
+            "item": {
+              "type": "text",
+              "suppressQuotes": true,
+              "placeholder": "0.pool.ntp.org"
+            },
+            "dependsOn": {
+              "key": "platform",
+              "value": "sntp"
+            }
+          },
+          {
+            "key": "custom_config",
+            "type": "raw_yaml",
+            "required": false,
+            "lvl": "advanced"
+          }
+        ]
+      }
+    }
+  ]
+}

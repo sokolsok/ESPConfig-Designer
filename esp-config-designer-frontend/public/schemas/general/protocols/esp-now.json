@@ -1,0 +1,108 @@
+{
+  "id": "protocols.espnow",
+  "domain": "espnow",
+  "platform": "core",
+  "requires": [],
+  "fields": [
+    {
+      "key": "enabled",
+      "label": "Enable ESP-NOW",
+      "type": "boolean",
+      "required": false,
+      "lvl": "simple",
+      "default": false,
+      "emitYAML": "never",
+      "helpUrl": "https://esphome.io/components/espnow/"
+    },
+    {
+      "key": "channel",
+      "type": "number",
+      "required": false,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "0"
+    },
+    {
+      "key": "auto_add_peer",
+      "type": "boolean",
+      "required": false,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": false
+    },
+    {
+      "key": "enable_on_boot",
+      "type": "boolean",
+      "required": false,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": true
+    },
+    {
+      "key": "peers",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "item": {
+        "type": "text",
+        "placeholder": "11:22:33:44:55:66"
+      }
+    },
+    {
+      "key": "on_receive",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "- logger.log: \"ESP-NOW received\""
+    },
+    {
+      "key": "on_unknown_peer",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "- logger.log: \"Unknown peer\""
+    },
+    {
+      "key": "on_broadcast",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "- logger.log: \"Broadcast received\""
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    }
+  ]
+}

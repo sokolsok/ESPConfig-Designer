@@ -1,0 +1,144 @@
+{
+  "id": "sensor.bme680",
+  "domain": "sensor",
+  "platform": "bme680",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/bme680/",
+  "fields": [
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [
+        {
+          "key": "oversampling",
+          "type": "select",
+          "required": false,
+          "lvl": "normal",
+          "default": "16x",
+          "options": [
+            "NONE",
+            "1x",
+            "2x",
+            "4x",
+            "8x",
+            "16x"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "pressure",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [
+        {
+          "key": "oversampling",
+          "type": "select",
+          "required": false,
+          "lvl": "normal",
+          "default": "16x",
+          "options": [
+            "NONE",
+            "1x",
+            "2x",
+            "4x",
+            "8x",
+            "16x"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "humidity",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [
+        {
+          "key": "oversampling",
+          "type": "select",
+          "required": false,
+          "lvl": "normal",
+          "default": "16x",
+          "options": [
+            "NONE",
+            "1x",
+            "2x",
+            "4x",
+            "8x",
+            "16x"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "gas_resistance",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x76"
+    },
+    {
+      "key": "iir_filter",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "OFF",
+      "options": [
+        "OFF",
+        "1x",
+        "3x",
+        "7x",
+        "15x",
+        "31x",
+        "63x",
+        "127x"
+      ]
+    },
+    {
+      "key": "heater",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "temperature",
+          "type": "number",
+          "required": false,
+          "lvl": "advanced",
+          "default": 320
+        },
+        {
+          "key": "duration",
+          "type": "duration",
+          "required": false,
+          "lvl": "advanced",
+          "default": "150ms"
+        }
+      ]
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "platform.rp2040",
+  "domain": "platform",
+  "platform": "rp2040",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/rp2040/",
+  "fields": [
+    {
+      "key": "board",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "rpipicow",
+      "placeholder": "rpipicow"
+    },
+    {
+      "key": "watchdog_timeout",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "8s"
+    }
+  ]
+}

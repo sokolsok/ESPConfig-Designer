@@ -1,0 +1,64 @@
+{
+  "id": "other.deep_sleep",
+  "domain": "deep_sleep",
+  "platform": "core",
+  "requires": [],
+  "fields": [
+    {
+      "key": "deep_sleep",
+      "type": "list",
+      "required": false,
+      "lvl": "simple",
+      "helpUrl": "https://esphome.io/components/deep_sleep/",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "run_duration",
+            "type": "duration",
+            "required": false,
+            "lvl": "simple",
+            "placeholder": "10min"
+          },
+          {
+            "key": "sleep_duration",
+            "type": "duration",
+            "required": false,
+            "lvl": "simple",
+            "placeholder": "30min"
+          },
+          {
+            "key": "wakeup_pin",
+            "type": "gpio",
+            "required": false,
+            "lvl": "simple",
+            "placeholder": "GPIOXX"
+          },
+          {
+            "key": "wakeup_pin_mode",
+            "type": "select",
+            "required": false,
+            "lvl": "simple",
+            "default": "IGNORE",
+            "options": [
+              "IGNORE",
+              "INVERT_WAKEUP"
+            ]
+          },
+          {
+            "key": "id",
+            "type": "id",
+            "required": false,
+            "lvl": "simple"
+          },
+          {
+            "key": "custom_config",
+            "type": "raw_yaml",
+            "required": false,
+            "lvl": "advanced"
+          }
+        ]
+      }
+    }
+  ]
+}

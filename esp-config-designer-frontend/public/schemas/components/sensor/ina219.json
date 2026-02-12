@@ -1,0 +1,78 @@
+{
+  "id": "sensor.ina219",
+  "domain": "sensor",
+  "platform": "ina219",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/ina219/",
+  "fields": [
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x40"
+    },
+    {
+      "key": "shunt_resistance",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0.1 ohm"
+    },
+    {
+      "key": "max_voltage",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "32V"
+    },
+    {
+      "key": "max_current",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "3.2A"
+    },
+    {
+      "key": "current",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "power",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "bus_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "shunt_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    }
+  ]
+}

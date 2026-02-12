@@ -1,0 +1,28 @@
+{
+  "id": "sensor.uptime",
+  "domain": "sensor",
+  "platform": "uptime",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/uptime/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "type",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "seconds",
+      "options": [
+        "seconds",
+        "timestamp"
+      ]
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    }
+  ]
+}

@@ -1,4 +1,6 @@
 __pycache__/
 *.pyc
 AGENTS.md
-WebAppLocal/
+esp-config-designer-frontend/node_modules/
+esp-config-designer-frontend/dist/
+esp-config-designer-frontend/runtime/

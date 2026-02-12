@@ -1,0 +1,56 @@
+{
+  "id": "sensor.dht",
+  "domain": "sensor",
+  "platform": "dht",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/dht/",
+  "fields": [
+    {
+      "key": "pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "model",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "AUTO_DETECT",
+      "options": [
+        "AUTO_DETECT",
+        "DHT11",
+        "DHT22",
+        "DHT22_TYPE2",
+        "AM2302",
+        "RHT03",
+        "SI7021",
+        "AM2120"
+      ]
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "humidity",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    }
+  ]
+}

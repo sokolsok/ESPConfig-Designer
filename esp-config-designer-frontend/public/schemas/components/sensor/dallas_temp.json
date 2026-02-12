@@ -1,0 +1,45 @@
+{
+  "id": "sensor.dallas_temp",
+  "domain": "sensor",
+  "platform": "dallas_temp",
+  "requires": [
+    "one_wire"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/dallas_temp/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "address",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "0x0000000000000000"
+    },
+    {
+      "key": "index",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "resolution",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    },
+    {
+      "key": "one_wire_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "one_wire"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "other.debug",
+  "domain": "debug",
+  "platform": "core",
+  "requires": [],
+  "fields": [
+    {
+      "key": "enabled",
+      "label": "Enable Debug",
+      "type": "boolean",
+      "required": false,
+      "lvl": "simple",
+      "default": false,
+      "emitYAML": "never",
+      "helpUrl": "https://esphome.io/components/debug/"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "5s"
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    }
+  ]
+}

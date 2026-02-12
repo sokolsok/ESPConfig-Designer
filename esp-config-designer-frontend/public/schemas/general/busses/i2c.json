@@ -1,0 +1,116 @@
+{
+  "id": "busses.i2c",
+  "domain": "i2c",
+  "platform": "core",
+  "requires": [],
+  "fields": [
+    {
+      "key": "enabled",
+      "label": "Enable I2C",
+      "type": "boolean",
+      "required": false,
+      "lvl": "simple",
+      "default": false,
+      "emitYAML": "never",
+      "helpUrl": "https://esphome.io/components/i2c/"
+    },
+    {
+      "key": "sda",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "scl",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "scan",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": true
+    },
+    {
+      "key": "frequency",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "50kHz"
+    },
+    {
+      "key": "timeout",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "100us"
+    },
+    {
+      "key": "sda_pullup_enabled",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": true
+    },
+    {
+      "key": "scl_pullup_enabled",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": true
+    },
+    {
+      "key": "low_power_mode",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": false
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    }
+  ]
+}

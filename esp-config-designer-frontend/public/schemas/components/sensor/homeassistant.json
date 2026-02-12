@@ -1,0 +1,24 @@
+{
+  "id": "sensor.homeassistant",
+  "domain": "sensor",
+  "platform": "homeassistant",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/homeassistant/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "entity_id",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "sensor.example_entity"
+    },
+    {
+      "key": "attribute",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "attribute_name"
+    }
+  ]
+}

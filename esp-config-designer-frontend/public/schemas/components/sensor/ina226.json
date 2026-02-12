@@ -1,0 +1,130 @@
+{
+  "id": "sensor.ina226",
+  "domain": "sensor",
+  "platform": "ina226",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/ina226/",
+  "fields": [
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x40"
+    },
+    {
+      "key": "shunt_resistance",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0.1 ohm"
+    },
+    {
+      "key": "max_current",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "3.2A"
+    },
+    {
+      "key": "adc_time",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "voltage",
+          "type": "select",
+          "required": false,
+          "lvl": "normal",
+          "default": "1100us",
+          "options": [
+            "140us",
+            "204us",
+            "332us",
+            "588us",
+            "1100us",
+            "2116us",
+            "4156us",
+            "8244us"
+          ]
+        },
+        {
+          "key": "current",
+          "type": "select",
+          "required": false,
+          "lvl": "normal",
+          "default": "1100us",
+          "options": [
+            "140us",
+            "204us",
+            "332us",
+            "588us",
+            "1100us",
+            "2116us",
+            "4156us",
+            "8244us"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "adc_averaging",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "4",
+      "options": [
+        "1",
+        "4",
+        "16",
+        "64",
+        "128",
+        "256",
+        "512",
+        "1024"
+      ]
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    },
+    {
+      "key": "current",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "power",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "bus_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "shunt_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    }
+  ]
+}

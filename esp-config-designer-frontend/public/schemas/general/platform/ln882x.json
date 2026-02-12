@@ -1,0 +1,149 @@
+{
+  "id": "platform.ln882x",
+  "domain": "platform",
+  "platform": "ln882x",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/ln882x/",
+  "fields": [
+    {
+      "key": "board",
+      "type": "text",
+      "required": true,
+      "lvl": "normal",
+      "default": "generic-ln882hki",
+      "placeholder": "generic-ln882hki"
+    },
+    {
+      "key": "family",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "options": [
+        "",
+        "bk7231n",
+        "bk7231t",
+        "rtl8710b",
+        "rtl8720c",
+        "bk7251",
+        "bk7231q",
+        "ln882hki"
+      ],
+      "note": "This option is not recommended unless required."
+    },
+    {
+      "key": "framework",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "version",
+          "type": "select",
+          "required": false,
+          "lvl": "advanced",
+          "default": "recommended",
+          "options": [
+            "dev",
+            "latest",
+            "recommended"
+          ]
+        },
+        {
+          "key": "source",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "libretiny/arduino"
+        },
+        {
+          "key": "loglevel",
+          "type": "select",
+          "required": false,
+          "lvl": "advanced",
+          "default": "warn",
+          "options": [
+            "verbose",
+            "trace",
+            "debug",
+            "info",
+            "warn",
+            "error",
+            "fatal",
+            "none"
+          ]
+        },
+        {
+          "key": "debug",
+          "type": "list",
+          "required": false,
+          "lvl": "advanced",
+          "rawList": true,
+          "item": {
+            "type": "select",
+            "options": [
+              "wifi",
+              "client",
+              "server",
+              "ssl",
+              "ota",
+              "fdb",
+              "mdns",
+              "lwip",
+              "lwip_assert"
+            ]
+          }
+        },
+        {
+          "key": "sdk_silent",
+          "type": "select",
+          "required": false,
+          "lvl": "advanced",
+          "default": "all",
+          "options": [
+            "all",
+            "auto",
+            "none"
+          ]
+        },
+        {
+          "key": "uart_port",
+          "type": "number",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "0"
+        },
+        {
+          "key": "gpio_recover",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced"
+        },
+        {
+          "key": "options",
+          "type": "list",
+          "required": false,
+          "lvl": "advanced",
+          "item": {
+            "type": "object",
+            "fields": [
+              {
+                "key": "key",
+                "type": "text",
+                "required": true,
+                "lvl": "advanced",
+                "placeholder": "option"
+              },
+              {
+                "key": "value",
+                "type": "text",
+                "required": false,
+                "lvl": "advanced",
+                "placeholder": "value"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "id": "automation.globals",
+  "domain": "globals",
+  "platform": "core",
+  "requires": [],
+  "fields": [
+    {
+      "key": "globals",
+      "type": "list",
+      "required": false,
+      "lvl": "simple",
+      "helpUrl": "https://esphome.io/components/globals/",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "id",
+            "type": "id",
+            "required": true,
+            "lvl": "simple",
+            "placeholder": "my_global"
+          },
+          {
+            "key": "type",
+            "type": "text",
+            "required": true,
+            "lvl": "simple",
+            "suppressQuotes": true,
+            "placeholder": "int"
+          },
+          {
+            "key": "restore_value",
+            "type": "boolean",
+            "required": false,
+            "lvl": "simple",
+            "default": false
+          },
+          {
+            "key": "max_restore_data_length",
+            "type": "number",
+            "required": false,
+            "lvl": "simple",
+            "placeholder": "63"
+          },
+          {
+            "key": "initial_value",
+            "type": "text",
+            "required": false,
+            "lvl": "simple",
+            "suppressQuotes": true,
+            "placeholder": "'0'"
+          },
+          {
+            "key": "custom_config",
+            "type": "raw_yaml",
+            "required": false,
+            "lvl": "advanced"
+          }
+        ]
+      }
+    }
+  ]
+}

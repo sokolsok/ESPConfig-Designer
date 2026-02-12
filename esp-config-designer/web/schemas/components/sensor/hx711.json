@@ -1,0 +1,43 @@
+{
+  "id": "sensor.hx711",
+  "domain": "sensor",
+  "platform": "hx711",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/hx711/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "dout_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "clk_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "gain",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "128",
+      "options": [
+        "32",
+        "64",
+        "128"
+      ]
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "id": "sensor.sht4x",
+  "domain": "sensor",
+  "platform": "sht4x",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/sht4x/",
+  "fields": [
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "humidity",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "precision",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "High",
+      "options": [
+        "High",
+        "Med",
+        "Low"
+      ]
+    },
+    {
+      "key": "heater_max_duty",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "default": 0.0
+    },
+    {
+      "key": "heater_power",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "High",
+      "options": [
+        "High",
+        "Med",
+        "Low"
+      ]
+    },
+    {
+      "key": "heater_time",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "Long",
+      "options": [
+        "Long",
+        "Short"
+      ]
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x44"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    }
+  ]
+}

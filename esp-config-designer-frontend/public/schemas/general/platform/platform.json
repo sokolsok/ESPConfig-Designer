@@ -1,0 +1,28 @@
+{
+  "id": "platform.core",
+  "domain": "platform",
+  "platform": "core",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/#supported-microcontrollers",
+  "fields": [
+    {
+      "key": "platform",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "esp32",
+      "set_global": "platform",
+      "options": [
+        "esp32",
+        "esp8266",
+        "rp2040",
+        "bk72xx",
+        "rtl87xx",
+        "ln882x",
+        "host",
+        "nrf52"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "binary_sensor.gpio",
+  "domain": "binary_sensor",
+  "platform": "gpio",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/binary_sensor/gpio/",
+  "fields": [
+    {
+      "key": "name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "lambda",
+      "type": "lambda",
+      "required": false
+    }
+  ]
+}

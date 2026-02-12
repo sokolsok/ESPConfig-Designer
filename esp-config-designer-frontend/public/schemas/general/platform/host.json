@@ -1,0 +1,17 @@
+{
+  "id": "platform.host",
+  "domain": "platform",
+  "platform": "host",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/host/",
+  "fields": [
+    {
+      "key": "mac_address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "06:35:69:ab:f6:79",
+      "placeholder": "06:35:69:ab:f6:79"
+    }
+  ]
+}

@@ -1,0 +1,3058 @@
+{
+  "sections": {
+    "esp8266": {
+      "key": "esp8266",
+      "title": "ESP8266 (ESP8266EX)",
+      "notes": [
+        "ESPHome notes (ESP8266): GPIO0, GPIO2, and GPIO15 are strapping pins. ESPHome recommends avoiding them or using them carefully, and will warn when configured.",
+        "GPIO6-11 are reserved for the flash interface. ESPHome blocks these pins and reports a compile error.",
+        "The safest pins for peripherals are GPIO4 and GPIO5 because they do not create unwanted boot states.",
+        "UART0 (GPIO1 TX, GPIO3 RX) is used for programming and logs. Using them for other purposes can disrupt flashing and serial communication."
+      ],
+      "rows": [
+        {
+          "id": "GPIO0",
+          "input": "Yes (internal pull-up)",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "0",
+          "selectable": true,
+          "error": "Strapping (BOOT0) - must be HIGH at boot (LOW forces flash mode). After boot it can be used as a normal input. ESPHome warns about strapping pins."
+        },
+        {
+          "id": "GPIO1",
+          "input": "Yes (RX0)",
+          "output": "Yes (UART0 TX)",
+          "status": "safe",
+          "value": "1",
+          "selectable": true,
+          "note": "UART0 TX outputs boot logs. Default state is HIGH at boot; boot can fail if forced LOW. Avoid attaching devices that react to boot pulses."
+        },
+        {
+          "id": "GPIO2",
+          "input": "Yes (internal pull-up)",
+          "output": "Yes",
+          "status": "caution",
+          "value": "2",
+          "selectable": true,
+          "warning": "Strapping - must be HIGH at boot; LOW prevents boot. Often connected to on-board LED. ESPHome warns about strapping pins."
+        },
+        {
+          "id": "GPIO3",
+          "input": "Yes (UART0 RX)",
+          "output": "Yes*",
+          "status": "caution",
+          "value": "3",
+          "selectable": true,
+          "warning": "UART0 RX is used for serial communication. Pull-up at boot. It can be driven as an output in software*, but this is nonstandard; keep for serial/programming."
+        },
+        {
+          "id": "GPIO4",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "4",
+          "selectable": true,
+          "warning": "General-purpose GPIO. No boot restrictions. Safe for relays and peripherals."
+        },
+        {
+          "id": "GPIO5",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "5",
+          "selectable": true,
+          "warning": "General-purpose GPIO. Often used as I2C SCL. Safe at boot."
+        },
+        {
+          "id": "GPIO6",
+          "input": "No",
+          "output": "No",
+          "status": "avoid",
+          "value": "6",
+          "selectable": true,
+          "error": "Reserved (Flash) - connected to external SPI flash. Do not use as GPIO. ESPHome blocks these pins."
+        },
+        {
+          "id": "GPIO7",
+          "input": "No",
+          "output": "No",
+          "status": "avoid",
+          "value": "7",
+          "selectable": true,
+          "error": "Reserved (Flash) - connected to external SPI flash. Do not use as GPIO. ESPHome blocks these pins."
+        },
+        {
+          "id": "GPIO8",
+          "input": "No",
+          "output": "No",
+          "status": "avoid",
+          "value": "8",
+          "selectable": true,
+          "error": "Reserved (Flash) - connected to external SPI flash. Do not use as GPIO. ESPHome blocks these pins."
+        },
+        {
+          "id": "GPIO9",
+          "input": "No",
+          "output": "No",
+          "status": "avoid",
+          "value": "9",
+          "selectable": true,
+          "error": "Reserved (Flash) - connected to external SPI flash. Do not use as GPIO. ESPHome blocks these pins."
+        },
+        {
+          "id": "GPIO10",
+          "input": "No",
+          "output": "No",
+          "status": "avoid",
+          "value": "10",
+          "selectable": true,
+          "error": "Reserved (Flash) - connected to external SPI flash. Do not use as GPIO. ESPHome blocks these pins."
+        },
+        {
+          "id": "GPIO11",
+          "input": "No",
+          "output": "No",
+          "status": "avoid",
+          "value": "11",
+          "selectable": true,
+          "error": "Reserved (Flash) - connected to external SPI flash. Do not use as GPIO. ESPHome blocks these pins."
+        },
+        {
+          "id": "GPIO12",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "12",
+          "selectable": true,
+          "warning": "General-purpose GPIO. Often SPI MISO. No boot restrictions."
+        },
+        {
+          "id": "GPIO13",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "13",
+          "selectable": true,
+          "warning": "General-purpose GPIO. Often SPI MOSI. No boot restrictions."
+        },
+        {
+          "id": "GPIO14",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "14",
+          "selectable": true,
+          "warning": "General-purpose GPIO. Often SPI SCLK. Generates a short PWM pulse at reset."
+        },
+        {
+          "id": "GPIO15",
+          "input": "Yes (internal pull-down)",
+          "output": "Yes",
+          "status": "caution",
+          "value": "15",
+          "selectable": true,
+          "warning": "Strapping - must be LOW at boot. Often used as SPI CS. ESPHome warns about strapping pins."
+        },
+        {
+          "id": "GPIO16",
+          "input": "No (no interrupts)",
+          "output": "Yes (no PWM/I2C)",
+          "status": "caution",
+          "value": "16",
+          "selectable": true,
+          "warning": "Special GPIO16 (D0). No interrupts, PWM, or I2C. Default HIGH at boot. Used for deep sleep wake (connects to RESET)."
+        },
+        {
+          "id": "A0 (ADC0)",
+          "input": "Analog in",
+          "output": "-",
+          "status": "caution",
+          "value": "A0",
+          "selectable": true,
+          "warning": "Analog input only. 0-1V on bare chip, up to 3.3V on modules with divider."
+        }
+      ]
+    },
+    "esp32": {
+      "key": "esp32",
+      "title": "ESP32 (original ESP32, WROOM-32)",
+      "notes": [
+        "ESPHome notes (ESP32): Strapping pins (GPIO0, GPIO2, GPIO5, GPIO12, GPIO15) are sampled during reset. Avoid using them as inputs with pull states that oppose the required boot levels. ESPHome shows a warning.",
+        "These pins can be used as outputs if the attached circuitry does not force an invalid level during boot.",
+        "GPIO34-39 are input-only. ESPHome reports an error if you configure them as outputs.",
+        "GPIO6-11 are flash interface pins and should not be used. ESPHome treats this as an error, unless you explicitly use ignore_pin_validation and your module allows it.",
+        "Default I2C pins are GPIO21 (SDA) and GPIO22 (SCL). Default SPI is VSPI (MOSI=23, MISO=19, SCLK=18, CS=5). These defaults are recommended, but the IO matrix lets you remap to other GPIOs.",
+        "UART0 (GPIO1 and GPIO3) is used for programming and logs. After flashing you can reuse it for communication, but during boot GPIO1 outputs debug data. Avoid attaching relays or devices that react to boot pulses."
+      ],
+      "rows": [
+        {
+          "id": "GPIO0",
+          "input": "Yes (internal pull-up)",
+          "output": "Yes",
+          "status": "caution",
+          "value": "0",
+          "selectable": true,
+          "warning": "Strapping - GPIO0 selects boot mode. Must be HIGH at boot (LOW forces flash). ESPHome warns about strapping pins."
+        },
+        {
+          "id": "GPIO1",
+          "input": "Yes*",
+          "output": "Yes (UART0 TX)",
+          "status": "caution",
+          "value": "1",
+          "selectable": true,
+          "warning": "UART0 TX outputs boot logs (default HIGH at boot). If forced LOW during reset, boot can fail. Avoid devices that pull it down."
+        },
+        {
+          "id": "GPIO2",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "2",
+          "selectable": true,
+          "warning": "Strapping - must be LOW/FLOAT at boot. Pulling HIGH prevents boot. ESPHome warns about strapping pins."
+        },
+        {
+          "id": "GPIO3",
+          "input": "Yes (UART0 RX)",
+          "output": "Yes*",
+          "status": "caution",
+          "value": "3",
+          "selectable": true,
+          "warning": "UART0 RX is used for programming/logs. Default pull-up at boot. Can be output in software*, but keep for UART0 when possible."
+        },
+        {
+          "id": "GPIO4",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "4",
+          "selectable": true,
+          "note": "General-purpose GPIO. No strapping function. Safe at boot. Supports ADC2_CH0 and touch T0."
+        },
+        {
+          "id": "GPIO5",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "5",
+          "selectable": true,
+          "warning": "Strapping - must be HIGH at boot. Emits PWM during reset. Default VSPI CS0. ESPHome warns about strapping pins."
+        },
+        {
+          "id": "GPIO6",
+          "input": "No",
+          "output": "No",
+          "status": "avoid",
+          "value": "6",
+          "selectable": true,
+          "error": "Reserved (SPI Flash) - connected to internal flash. Do not use. ESPHome blocks these pins."
+        },
+        {
+          "id": "GPIO7",
+          "input": "No",
+          "output": "No",
+          "status": "avoid",
+          "value": "7",
+          "selectable": true,
+          "error": "Reserved (SPI Flash) - connected to internal flash. Do not use. ESPHome blocks these pins."
+        },
+        {
+          "id": "GPIO8",
+          "input": "No",
+          "output": "No",
+          "status": "avoid",
+          "value": "8",
+          "selectable": true,
+          "error": "Reserved (SPI Flash) - connected to internal flash. Do not use. ESPHome blocks these pins."
+        },
+        {
+          "id": "GPIO9",
+          "input": "No",
+          "output": "No",
+          "status": "avoid",
+          "value": "9",
+          "selectable": true,
+          "error": "Reserved (SPI Flash) - connected to internal flash. Do not use. ESPHome blocks these pins."
+        },
+        {
+          "id": "GPIO10",
+          "input": "No",
+          "output": "No",
+          "status": "avoid",
+          "value": "10",
+          "selectable": true,
+          "error": "Reserved (SPI Flash) - connected to internal flash. Do not use. ESPHome blocks these pins."
+        },
+        {
+          "id": "GPIO11",
+          "input": "No",
+          "output": "No",
+          "status": "avoid",
+          "value": "11",
+          "selectable": true,
+          "error": "Reserved (SPI Flash) - connected to internal flash. Do not use. ESPHome blocks these pins."
+        },
+        {
+          "id": "GPIO12",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "12",
+          "selectable": true,
+          "warning": "Strapping - must be LOW at boot to keep flash at 3.3V. HIGH can force 1.8V and break boot. ESPHome warns about strapping pins."
+        },
+        {
+          "id": "GPIO13",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "13",
+          "selectable": true,
+          "note": "General-purpose GPIO (ADC2_CH4, Touch T4). No boot restrictions."
+        },
+        {
+          "id": "GPIO14",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "14",
+          "selectable": true,
+          "note": "General-purpose GPIO (ADC2_CH6, Touch T6). Emits PWM during reset."
+        },
+        {
+          "id": "GPIO15",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "15",
+          "selectable": true,
+          "note": "Strapping - must be HIGH at boot. Emits PWM during reset. ESPHome warns about strapping pins."
+        },
+        {
+          "id": "GPIO16",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "16",
+          "selectable": true,
+          "note": "General-purpose GPIO (ADC2_CH8). UART2 RX on some boards."
+        },
+        {
+          "id": "GPIO17",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "17",
+          "selectable": true,
+          "note": "General-purpose GPIO (ADC2_CH9). UART2 TX on some boards."
+        },
+        {
+          "id": "GPIO18",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "18",
+          "selectable": true,
+          "note": "General-purpose GPIO. Default VSPI SCLK."
+        },
+        {
+          "id": "GPIO19",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "19",
+          "selectable": true,
+          "note": "General-purpose GPIO. Default VSPI MISO."
+        },
+        {
+          "id": "GPIO21",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "21",
+          "selectable": true,
+          "note": "General-purpose GPIO. Default I2C SDA on many dev kits."
+        },
+        {
+          "id": "GPIO22",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "22",
+          "selectable": true,
+          "note": "General-purpose GPIO. Default I2C SCL on many dev kits."
+        },
+        {
+          "id": "GPIO23",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "23",
+          "selectable": true,
+          "note": "General-purpose GPIO. Default VSPI MOSI."
+        },
+        {
+          "id": "GPIO25",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "25",
+          "selectable": true,
+          "note": "General-purpose GPIO with DAC1 output (ADC2_CH8)."
+        },
+        {
+          "id": "GPIO26",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "26",
+          "selectable": true,
+          "note": "General-purpose GPIO with DAC2 output (ADC2_CH9)."
+        },
+        {
+          "id": "GPIO27",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "27",
+          "selectable": true,
+          "note": "General-purpose GPIO (ADC2_CH7, Touch T7)."
+        },
+        {
+          "id": "GPIO32",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "32",
+          "selectable": true,
+          "note": "General-purpose GPIO (ADC1_CH4, Touch T9, RTC_GPIO9)."
+        },
+        {
+          "id": "GPIO33",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "33",
+          "selectable": true,
+          "note": "General-purpose GPIO (ADC1_CH5, Touch T8, RTC_GPIO8)."
+        },
+        {
+          "id": "GPIO34",
+          "input": "Yes",
+          "output": "No",
+          "status": "caution",
+          "value": "34",
+          "selectable": true,
+          "warning": "Input-only GPIO34 (ADC1_CH6, RTC_GPIO4)."
+        },
+        {
+          "id": "GPIO35",
+          "input": "Yes",
+          "output": "No",
+          "status": "caution",
+          "value": "35",
+          "selectable": true,
+          "warning": "Input-only GPIO35 (ADC1_CH7, RTC_GPIO5)."
+        },
+        {
+          "id": "GPIO36",
+          "input": "Yes",
+          "output": "No",
+          "status": "caution",
+          "value": "36",
+          "selectable": true,
+          "warning": "Input-only GPIO36 (ADC1_CH0, RTC_GPIO0)."
+        },
+        {
+          "id": "GPIO37",
+          "input": "Yes",
+          "output": "No",
+          "status": "caution",
+          "value": "37",
+          "selectable": true,
+          "warning": "Input-only GPIO37 (ADC1_CH1). Not broken out on some modules."
+        },
+        {
+          "id": "GPIO38",
+          "input": "Yes",
+          "output": "No",
+          "status": "caution",
+          "value": "38",
+          "selectable": true,
+          "warning": "Input-only GPIO38 (ADC1_CH2). Not broken out on some modules."
+        },
+        {
+          "id": "GPIO39",
+          "input": "Yes",
+          "output": "No",
+          "status": "caution",
+          "value": "39",
+          "selectable": true,
+          "warning": "Input-only GPIO39 (ADC1_CH3, RTC_GPIO3)."
+        }
+      ]
+    },
+    "esp32-s2": {
+      "key": "esp32-s2",
+      "title": "ESP32-S2 (ESP32-S2-SOLO)",
+      "notes": [
+        "ESPHome notes (ESP32-S2): Strapping pins are GPIO0, GPIO45, and GPIO46. ESPHome warns if you use them as GPIO; make sure external circuits do not alter their levels during reset.",
+        "GPIO46 is a special strapping input and is not supported as an output. GPIO26-32 are used by flash/PSRAM and are not available to the user.",
+        "GPIO39-42 are JTAG pins. Avoid using them unless you need debugging; ESPHome omits them on many board definitions.",
+        "The built-in USB interface uses GPIO19/20. If firmware uses native USB for communication, do not reuse these pins.",
+        "I2C can be mapped to any free GPIO using the IO matrix. Common choices are GPIO8 (SDA) and GPIO9 (SCL)."
+      ],
+      "rows": [
+        {
+          "id": "GPIO0",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "0",
+          "selectable": true,
+          "error": "Strapping - selects boot mode. Must be HIGH at boot (LOW forces flash)."
+        },
+        {
+          "id": "GPIO1",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "1",
+          "selectable": true,
+          "note": "General-purpose GPIO (ADC1_CH5)."
+        },
+        {
+          "id": "GPIO2",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "2",
+          "selectable": true,
+          "note": "General-purpose GPIO (ADC1_CH6)."
+        },
+        {
+          "id": "GPIO3",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "3",
+          "selectable": true,
+          "note": "General-purpose GPIO (ADC1_CH7)."
+        },
+        {
+          "id": "GPIO4",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "4",
+          "selectable": true,
+          "note": "General-purpose GPIO (ADC1_CH4)."
+        },
+        {
+          "id": "GPIO5",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "5",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC2_CH5)."
+        },
+        {
+          "id": "GPIO6",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "6",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC2_CH6)."
+        },
+        {
+          "id": "GPIO7",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "7",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC2_CH7)."
+        },
+        {
+          "id": "GPIO8",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "8",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC2_CH8)."
+        },
+        {
+          "id": "GPIO9",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "9",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC2_CH9)."
+        },
+        {
+          "id": "GPIO10",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "10",
+          "selectable": true,
+          "note": "General-purpose GPIO (ADC1_CH8)."
+        },
+        {
+          "id": "GPIO11",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "11",
+          "selectable": true,
+          "note": "General-purpose GPIO (ADC1_CH9)."
+        },
+        {
+          "id": "GPIO12",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "12",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC2_CH0)."
+        },
+        {
+          "id": "GPIO13",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "13",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC2_CH1)."
+        },
+        {
+          "id": "GPIO14",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "14",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC2_CH2)."
+        },
+        {
+          "id": "GPIO15",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "15",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC2_CH3)."
+        },
+        {
+          "id": "GPIO16",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "16",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC2_CH4)."
+        },
+        {
+          "id": "GPIO17",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "17",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO18",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "18",
+          "selectable": true,
+          "note": "General-purpose GPIO. On DevKitC-1 controls built-in addressable RGB LED."
+        },
+        {
+          "id": "GPIO19",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "19",
+          "selectable": true,
+          "error": "USB D- line used by native USB. Avoid using as GPIO if USB is used."
+        },
+        {
+          "id": "GPIO20",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "20",
+          "selectable": true,
+          "error": "USB D+ line used by native USB."
+        },
+        {
+          "id": "GPIO21",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "21",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO26",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "26",
+          "selectable": false,
+          "error": "Reserved (Flash) - GPIO26-32 connected to internal flash/PSRAM and not available."
+        },
+        {
+          "id": "GPIO27",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "27",
+          "selectable": true,
+          "error": "Reserved (Flash) ."
+        },
+        {
+          "id": "GPIO28",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "28",
+          "selectable": true,
+          "error": "Reserved (Flash) ."
+        },
+        {
+          "id": "GPIO29",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "29",
+          "selectable": true,
+          "error": "Reserved (Flash) ."
+        },
+        {
+          "id": "GPIO30",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "30",
+          "selectable": true,
+          "error": "Reserved (Flash) ."
+        },
+        {
+          "id": "GPIO31",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "31",
+          "selectable": true,
+          "error": "Reserved (Flash) ."
+        },
+        {
+          "id": "GPIO32",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "32",
+          "selectable": true,
+          "error": "Reserved (Flash) ."
+        },
+        {
+          "id": "GPIO33",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "33",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO34",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "34",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO35",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "35",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO36",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "36",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO37",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "37",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO38",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "38",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO39",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "39",
+          "selectable": true,
+          "error": "JTAG TCK - reserved for JTAG on many boards (GPIO39-42)."
+        },
+        {
+          "id": "GPIO40",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "40",
+          "selectable": true,
+          "warning": "JTAG TMS ."
+        },
+        {
+          "id": "GPIO41",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "41",
+          "selectable": true,
+          "warning": "JTAG TDI ."
+        },
+        {
+          "id": "GPIO42",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "42",
+          "selectable": true,
+          "warning": "JTAG TDO ."
+        },
+        {
+          "id": "GPIO45",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "45",
+          "selectable": true,
+          "error": "Strapping - GPIO45 selects VDD_SDIO voltage. Ensure correct default state; invalid levels can break flash."
+        },
+        {
+          "id": "GPIO46",
+          "input": "Yes (input-only)",
+          "output": "No",
+          "status": "avoid",
+          "value": "46",
+          "selectable": true,
+          "error": "Strapping & input-only - fixed pull-down. Used to select ROM log mode. Avoid using as a normal input."
+        }
+      ]
+    },
+    "esp32-s3": {
+      "key": "esp32-s3",
+      "title": "ESP32-S3 (ESP32-S3-WROOM)",
+      "notes": [
+        "ESPHome notes (ESP32-S3): Strapping pins are GPIO0, GPIO3, GPIO45, and GPIO46. Avoid loading them at boot. ESPHome warns if you use them as GPIO. GPIO45 is especially sensitive because it sets flash voltage and should stay at its default level.",
+        "GPIO26-32 are used by flash/PSRAM and are not broken out on the module. GPIO43 and GPIO44 are used by UART0 for flashing; GPIO44 outputs boot logs that may affect attached devices.",
+        "S3 includes built-in USB (device/host) with integrated JTAG, enabling programming and debugging over USB without UART0.",
+        "I2C can be mapped to any free GPIO; common defaults are GPIO8 (SDA) and GPIO9 (SCL). SPI defaults to VSPI; on some Octal flash modules MOSI=11, MISO=13, SCLK=12, CS=10, but the IO matrix allows remapping.",
+        "Touch pins (Touch1-14) can be used as touch sensors. Using them as GPIO disables touch sensing."
+      ],
+      "rows": [
+        {
+          "id": "GPIO0",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "0",
+          "selectable": true,
+          "warning": "Strapping - selects boot mode. Pull-up; must be HIGH at boot."
+        },
+        {
+          "id": "GPIO1",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "1",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC1_CH0, Touch1)."
+        },
+        {
+          "id": "GPIO2",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "2",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC1_CH1, Touch2)."
+        },
+        {
+          "id": "GPIO3",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "3",
+          "selectable": true,
+          "warning": "Strapping - selects JTAG source. Keep default pull-down at boot."
+        },
+        {
+          "id": "GPIO4",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "4",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC1_CH3, Touch4)."
+        },
+        {
+          "id": "GPIO5",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "5",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC1_CH4, Touch5)."
+        },
+        {
+          "id": "GPIO6",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "6",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC1_CH5, Touch6)."
+        },
+        {
+          "id": "GPIO7",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "7",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC1_CH6, Touch7)."
+        },
+        {
+          "id": "GPIO8",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "8",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC1_CH7, Touch8)."
+        },
+        {
+          "id": "GPIO9",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "9",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC1_CH8, Touch9)."
+        },
+        {
+          "id": "GPIO10",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "10",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC2_CH0, Touch10)."
+        },
+        {
+          "id": "GPIO11",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "11",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC2_CH1, Touch11)."
+        },
+        {
+          "id": "GPIO12",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "12",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC2_CH2, Touch12)."
+        },
+        {
+          "id": "GPIO13",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "13",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC2_CH3, Touch13)."
+        },
+        {
+          "id": "GPIO14",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "14",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC2_CH4, Touch14)."
+        },
+        {
+          "id": "GPIO15",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "15",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC2_CH5)."
+        },
+        {
+          "id": "GPIO16",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "16",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC2_CH6)."
+        },
+        {
+          "id": "GPIO17",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "17",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC2_CH7)."
+        },
+        {
+          "id": "GPIO18",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "18",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC2_CH8)."
+        },
+        {
+          "id": "GPIO19",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "19",
+          "selectable": true,
+          "warning": "General-purpose GPIO (ADC2_CH9)."
+        },
+        {
+          "id": "GPIO20",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "20",
+          "selectable": false,
+          "error": "Not available as GPIO."
+        },
+        {
+          "id": "GPIO21",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "21",
+          "selectable": false,
+          "error": "Not available as GPIO."
+        },
+        {
+          "id": "GPIO22",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "22",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO23",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "23",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO24",
+          "input": "-",
+          "output": "-",
+          "status": "safe",
+          "value": "24",
+          "selectable": true,
+          "note": "Not broken out on S3-WROOM modules."
+        },
+        {
+          "id": "GPIO25",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "25",
+          "selectable": false,
+          "error": "Not available on S3."
+        },
+        {
+          "id": "GPIO26",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "26",
+          "selectable": false,
+          "error": "Reserved (Flash) - GPIO26-32 connected to flash/PSRAM and not available."
+        },
+        {
+          "id": "GPIO27",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "27",
+          "selectable": true,
+          "error": "Reserved (Flash/PSRAM) ."
+        },
+        {
+          "id": "GPIO28",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "28",
+          "selectable": true,
+          "error": "Reserved (Flash/PSRAM) ."
+        },
+        {
+          "id": "GPIO29",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "29",
+          "selectable": true,
+          "error": "Reserved (Flash/PSRAM) ."
+        },
+        {
+          "id": "GPIO30",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "30",
+          "selectable": true,
+          "error": "Reserved (Flash/PSRAM) ."
+        },
+        {
+          "id": "GPIO31",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "31",
+          "selectable": true,
+          "error": "Reserved (Flash/PSRAM) ."
+        },
+        {
+          "id": "GPIO32",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "32",
+          "selectable": true,
+          "error": "Reserved (Flash/PSRAM) ."
+        },
+        {
+          "id": "GPIO33",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "33",
+          "selectable": true,
+          "note": "General-purpose GPIO (ADC1_CH9)."
+        },
+        {
+          "id": "GPIO34",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "34",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO35",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "35",
+          "selectable": true,
+          "error": "General-purpose GPIO. Some modules with Octal PSRAM may reserve GPIO35."
+        },
+        {
+          "id": "GPIO36",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "36",
+          "selectable": true,
+          "error": "General-purpose GPIO. Some modules with Octal PSRAM may reserve GPIO36."
+        },
+        {
+          "id": "GPIO37",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "37",
+          "selectable": true,
+          "error": "General-purpose GPIO. Some modules with Octal PSRAM may reserve GPIO37."
+        },
+        {
+          "id": "GPIO38",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "38",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO39",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "39",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO40",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "40",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO41",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "41",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO42",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "42",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO43",
+          "input": "Yes (UART0 RX)",
+          "output": "Yes*",
+          "status": "caution",
+          "value": "43",
+          "selectable": true,
+          "warning": "UART0 RX connected to USB-UART. Keep for programming."
+        },
+        {
+          "id": "GPIO44",
+          "input": "Yes*",
+          "output": "Yes (UART0 TX)",
+          "status": "caution",
+          "value": "44",
+          "selectable": true,
+          "warning": "UART0 TX connected to USB-UART. Emits boot logs."
+        },
+        {
+          "id": "GPIO45",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "45",
+          "selectable": true,
+          "error": "Strapping - selects flash voltage (VDD_SPI). Keep default state."
+        },
+        {
+          "id": "GPIO46",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "46",
+          "selectable": true,
+          "warning": "Strapping - participates in boot mode selection and ROM log control. Avoid pull-ups to VCC."
+        },
+        {
+          "id": "GPIO47",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "47",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO48",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "48",
+          "selectable": true,
+          "note": "General-purpose GPIO. On DevKitC controls RGB LED blue channel."
+        }
+      ]
+    },
+    "esp32-c2": {
+      "key": "esp32-c2",
+      "title": "ESP32-C2 (ESP8684)",
+      "notes": [
+        "ESPHome notes (ESP32-C2): ESP32-C2 has only 14 GPIO, so plan pin usage carefully.",
+        "GPIO8 and GPIO9 are strapping pins. ESPHome warns when you use them; make sure external circuits do not pull them LOW during reset. Treat GPIO8 and GPIO9 as advanced pins until you understand their boot behavior.",
+        "GPIO4, GPIO5, GPIO6, GPIO7, and GPIO10 are tied to the flash interface. ESPHome marks them as reserved and blocks them by default unless you override with ignore_pin_validation.",
+        "The safest general-purpose pins are GPIO0, GPIO1, GPIO2, GPIO3, and GPIO18 (plus GPIO19/20 only if UART0 is not used).",
+        "Recommended I2C pins are SDA=GPIO2 and SCL=GPIO3 (or SDA=GPIO0, SCL=GPIO1). These pairs avoid conflicts with other functions.",
+        "GPIO19 and GPIO20 are UART0 for programming and logs. Keep them free during flashing and debug, even if you temporarily repurpose them.",
+        "GPIO5 is the only ADC2 pin and shares functionality with WiFi. Analog reads may fail during active WiFi, so use GPIO0-3 (ADC1) for analog sensors when possible."
+      ],
+      "rows": [
+        {
+          "id": "GPIO0",
+          "input": "Yes (ADC1_CH0)",
+          "output": "Yes",
+          "status": "safe",
+          "value": "0",
+          "selectable": true,
+          "note": "General-purpose GPIO. On DevKitC-02 drives red LED."
+        },
+        {
+          "id": "GPIO1",
+          "input": "Yes (ADC1_CH1)",
+          "output": "Yes",
+          "status": "safe",
+          "value": "1",
+          "selectable": true,
+          "note": "General-purpose GPIO. On DevKit drives green LED."
+        },
+        {
+          "id": "GPIO2",
+          "input": "Yes (ADC1_CH2)",
+          "output": "Yes",
+          "status": "safe",
+          "value": "2",
+          "selectable": true,
+          "note": "General-purpose GPIO. Recommended as I2C SDA."
+        },
+        {
+          "id": "GPIO3",
+          "input": "Yes (ADC1_CH3)",
+          "output": "Yes",
+          "status": "safe",
+          "value": "3",
+          "selectable": true,
+          "note": "General-purpose GPIO. Recommended as I2C SCL."
+        },
+        {
+          "id": "GPIO4",
+          "input": "Yes (ADC1_CH4)",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "4",
+          "selectable": true,
+          "error": "Flash FSPIHD - connected to SPI flash. Possible GPIO but avoid heavy toggling."
+        },
+        {
+          "id": "GPIO5",
+          "input": "Yes (ADC2_CH0)",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "5",
+          "selectable": true,
+          "error": "Flash FSPIWP - connected to flash. ADC2 conflicts with WiFi."
+        },
+        {
+          "id": "GPIO6",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "6",
+          "selectable": true,
+          "error": "Flash FSPICLK - flash clock. Avoid use."
+        },
+        {
+          "id": "GPIO7",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "7",
+          "selectable": true,
+          "error": "Flash FSPID - flash data line. Avoid use."
+        },
+        {
+          "id": "GPIO8",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "8",
+          "selectable": true,
+          "warning": "Strapping - affects boot mode. Do not pull LOW during reset. On DevKit drives blue LED."
+        },
+        {
+          "id": "GPIO9",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "9",
+          "selectable": true,
+          "warning": "Strapping - boot/log strap. Internal pull-up. Avoid forcing LOW at boot."
+        },
+        {
+          "id": "GPIO10",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "10",
+          "selectable": true,
+          "error": "Flash FSPICS0 - flash chip select. Avoid use unless you know your module wiring."
+        },
+        {
+          "id": "GPIO18",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "18",
+          "selectable": true,
+          "note": "General-purpose GPIO. Safe digital IO."
+        },
+        {
+          "id": "GPIO19",
+          "input": "Yes (UART0 RX)",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "19",
+          "selectable": true,
+          "error": "UART0 RX for programming. Keep free when flashing."
+        },
+        {
+          "id": "GPIO20",
+          "input": "Yes*",
+          "output": "Yes (UART0 TX)",
+          "status": "caution",
+          "value": "20",
+          "selectable": true,
+          "warning": "UART0 TX for boot logs and programming. Avoid using for peripherals."
+        }
+      ]
+    },
+    "esp32-c3": {
+      "key": "esp32-c3",
+      "title": "ESP32-C3 (ESP32-C3-WROOM-02)",
+      "notes": [
+        "ESPHome notes (ESP32-C3): Strapping pins are GPIO2, GPIO8, and GPIO9. Avoid attaching circuits that change their levels during reset. ESPHome warns when you use them as GPIO.",
+        "GPIO9 is tied to the BOOT button on dev kits, and GPIO8 often drives the on-board LED. Heavy loads or large capacitance on these lines can prevent boot.",
+        "GPIO5 is the only ADC2 pin. Analog reads can fail during active WiFi.",
+        "The safest GPIOs (no strapping or special functions) are GPIO0, GPIO1, GPIO3, GPIO4, GPIO6, GPIO7, and GPIO10.",
+        "GPIO19 and GPIO20 are UART0. Keep them for logs and flashing; using them as GPIO makes programming and debugging harder.",
+        "I2C can be mapped to any free pins. A common choice is GPIO4 (SDA) and GPIO5 (SCL) or other free pairs.",
+        "SPI can be mapped to any GPIO. The Arduino default on C3 is MOSI=7, MISO=2, SCLK=6, CS=10, but those lines overlap with flash pins on many modules, so pick alternative GPIOs when possible."
+      ],
+      "rows": [
+        {
+          "id": "GPIO0",
+          "input": "Yes (ADC1_CH0)",
+          "output": "Yes",
+          "status": "safe",
+          "value": "0",
+          "selectable": true,
+          "note": "General-purpose GPIO. Also RTC 32k_XP when using external 32kHz oscillator."
+        },
+        {
+          "id": "GPIO1",
+          "input": "Yes (ADC1_CH1)",
+          "output": "Yes",
+          "status": "safe",
+          "value": "1",
+          "selectable": true,
+          "note": "General-purpose GPIO. Also RTC 32k_XN when using external 32kHz oscillator."
+        },
+        {
+          "id": "GPIO2",
+          "input": "Yes (ADC1_CH2)",
+          "output": "Yes",
+          "status": "caution",
+          "value": "2",
+          "selectable": true,
+          "warning": "Strapping - participates in boot mode selection. Avoid pull-up at reset."
+        },
+        {
+          "id": "GPIO3",
+          "input": "Yes (ADC1_CH3)",
+          "output": "Yes",
+          "status": "safe",
+          "value": "3",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO4",
+          "input": "Yes (ADC1_CH4)",
+          "output": "Yes",
+          "status": "safe",
+          "value": "4",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO5",
+          "input": "Yes (ADC2_CH0)",
+          "output": "Yes",
+          "status": "caution",
+          "value": "5",
+          "selectable": true,
+          "warning": "ADC2 - analog reads can conflict with WiFi. Digital IO is fine."
+        },
+        {
+          "id": "GPIO6",
+          "input": "Yes (FSPIQ)",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "6",
+          "selectable": true,
+          "error": "Flash interface - connected to flash. Avoid use if possible."
+        },
+        {
+          "id": "GPIO7",
+          "input": "Yes (FSPID)",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "7",
+          "selectable": true,
+          "error": "Flash interface - flash data line. Avoid heavy use."
+        },
+        {
+          "id": "GPIO8",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "8",
+          "selectable": true,
+          "warning": "Strapping - controls ROM log output and boot mode. Often drives blue LED."
+        },
+        {
+          "id": "GPIO9",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "9",
+          "selectable": true,
+          "warning": "Strapping - bootloader strap. Tied to BOOT button on dev kits."
+        },
+        {
+          "id": "GPIO10",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "10",
+          "selectable": true,
+          "note": "General-purpose GPIO. Default SPI CS1 on some boards."
+        },
+        {
+          "id": "GPIO11",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "11",
+          "selectable": false,
+          "error": "Not available as GPIO."
+        },
+        {
+          "id": "GPIO12",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "12",
+          "selectable": false,
+          "error": "Not available as GPIO."
+        },
+        {
+          "id": "GPIO13",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "13",
+          "selectable": false,
+          "error": "Not available as GPIO."
+        },
+        {
+          "id": "GPIO14",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "14",
+          "selectable": false,
+          "error": "Not available as GPIO."
+        },
+        {
+          "id": "GPIO15",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "15",
+          "selectable": false,
+          "error": "Not available as GPIO."
+        },
+        {
+          "id": "GPIO16",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "16",
+          "selectable": false,
+          "error": "Not available as GPIO."
+        },
+        {
+          "id": "GPIO17",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "17",
+          "selectable": false,
+          "error": "Not available as GPIO."
+        },
+        {
+          "id": "GPIO18",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "18",
+          "selectable": false,
+          "error": "Not available as GPIO."
+        },
+        {
+          "id": "GPIO19",
+          "input": "Yes (UART0 RX)",
+          "output": "Yes*",
+          "status": "caution",
+          "value": "19",
+          "selectable": true,
+          "warning": "UART0 RX connected to USB-UART. Keep for programming."
+        },
+        {
+          "id": "GPIO20",
+          "input": "Yes*",
+          "output": "Yes (UART0 TX)",
+          "status": "caution",
+          "value": "20",
+          "selectable": true,
+          "warning": "UART0 TX outputs boot logs. Avoid using for peripherals."
+        }
+      ]
+    },
+    "esp32-c5": {
+      "key": "esp32-c5",
+      "title": "ESP32-C5 (ESP32-C5-WROOM-1)",
+      "notes": [
+        "ESPHome notes (ESP32-C5): ESP32-C5 introduces many strapping pins. GPIO2, GPIO3, GPIO7, GPIO25, GPIO26, GPIO27, and GPIO28 are sampled at boot. Ensure their default levels are preserved (most have pull-ups), and avoid loads that change them during reset. ESPHome warns if you use these pins.",
+        "GPIO16-22 are usually connected to the SPI flash interface and are not available as GPIO. ESPHome blocks them unless ignore_pin_validation is used.",
+        "The C5 module includes USB-JTAG. GPIO13/14 are D- and D+ lines, so do not reuse them when USB/JTAG is active.",
+        "Default UART0 is GPIO11 (TX) and GPIO12 (RX). Keep these pins for logs and flashing.",
+        "Many C5 pins overlap JTAG/MTDI/MTMS signals. After boot they can be used as normal GPIO, but make sure external circuits do not disturb boot levels.",
+        "Recommended I2C pins are GPIO4 (SDA) and GPIO5 (SCL) or other free pairs. SPI can be mapped to any GPIO; the default FSPI uses GPIO6, GPIO7, GPIO10, GPIO4, GPIO5 but these lines are shared with flash, so prefer other pins such as GPIO23/24 via VSPI when available."
+      ],
+      "rows": [
+        {
+          "id": "GPIO0",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "0",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO1",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "1",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO2",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "2",
+          "selectable": true,
+          "warning": "Strapping - boot configuration pin (ADC1_CH1)."
+        },
+        {
+          "id": "GPIO3",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "3",
+          "selectable": true,
+          "warning": "Strapping - boot configuration pin (ADC1_CH2)."
+        },
+        {
+          "id": "GPIO4",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "4",
+          "selectable": true,
+          "note": "General-purpose GPIO (ADC1_CH3)."
+        },
+        {
+          "id": "GPIO5",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "5",
+          "selectable": true,
+          "note": "General-purpose GPIO (ADC1_CH4)."
+        },
+        {
+          "id": "GPIO6",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "6",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO7",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "7",
+          "selectable": true,
+          "warning": "Strapping - boot configuration pin."
+        },
+        {
+          "id": "GPIO8",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "8",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO9",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "9",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO10",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "10",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO11",
+          "input": "Yes*",
+          "output": "Yes",
+          "status": "caution",
+          "value": "11",
+          "selectable": true,
+          "warning": "UART0 TX used for programming. Keep free if using UART."
+        },
+        {
+          "id": "GPIO12",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "caution",
+          "value": "12",
+          "selectable": true,
+          "warning": "UART0 RX used for programming."
+        },
+        {
+          "id": "GPIO13",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "13",
+          "selectable": true,
+          "error": "USB D- line used for native USB/JTAG. Avoid using when USB is active."
+        },
+        {
+          "id": "GPIO14",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "14",
+          "selectable": true,
+          "error": "USB D+ line used for native USB/JTAG."
+        },
+        {
+          "id": "GPIO15",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "15",
+          "selectable": true,
+          "warning": "Strapping - boot configuration pin (pull-up default)."
+        },
+        {
+          "id": "GPIO16",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "16",
+          "selectable": true,
+          "error": "SPI0/1 Flash - used by external flash. Do not use unless you know your module wiring."
+        },
+        {
+          "id": "GPIO17",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "17",
+          "selectable": true,
+          "error": "SPI0/1 Flash - used by external flash. Do not use unless you know your module wiring."
+        },
+        {
+          "id": "GPIO18",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "18",
+          "selectable": true,
+          "error": "SPI0/1 Flash - used by external flash. Do not use unless you know your module wiring."
+        },
+        {
+          "id": "GPIO19",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "19",
+          "selectable": true,
+          "error": "SPI0/1 Flash - used by external flash. Do not use unless you know your module wiring."
+        },
+        {
+          "id": "GPIO20",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "20",
+          "selectable": true,
+          "error": "SPI0/1 Flash - used by external flash. Do not use unless you know your module wiring."
+        },
+        {
+          "id": "GPIO21",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "21",
+          "selectable": true,
+          "error": "SPI0/1 Flash - used by external flash. Do not use unless you know your module wiring."
+        },
+        {
+          "id": "GPIO22",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "22",
+          "selectable": true,
+          "error": "SPI0/1 Flash - used by external flash. Do not use unless you know your module wiring."
+        },
+        {
+          "id": "GPIO23",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "23",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO24",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "24",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO25",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "25",
+          "selectable": true,
+          "warning": "Strapping - boot configuration pin (pull-up default)."
+        },
+        {
+          "id": "GPIO26",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "26",
+          "selectable": true,
+          "warning": "Strapping - boot configuration pin (float default)."
+        },
+        {
+          "id": "GPIO27",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "27",
+          "selectable": true,
+          "warning": "Strapping - boot configuration pin (pull-up default)."
+        },
+        {
+          "id": "GPIO28",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "28",
+          "selectable": true,
+          "warning": "Strapping - boot configuration pin (pull-up default)."
+        },
+        {
+          "id": "GPIO29",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "29",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO30",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "30",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO31",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "31",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO32",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "32",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO33",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "33",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO34",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "34",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO35",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "35",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO36",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "36",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO37",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "37",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO38",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "38",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO39",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "39",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        }
+      ]
+    },
+    "esp32-c6": {
+      "key": "esp32-c6",
+      "title": "ESP32-C6 (ESP32-C6-WROOM-1)",
+      "notes": [
+        "ESPHome notes (ESP32-C6): Strapping pins include GPIO8, GPIO9, GPIO15, and the JTAG pins (MTMS, MTDI). Keep them at their default boot levels. ESPHome warns when you use them as GPIO.",
+        "GPIO16-22 are used by the SPI flash interface, especially on modules with external flash. Avoid using these pins unless your module documentation explicitly allows it.",
+        "ESP32-C6 supports Wi-Fi 6 and Thread/Zigbee (802.15.4). These radio features do not change GPIO mapping.",
+        "Some C6 modules include native USB. When USB is in use, keep D+ and D- dedicated to USB.",
+        "UART0 pin mapping depends on the module. Check the module documentation and keep those pins free for flashing and logs.",
+        "I2C and SPI recommendations are similar to ESP32-C5. Use the IO matrix to map buses to free GPIO."
+      ],
+      "rows": [
+        {
+          "id": "GPIO0",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "0",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO1",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "1",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO2",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "2",
+          "selectable": true,
+          "warning": "Strapping (MTMS) - boot configuration pin."
+        },
+        {
+          "id": "GPIO3",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "3",
+          "selectable": true,
+          "warning": "Strapping (MTDI) - boot configuration pin."
+        },
+        {
+          "id": "GPIO4",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "4",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO5",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "5",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO6",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "6",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO7",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "7",
+          "selectable": true,
+          "warning": "Strapping - boot configuration pin."
+        },
+        {
+          "id": "GPIO8",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "8",
+          "selectable": true,
+          "warning": "Strapping - boot mode/log pin."
+        },
+        {
+          "id": "GPIO9",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "9",
+          "selectable": true,
+          "warning": "Strapping - boot mode/log pin."
+        },
+        {
+          "id": "GPIO10",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "10",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO11",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "11",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO12",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "12",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO13",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "13",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO14",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "14",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO15",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "15",
+          "selectable": true,
+          "warning": "Strapping - boot configuration pin."
+        },
+        {
+          "id": "GPIO16",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "16",
+          "selectable": true,
+          "error": "Flash SPI - connected to flash. Avoid use."
+        },
+        {
+          "id": "GPIO17",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "17",
+          "selectable": true,
+          "error": "Flash SPI - connected to flash. Avoid use."
+        },
+        {
+          "id": "GPIO18",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "18",
+          "selectable": true,
+          "error": "Flash SPI - connected to flash. Avoid use."
+        },
+        {
+          "id": "GPIO19",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "19",
+          "selectable": true,
+          "error": "Flash SPI - connected to flash. Avoid use."
+        },
+        {
+          "id": "GPIO20",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "20",
+          "selectable": true,
+          "error": "Flash SPI - connected to flash. Avoid use."
+        },
+        {
+          "id": "GPIO21",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "21",
+          "selectable": true,
+          "error": "Flash SPI - connected to flash. Avoid use."
+        },
+        {
+          "id": "GPIO22",
+          "input": "Yes",
+          "output": "Yes*",
+          "status": "avoid",
+          "value": "22",
+          "selectable": true,
+          "error": "Flash SPI - connected to flash. Avoid use."
+        },
+        {
+          "id": "GPIO23",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "23",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO24",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "24",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO25",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "25",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO34",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "34",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO35",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "35",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO36",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "36",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO37",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "37",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO38",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "38",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        }
+      ]
+    },
+    "esp32-h2": {
+      "key": "esp32-h2",
+      "title": "ESP32-H2 (ESP32-H2-MINI-1)",
+      "notes": [
+        "ESPHome notes (ESP32-H2): ESP32-H2 has no Wi-Fi and includes BLE and 802.15.4. It has integrated QSPI flash. GPIO0-5 are connected to flash and cannot be used as GPIO; ESPHome ignores them.",
+        "Strapping pins include GPIO8 (ROM log control) and GPIO9/25 (boot mode). Avoid anything that forces non-default levels during reset. ESPHome treats their use as potentially unsafe and shows warnings. On the H2 dev kit, the BOOT button is on GPIO9 and the addressable RGB LED data is on GPIO8.",
+        "ESP32-H2 includes native USB 2.0 Full Speed. The DevKitM-1 board has two USB-C ports: one for USB-UART and one for native USB. You can flash via USB DFU; if you use UART0 (GPIO23/24) for flashing, keep those pins dedicated.",
+        "I2C and SPI mapping is flexible through the IO matrix. Typical I2C uses GPIO10/11, and SPI uses the FSPI controller, but those lines overlap flash, so use a secondary controller or free GPIO for external SPI devices.",
+        "H2 has two analog comparators (ZCD0, ZCD1 on GPIO10/11). If you do not use them, GPIO10/11 can be regular GPIO."
+      ],
+      "rows": [
+        {
+          "id": "GPIO0",
+          "input": "Yes (ADC1_CH0)",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "0",
+          "selectable": true,
+          "error": "Flash QSPI - connected to internal flash (QSPI IO0). Do not use."
+        },
+        {
+          "id": "GPIO1",
+          "input": "Yes (ADC1_CH1)",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "1",
+          "selectable": true,
+          "error": "Flash QSPI - connected to internal flash (CS0). Do not use."
+        },
+        {
+          "id": "GPIO2",
+          "input": "Yes (ADC1_CH2)",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "2",
+          "selectable": true,
+          "error": "Flash QSPI - connected to internal flash (WP). Do not use."
+        },
+        {
+          "id": "GPIO3",
+          "input": "Yes (ADC1_CH3)",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "3",
+          "selectable": true,
+          "error": "Flash QSPI - connected to internal flash (HD). Do not use."
+        },
+        {
+          "id": "GPIO4",
+          "input": "Yes (ADC1_CH4)",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "4",
+          "selectable": true,
+          "error": "Flash QSPI - connected to internal flash (CLK). Do not use."
+        },
+        {
+          "id": "GPIO5",
+          "input": "Yes (ADC1_CH5)",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "5",
+          "selectable": true,
+          "error": "Flash QSPI - connected to internal flash (D0). Do not use."
+        },
+        {
+          "id": "GPIO6",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "6",
+          "selectable": false,
+          "error": "Not available as GPIO."
+        },
+        {
+          "id": "GPIO7",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "7",
+          "selectable": false,
+          "error": "Not available as GPIO."
+        },
+        {
+          "id": "GPIO8",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "8",
+          "selectable": true,
+          "warning": "Strapping - controls ROM log output. Often drives RGB LED data on dev kits."
+        },
+        {
+          "id": "GPIO9",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "9",
+          "selectable": true,
+          "warning": "Strapping - boot mode strap (often tied to BOOT button)."
+        },
+        {
+          "id": "GPIO10",
+          "input": "Yes (ZCD0)",
+          "output": "Yes",
+          "status": "caution",
+          "value": "10",
+          "selectable": true,
+          "warning": "General-purpose GPIO with analog comparator ZCD0."
+        },
+        {
+          "id": "GPIO11",
+          "input": "Yes (ZCD1)",
+          "output": "Yes",
+          "status": "caution",
+          "value": "11",
+          "selectable": true,
+          "warning": "General-purpose GPIO with analog comparator ZCD1."
+        },
+        {
+          "id": "GPIO12",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "12",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO13",
+          "input": "Yes (XTAL_32K_P)",
+          "output": "Yes",
+          "status": "safe",
+          "value": "13",
+          "selectable": true,
+          "note": "32kHz oscillator pin. Avoid if using external 32kHz crystal."
+        },
+        {
+          "id": "GPIO14",
+          "input": "Yes (XTAL_32K_N)",
+          "output": "Yes",
+          "status": "safe",
+          "value": "14",
+          "selectable": true,
+          "note": "32kHz oscillator pin. Avoid if using external 32kHz crystal."
+        },
+        {
+          "id": "GPIO15",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "15",
+          "selectable": false,
+          "error": "Not available as GPIO."
+        },
+        {
+          "id": "GPIO16",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "16",
+          "selectable": true,
+          "error": "Not available as GPIO."
+        },
+        {
+          "id": "GPIO17",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "17",
+          "selectable": true,
+          "error": "Not available as GPIO."
+        },
+        {
+          "id": "GPIO18",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "18",
+          "selectable": true,
+          "error": "Not available as GPIO."
+        },
+        {
+          "id": "GPIO19",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "19",
+          "selectable": true,
+          "error": "Not available as GPIO."
+        },
+        {
+          "id": "GPIO20",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "20",
+          "selectable": true,
+          "error": "Not available as GPIO."
+        },
+        {
+          "id": "GPIO21",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "21",
+          "selectable": true,
+          "error": "Not available as GPIO."
+        },
+        {
+          "id": "GPIO22",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "22",
+          "selectable": true,
+          "note": "General-purpose GPIO."
+        },
+        {
+          "id": "GPIO23",
+          "input": "Yes (UART0 RX)",
+          "output": "Yes*",
+          "status": "caution",
+          "value": "23",
+          "selectable": true,
+          "warning": "UART0 RX connected to USB-UART. Keep for programming."
+        },
+        {
+          "id": "GPIO24",
+          "input": "Yes*",
+          "output": "Yes (UART0 TX)",
+          "status": "avoid",
+          "value": "24",
+          "selectable": true,
+          "error": "UART0 TX outputs boot logs. Keep free during flashing."
+        },
+        {
+          "id": "GPIO25",
+          "input": "Yes (FSPICS3)",
+          "output": "Yes",
+          "status": "caution",
+          "value": "25",
+          "selectable": true,
+          "warning": "Strapping - boot/radio configuration. Keep default state during reset."
+        },
+        {
+          "id": "GPIO26",
+          "input": "-",
+          "output": "-",
+          "status": "avoid",
+          "value": "26",
+          "selectable": false,
+          "error": "Not available as GPIO."
+        }
+      ]
+    },
+    "esp32-p4": {
+      "key": "esp32-p4",
+      "title": "ESP32-P4 (ESP32-P4)",
+      "notes": [
+        "ESPHome notes (ESP32-P4): ESP32-P4 has five strapping pins: GPIO34, GPIO35, GPIO36, GPIO37, and GPIO38. They select boot sources (flash/UART/USB) and other parameters. Do not attach components that can disturb their default levels at reset. On EVB boards the BOOT button is on GPIO35. ESPHome warns or errors unless ignore_strapping_warning is used.",
+        "P4 includes USB 2.0 OTG with JTAG. GPIO24/25 are D- and D+ lines. Do not reuse them when USB/JTAG is active.",
+        "ESP32-P4 has no Wi-Fi, so there is no ADC2 vs WiFi conflict. All ADC pins can be used independently. The chip exposes many GPIO (40+), and there are no input-only pins.",
+        "GPIO16-21 are used for the flash (QSPI) interface on many modules. Treat them as reserved, especially on modules with external PSRAM.",
+        "UART0 is mainly for logs. USB-serial can be used instead, so UART0 may not be required for flashing.",
+        "Choose safe GPIO that do not serve multiple functions at once. The IO matrix allows I2C, SPI, I2S, and other buses to be mapped to almost any free GPIO, but follow Espressif defaults when possible (for example I2C on GPIO8/9).",
+        "Strapping pins can be used as outputs after boot if they do not disturb boot levels. For example, GPIO35 is available as GPIO after initialization."
+      ],
+      "rows": [
+        {
+          "id": "GPIO0",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "0",
+          "selectable": true,
+          "warning": "General-purpose GPIO. Some pins are used for strapping and boot configuration on specific modules."
+        },
+        {
+          "id": "GPIO1",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "1",
+          "selectable": true,
+          "warning": "General-purpose GPIO. Some pins are used for strapping and boot configuration on specific modules."
+        },
+        {
+          "id": "GPIO2",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "2",
+          "selectable": true,
+          "warning": "General-purpose GPIO. Some pins are used for strapping and boot configuration on specific modules."
+        },
+        {
+          "id": "GPIO3",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "3",
+          "selectable": true,
+          "warning": "General-purpose GPIO. Some pins are used for strapping and boot configuration on specific modules."
+        },
+        {
+          "id": "GPIO4",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "4",
+          "selectable": true,
+          "warning": "General-purpose GPIO. Some pins are used for strapping and boot configuration on specific modules."
+        },
+        {
+          "id": "GPIO5",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "5",
+          "selectable": true,
+          "warning": "General-purpose GPIO. Some pins are used for strapping and boot configuration on specific modules."
+        },
+        {
+          "id": "GPIO6",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "6",
+          "selectable": true,
+          "warning": "General-purpose GPIO. Some pins are used for strapping and boot configuration on specific modules."
+        },
+        {
+          "id": "GPIO7",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "caution",
+          "value": "7",
+          "selectable": true,
+          "warning": "General-purpose GPIO. Some pins are used for strapping and boot configuration on specific modules."
+        },
+        {
+          "id": "GPIO8",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "8",
+          "selectable": true,
+          "note": "General-purpose GPIO. Many pins are flexible via the IO matrix."
+        },
+        {
+          "id": "GPIO9",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "9",
+          "selectable": true,
+          "note": "General-purpose GPIO. Many pins are flexible via the IO matrix."
+        },
+        {
+          "id": "GPIO10",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "10",
+          "selectable": true,
+          "note": "General-purpose GPIO. Many pins are flexible via the IO matrix."
+        },
+        {
+          "id": "GPIO11",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "11",
+          "selectable": true,
+          "note": "General-purpose GPIO. Many pins are flexible via the IO matrix."
+        },
+        {
+          "id": "GPIO12",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "12",
+          "selectable": true,
+          "note": "General-purpose GPIO. Many pins are flexible via the IO matrix."
+        },
+        {
+          "id": "GPIO13",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "13",
+          "selectable": true,
+          "note": "General-purpose GPIO. Many pins are flexible via the IO matrix."
+        },
+        {
+          "id": "GPIO14",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "14",
+          "selectable": true,
+          "note": "General-purpose GPIO. Many pins are flexible via the IO matrix."
+        },
+        {
+          "id": "GPIO15",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "15",
+          "selectable": true,
+          "note": "General-purpose GPIO. Many pins are flexible via the IO matrix."
+        },
+        {
+          "id": "GPIO16",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "16",
+          "selectable": true,
+          "note": "General-purpose GPIO. Some may map to camera or high-speed interfaces on specific boards."
+        },
+        {
+          "id": "GPIO17",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "17",
+          "selectable": true,
+          "note": "General-purpose GPIO. Some may map to camera or high-speed interfaces on specific boards."
+        },
+        {
+          "id": "GPIO18",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "18",
+          "selectable": true,
+          "note": "General-purpose GPIO. Some may map to camera or high-speed interfaces on specific boards."
+        },
+        {
+          "id": "GPIO19",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "19",
+          "selectable": true,
+          "note": "General-purpose GPIO. Some may map to camera or high-speed interfaces on specific boards."
+        },
+        {
+          "id": "GPIO20",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "20",
+          "selectable": true,
+          "note": "General-purpose GPIO. Some may map to camera or high-speed interfaces on specific boards."
+        },
+        {
+          "id": "GPIO21",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "21",
+          "selectable": true,
+          "note": "General-purpose GPIO. Some may map to camera or high-speed interfaces on specific boards."
+        },
+        {
+          "id": "GPIO22",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "22",
+          "selectable": true,
+          "note": "General-purpose GPIO. Some may map to camera or high-speed interfaces on specific boards."
+        },
+        {
+          "id": "GPIO23",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "23",
+          "selectable": true,
+          "note": "General-purpose GPIO. Some may map to camera or high-speed interfaces on specific boards."
+        },
+        {
+          "id": "GPIO24",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "24",
+          "selectable": true,
+          "error": "General-purpose GPIO. Check board documentation for any reserved pins."
+        },
+        {
+          "id": "GPIO25",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "25",
+          "selectable": true,
+          "error": "General-purpose GPIO. Check board documentation for any reserved pins."
+        },
+        {
+          "id": "GPIO26",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "26",
+          "selectable": true,
+          "error": "General-purpose GPIO. Check board documentation for any reserved pins."
+        },
+        {
+          "id": "GPIO27",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "27",
+          "selectable": true,
+          "error": "General-purpose GPIO. Check board documentation for any reserved pins."
+        },
+        {
+          "id": "GPIO28",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "28",
+          "selectable": true,
+          "error": "General-purpose GPIO. Check board documentation for any reserved pins."
+        },
+        {
+          "id": "GPIO29",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "29",
+          "selectable": true,
+          "error": "General-purpose GPIO. Check board documentation for any reserved pins."
+        },
+        {
+          "id": "GPIO30",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "30",
+          "selectable": true,
+          "error": "General-purpose GPIO. Check board documentation for any reserved pins."
+        },
+        {
+          "id": "GPIO31",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "31",
+          "selectable": true,
+          "error": "General-purpose GPIO. Check board documentation for any reserved pins."
+        },
+        {
+          "id": "GPIO32",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "32",
+          "selectable": true,
+          "error": "General-purpose GPIO. Some pins may be input-only depending on module routing."
+        },
+        {
+          "id": "GPIO33",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "33",
+          "selectable": true,
+          "error": "General-purpose GPIO. Some pins may be input-only depending on module routing."
+        },
+        {
+          "id": "GPIO34",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "34",
+          "selectable": true,
+          "error": "General-purpose GPIO. Some pins may be input-only depending on module routing."
+        },
+        {
+          "id": "GPIO35",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "35",
+          "selectable": true,
+          "error": "General-purpose GPIO. Some pins may be input-only depending on module routing."
+        },
+        {
+          "id": "GPIO36",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "36",
+          "selectable": true,
+          "error": "General-purpose GPIO. Some pins may be input-only depending on module routing."
+        },
+        {
+          "id": "GPIO37",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "37",
+          "selectable": true,
+          "error": "General-purpose GPIO. Some pins may be input-only depending on module routing."
+        },
+        {
+          "id": "GPIO38",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "38",
+          "selectable": true,
+          "error": "General-purpose GPIO. Some pins may be input-only depending on module routing."
+        },
+        {
+          "id": "GPIO39",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "avoid",
+          "value": "39",
+          "selectable": true,
+          "error": "General-purpose GPIO. Some pins may be input-only depending on module routing."
+        },
+        {
+          "id": "GPIO40",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "40",
+          "selectable": true,
+          "note": "General-purpose GPIO. Many pins are shared with high-speed peripherals."
+        },
+        {
+          "id": "GPIO41",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "41",
+          "selectable": true,
+          "note": "General-purpose GPIO. Many pins are shared with high-speed peripherals."
+        },
+        {
+          "id": "GPIO42",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "42",
+          "selectable": true,
+          "note": "General-purpose GPIO. Many pins are shared with high-speed peripherals."
+        },
+        {
+          "id": "GPIO43",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "43",
+          "selectable": true,
+          "note": "General-purpose GPIO. Many pins are shared with high-speed peripherals."
+        },
+        {
+          "id": "GPIO44",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "44",
+          "selectable": true,
+          "note": "General-purpose GPIO. Many pins are shared with high-speed peripherals."
+        },
+        {
+          "id": "GPIO45",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "45",
+          "selectable": true,
+          "note": "General-purpose GPIO. Many pins are shared with high-speed peripherals."
+        },
+        {
+          "id": "GPIO46",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "46",
+          "selectable": true,
+          "note": "General-purpose GPIO. Many pins are shared with high-speed peripherals."
+        },
+        {
+          "id": "GPIO47",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "47",
+          "selectable": true,
+          "note": "General-purpose GPIO. Many pins are shared with high-speed peripherals."
+        },
+        {
+          "id": "48+",
+          "input": "Yes",
+          "output": "Yes",
+          "status": "safe",
+          "value": "48+",
+          "selectable": true,
+          "note": "General-purpose GPIO on high-pin-count packages. Refer to module pinout for availability."
+        }
+      ]
+    }
+  }
+}

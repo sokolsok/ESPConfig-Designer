@@ -1,0 +1,60 @@
+{
+  "id": "sensor.adc",
+  "domain": "sensor",
+  "platform": "adc",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/adc/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "attenuation",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "0db",
+        "2.5db",
+        "6db",
+        "12db"
+      ]
+    },
+    {
+      "key": "raw",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "samples",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "sampling_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "avg",
+        "min",
+        "max"
+      ]
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    }
+  ]
+}

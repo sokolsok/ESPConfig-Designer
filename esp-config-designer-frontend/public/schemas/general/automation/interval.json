@@ -1,0 +1,51 @@
+{
+  "id": "automation.interval",
+  "domain": "interval",
+  "platform": "core",
+  "requires": [],
+  "fields": [
+    {
+      "key": "interval",
+      "type": "list",
+      "required": false,
+      "lvl": "simple",
+      "helpUrl": "https://esphome.io/components/interval/",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "interval",
+            "type": "duration",
+            "required": true,
+            "lvl": "simple",
+            "placeholder": "1min"
+          },
+          {
+            "key": "startup_delay",
+            "type": "duration",
+            "required": false,
+            "lvl": "simple",
+            "placeholder": "0s"
+          },
+          {
+            "key": "then",
+            "type": "list",
+            "required": true,
+            "lvl": "simple",
+            "item": {
+              "type": "object",
+              "fields": [],
+              "extends": "base_actions.json"
+            }
+          },
+          {
+            "key": "custom_config",
+            "type": "raw_yaml",
+            "required": false,
+            "lvl": "advanced"
+          }
+        ]
+      }
+    }
+  ]
+}

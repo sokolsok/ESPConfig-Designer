@@ -13,7 +13,7 @@ import socket
 import shlex
 from collections import deque
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from flask import Flask, Response, jsonify, make_response, request, send_file, send_from_directory
 
@@ -262,6 +262,14 @@ def resolve_host(host: str) -> bool:
         return True
     except Exception:
         return False
+
+
+def evaluate_device_connectivity(host: str) -> Tuple[bool, bool, bool]:
+    """Return (online, dns_ok, ota_ok) for a device host."""
+    dns_ok = resolve_host(host)
+    ota_ok = ping_host(host)
+    online = dns_ok or ota_ok
+    return online, dns_ok, ota_ok
 
 
 def find_firmware_path(node_name: str, variant: str = "ota") -> str:
@@ -971,24 +979,46 @@ def api_devices_list():
 
     devices = load_devices()
     refresh = str(request.args.get("refresh", "0")).strip() in ("1", "true", "yes")
-    deep = str(request.args.get("deep", "0")).strip() in ("1", "true", "yes")
+    # "deep" query param is accepted for backward compatibility,
+    # but status evaluation always uses both DNS + OTA checks.
+    response_devices = []
     if refresh:
         now = utc_now()
         updated_any = False
         for device in devices:
             host = device.get("host") or f"{device.get('name', '')}.local"
-            online = ping_host(host) if deep else resolve_host(host)
+            online, dns_ok, ota_ok = evaluate_device_connectivity(host)
             status = "online" if online else "offline"
+            if device.get("host") != host:
+                device["host"] = host
+                updated_any = True
             if device.get("status") != status:
                 device["status"] = status
                 device["updated_at"] = now
                 updated_any = True
             if online:
                 device["last_seen"] = now
+            response_devices.append(
+                {
+                    **device,
+                    "checks": {"dns": dns_ok, "ota": ota_ok},
+                }
+            )
         if updated_any:
             save_devices(devices)
+    else:
+        for device in devices:
+            host = device.get("host") or f"{device.get('name', '')}.local"
+            online, dns_ok, ota_ok = evaluate_device_connectivity(host)
+            response_devices.append(
+                {
+                    **device,
+                    "host": host,
+                    "checks": {"dns": dns_ok, "ota": ota_ok},
+                }
+            )
 
-    return jsonify({"status": "ok", "devices": devices})
+    return jsonify({"status": "ok", "devices": response_devices})
 
 
 @app.route("/api/install", methods=["POST", "OPTIONS"])

@@ -1,0 +1,123 @@
+{
+  "id": "display.ssd1306_i2c",
+  "domain": "display",
+  "platform": "ssd1306_i2c",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/display/ssd1306/",
+  "display_builder": true,
+  "displayType": "monochrome",
+  "model_meta": {
+    "SSD1306 128x32": {
+      "w": 128,
+      "h": 32
+    },
+    "SSD1306 128x64": {
+      "w": 128,
+      "h": 64
+    },
+    "SSD1306 96x16": {
+      "w": 96,
+      "h": 16
+    },
+    "SSD1306 72x40": {
+      "w": 72,
+      "h": 40
+    },
+    "SSD1306 64x48": {
+      "w": 64,
+      "h": 48
+    },
+    "SH1106 128x32": {
+      "w": 128,
+      "h": 32
+    },
+    "SH1106 128x64": {
+      "w": 128,
+      "h": 64
+    },
+    "SH1106 96x16": {
+      "w": 96,
+      "h": 16
+    },
+    "SH1106 64x48": {
+      "w": 64,
+      "h": 48
+    },
+    "SH1107 128x64": {
+      "w": 128,
+      "h": 64
+    },
+    "SH1107 128x128": {
+      "w": 128,
+      "h": 128
+    },
+    "SSD1305 128x32": {
+      "w": 128,
+      "h": 32
+    },
+    "SSD1305 128x64": {
+      "w": 128,
+      "h": 64
+    }
+  },
+  "fields": [
+    {
+      "key": "model",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "SSD1306 128x64",
+      "options": [
+        "SSD1306 128x32",
+        "SSD1306 128x64",
+        "SSD1306 96x16",
+        "SSD1306 72x40",
+        "SSD1306 64x48",
+        "SH1106 128x32",
+        "SH1106 128x64",
+        "SH1106 96x16",
+        "SH1106 64x48",
+        "SH1107 128x64",
+        "SH1107 128x128",
+        "SSD1305 128x32",
+        "SSD1305 128x64"
+      ]
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "default": "0x3C"
+    },
+    {
+      "key": "reset_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "external_vcc",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "1s"
+    },
+    {
+      "key": "lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

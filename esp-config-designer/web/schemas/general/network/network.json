@@ -1,0 +1,300 @@
+{
+  "id": "network.core",
+  "domain": "network",
+  "platform": "core",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/#network-hardware",
+  "fields": [
+    {
+      "key": "transport",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "wifi",
+      "set_global": "transport",
+      "options": [
+        "wifi",
+        "ethernet"
+      ]
+    },
+    {
+      "key": "ota",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "enabled",
+          "label": "OTA Enable",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal",
+          "default": true,
+          "emitYAML": "never"
+        },
+        {
+          "key": "use_password",
+          "label": "Use password",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal",
+          "default": true,
+          "emitYAML": "never",
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        },
+        {
+          "key": "password",
+          "type": "password",
+          "required": false,
+          "lvl": "normal",
+          "emitYAML": "dependsOn",
+          "placeholder": "3328c63458761dd15990ebbd44e543b2",
+          "settings": {
+            "format": "any",
+            "generator": {
+              "mode": "password",
+              "onEmpty": true,
+              "minLength": 32,
+              "length": 32,
+              "charset": "0123456789abcdef"
+            }
+          },
+          "dependsOn": {
+            "key": "use_password",
+            "value": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "web_server",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "enabled",
+          "label": "Web Server",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false,
+          "emitYAML": "never"
+        },
+        {
+          "key": "port",
+          "type": "number",
+          "required": true,
+          "lvl": "advanced",
+          "default": "80",
+          "placeholder": "80",
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        },
+        {
+          "key": "auth",
+          "type": "object",
+          "required": false,
+          "lvl": "advanced",
+          "fields": [
+            {
+              "key": "username",
+              "type": "text",
+              "required": false,
+              "lvl": "advanced",
+              "placeholder": "!secret web_server_username"
+            },
+            {
+              "key": "password",
+              "type": "password",
+              "required": false,
+              "lvl": "advanced",
+              "settings": {
+                "format": "any",
+                "generator": {
+                  "mode": "none"
+                }
+              },
+              "placeholder": "!secret web_server_password"
+            }
+          ],
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        },
+        {
+          "key": "css_url",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "https://oi.esphome.io/v1/webserver-v1.min.css",
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        },
+        {
+          "key": "css_include",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "./www/webserver.css",
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        },
+        {
+          "key": "js_url",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "https://oi.esphome.io/v1/webserver-v1.min.js",
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        },
+        {
+          "key": "js_include",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "./www/webserver.js",
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        },
+        {
+          "key": "include_internal",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        },
+        {
+          "key": "enable_private_network_access",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        },
+        {
+          "key": "log",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        },
+        {
+          "key": "ota",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        },
+        {
+          "key": "id",
+          "type": "id",
+          "required": false,
+          "lvl": "advanced",
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        },
+        {
+          "key": "local",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        },
+        {
+          "key": "compression",
+          "type": "select",
+          "required": false,
+          "lvl": "advanced",
+          "options": [
+            "br",
+            "gzip"
+          ],
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        },
+        {
+          "key": "version",
+          "type": "select",
+          "required": false,
+          "lvl": "advanced",
+          "options": [
+            "1",
+            "2",
+            "3"
+          ],
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        },
+        {
+          "key": "sorting_groups",
+          "type": "list",
+          "required": false,
+          "lvl": "advanced",
+          "item": {
+            "type": "object",
+            "fields": [
+              {
+                "key": "id",
+                "type": "id",
+                "required": true,
+                "lvl": "advanced"
+              },
+              {
+                "key": "name",
+                "type": "text",
+                "required": true,
+                "lvl": "advanced"
+              },
+              {
+                "key": "sorting_weight",
+                "type": "number",
+                "required": false,
+                "lvl": "advanced"
+              }
+            ]
+          },
+          "dependsOn": {
+            "key": "enabled",
+            "value": true
+          }
+        }
+      ]
+    }
+  ]
+}

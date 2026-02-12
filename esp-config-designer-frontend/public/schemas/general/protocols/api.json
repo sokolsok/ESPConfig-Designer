@@ -1,0 +1,191 @@
+{
+  "id": "protocols.api",
+  "domain": "api",
+  "platform": "core",
+  "requires": [],
+  "fields": [
+    {
+      "key": "enabled",
+      "label": "Enable API",
+      "type": "boolean",
+      "required": false,
+      "lvl": "simple",
+      "default": true,
+      "emitYAML": "never",
+      "helpUrl": "https://esphome.io/components/api/"
+    },
+    {
+      "key": "encryption",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "dependsOn",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "fields": [
+        {
+          "key": "enable",
+          "type": "boolean",
+          "required": false,
+          "lvl": "simple",
+          "default": true,
+          "emitYAML": "never"
+        },
+        {
+          "key": "key",
+          "type": "password",
+          "required": true,
+          "lvl": "simple",
+          "emitYAML": "dependsOn",
+          "placeholder": "SUy+LOZ1UM4OnR9/Y4fzhDgunMTG+VZWBklKsHLS9Pc=",
+          "settings": {
+            "format": "base64_44",
+            "generator": {
+              "mode": "base64",
+              "onEmpty": true,
+              "bytes": 32
+            }
+          },
+          "dependsOn": {
+            "key": "enable",
+            "value": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "actions",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "- logger.log: \"Hello\"",
+      "helpUrl": "https://esphome.io/components/api/#actions"
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "placeholder": "my_api_id",
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    },
+    {
+      "key": "port",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "6053"
+    },
+    {
+      "key": "reboot_timeout",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "15min"
+    },
+    {
+      "key": "batch_delay",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "100ms"
+    },
+    {
+      "key": "listen_backlog",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "4"
+    },
+    {
+      "key": "max_connections",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "8"
+    },
+    {
+      "key": "max_send_queue",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "8"
+    },
+    {
+      "key": "custom_services",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": false
+    },
+    {
+      "key": "homeassistant_services",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": false
+    },
+    {
+      "key": "homeassistant_states",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": false
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    }
+  ]
+}

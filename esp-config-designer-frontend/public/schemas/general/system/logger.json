@@ -1,0 +1,108 @@
+{
+  "id": "other.logger",
+  "domain": "logger",
+  "platform": "core",
+  "requires": [],
+  "fields": [
+    {
+      "key": "enabled",
+      "label": "Enable Logger",
+      "type": "boolean",
+      "required": false,
+      "lvl": "simple",
+      "default": true,
+      "emitYAML": "never",
+      "helpUrl": "https://esphome.io/components/logger/"
+    },
+    {
+      "key": "level",
+      "type": "select",
+      "required": false,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "options": [
+        "NONE",
+        "ERROR",
+        "WARN",
+        "INFO",
+        "DEBUG",
+        "VERBOSE",
+        "VERY_VERBOSE"
+      ]
+    },
+    {
+      "key": "baud_rate",
+      "type": "simple",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": "115200",
+      "placeholder": "115200"
+    },
+    {
+      "key": "hardware_uart",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": "UART0",
+      "options": [
+        "UART0",
+        "UART1",
+        "UART2",
+        "USB_CDC"
+      ]
+    },
+    {
+      "key": "tx_buffer_size",
+      "type": "advanced",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "512"
+    },
+    {
+      "key": "deassert_rts_dtr",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "placeholder": "uart_id",
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    }
+  ]
+}

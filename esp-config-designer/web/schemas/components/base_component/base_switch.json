@@ -1,0 +1,90 @@
+{
+  "id": "base.switch",
+  "domain": "switch",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "text",
+      "required": false
+    },
+    {
+      "key": "name",
+      "type": "text",
+      "required": false
+    },
+    {
+      "key": "icon",
+      "type": "icon",
+      "required": false
+    },
+    {
+      "key": "inverted",
+      "type": "boolean",
+      "required": false
+    },
+    {
+      "key": "internal",
+      "type": "boolean",
+      "required": false
+    },
+    {
+      "key": "restore_mode",
+      "type": "select",
+      "required": false,
+      "options": [
+        "RESTORE_DEFAULT_OFF",
+        "RESTORE_DEFAULT_ON",
+        "RESTORE_INVERTED_DEFAULT_OFF",
+        "RESTORE_INVERTED_DEFAULT_ON",
+        "ALWAYS_OFF",
+        "ALWAYS_ON",
+        "DISABLED"
+      ]
+    },
+    {
+      "key": "on_turn_on",
+      "type": "list",
+      "required": false,
+      "item": {
+        "type": "object",
+        "fields": []
+      }
+    },
+    {
+      "key": "on_turn_off",
+      "type": "list",
+      "required": false,
+      "item": {
+        "type": "object",
+        "fields": []
+      }
+    },
+    {
+      "key": "on_state",
+      "type": "list",
+      "required": false,
+      "item": {
+        "type": "object",
+        "fields": []
+      }
+    },
+    {
+      "key": "disabled_by_default",
+      "type": "boolean",
+      "required": false
+    },
+    {
+      "key": "entity_category",
+      "type": "text",
+      "required": false
+    },
+    {
+      "key": "device_class",
+      "type": "text",
+      "required": false
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "sensor.bh1750",
+  "domain": "sensor",
+  "platform": "bh1750",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/bh1750/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x23"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    }
+  ]
+}

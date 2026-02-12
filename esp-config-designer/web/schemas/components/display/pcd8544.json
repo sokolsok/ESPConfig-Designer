@@ -1,0 +1,87 @@
+{
+  "id": "display.pcd8544",
+  "domain": "display",
+  "platform": "pcd8544",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/display/pcd8544/",
+  "display_builder": true,
+  "displayType": "monochrome",
+  "model_meta": {
+    "PCD8544 84x48": {
+      "w": 84,
+      "h": 48
+    }
+  },
+  "fields": [
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "dc_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "reset_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "rotation",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "0",
+      "options": [
+        "0",
+        "90",
+        "180",
+        "270"
+      ]
+    },
+    {
+      "key": "contrast",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "default": 0.5
+    },
+    {
+      "key": "bias",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "default": 4
+    },
+    {
+      "key": "temperature_coefficient",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "default": 3
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "1s"
+    },
+    {
+      "key": "lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

@@ -1,0 +1,277 @@
+{
+  "id": "network.ethernet",
+  "domain": "network",
+  "platform": "ethernet",
+  "requires": [],
+  "requiresByType": {
+    "W5500": [
+      "spi"
+    ],
+    "DM9051": [
+      "spi"
+    ]
+  },
+  "fields": [
+    {
+      "key": "type",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "LAN8720",
+      "options": [
+        "LAN8720",
+        "RTL8201",
+        "DP83848",
+        "IP101",
+        "JL1101",
+        "KSZ8081",
+        "KSZ8081RNA",
+        "W5500",
+        "DM9051"
+      ]
+    },
+    {
+      "key": "mdc_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "GPIOXX",
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "LAN8720",
+          "RTL8201",
+          "DP83848",
+          "IP101",
+          "JL1101",
+          "KSZ8081",
+          "KSZ8081RNA"
+        ]
+      }
+    },
+    {
+      "key": "mdio_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "GPIOXX",
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "LAN8720",
+          "RTL8201",
+          "DP83848",
+          "IP101",
+          "JL1101",
+          "KSZ8081",
+          "KSZ8081RNA"
+        ]
+      }
+    },
+    {
+      "key": "clk",
+      "type": "object",
+      "required": true,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "pin",
+          "type": "gpio",
+          "required": true,
+          "lvl": "simple",
+          "placeholder": "GPIOXX"
+        },
+        {
+          "key": "mode",
+          "type": "select",
+          "required": true,
+          "lvl": "simple",
+          "default": "CLK_OUT",
+          "options": [
+            "CLK_EXT_IN",
+            "CLK_OUT"
+          ]
+        }
+      ],
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "LAN8720",
+          "RTL8201",
+          "DP83848",
+          "IP101",
+          "JL1101",
+          "KSZ8081",
+          "KSZ8081RNA"
+        ]
+      }
+    },
+    {
+      "key": "phy_addr",
+      "type": "simple",
+      "required": true,
+      "lvl": "normal",
+      "default": "0",
+      "placeholder": "0",
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "LAN8720",
+          "RTL8201",
+          "DP83848",
+          "IP101",
+          "JL1101",
+          "KSZ8081",
+          "KSZ8081RNA"
+        ]
+      }
+    },
+    {
+      "key": "power_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "GPIOXX",
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "LAN8720",
+          "RTL8201",
+          "DP83848",
+          "IP101",
+          "JL1101",
+          "KSZ8081",
+          "KSZ8081RNA"
+        ]
+      }
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "GPIOXX",
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "W5500",
+          "DM9051"
+        ]
+      }
+    },
+    {
+      "key": "spi_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "spi_bus",
+      "domain": "spi",
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "W5500",
+          "DM9051"
+        ]
+      }
+    },
+    {
+      "key": "interrupt_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "GPIOXX",
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "W5500",
+          "DM9051"
+        ]
+      }
+    },
+    {
+      "key": "reset_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "GPIOXX",
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "W5500",
+          "DM9051"
+        ]
+      }
+    },
+    {
+      "key": "clock_speed",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "26.67MHz",
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "W5500",
+          "DM9051"
+        ]
+      }
+    },
+    {
+      "key": "polling_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "10ms",
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "W5500",
+          "DM9051"
+        ]
+      }
+    },
+    {
+      "key": "manual_ip",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "static_ip",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "192.168.1.50"
+        },
+        {
+          "key": "gateway",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "192.168.1.1"
+        },
+        {
+          "key": "subnet",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "255.255.255.0"
+        },
+        {
+          "key": "dns1",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "1.1.1.1"
+        },
+        {
+          "key": "dns2",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "8.8.8.8"
+        }
+      ]
+    }
+  ]
+}

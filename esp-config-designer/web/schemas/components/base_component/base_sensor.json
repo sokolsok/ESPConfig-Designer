@@ -1,0 +1,128 @@
+{
+  "id": "base.sensor",
+  "domain": "sensor",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "id",
+      "placeholder": "example_sensor_id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "unit_of_measurement",
+      "placeholder": "C°, mm, kg, V ..",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "icon",
+      "placeholder": "mdi:cat",
+      "type": "icon",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "device_class",
+      "placeholder": "energy, humidity, wind_speed ..",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "state_class",
+      "placeholder": "MEASUREMENT, TOTAL ..",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "accuracy_decimals",
+      "placeholder": "0.1, 0.001, 0.0001 ..",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "expire_after",
+      "placeholder": "10ms, 2:01:30, never ..",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "entity_category",
+      "placeholder": "Light, Fan, Climate ..",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },    
+    {
+      "key": "internal",
+      "placeholder": "",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "force_update",
+      "placeholder": "",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "disabled_by_default",
+      "placeholder": "",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "filters",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_filters.json"
+      }
+    },
+    {
+      "key": "on_value",
+      "placeholder": "- logger.log: \"Value changed\"",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "helpUrl": "https://esphome.io/components/sensor/#sensor-automation"
+    },
+    {
+      "key": "on_value_range",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "- logger.log: \"Range matched\"",
+      "helpUrl": "https://esphome.io/components/sensor/#sensor-automation"
+    },
+    {
+      "key": "on_raw_value",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "- logger.log: \"Raw value\"",
+      "helpUrl": "https://esphome.io/components/sensor/#sensor-automation"
+    }
+  ]
+}

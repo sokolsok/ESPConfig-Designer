@@ -1,0 +1,456 @@
+{
+  "id": "protocols.mqtt",
+  "domain": "mqtt",
+  "platform": "core",
+  "requires": [],
+  "fields": [
+    {
+      "key": "enabled",
+      "label": "Enable MQTT",
+      "type": "boolean",
+      "required": false,
+      "lvl": "simple",
+      "default": false,
+      "emitYAML": "never",
+      "helpUrl": "https://esphome.io/components/mqtt/"
+    },
+    {
+      "key": "broker",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "10.0.0.2",
+      "suppressQuotes": "true"
+    },
+    {
+      "key": "username",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "!secret mqtt_username"
+    },
+    {
+      "key": "password",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "!secret mqtt_password"
+    },
+    {
+      "key": "port",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "1883"
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    },
+    {
+      "key": "client_id",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    },
+    {
+      "key": "topic_prefix",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "your_device_name_prefix"
+    },
+    {
+      "key": "enable_on_boot",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": true
+    },
+    {
+      "key": "clean_session",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": false
+    },
+    {
+      "key": "discover_ip",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": true
+    },
+    {
+      "key": "discovery",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": true
+    },
+    {
+      "key": "discovery_retain",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": true
+    },
+    {
+      "key": "discovery_prefix",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "homeassistant"
+    },
+    {
+      "key": "discovery_unique_id_generator",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": "legacy",
+      "options": [
+        "legacy",
+        "mac"
+      ]
+    },
+    {
+      "key": "discovery_object_id_generator",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": "none",
+      "options": [
+        "none",
+        "device_name"
+      ]
+    },
+    {
+      "key": "use_abbreviations",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": true
+    },
+    {
+      "key": "keepalive",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "15s"
+    },
+    {
+      "key": "reboot_timeout",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "15min"
+    },
+    {
+      "key": "log_topic",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "fields": [
+        {
+          "key": "topic",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "logs"
+        },
+        {
+          "key": "level",
+          "type": "select",
+          "required": false,
+          "lvl": "normal",
+          "default": "NONE",
+          "options": [
+            "NONE",
+            "ERROR",
+            "WARN",
+            "INFO",
+            "DEBUG",
+            "VERBOSE",
+            "VERY_VERBOSE"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "birth_message",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "fields": [
+        {
+          "key": "topic",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "payload",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "qos",
+          "type": "number",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0"
+        },
+        {
+          "key": "retain",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal",
+          "default": true
+        }
+      ]
+    },
+    {
+      "key": "will_message",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "fields": [
+        {
+          "key": "topic",
+          "type": "text",
+          "required": true,
+          "lvl": "normal"
+        },
+        {
+          "key": "payload",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "qos",
+          "type": "number",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0"
+        },
+        {
+          "key": "retain",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal",
+          "default": true
+        }
+      ]
+    },
+    {
+      "key": "shutdown_message",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "fields": [
+        {
+          "key": "topic",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "payload",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "qos",
+          "type": "number",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0"
+        },
+        {
+          "key": "retain",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal",
+          "default": true
+        }
+      ]
+    },
+    {
+      "key": "certificate_authority",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    },
+    {
+      "key": "client_certificate",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    },
+    {
+      "key": "client_certificate_key",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    },
+    {
+      "key": "skip_cert_cn_check",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": false
+    },
+    {
+      "key": "idf_send_async",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": false
+    },
+    {
+      "key": "publish_nan_as_none",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": false
+    },
+    {
+      "key": "wait_for_connection",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": false
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,203 @@
+{
+  "id": "base.actions",
+  "type": "action-catalog",
+  "fields": [],
+  "actions": [
+    {
+      "id": "logger.log",
+      "label": "Logger Log",
+      "description": "Write a message to the ESPHome logger.",
+      "domain": "logger",
+      "fields": [
+        {
+          "key": "message",
+          "placeholder": "Hello from ESPHome",
+          "type": "text",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "switch.turn_on",
+      "label": "Switch Turn On",
+      "description": "Turn a switch on by ID.",
+      "domain": "switch",
+      "fields": [
+        {
+          "key": "id",
+          "placeholder": "switch_id",
+          "type": "id_ref",
+          "required": true,
+          "domain": "switch"
+        }
+      ]
+    },
+    {
+      "id": "switch.turn_off",
+      "label": "Switch Turn Off",
+      "description": "Turn a switch off by ID.",
+      "domain": "switch",
+      "fields": [
+        {
+          "key": "id",
+          "placeholder": "switch_id",
+          "type": "id_ref",
+          "required": true,
+          "domain": "switch"
+        }
+      ]
+    },
+    {
+      "id": "switch.toggle",
+      "label": "Switch Toggle",
+      "description": "Toggle a switch by ID.",
+      "domain": "switch",
+      "fields": [
+        {
+          "key": "id",
+          "placeholder": "switch_id",
+          "type": "id_ref",
+          "required": true,
+          "domain": "switch"
+        }
+      ]
+    },
+    {
+      "id": "light.turn_on",
+      "label": "Light Turn On",
+      "description": "Turn a light on by ID.",
+      "domain": "light",
+      "fields": [
+        {
+          "key": "id",
+          "placeholder": "light_id",
+          "type": "id_ref",
+          "required": true,
+          "domain": "light"
+        }
+      ]
+    },
+    {
+      "id": "light.turn_off",
+      "label": "Light Turn Off",
+      "description": "Turn a light off by ID.",
+      "domain": "light",
+      "fields": [
+        {
+          "key": "id",
+          "placeholder": "light_id",
+          "type": "id_ref",
+          "required": true,
+          "domain": "light"
+        }
+      ]
+    },
+    {
+      "id": "delay",
+      "label": "Delay",
+      "description": "Wait for a duration before continuing.",
+      "domain": "core",
+      "fields": [
+        {
+          "key": "duration",
+          "placeholder": "1s",
+          "type": "duration",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "script.execute",
+      "label": "Script Execute",
+      "description": "Run a script by ID.",
+      "domain": "script",
+      "fields": [
+        {
+          "key": "id",
+          "placeholder": "script_id",
+          "type": "id_ref",
+          "required": true,
+          "domain": "script"
+        }
+      ]
+    },
+    {
+      "id": "script.stop",
+      "label": "Script Stop",
+      "description": "Stop a running script by ID.",
+      "domain": "script",
+      "fields": [
+        {
+          "key": "id",
+          "placeholder": "script_id",
+          "type": "id_ref",
+          "required": true,
+          "domain": "script"
+        }
+      ]
+    },
+    {
+      "id": "script.wait",
+      "label": "Script Wait",
+      "description": "Wait until a script finishes.",
+      "domain": "script",
+      "fields": [
+        {
+          "key": "id",
+          "placeholder": "script_id",
+          "type": "id_ref",
+          "required": true,
+          "domain": "script"
+        }
+      ]
+    },
+    {
+      "id": "deep_sleep.enter",
+      "label": "Deep Sleep Enter",
+      "description": "Put the device into deep sleep.",
+      "domain": "deep_sleep",
+      "fields": [
+        {
+          "key": "sleep_duration",
+          "placeholder": "10min",
+          "type": "duration",
+          "required": false
+        },
+        {
+          "key": "until",
+          "placeholder": "2024-01-01 00:00:00",
+          "type": "text",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "deep_sleep.prevent",
+      "label": "Deep Sleep Prevent",
+      "description": "Prevent the device from entering deep sleep.",
+      "domain": "deep_sleep",
+      "fields": []
+    },
+    {
+      "id": "deep_sleep.allow",
+      "label": "Deep Sleep Allow",
+      "description": "Allow the device to enter deep sleep again.",
+      "domain": "deep_sleep",
+      "fields": []
+    },
+    {
+      "id": "lambda",
+      "label": "Lambda",
+      "description": "Run a custom lambda action.",
+      "domain": "core",
+      "fields": [
+        {
+          "key": "value",
+          "placeholder": "return x;",
+          "type": "lambda",
+          "required": true
+        }
+      ]
+    }
+  ]
+}

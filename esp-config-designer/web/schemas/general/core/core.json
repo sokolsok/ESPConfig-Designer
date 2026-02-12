@@ -1,0 +1,286 @@
+{
+  "id": "esphome.core",
+  "domain": "esphome",
+  "platform": "core",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/esphome/",
+  "fields": [
+    {
+      "key": "friendly_name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Living Room Controller",
+      "suppressQuotes": true
+    },
+    {
+      "key": "name",
+      "type": "slug",
+      "settings": {
+        "autoPath": "esphomeCore.friendly_name",
+        "fallbackText": "new-device",
+        "maxLength": 24
+      },
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "living-room-controller"
+    },
+    {
+      "key": "area",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "Living Room"
+    },
+    {
+      "key": "comment",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "Living room ESP32 controller"
+    },
+    {
+      "key": "build_path",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": ".esphome/build/livingroom"
+    },
+    {
+      "key": "name_add_mac_suffix",
+      "type": "boolean",
+      "required": false,
+	  "default": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "platformio_options",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "key",
+            "type": "text",
+            "required": true,
+			"lvl": "advanced",
+            "placeholder": "upload_speed"
+          },
+          {
+            "key": "value",
+            "type": "text",
+            "required": false,
+			"lvl": "advanced",
+            "placeholder": "115200"
+          }
+        ]
+      }
+    },
+    {
+      "key": "environment_variables",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "key",
+            "type": "text",
+            "required": true,
+            "placeholder": "HTTP_PROXY"
+          },
+          {
+            "key": "value",
+            "type": "text",
+            "required": false,
+            "placeholder": "http://user:pass@proxy:3128/"
+          }
+        ]
+      }
+    },
+    {
+      "key": "includes",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "text"
+      }
+    },
+    {
+      "key": "includes_c",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "text"
+      }
+    },
+    {
+      "key": "libraries",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "text"
+      }
+    },
+    {
+      "key": "project",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "name",
+          "type": "text",
+          "required": false,
+		  "lvl": "advanced",
+          "placeholder": "author.project"
+        },
+        {
+          "key": "version",
+          "type": "text",
+          "required": false,
+		  "lvl": "advanced",
+          "placeholder": "1.0.0"
+        },
+        {
+          "key": "on_update",
+          "type": "list",
+          "required": false,
+		  "lvl": "advanced",
+          "item": {
+            "type": "object",
+            "fields": [],
+            "extends": "base_actions.json"
+          }
+        }
+      ]
+    },
+    {
+      "key": "min_version",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "2025.11.0"
+    },
+    {
+      "key": "compile_process_limit",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "4"
+    },
+    {
+      "key": "debug_scheduler",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "devices",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "id",
+            "type": "id",
+            "required": true,
+			"lvl": "advanced",
+            "placeholder": "front_door_device"
+          },
+          {
+            "key": "name",
+            "type": "text",
+            "required": true,
+			"lvl": "advanced",
+            "placeholder": "Front Door Sensor"
+          },
+          {
+            "key": "area_id",
+            "type": "id",
+            "required": false,
+			"lvl": "advanced",
+            "placeholder": "entrance_area"
+          }
+        ]
+      }
+    },
+    {
+      "key": "on_boot",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "priority",
+            "type": "number",
+            "required": false,
+			"lvl": "advanced",
+            "placeholder": "600"
+          },
+          {
+            "key": "then",
+            "type": "list",
+            "required": false,
+			"lvl": "advanced",
+            "item": {
+              "type": "object",
+              "fields": [],
+              "extends": "base_actions.json"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "key": "on_shutdown",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "priority",
+            "type": "number",
+            "required": false,
+			"lvl": "advanced",
+            "placeholder": "600"
+          },
+          {
+            "key": "then",
+            "type": "list",
+            "required": false,
+			"lvl": "advanced",
+            "item": {
+              "type": "object",
+              "fields": [],
+              "extends": "base_actions.json"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "key": "on_loop",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      }
+    }
+  ]
+}

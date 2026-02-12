@@ -1,0 +1,71 @@
+{
+  "id": "sensor.ens160_i2c",
+  "domain": "sensor",
+  "platform": "ens160_i2c",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/ens160_i2c/",
+  "fields": [
+    {
+      "key": "eco2",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "tvoc",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "aqi",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x52"
+    },
+    {
+      "key": "compensation",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "temperature",
+          "type": "id_ref",
+          "required": true,
+          "lvl": "advanced",
+          "domain": "sensor"
+        },
+        {
+          "key": "humidity",
+          "type": "id_ref",
+          "required": true,
+          "lvl": "advanced",
+          "domain": "sensor"
+        }
+      ]
+    }
+  ]
+}

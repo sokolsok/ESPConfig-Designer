@@ -1,0 +1,32 @@
+{
+  "id": "sensor.ct_clamp",
+  "domain": "sensor",
+  "platform": "ct_clamp",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/ct_clamp/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "sensor",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "sensor",
+      "placeholder": "sensor_id"
+    },
+    {
+      "key": "sample_duration",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "200ms"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    }
+  ]
+}

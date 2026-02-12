@@ -1,0 +1,78 @@
+{
+  "id": "sensor.pulse_counter",
+  "domain": "sensor",
+  "platform": "pulse_counter",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/pulse_counter/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "count_mode",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "rising_edge",
+          "type": "select",
+          "required": false,
+          "lvl": "advanced",
+          "default": "INCREMENT",
+          "options": [
+            "DISABLE",
+            "INCREMENT",
+            "DECREMENT"
+          ]
+        },
+        {
+          "key": "falling_edge",
+          "type": "select",
+          "required": false,
+          "lvl": "advanced",
+          "default": "DISABLE",
+          "options": [
+            "DISABLE",
+            "INCREMENT",
+            "DECREMENT"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "use_pcnt",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": true
+    },
+    {
+      "key": "internal_filter",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "default": "13us"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    },
+    {
+      "key": "total",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
+    }
+  ]
+}

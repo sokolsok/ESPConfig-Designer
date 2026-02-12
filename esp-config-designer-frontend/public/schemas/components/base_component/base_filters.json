@@ -1,0 +1,305 @@
+{
+  "id": "base.filters",
+  "type": "filter-catalog",
+  "description": "Sensor filter catalog for list-based filter pickers.",
+  "filters": [
+    {
+      "id": "calibrate_linear",
+      "label": "Calibrate Linear",
+      "description": "Map measured values to true values using a linear fit. Useful when a sensor has a consistent bias across its range.",
+      "style": "object",
+      "fields": [
+        {
+          "key": "method",
+          "type": "select",
+          "required": false,
+          "options": ["least_squares", "exact"]
+        },
+        {
+          "key": "datapoints",
+          "type": "list",
+          "required": true,
+          "item": { "type": "text" }
+        }
+      ]
+    },
+    {
+      "id": "calibrate_polynomial",
+      "label": "Calibrate Polynomial",
+      "description": "Fit a polynomial curve to measured and true values. Use this when linear calibration is not accurate enough.",
+      "style": "object",
+      "fields": [
+        {
+          "key": "degree",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "datapoints",
+          "type": "list",
+          "required": true,
+          "item": { "type": "text" }
+        }
+      ]
+    },
+    {
+      "id": "clamp",
+      "label": "Clamp",
+      "description": "Limit values to a minimum/maximum range. Optionally ignore values outside the range.",
+      "style": "object",
+      "fields": [
+        { "key": "min_value", "type": "number", "required": false },
+        { "key": "max_value", "type": "number", "required": false },
+        { "key": "ignore_out_of_range", "type": "boolean", "required": false }
+      ]
+    },
+    {
+      "id": "debounce",
+      "label": "Debounce",
+      "description": "Publish only after the value has been stable for a period of time. Useful to reduce noisy spikes.",
+      "style": "scalar",
+      "valueType": "duration",
+      "fields": [{ "key": "value", "type": "duration", "required": true }]
+    },
+    {
+      "id": "delta",
+      "label": "Delta",
+      "description": "Only pass values that differ from the previous value by a given absolute or percentage delta.",
+      "style": "scalar",
+      "valueType": "text",
+      "fields": [{ "key": "value", "type": "text", "required": true }]
+    },
+    {
+      "id": "exponential_moving_average",
+      "label": "Moving Average",
+      "description": "Smooth values using an exponential moving average with configurable output rate.",
+      "style": "object",
+      "fields": [
+        { "key": "alpha", "type": "number", "required": false },
+        { "key": "send_every", "type": "number", "required": false },
+        { "key": "send_first_at", "type": "number", "required": false }
+      ]
+    },
+    {
+      "id": "filter_out",
+      "label": "Filter Out",
+      "description": "Drop specific values from the stream. Useful for ignoring known invalid readings.",
+      "style": "list",
+      "valueKey": "values",
+      "fields": [
+        {
+          "key": "values",
+          "type": "list",
+		  "lvl": "advanced",
+          "required": true,
+          "item": { "type": "text" }
+        }
+      ]
+    },
+    {
+      "id": "heartbeat",
+      "label": "Heartbeat",
+      "description": "Send the last known value at a fixed interval. Can also publish immediately on new values.",
+      "style": "object",
+      "fields": [
+        { "key": "period", "type": "duration", "required": true },
+        { "key": "optimistic", "type": "boolean", "required": false }
+      ]
+    },
+    {
+      "id": "lambda",
+      "label": "Lambda",
+      "description": "Apply a custom expression to each value. Use this for custom math or conditional filtering.",
+      "style": "scalar",
+      "valueType": "lambda",
+      "fields": [{ "key": "value", "type": "lambda", "required": true }]
+    },
+    {
+      "id": "max",
+      "label": "Max",
+      "description": "Publish the moving maximum over a window of samples. Smooths short spikes downward.",
+      "style": "object",
+      "fields": [
+        { "key": "window_size", "type": "number", "required": false },
+        { "key": "send_every", "type": "number", "required": false },
+        { "key": "send_first_at", "type": "number", "required": false }
+      ]
+    },
+    {
+      "id": "median",
+      "label": "Median",
+      "description": "Publish the median value over a window. Great for removing outliers in noisy data.",
+      "style": "object",
+      "fields": [
+        { "key": "window_size", "type": "number", "required": false },
+        { "key": "send_every", "type": "number", "required": false },
+        { "key": "send_first_at", "type": "number", "required": false }
+      ]
+    },
+    {
+      "id": "min",
+      "label": "Min",
+      "description": "Publish the moving minimum over a window of samples. Smooths short spikes upward.",
+      "style": "object",
+      "fields": [
+        { "key": "window_size", "type": "number", "required": false },
+        { "key": "send_every", "type": "number", "required": false },
+        { "key": "send_first_at", "type": "number", "required": false }
+      ]
+    },
+    {
+      "id": "multiply",
+      "label": "Multiply",
+      "description": "Multiply each value by a constant or lambda. Use for unit conversions or scaling.",
+      "style": "scalar",
+      "valueType": "number",
+      "fields": [{ "key": "value", "type": "number", "required": true }]
+    },
+    {
+      "id": "offset",
+      "label": "Offset",
+      "description": "Add a constant or lambda to each value. Useful for calibration offsets.",
+      "style": "scalar",
+      "valueType": "number",
+      "fields": [{ "key": "value", "type": "number", "required": true }]
+    },
+    {
+      "id": "or",
+      "label": "Or",
+      "description": "Return the first child filter that produces a value. Combine two filters into a fallback chain.",
+      "style": "list",
+      "valueKey": "filters",
+      "fields": [
+        {
+          "key": "filters",
+          "type": "list",
+          "required": true,
+          "item": { "type": "object", "fields": [] }
+        }
+      ]
+    },
+    {
+      "id": "quantile",
+      "label": "Quantile",
+      "description": "Publish a quantile from a window of samples. Helps remove outliers while keeping trends.",
+      "style": "object",
+      "fields": [
+        { "key": "window_size", "type": "number", "required": false },
+        { "key": "send_every", "type": "number", "required": false },
+        { "key": "send_first_at", "type": "number", "required": false },
+        { "key": "quantile", "type": "number", "required": false }
+      ]
+    },
+    {
+      "id": "round",
+      "label": "Round",
+      "description": "Round values to a given number of decimal places.",
+      "style": "scalar",
+      "valueType": "number",
+      "fields": [{ "key": "value", "type": "number", "required": true }]
+    },
+    {
+      "id": "round_to_multiple_of",
+      "label": "Round to Multiple",
+      "description": "Round values to the nearest multiple of a given number.",
+      "style": "scalar",
+      "valueType": "number",
+      "fields": [{ "key": "value", "type": "number", "required": true }]
+    },
+    {
+      "id": "skip_initial",
+      "label": "Skip Initial",
+      "description": "Skip the first N readings after boot. Useful when sensors need a warm-up period.",
+      "style": "scalar",
+      "valueType": "number",
+      "fields": [{ "key": "value", "type": "number", "required": true }]
+    },
+    {
+      "id": "sliding_window_moving_average",
+      "label": "Sliding Window",
+      "description": "Average the last N values, publishing at a set interval.",
+      "style": "object",
+      "fields": [
+        { "key": "window_size", "type": "number", "required": false },
+        { "key": "send_every", "type": "number", "required": false },
+        { "key": "send_first_at", "type": "number", "required": false }
+      ]
+    },
+    {
+      "id": "throttle",
+      "label": "Throttle",
+      "description": "Limit how often values pass through. Useful to reduce update rate.",
+      "style": "scalar",
+      "valueType": "duration",
+      "fields": [{ "key": "value", "type": "duration", "required": true }]
+    },
+    {
+      "id": "throttle_average",
+      "label": "Throttle Average",
+      "description": "Average values over a period and publish once per interval.",
+      "style": "scalar",
+      "valueType": "duration",
+      "fields": [{ "key": "value", "type": "duration", "required": true }]
+    },
+    {
+      "id": "throttle_with_priority",
+      "label": "Throttle with Priority",
+      "description": "Throttle values unless they match a prioritized list. Prioritized values pass through immediately.",
+      "style": "object",
+      "fields": [
+        { "key": "timeout", "type": "duration", "required": true },
+        {
+          "key": "value",
+          "type": "list",
+          "required": true,
+          "item": { "type": "text" }
+        }
+      ]
+    },
+    {
+      "id": "timeout",
+      "label": "Timeout",
+      "description": "If no value is published within the timeout, send a replacement value.",
+      "style": "scalar_or_object",
+      "valueType": "duration",
+      "fields": [
+        { "key": "timeout", "type": "duration", "required": true },
+        { "key": "value", "type": "text", "required": false }
+      ]
+    },
+    {
+      "id": "to_ntc_resistance",
+      "label": "To NTC Resistance",
+      "description": "Convert temperature readings to NTC resistance using a calibration curve.",
+      "style": "object",
+      "fields": [
+        {
+          "key": "calibration",
+          "type": "list",
+          "required": true,
+          "item": { "type": "text" }
+        },
+        { "key": "a", "type": "number", "required": false },
+        { "key": "b", "type": "number", "required": false },
+        { "key": "c", "type": "number", "required": false }
+      ]
+    },
+    {
+      "id": "to_ntc_temperature",
+      "label": "To NTC Temperature",
+      "description": "Convert resistance readings to temperature using a calibration curve.",
+      "style": "object",
+      "fields": [
+        {
+          "key": "calibration",
+          "type": "list",
+          "required": true,
+          "item": { "type": "text" }
+        },
+        { "key": "a", "type": "number", "required": false },
+        { "key": "b", "type": "number", "required": false },
+        { "key": "c", "type": "number", "required": false }
+      ]
+    }
+  ]
+}

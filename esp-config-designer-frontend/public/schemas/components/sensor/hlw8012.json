@@ -1,0 +1,113 @@
+{
+  "id": "sensor.hlw8012",
+  "domain": "sensor",
+  "platform": "hlw8012",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/hlw8012/",
+  "fields": [
+    {
+      "key": "sel_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "cf_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "cf1_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "current",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "power",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "energy",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    },
+    {
+      "key": "current_resistor",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0.001 ohm"
+    },
+    {
+      "key": "voltage_divider",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 2351
+    },
+    {
+      "key": "model",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "HLW8012",
+      "options": [
+        "HLW8012",
+        "CSE7759",
+        "BL0937"
+      ]
+    },
+    {
+      "key": "change_mode_every",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 8
+    },
+    {
+      "key": "initial_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "VOLTAGE",
+      "options": [
+        "VOLTAGE",
+        "CURRENT"
+      ]
+    }
+  ]
+}

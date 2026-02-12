@@ -1,0 +1,106 @@
+{
+  "id": "platform.nrf52",
+  "domain": "platform",
+  "platform": "nrf52",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/nrf52/",
+  "fields": [
+    {
+      "key": "board",
+      "type": "select",
+      "required": true,
+      "lvl": "normal",
+      "default": "adafruit_feather_nrf52840",
+      "options": [
+        "adafruit_feather_nrf52840",
+        "adafruit_itsybitsy_nrf52840",
+        "xiao_ble"
+      ]
+    },
+    {
+      "key": "bootloader",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "options": [
+        "mcuboot",
+        "adafruit",
+        "adafruit_nrf52_sd132",
+        "adafruit_nrf52_sd140_v6",
+        "adafruit_nrf52_sd140_v7"
+      ]
+    },
+    {
+      "key": "dcdc",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": true,
+      "suppressDefault": true
+    },
+    {
+      "key": "dfu",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "reset_pin",
+          "type": "text",
+          "required": true,
+          "lvl": "advanced",
+          "placeholder": "GPIOXX"
+        },
+        {
+          "key": "inverted",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false,
+          "suppressDefault": true
+        }
+      ]
+    },
+    {
+      "key": "reg0",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "voltage",
+          "type": "text",
+          "required": true,
+          "lvl": "advanced",
+          "placeholder": "3.0V"
+        },
+        {
+          "key": "uicr_erase",
+          "type": "boolean",
+          "lvl": "advanced",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "framework",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "version",
+          "type": "select",
+          "required": false,
+          "lvl": "advanced",
+          "default": "2.6.1-7",
+          "options": [
+            "2.6.1-7",
+            "2.9.2-0",
+            "3.2.0-0"
+          ]
+        }
+      ]
+    }
+  ]
+}

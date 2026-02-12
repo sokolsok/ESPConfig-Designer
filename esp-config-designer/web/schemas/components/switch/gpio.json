@@ -1,0 +1,19 @@
+{
+  "id": "switch.gpio",
+  "domain": "switch",
+  "platform": "gpio",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/switch/gpio/",
+  "fields": [
+    {
+      "key": "name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": false
+    }
+  ]
+}

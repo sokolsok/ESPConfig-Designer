@@ -1,0 +1,121 @@
+{
+  "id": "sensor.tsl2591",
+  "domain": "sensor",
+  "platform": "tsl2591",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/tsl2591/",
+  "fields": [
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x29"
+    },
+    {
+      "key": "integration_time",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "100ms",
+      "options": [
+        "100ms",
+        "200ms",
+        "300ms",
+        "400ms",
+        "500ms",
+        "600ms"
+      ]
+    },
+    {
+      "key": "gain",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "auto",
+      "options": [
+        "low",
+        "1x",
+        "medium",
+        "med",
+        "25x",
+        "high",
+        "400x",
+        "maximum",
+        "max",
+        "9500x",
+        "auto"
+      ]
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    },
+    {
+      "key": "power_save_mode",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    },
+    {
+      "key": "device_factor",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 53.0
+    },
+    {
+      "key": "glass_attenuation_factor",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 7.7
+    },
+    {
+      "key": "full_spectrum",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "infrared",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "visible",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "calculated_lux",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "actual_gain",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    }
+  ]
+}

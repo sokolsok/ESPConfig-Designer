@@ -1,0 +1,110 @@
+{
+  "id": "busses.spi",
+  "domain": "spi",
+  "platform": "core",
+  "requires": [],
+  "fields": [
+    {
+      "key": "enabled",
+      "label": "Enable SPI",
+      "type": "boolean",
+      "required": false,
+      "lvl": "simple",
+      "default": false,
+      "emitYAML": "never",
+      "helpUrl": "https://esphome.io/components/spi/"
+    },
+    {
+      "key": "type",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "options": [
+        "single",
+        "quad",
+        "octal"
+      ],
+      "default": "single"
+    },
+    {
+      "key": "mosi_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "miso_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "clk_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "data_pins",
+      "type": "list",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "item": {
+        "type": "gpio",
+        "placeholder": "GPIOXX"
+      }
+    },
+    {
+      "key": "interface",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "options": [
+        "any",
+        "software",
+        "hardware",
+        "spi",
+        "spi2",
+        "spi3"
+      ],
+      "default": "any"
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    }
+  ]
+}

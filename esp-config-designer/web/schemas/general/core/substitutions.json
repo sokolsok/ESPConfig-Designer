@@ -1,0 +1,33 @@
+{
+  "id": "esphome.substitutions",
+  "domain": "substitutions",
+  "platform": "core",
+  "requires": [],
+  "fields": [
+    {
+      "key": "substitutions",
+      "type": "list",
+      "required": false,
+      "lvl": "normal",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "key",
+            "type": "text",
+            "required": true,
+            "lvl": "normal",
+            "placeholder": "device_name"
+          },
+          {
+            "key": "value",
+            "type": "text",
+            "required": false,
+            "lvl": "normal",
+            "placeholder": "livingroom"
+          }
+        ]
+      }
+    }
+  ]
+}

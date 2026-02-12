@@ -1,0 +1,89 @@
+{
+  "id": "automation.script",
+  "domain": "script",
+  "platform": "core",
+  "requires": [],
+  "fields": [
+    {
+      "key": "script",
+      "type": "list",
+      "required": false,
+      "lvl": "simple",
+      "helpUrl": "https://esphome.io/components/script/",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "id",
+            "type": "id",
+            "required": true,
+            "lvl": "simple",
+            "placeholder": "my_script"
+          },
+          {
+            "key": "mode",
+            "type": "select",
+            "required": false,
+            "lvl": "simple",
+            "default": "single",
+            "options": [
+              "single",
+              "restart",
+              "queued",
+              "parallel"
+            ]
+          },
+          {
+            "key": "max_runs",
+            "type": "number",
+            "required": false,
+            "lvl": "simple",
+            "placeholder": "5"
+          },
+          {
+            "key": "parameters",
+            "type": "list",
+            "required": false,
+            "lvl": "simple",
+            "item": {
+              "type": "object",
+              "fields": [
+                {
+                  "key": "key",
+                  "type": "text",
+                  "required": true,
+                  "lvl": "simple",
+                  "placeholder": "delay_ms"
+                },
+                {
+                  "key": "value",
+                  "type": "text",
+                  "required": true,
+                  "lvl": "simple",
+                  "placeholder": "int"
+                }
+              ]
+            }
+          },
+          {
+            "key": "then",
+            "type": "list",
+            "required": true,
+            "lvl": "simple",
+            "item": {
+              "type": "object",
+              "fields": [],
+              "extends": "base_actions.json"
+            }
+          },
+          {
+            "key": "custom_config",
+            "type": "raw_yaml",
+            "required": false,
+            "lvl": "advanced"
+          }
+        ]
+      }
+    }
+  ]
+}

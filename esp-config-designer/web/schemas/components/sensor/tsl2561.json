@@ -1,0 +1,56 @@
+{
+  "id": "sensor.tsl2561",
+  "domain": "sensor",
+  "platform": "tsl2561",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/tsl2561/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x39"
+    },
+    {
+      "key": "integration_time",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "402ms",
+      "options": [
+        "14ms",
+        "101ms",
+        "402ms"
+      ]
+    },
+    {
+      "key": "gain",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "1x",
+      "options": [
+        "1x",
+        "16x"
+      ]
+    },
+    {
+      "key": "is_cs_package",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    }
+  ]
+}
