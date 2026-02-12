@@ -1,0 +1,4 @@
+configuration:
+  use_esphome_shared_path:
+    name: Use ESPHome Shared Path
+    description: Store projects, assets, and YAML files in /config/esphome. Disable to keep data independent in /config/ecd (recommended).

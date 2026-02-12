@@ -1,0 +1,4 @@
+configuration:
+  use_esphome_shared_path:
+    name: Uzyj wspolnej sciezki ESPHome
+    description: Zapisuj projekty, zasoby i pliki YAML w /config/esphome. Wylacz, aby trzymac dane niezaleznie w /config/ecd (zalecane).

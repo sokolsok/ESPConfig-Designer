@@ -1,0 +1,26 @@
+{
+  "name": "ESPConfig Designer",
+  "slug": "esp-config-designer",
+  "description": "Ingress-only ESPHome config designer. Build YAML, compile, and flash devices with live logs.",
+  "version": "1.2.3",
+  "build": "Dockerfile",
+  "arch": ["amd64", "aarch64"],
+  "startup": "services",
+  "boot": "auto",
+  "init": false,
+  "host_network": false,
+  "ingress": true,
+  "ingress_port": 8099,
+  "watchdog": "http://[HOST]:8099/api/health",
+  "logo": "logo.png",
+  "icon": "logo.png",
+  "panel_icon": "mdi:home-automation",
+  "panel_title": "ESP Config Designer",
+  "map": ["config:rw"],
+  "options": {
+    "use_esphome_shared_path": false
+  },
+  "schema": {
+    "use_esphome_shared_path": "bool"
+  }
+}
