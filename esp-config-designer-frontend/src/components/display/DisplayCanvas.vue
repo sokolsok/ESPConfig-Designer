@@ -240,6 +240,7 @@ const hitMargin = 2;
 const loadedFonts = new Map();
 const processedImages = new Map();
 const processedAnimations = new Map();
+const processedRevision = ref(0);
 
 const canvasStyle = computed(() => {
   const grid = props.gridSize * props.zoom;
@@ -572,23 +573,185 @@ const graphLegend = (element) => {
   };
 };
 
-const imageKey = (element) => `${element.imageUrl || ""}|${element.invert ? "1" : "0"}`;
+const resolvePreviewType = (value) => {
+  const type = String(value || "BINARY").trim().toUpperCase();
+  return ["BINARY", "GRAYSCALE", "RGB565", "RGB"].includes(type) ? type : "BINARY";
+};
+
+const resolvePreviewTransparency = (type, value) => {
+  const current = String(value || "opaque").trim().toLowerCase();
+  if (type === "BINARY") {
+    return current === "chroma_key" ? "chroma_key" : "opaque";
+  }
+  return ["opaque", "chroma_key", "alpha_channel"].includes(current) ? current : "opaque";
+};
+
+const resolvePreviewDither = (value) => {
+  const dither = String(value || "NONE").trim().toUpperCase();
+  return dither === "FLOYDSTEINBERG" ? "FLOYDSTEINBERG" : "NONE";
+};
+
+const resolveEncodingForElement = (element) => {
+  if (element?.type === "animation") {
+    const type = resolvePreviewType(element.animationType);
+    return {
+      type,
+      transparency: resolvePreviewTransparency(type, element.animationTransparency),
+      invertAlpha: ["BINARY", "GRAYSCALE"].includes(type) ? Boolean(element.animationInvertAlpha) : false,
+      dither: ["BINARY", "GRAYSCALE"].includes(type) ? resolvePreviewDither(element.animationDither) : "NONE",
+      byteOrder: type === "RGB565" ? String(element.animationByteOrder || "big_endian") : "big_endian"
+    };
+  }
+
+  const type = resolvePreviewType(element?.imageType);
+  return {
+    type,
+    transparency: resolvePreviewTransparency(type, element?.imageTransparency),
+    invertAlpha: ["BINARY", "GRAYSCALE"].includes(type)
+      ? Boolean(element?.imageInvertAlpha ?? element?.invert)
+      : false,
+    dither: ["BINARY", "GRAYSCALE"].includes(type) ? resolvePreviewDither(element?.imageDither) : "NONE",
+    byteOrder: type === "RGB565" ? String(element?.imageByteOrder || "big_endian") : "big_endian"
+  };
+};
+
+const transparencyAlpha = (transparency, alpha) => {
+  if (transparency === "opaque") return 255;
+  if (transparency === "chroma_key") return alpha >= 128 ? 255 : 0;
+  return alpha;
+};
+
+const createLumaBuffer = (data, invertAlpha) => {
+  const buffer = new Float32Array(data.length / 4);
+  for (let i = 0, p = 0; i < data.length; i += 4, p += 1) {
+    const luma = 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
+    buffer[p] = invertAlpha ? 255 - luma : luma;
+  }
+  return buffer;
+};
+
+const applyFloydSteinberg = (buffer, width, height, quantize, alphaMask) => {
+  const at = (x, y) => y * width + x;
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const idx = at(x, y);
+      if (alphaMask && !alphaMask[idx]) continue;
+      const oldValue = buffer[idx];
+      const nextValue = quantize(oldValue);
+      const err = oldValue - nextValue;
+      buffer[idx] = nextValue;
+      if (x + 1 < width) buffer[at(x + 1, y)] += (err * 7) / 16;
+      if (x - 1 >= 0 && y + 1 < height) buffer[at(x - 1, y + 1)] += (err * 3) / 16;
+      if (y + 1 < height) buffer[at(x, y + 1)] += (err * 5) / 16;
+      if (x + 1 < width && y + 1 < height) buffer[at(x + 1, y + 1)] += err / 16;
+    }
+  }
+};
+
+const applyDisplayEncoding = (imageData, encoding) => {
+  const { data, width, height } = imageData;
+  const onColor = [203, 213, 245];
+  const offColor = [2, 6, 23];
+  const alphaMask = new Uint8Array(width * height);
+
+  for (let i = 0, p = 0; i < data.length; i += 4, p += 1) {
+    const alpha = transparencyAlpha(encoding.transparency, data[i + 3]);
+    data[i + 3] = alpha;
+    alphaMask[p] = alpha > 0 ? 1 : 0;
+  }
+
+  if (encoding.type === "RGB") {
+    return;
+  }
+
+  if (encoding.type === "RGB565") {
+    for (let i = 0; i < data.length; i += 4) {
+      if (!data[i + 3]) continue;
+      data[i] = Math.round((data[i] * 31) / 255) * 8;
+      data[i + 1] = Math.round((data[i + 1] * 63) / 255) * 4;
+      data[i + 2] = Math.round((data[i + 2] * 31) / 255) * 8;
+    }
+    return;
+  }
+
+  const luma = createLumaBuffer(data, encoding.invertAlpha);
+  if (encoding.dither === "FLOYDSTEINBERG") {
+    if (encoding.type === "BINARY") {
+      applyFloydSteinberg(luma, width, height, (value) => (value >= 128 ? 255 : 0), alphaMask);
+    } else {
+      applyFloydSteinberg(luma, width, height, (value) => Math.round(value / 17) * 17, alphaMask);
+    }
+  }
+
+  for (let i = 0, p = 0; i < data.length; i += 4, p += 1) {
+    if (!data[i + 3]) continue;
+    if (encoding.type === "BINARY") {
+      const isOn = (encoding.dither === "FLOYDSTEINBERG" ? luma[p] : luma[p] >= 128 ? 255 : 0) >= 128;
+      if (isOn) {
+        data[i] = onColor[0];
+        data[i + 1] = onColor[1];
+        data[i + 2] = onColor[2];
+        data[i + 3] = 255;
+      } else if (encoding.transparency === "opaque") {
+        data[i] = offColor[0];
+        data[i + 1] = offColor[1];
+        data[i + 2] = offColor[2];
+        data[i + 3] = 255;
+      } else {
+        data[i + 3] = 0;
+      }
+      continue;
+    }
+
+    const gray = Math.max(0, Math.min(255, Math.round(encoding.dither === "FLOYDSTEINBERG" ? luma[p] : luma[p])));
+    data[i] = gray;
+    data[i + 1] = gray;
+    data[i + 2] = gray;
+  }
+};
+
+const imageKey = (element) => {
+  const encoding = resolveEncodingForElement(element);
+  return [
+    element.imageUrl || "",
+    encoding.type,
+    encoding.transparency,
+    encoding.invertAlpha ? "1" : "0",
+    encoding.dither,
+    encoding.byteOrder
+  ].join("|");
+};
 
 const imageDisplayUrl = (element) => {
+  processedRevision.value;
   const key = imageKey(element);
   return processedImages.get(key) || element.imageUrl;
 };
 
-const animationKey = (element) => `${element.animationUrl || ""}|${element.autoAnimate ? "1" : "0"}`;
+const animationKey = (element) => {
+  const encoding = resolveEncodingForElement(element);
+  return [
+    element.animationUrl || "",
+    element.autoAnimate ? "1" : "0",
+    encoding.type,
+    encoding.transparency,
+    encoding.invertAlpha ? "1" : "0",
+    encoding.dither,
+    encoding.byteOrder
+  ].join("|");
+};
 
 const animationDisplayUrl = (element) => {
+  processedRevision.value;
   if (element.autoAnimate) return element.animationUrl;
   const key = animationKey(element);
   return processedAnimations.get(key) || element.animationUrl;
 };
 
-const processImage = async (url, invert) => {
-  const key = `${url}|${invert ? "1" : "0"}`;
+const processImage = async (element) => {
+  const url = element?.imageUrl || "";
+  const key = imageKey(element);
+  const encoding = resolveEncodingForElement(element);
   if (!url || processedImages.has(key)) return;
   const img = new Image();
   img.src = url;
@@ -606,35 +769,17 @@ const processImage = async (url, invert) => {
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(img, 0, 0);
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const data = imageData.data;
-  const onColor = [203, 213, 245];
-  for (let i = 0; i < data.length; i += 4) {
-    const r = data[i];
-    const g = data[i + 1];
-    const b = data[i + 2];
-    const a = data[i + 3];
-    if (a == 0) {
-      data[i + 3] = 0;
-      continue;
-    }
-    const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    const isOn = invert ? luminance < 128 : luminance >= 128;
-    if (isOn) {
-      data[i] = onColor[0];
-      data[i + 1] = onColor[1];
-      data[i + 2] = onColor[2];
-      data[i + 3] = 255;
-    } else {
-      data[i + 3] = 0;
-    }
-  }
+  applyDisplayEncoding(imageData, encoding);
   ctx.putImageData(imageData, 0, 0);
   processedImages.set(key, canvas.toDataURL("image/png"));
+  processedRevision.value += 1;
 };
 
-const processAnimation = async (url) => {
+const processAnimation = async (element) => {
+  const url = element?.animationUrl || "";
   if (!url) return;
-  const key = `${url}|0`;
+  const key = animationKey(element);
+  const encoding = resolveEncodingForElement(element);
   if (processedAnimations.has(key)) return;
   const img = new Image();
   img.src = url;
@@ -650,7 +795,11 @@ const processAnimation = async (url) => {
   if (!ctx) return;
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(img, 0, 0);
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  applyDisplayEncoding(imageData, encoding);
+  ctx.putImageData(imageData, 0, 0);
   processedAnimations.set(key, canvas.toDataURL("image/png"));
+  processedRevision.value += 1;
 };
 
 const isFontSupported = (url) => {
@@ -967,13 +1116,13 @@ watch(
     elements
       .filter((element) => element.type === "image" && element.imageUrl)
       .forEach((element) => {
-        processImage(element.imageUrl, Boolean(element.invert));
+        processImage(element);
       });
     elements
       .filter((element) => element.type === "animation" && element.animationUrl)
       .forEach((element) => {
         if (!element.autoAnimate) {
-          processAnimation(element.animationUrl);
+          processAnimation(element);
         }
       });
   },
@@ -996,7 +1145,7 @@ watch(
   background-color: #020617;
   background-image: linear-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px),
     linear-gradient(90deg, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
-  border-radius: 10px;
+  border-radius: 4px;
   border: 1px solid rgba(148, 163, 184, 0.35);
   overflow: hidden;
 }

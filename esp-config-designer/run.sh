@@ -67,6 +67,7 @@ mkdir -p "$project_dir"
 mkdir -p "$asset_root"
 mkdir -p "$asset_root/fonts"
 mkdir -p "$asset_root/images"
+mkdir -p "$asset_root/audio"
 
 if [ -d /build ]; then
   export ESPHOME_BUILD_PATH="/build"

@@ -1,257 +1,121 @@
-# ESP Builder WebApp (Vue + Add-on API)
+# ESP Config Designer Frontend
 
-Visual ESPHome web application with a schema-driven Builder and a Dashboard explorer.
+Vue 3 + Vite frontend for the ESP Config Designer Home Assistant add-on.
 
-This README documents the **full current project**: architecture, routing, schema system, YAML flow, dashboard model, display configurator, and API contracts.
+This document describes the application structure and runtime behavior.
 
-## Overview
+## What the app is
+- A schema-driven ESPHome configuration editor.
+- A project dashboard with virtual folders.
+- A display layout editor (Display Configurator) with canvas preview.
+- An Asset Manager for images and fonts (upload, list, rename, delete).
+- A shared install/log/export UI working in both Dashboard and Builder views.
 
-### What the app does
-- Builds ESPHome YAML through dynamic JSON schema forms.
-- Organizes project files in a dashboard with virtual folders.
-- Keeps physical files flat while storing folder placement metadata in `projects.json`.
+## Views
 
-### Main views
-- **Dashboard** (`#/`): project explorer with folder tree + cards.
-- **Builder** (`#/builder`): schema-driven config editor + YAML preview/export.
+### Dashboard (`#/`)
+- Explorer with tree + cards.
+- Virtual folders are persisted in `projects.json`.
+- Allows selecting a project and running top-bar actions.
+- Shows project online state from add-on device status.
 
-### Frontend vs backend
-- Frontend: Vue 3 + Vite.
-- Primary runtime backend: Home Assistant add-on API over Ingress.
-- Backend in this repo: PHP endpoints under `api/` (legacy compatibility path).
-- Dev runtime storage: `runtime/esp_projects` and `runtime/esp_assets`.
+### Builder (`#/builder`)
+- Form editor generated from JSON schemas.
+- YAML preview/export.
+- Display Configurator for text/icon/image/animation/graph/shape layout.
+- Asset Manager available from Builder Project menu and Display Configurator.
+- Save state tracking via top-level `isSaved` flag.
+- Device status badge for current YAML.
 
-## Routing and shell
+## Shared top-bar actions
+- `Install`
+- `Logs`
+- `Export`
 
-- Router uses hash history for Home Assistant ingress compatibility.
-- Route map:
-  - `#/` -> `DashboardView`
-  - `#/builder` -> `BuilderView`
-- Shared top bar is in `src/App.vue`.
+State is propagated by custom events from views to `App.vue`.
 
-## UI layout
+## Shared install/logs runtime
+- UI component: `src/components/InstallConsoleModal.vue`
+- Runtime flow: `src/composables/useInstallConsoleFlow.js`
 
-### Dashboard layout
-- Left sidebar (resizable width):
-  - New device button,
-  - nested folder tree,
-  - inline folder creation,
-  - folder menu actions.
-- Main pane:
-  - toolbar (mode toggle, parent-up button, breadcrumb, search),
-  - folder cards section (folder mode),
-  - project cards section.
-- Project cards can show online state with green glow (`project-tile--online`).
-- Device status refresh runs while Dashboard is mounted.
-- Project list updates are event-driven across tabs (`app:projects-updated` + BroadcastChannel/storage fallback).
+Shared flow includes:
+- job start (`compile`, `ota`, `logs`),
+- live log stream (SSE),
+- tail-wait fallback,
+- cancel support,
+- serial flash via Web Serial,
+- firmware download flow.
 
-### Builder layout
-- Left sidebar + two-column work area.
-- Work area columns:
-  - **Configuration** (left)
-  - **YAML Preview** (right, intentionally wider)
-- Independent vertical scroll per column.
-- Project menu `Save` persists YAML + project JSON + `projects.json` metadata via add-on API.
-- Terminal modal handles compile/install/logs with live stream and long-poll fallback.
-- Install modal supports `Via Serial Port`, `Wireless (OTA)`, and `Download Binary`.
+## Architecture highlights
 
-## Repository layout (high level)
+### Routing
+- Hash history router for ingress compatibility.
+- Routes:
+  - `#/` -> Dashboard
+  - `#/builder` -> Builder
 
-```text
-api/
-data/
-public/
-  schemas/
-  components_list/
-runtime/
-  esp_projects/
-  esp_assets/
-src/
-  components/
-  router/
-  utils/
-  views/
-    DashboardView.vue
-    BuilderView.vue
-  App.vue
-  main.js
-  style.css
-vite.config.js
-```
+### Data and persistence
+- Project JSON files are flat in storage.
+- Folder hierarchy is virtual and stored in `projects.json`.
+- `isSaved` is the only supported save-state flag.
+- Legacy save-state keys are cleaned out from persisted data.
+- Display asset references are validated when opening a project in Builder.
+- Missing display image/animation references fallback to empty selection.
+- Missing local display font references fallback to default Google font.
 
-## Core files and responsibilities
+### Status polling
+- Dashboard polls all devices while the document is visible.
+- Builder polls only the current device status (lighter path) while visible.
 
-### Core views
-- `src/views/DashboardView.vue`: project explorer, virtual folders, drag/drop placement, persistence logic.
-- `src/views/BuilderView.vue`: schema orchestration, YAML preview/export, project save/install flows, terminal jobs.
-- `src/App.vue`: shared top bar and Builder action triggers (`Install`, `Logs`, `Compile`, `Export`).
-- `src/router/index.js`: route setup with hash history.
+## Key source files
+- `src/App.vue` -> shell and shared top bar.
+- `src/views/DashboardView.vue` -> explorer and selected-project actions.
+- `src/views/BuilderView.vue` -> schema editor and YAML flow.
+- `src/components/display/DisplayBuilder.vue` -> Display Configurator container.
+- `src/components/display/DisplayInspector.vue` -> Display element editor.
+- `src/components/display/DisplayCanvas.vue` -> canvas preview renderer.
+- `src/components/assets/AssetManagerModal.vue` -> assets CRUD modal UI.
+- `src/components/InstallConsoleModal.vue` -> shared install/console modal UI.
+- `src/composables/useInstallConsoleFlow.js` -> shared install/log runtime logic.
+- `src/utils/assetsApi.js` -> frontend asset API client.
+- `src/utils/displayImageEncoding.js` -> image/animation encoding normalization.
+- `src/utils/schemaLoader.js` -> schema loading and extends resolution.
+- `src/utils/schemaYaml.js` -> YAML generation.
+- `src/utils/schemaVisibility.js` -> visibility/dependency rules.
 
-### Schema rendering components
-- `src/components/SchemaRenderer.vue`: loads schemas and renders ordered/filtered fields.
-- `src/components/SchemaField.vue`: renders field types and emits updates.
-- `src/components/CatalogListField.vue`: unified list UI for catalogs.
-- `src/components/PickerModal.vue`: reusable picker UI.
+## API contract (add-on)
 
-### Shared UI modules
-- `src/components/ConfirmModal.vue`
-- `src/components/GpioPickerModal.vue`
-- `src/components/GpioGuideModal.vue`
-
-### Utility modules
-- `src/utils/schemaLoader.js`
-- `src/utils/schemaVisibility.js`
-- `src/utils/schemaRequirements.js`
-- `src/utils/schemaYaml.js`
-- `src/utils/schemaAuto.js`
-- `src/utils/gpioData.js`
-
-## Dashboard data model
-
-Physical project files are flat JSON files. Folder hierarchy is virtual and stored in `projects.json`.
-
-Example structure:
-
-```json
-{
-  "version": 1,
-  "updatedAt": "2026-02-11T00:00:00.000Z",
-  "folders": [
-    { "id": "root", "name": "Projects", "parentId": null }
-  ],
-  "projectPlacement": [
-    { "name": "my-device.json", "folderId": "root" }
-  ]
-}
-```
-
-Rules:
-- Root ID is fixed to `root`.
-- Root label is `Projects`.
-- Folder delete removes subtree and reassigns projects to root.
-- Drag/drop changes `projectPlacement` only.
-
-## Dashboard persistence contracts
-
-### Dev mode (`vite.config.js` middleware)
-- `GET /dev/projects/list`
-- `GET /dev/projects/index`
-- `POST /dev/projects/index`
-
-These endpoints read/write `runtime/esp_projects` directly for local development.
-
-### Add-on compatible mode
+### Projects and YAML
 - `GET /projects/list`
-- `GET /projects/load?name=projects.json`
+- `GET /projects/load?name=<project>.json`
 - `POST /projects/save`
+- `POST /save` (write YAML)
+- `GET /yaml/load?name=<node>.yaml`
+- `DELETE /yaml/delete?name=<node>.yaml`
 
-### Add-on runtime contracts used by Builder
-- `POST /save`
+### Assets
+- `GET /api/assets/manifest?kind=all|images|fonts|audio&refresh=0|1`
+- `GET /api/assets/<kind>/<filename>`
+- `POST /api/assets/upload?kind=images|fonts|audio`
+- `POST /api/assets/rename`
+- `DELETE /api/assets/<kind>/<filename>`
+- `GET /api/assets/mdi-substitutions`
+- `POST /api/assets/refresh?kind=all|fonts|images|audio`
+
+### Devices
+- `POST /api/devices/register`
+- `GET /api/devices/list?refresh=1`
+- `GET /api/devices/status?yaml=<node>.yaml&refresh=0|1`
+
+### Jobs and firmware
 - `POST /api/install`
 - `GET /api/jobs/<job_id>`
 - `GET /api/jobs/<job_id>/stream`
 - `GET /api/jobs/<job_id>/tail-wait`
 - `POST /api/jobs/<job_id>/cancel`
-- `GET /api/firmware?yaml=<name>&variant=ota|factory`
-- `POST /api/devices/register`
-- `GET /api/devices/list?refresh=1`
+- `GET /api/firmware?yaml=<node>.yaml&variant=factory|ota`
 
-## Schema system
-
-### Locations
-- General schemas: `public/schemas/general/`
-  - `core`, `platform`, `network`, `protocols`, `busses`, `system`, `automation`
-- Component schemas: `public/schemas/components/<domain>/<platform>.json`
-- Base component schemas: `public/schemas/components/base_component/`
-- Component catalog: `public/components_list/components_list.json`
-
-### Extends
-- Supported at schema level and field level.
-- Loader merges base fields first, then local fields.
-- Duplicate field keys are deduplicated by `key`.
-
-### Visibility and dependencies
-- Local dependency: `dependsOn`.
-- Global dependency: `set_global` + `globalDependsOn`.
-- `uiHidden` hides from UI while keeping data path available.
-
-### YAML emission
-- `emitYAML` per field:
-  - `never`
-  - `always`
-  - `visible`
-  - `dependsOn`
-- Default behavior when omitted:
-  - fields with dependencies -> `dependsOn`
-  - otherwise -> `visible`
-
-### Requires/interfaces
-- Recognized buses: `i2c`, `spi`, `uart`, `one_wire`, `i2s`, `canbus`.
-- Optional advanced keys: `requiresByBus`, `requiresByType`.
-
-## Builder behavior notes
-
-- Tabs: Core, Platform, Network, Protocols, Busses, System, Automation, Components.
-- `Simple/Normal/Advanced` modes control field visibility via `lvl`.
-- Field order follows schema order.
-- `globalStore` drives global dependency visibility checks.
-- Export is blocked by form errors.
-- Bus/protocol sections use per-schema `enabled` fields.
-- GPIO fields are editable and picker-assisted.
-- Top-level schema `helpUrl` is used for docs links.
-- Password generation can be schema-driven.
-
-## YAML generation behavior
-
-Key points:
-- YAML is generated from current config + schema metadata.
-- Field emission obeys `emitYAML` and dependency visibility.
-- Internal display metadata is not emitted into final YAML.
-
-Primary generator:
-- `src/utils/schemaYaml.js`
-
-## Display configurator
-
-### UI files
-- `src/components/display/DisplayBuilder.vue`
-- `src/components/display/DisplayCanvas.vue`
-- `src/components/display/DisplayInspector.vue`
-- `src/components/display/DisplayToolbar.vue`
-
-### Schema and assets
-- `public/schemas/components/display/ssd1306.json`
-- Runtime assets:
-  - `runtime/esp_assets/fonts.json`
-  - `runtime/esp_assets/gfonts.json`
-  - `runtime/esp_assets/images.json`
-  - `runtime/esp_assets/fonts/materialdesignicons-webfont.ttf`
-  - `runtime/esp_assets/mdi_glyph_substitutions.yaml`
-
-### Behavior notes
-- Opens from schemas with `display_builder: true`.
-- Modal closure is controlled to avoid accidental dismissals.
-- Supports text, image, icon, and shapes.
-- Uses global ID index for dynamic text sources.
-- Stores editor data under `_display_builder` and suppresses it in YAML output.
-
-## Existing backend API in this repo
-
-### `api/register-key.php`
-- POST `{ apiKey, filename }`
-- Stores key data in `data/keys.json`.
-
-### `api/yaml.php`
-- Requires `X-API-Key`.
-- GET returns queue and may delete unless `peek=1`.
-- POST writes `{ files: [...] }`.
-
-### `api/ha-webhook.php`
-- POST forwards YAML to a Home Assistant webhook URL.
-
-## Development
-
-Install and run:
+## Local development
 
 ```bash
 npm install
@@ -264,7 +128,7 @@ Build:
 npm run build
 ```
 
-## Notes
-- Hash routing is intentional for ingress stability.
-- Dashboard root folder ID must remain `root`.
-- Folder organization is virtual metadata, not physical directory layout.
+## Deploy to add-on
+1. Build frontend (`npm run build`).
+2. Copy `dist/*` into `../esp-config-designer/web/`.
+3. Rebuild/restart add-on.

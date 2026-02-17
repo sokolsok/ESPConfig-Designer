@@ -27,8 +27,8 @@
             </p>
           </div>
           <div class="display-config-actions">
+            <button type="button" class="secondary compact" @click="openAssetManager">Assets</button>
             <button type="button" class="secondary compact" @click="confirmResetOpen = true">Reset</button>
-            <button type="button" class="secondary compact" @click="handleClose">Close</button>
           </div>
         </header>
         <ConfirmModal
@@ -144,49 +144,41 @@
             </div>
           </section>
 
-          <section class="display-config-panel display-config-panel--inspector">
-            <div class="display-config-panel__header">
-              <h4>Inspector</h4>
-              <span v-if="selectedElement" class="display-element-badge">
-                {{ inspectorBadgeLabel(selectedElement) }}
-              </span>
+          <div class="display-config-inspector-column">
+            <section class="display-config-panel display-config-panel--inspector">
+              <div class="display-config-panel__header">
+                <h4>Inspector</h4>
+                <button
+                  v-if="selectedElement"
+                  type="button"
+                  class="secondary compact display-inspector-delete"
+                  @click="handleDelete"
+                >
+                  Delete {{ deleteElementLabel(selectedElement) }}
+                </button>
+              </div>
+              <div class="display-inspector-body">
+                <DisplayInspector
+                  variant="flat"
+                  :show-header="false"
+                  :selected-element="selectedElement"
+                  :screen-w="screen?.w || 0"
+                  :screen-h="screen?.h || 0"
+                  :is-monochrome="isMonochrome"
+                  :images="images"
+                  :local-fonts="localFonts"
+                  :google-fonts="googleFonts"
+                  :assets-base="assetsBase"
+                  :dynamic-ids="dynamicIdOptions"
+                  :mdi-icons="mdiIcons"
+                  @update="handleInspectorUpdate"
+                />
+              </div>
+            </section>
+            <div class="display-inspector-footer">
+              <button type="button" class="secondary compact" @click="handleClose">Close</button>
             </div>
-            <div class="display-inspector-body">
-              <DisplayInspector
-                variant="flat"
-                :show-header="false"
-                :selected-element="selectedElement"
-                :screen-w="screen?.w || 0"
-                :screen-h="screen?.h || 0"
-                :is-monochrome="isMonochrome"
-                :images="images"
-                :local-fonts="localFonts"
-                :google-fonts="googleFonts"
-                :assets-base="assetsBase"
-                :dynamic-ids="dynamicIdOptions"
-                :mdi-icons="mdiIcons"
-                @update="handleInspectorUpdate"
-              />
-            </div>
-            <div class="display-inspector-actions">
-              <button
-                type="button"
-                class="secondary compact"
-                :disabled="!selectedElement"
-                @click="handleDuplicate"
-              >
-                Duplicate
-              </button>
-              <button
-                type="button"
-                class="secondary compact display-inspector-actions__delete"
-                :disabled="!selectedElement"
-                @click="handleDelete"
-              >
-                Delete
-              </button>
-            </div>
-          </section>
+          </div>
         </div>
       </div>
     </div>
@@ -199,6 +191,10 @@ import ConfirmModal from "../ConfirmModal.vue";
 import DisplayCanvas from "./DisplayCanvas.vue";
 import DisplayToolbar from "./DisplayToolbar.vue";
 import DisplayInspector from "./DisplayInspector.vue";
+import {
+  normalizeAnimationElementEncoding,
+  normalizeImageElementEncoding
+} from "../../utils/displayImageEncoding";
 
 const props = defineProps({
   schema: {
@@ -216,8 +212,26 @@ const props = defineProps({
   mdiIcons: {
     type: Array,
     default: () => []
+  },
+  images: {
+    type: Array,
+    default: () => []
+  },
+  localFonts: {
+    type: Array,
+    default: () => []
+  },
+  googleFonts: {
+    type: Array,
+    default: () => []
+  },
+  assetsBase: {
+    type: String,
+    default: ""
   }
 });
+
+const emit = defineEmits(["open-asset-manager"]);
 
 const zoom = ref(1);
 const gridSize = 2;
@@ -229,13 +243,11 @@ const panY = ref(0);
 const isPanning = ref(false);
 const panStart = ref({ x: 0, y: 0, panX: 0, panY: 0 });
 const backdropPointerDown = ref(false);
-const baseUrl = import.meta.env.BASE_URL || "/";
-const normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-const assetsBase = `${normalizedBaseUrl}runtime/esp_assets/`;
+const assetsBase = computed(() => props.assetsBase || "");
 
-const images = ref([]);
-const localFonts = ref([]);
-const googleFonts = ref([]);
+const images = computed(() => props.images || []);
+const localFonts = computed(() => props.localFonts || []);
+const googleFonts = computed(() => props.googleFonts || []);
 
 const elements = ref([]);
 const selectedId = ref(null);
@@ -332,7 +344,7 @@ const getDefaultTextFont = () => {
       fontSource: "local",
       fontFamily: local.label,
       fontFile: local.file,
-      fontUrl: `${assetsBase}fonts/${local.file}`,
+      fontUrl: `${assetsBase.value}fonts/${local.file}`,
       fontVariant: "regular",
       fontStyle: style.style,
       fontWeight: style.weight
@@ -355,7 +367,7 @@ const getDefaultLegendFont = (size) => {
       family: local.label,
       file: local.file,
       variant: "regular",
-      url: `${assetsBase}fonts/${local.file}`,
+      url: `${assetsBase.value}fonts/${local.file}`,
       weight: style.weight,
       style: style.style,
       size
@@ -428,7 +440,18 @@ const buildElement = (type) => {
       offLabel: "OFF",
       wrap: true
     },
-    image: { w: 24, h: 24, image: "", imageUrl: "", invert: false, imageType: "BINARY" },
+    image: {
+      w: 24,
+      h: 24,
+      image: "",
+      imageUrl: "",
+      imageType: "BINARY",
+      imageTransparency: "opaque",
+      imageInvertAlpha: false,
+      imageDither: "NONE",
+      imageByteOrder: "big_endian",
+      invert: false
+    },
     icon: { w: 20, h: 20, icon: "" },
     graph: {
       w: 80,
@@ -479,7 +502,11 @@ const buildElement = (type) => {
       h: 48,
       animationId: "",
       animationFile: "",
+      animationType: "BINARY",
       animationTransparency: "opaque",
+      animationInvertAlpha: false,
+      animationDither: "NONE",
+      animationByteOrder: "big_endian",
       autoAnimate: false,
       intervalMs: "",
       loopEnabled: false,
@@ -533,7 +560,23 @@ const buildElement = (type) => {
 const loadLayout = () => {
   const stored = props.componentConfig?.[layoutKey];
   if (!stored?.elements || elements.value.length) return;
-  elements.value = Array.isArray(stored.elements) ? stored.elements : [];
+  const sourceElements = Array.isArray(stored.elements) ? stored.elements : [];
+  elements.value = sourceElements.map((element) => {
+    if (!element || typeof element !== "object") return element;
+    if (element.type === "image") {
+      return {
+        ...element,
+        ...normalizeImageElementEncoding(element)
+      };
+    }
+    if (element.type === "animation") {
+      return {
+        ...element,
+        ...normalizeAnimationElementEncoding(element)
+      };
+    }
+    return element;
+  });
   const ids = elements.value
     .map((item) => item?.id || "")
     .filter(Boolean)
@@ -573,13 +616,6 @@ const cloneElement = (source, offsetX = 8, offsetY = 8) => {
     x: nextX,
     y: nextY
   };
-};
-
-const handleDuplicate = () => {
-  const clone = cloneElement(selectedElement.value);
-  if (!clone) return;
-  elements.value = [...elements.value, clone];
-  selectedId.value = clone.id;
 };
 
 const isEditableTarget = (target) => {
@@ -713,16 +749,15 @@ const elementListLabel = (element) => {
   return element.id;
 };
 
-const inspectorBadgeLabel = (element) => {
-  if (element.type === "text") {
-    return element.textMode === "dynamic" ? "value" : "text";
-  }
-  if (element.type === "graph") return element.graphId || "graph";
-  if (element.type === "animation") return element.animationId || "animation";
-  if (element.type === "shape") {
-    return element.shapeType || "shape";
-  }
-  return element.type;
+const deleteElementLabel = (element) => {
+  if (!element?.type) return "Element";
+  if (element.type === "text") return "Text";
+  if (element.type === "image") return "Image";
+  if (element.type === "icon") return "Icon";
+  if (element.type === "graph") return "Graph";
+  if (element.type === "animation") return "Animation";
+  if (element.type === "shape") return "Shape";
+  return "Element";
 };
 
 const elementTypeLabel = (element) => {
@@ -858,7 +893,7 @@ const ensureTextDefaults = () => {
         fontSource: "local",
         fontFamily: local.label,
         fontFile: local.file,
-        fontUrl: `${assetsBase}fonts/${local.file}`,
+        fontUrl: `${assetsBase.value}fonts/${local.file}`,
         fontVariant: "regular",
         fontStyle: style.style,
         fontWeight: style.weight
@@ -880,9 +915,13 @@ const ensureAnimationDefaults = () => {
     if (element.animationUrl) return element;
     return {
       ...element,
-      animationUrl: `${assetsBase}images/${element.animationFile}`
+      animationUrl: `${assetsBase.value}images/${element.animationFile}`
     };
   });
+};
+
+const openAssetManager = () => {
+  emit("open-asset-manager");
 };
 
 const toggleBodyScroll = (enabled) => {
@@ -905,29 +944,23 @@ watch(
   }
 );
 
-const loadManifest = async (path, fallback) => {
-  try {
-    const response = await fetch(path);
-    if (!response.ok) return fallback;
-    return await response.json();
-  } catch (error) {
-    return fallback;
-  }
-};
-
 onMounted(async () => {
-  const localData = await loadManifest(`${assetsBase}fonts.json`, { fonts: [] });
-  const googleData = await loadManifest(`${assetsBase}gfonts.json`, { families: [] });
-  const imagesData = await loadManifest(`${assetsBase}images.json`, { images: [] });
-  localFonts.value = localData.fonts || [];
-  googleFonts.value = googleData.families || [];
-  images.value = imagesData.images || [];
   loadLayout();
   ensureTextDefaults();
   ensureGraphDefaults();
   ensureAnimationDefaults();
   window.addEventListener("keydown", handleKeyDown);
 });
+
+watch(
+  () => [images.value, localFonts.value, googleFonts.value, assetsBase.value],
+  () => {
+    ensureTextDefaults();
+    ensureGraphDefaults();
+    ensureAnimationDefaults();
+  },
+  { deep: true }
+);
 
 watch(
   () => elements.value,
@@ -1018,7 +1051,7 @@ onBeforeUnmount(() => {
 
 .display-config-card {
   background: #ffffff;
-  border-radius: 18px;
+  border-radius: 4px;
   width: min(1200px, 94vw);
   height: 700px;
   padding: 20px 24px;
@@ -1123,6 +1156,14 @@ onBeforeUnmount(() => {
 .display-config-panel--inspector {
   overflow: hidden;
   align-content: start;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.display-config-inspector-column {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 8px;
 }
 
 .display-config-panel--toolbox,
@@ -1130,7 +1171,7 @@ onBeforeUnmount(() => {
 .display-config-panel--inspector {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 14px;
+  border-radius: 4px;
   padding: 12px;
 }
 
@@ -1142,7 +1183,7 @@ onBeforeUnmount(() => {
 .display-config-panel--layers {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 14px;
+  border-radius: 4px;
   padding: 12px;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
@@ -1155,7 +1196,7 @@ onBeforeUnmount(() => {
   gap: 6px;
   overflow: auto;
   padding-right: 6px;
-  max-height: 220px;
+  min-height: 0;
   align-content: start;
 }
 
@@ -1165,7 +1206,7 @@ onBeforeUnmount(() => {
   gap: 8px;
   align-items: center;
   border: 1px solid #e2e8f0;
-  border-radius: 10px;
+  border-radius: 4px;
   background: #ffffff;
   padding: 6px 8px;
   font-size: 12px;
@@ -1213,24 +1254,16 @@ onBeforeUnmount(() => {
   padding-right: 4px;
 }
 
-.display-inspector-actions {
+.display-inspector-footer {
   display: flex;
-  gap: 8px;
-  margin-top: auto;
+  justify-content: flex-end;
 }
 
-.display-inspector-actions__delete {
-  margin-left: auto;
-}
-
-.display-element-badge {
-  background: #0f172a;
-  color: #f8fafc;
-  font-size: 10px;
-  padding: 4px 8px;
-  border-radius: 999px;
-  text-transform: uppercase;
-  font-weight: 700;
+.display-inspector-delete {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 4px;
+  font-size: 12px;
 }
 
 .display-zoom {
@@ -1242,7 +1275,7 @@ onBeforeUnmount(() => {
   width: 28px;
   height: 28px;
   padding: 0;
-  border-radius: 8px;
+  border-radius: 4px;
   font-size: 16px;
   line-height: 1;
 }

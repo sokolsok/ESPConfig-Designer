@@ -1,4 +1,5 @@
 import json
+import mimetypes
 import os
 import queue
 import re
@@ -14,8 +15,15 @@ import shlex
 from collections import deque
 from datetime import datetime
 from typing import List, Optional, Tuple
+from urllib.parse import quote
 
 from flask import Flask, Response, jsonify, make_response, request, send_file, send_from_directory
+
+try:
+    from zeroconf import IPVersion, Zeroconf
+except Exception:
+    IPVersion = None
+    Zeroconf = None
 
 TARGET_DIR = os.environ.get("TARGET_DIR", "/config/esphome").strip()
 PROJECT_DIR = os.environ.get("PROJECT_DIR", "/config/esphome/esp_projects").strip()
@@ -33,10 +41,53 @@ PING_TIMEOUT = float(os.environ.get("PING_TIMEOUT", "0.8"))
 ASSET_ROOT = os.environ.get("ASSET_ROOT", "/config/esphome/esp_assets").strip()
 ASSET_FONTS_DIR = os.path.join(ASSET_ROOT, "fonts")
 ASSET_IMAGES_DIR = os.path.join(ASSET_ROOT, "images")
+ASSET_AUDIO_DIR = os.path.join(ASSET_ROOT, "audio")
 ASSET_FONTS_JSON = os.path.join(ASSET_ROOT, "fonts.json")
 ASSET_IMAGES_JSON = os.path.join(ASSET_ROOT, "images.json")
+ASSET_AUDIO_JSON = os.path.join(ASSET_ROOT, "audio.json")
 ASSET_GFONTS_JSON = os.path.join(ASSET_ROOT, "gfonts.json")
 ASSET_GLYPH_SUBS = os.path.join(ASSET_ROOT, "mdi_glyph_substitutions.yaml")
+SECRETS_FILENAME = "secrets.yaml"
+SECRETS_RAW_MAX_BYTES = 256 * 1024
+
+ASSET_ALLOWED_EXTENSIONS = {
+    "fonts": {".ttf", ".otf"},
+    "images": {".png", ".bmp", ".gif"},
+    "audio": {".mp3", ".wav", ".ogg"},
+}
+ASSET_MAX_SIZE_BYTES = {
+    "fonts": 5 * 1024 * 1024,
+    "images": 10 * 1024 * 1024,
+    "audio": 10 * 1024 * 1024,
+}
+ASSET_ALLOWED_MIME = {
+    "fonts": {
+        "font/ttf",
+        "application/x-font-ttf",
+        "font/otf",
+        "application/x-font-otf",
+        "application/font-sfnt",
+        "application/octet-stream",
+    },
+    "images": {
+        "image/png",
+        "image/bmp",
+        "image/gif",
+        "application/octet-stream",
+    },
+    "audio": {
+        "audio/mpeg",
+        "audio/mp3",
+        "audio/wav",
+        "audio/x-wav",
+        "audio/wave",
+        "audio/ogg",
+        "application/ogg",
+        "application/octet-stream",
+    },
+}
+
+ASSET_LOCK = threading.Lock()
 
 SEED_ROOT = os.environ.get("SEED_ROOT", "/seed_esphome").strip()
 
@@ -103,6 +154,15 @@ def sanitize_log_line(line: str) -> str:
     return ANSI_ESCAPE.sub("", line)
 
 
+def should_skip_log_line(job_action: str, line: str) -> bool:
+    if job_action != "logs":
+        return False
+    normalized = line.lower()
+    if "esphome.ota" not in normalized:
+        return False
+    return "handshake" in normalized or "read magic" in normalized
+
+
 def read_json_file(path: str) -> Optional[dict]:
     if not os.path.isfile(path):
         return None
@@ -152,12 +212,15 @@ def seed_tree(source_root: str, target_root: str) -> None:
 def seed_assets() -> None:
     os.makedirs(ASSET_FONTS_DIR, exist_ok=True)
     os.makedirs(ASSET_IMAGES_DIR, exist_ok=True)
+    os.makedirs(ASSET_AUDIO_DIR, exist_ok=True)
     os.makedirs(PROJECT_DIR, exist_ok=True)
 
     if not os.path.isfile(ASSET_FONTS_JSON):
         write_json_file(ASSET_FONTS_JSON, {"fonts": []})
     if not os.path.isfile(ASSET_IMAGES_JSON):
         write_json_file(ASSET_IMAGES_JSON, {"images": []})
+    if not os.path.isfile(ASSET_AUDIO_JSON):
+        write_json_file(ASSET_AUDIO_JSON, {"audio": []})
     if not os.path.isfile(ASSET_GFONTS_JSON):
         write_json_file(ASSET_GFONTS_JSON, {"families": []})
 
@@ -209,6 +272,184 @@ def sync_assets(kind: str = "all") -> dict:
         result["fonts"] = sync_asset_index("fonts", ASSET_FONTS_DIR, ASSET_FONTS_JSON)
     if kind in ("all", "images"):
         result["images"] = sync_asset_index("images", ASSET_IMAGES_DIR, ASSET_IMAGES_JSON)
+    if kind in ("all", "audio"):
+        result["audio"] = sync_asset_index("audio", ASSET_AUDIO_DIR, ASSET_AUDIO_JSON)
+    return result
+
+
+def json_error(message: str, code: str, status_code: int):
+    return jsonify({"status": "error", "code": code, "message": message}), status_code
+
+
+def parse_asset_kind(value: str) -> str:
+    kind = str(value or "").strip().lower()
+    if kind in ("images", "fonts", "audio"):
+        return kind
+    return ""
+
+
+def parse_asset_refresh_flag(value: str) -> bool:
+    normalized = str(value or "0").strip().lower()
+    return normalized in ("1", "true", "yes", "on")
+
+
+def asset_meta_for_kind(kind: str) -> dict:
+    if kind == "images":
+        return {
+            "key": "images",
+            "folder": ASSET_IMAGES_DIR,
+            "json_path": ASSET_IMAGES_JSON,
+            "max_bytes": ASSET_MAX_SIZE_BYTES["images"],
+            "extensions": ASSET_ALLOWED_EXTENSIONS["images"],
+            "mime": ASSET_ALLOWED_MIME["images"],
+        }
+    if kind == "fonts":
+        return {
+            "key": "fonts",
+            "folder": ASSET_FONTS_DIR,
+            "json_path": ASSET_FONTS_JSON,
+            "max_bytes": ASSET_MAX_SIZE_BYTES["fonts"],
+            "extensions": ASSET_ALLOWED_EXTENSIONS["fonts"],
+            "mime": ASSET_ALLOWED_MIME["fonts"],
+        }
+    if kind == "audio":
+        return {
+            "key": "audio",
+            "folder": ASSET_AUDIO_DIR,
+            "json_path": ASSET_AUDIO_JSON,
+            "max_bytes": ASSET_MAX_SIZE_BYTES["audio"],
+            "extensions": ASSET_ALLOWED_EXTENSIONS["audio"],
+            "mime": ASSET_ALLOWED_MIME["audio"],
+        }
+    return {}
+
+
+def validate_asset_filename(filename: str) -> str:
+    name = str(filename or "").strip()
+    if not name:
+        return ""
+    if "\x00" in name:
+        return ""
+    if "/" in name or "\\" in name:
+        return ""
+    if name in (".", ".."):
+        return ""
+    if os.path.basename(name) != name:
+        return ""
+    return name
+
+
+def validate_asset_extension(filename: str, allowed_extensions: set) -> bool:
+    _, ext = os.path.splitext(filename)
+    return ext.lower() in allowed_extensions
+
+
+def ensure_asset_filename_available(folder: str, filename: str) -> str:
+    base, ext = os.path.splitext(filename)
+    candidate = filename
+    index = 1
+    while os.path.isfile(os.path.join(folder, candidate)):
+        candidate = f"{base}_{index}{ext}"
+        index += 1
+    return candidate
+
+
+def timestamp_to_utc(value: float) -> str:
+    return f"{datetime.utcfromtimestamp(value).isoformat()}Z"
+
+
+def build_asset_entries(kind: str) -> List[dict]:
+    meta = asset_meta_for_kind(kind)
+    if not meta:
+        return []
+
+    folder = meta["folder"]
+    key = meta["key"]
+    json_path = meta["json_path"]
+    allowed_extensions = meta["extensions"]
+
+    os.makedirs(folder, exist_ok=True)
+    index_payload = read_json_file(json_path) or {}
+    indexed = index_payload.get(key, [])
+    indexed_map = {
+        item.get("file"): item
+        for item in indexed
+        if isinstance(item, dict) and item.get("file")
+    }
+
+    filenames = []
+    for name in os.listdir(folder):
+        path = os.path.join(folder, name)
+        if not os.path.isfile(path):
+            continue
+        if not validate_asset_extension(name, allowed_extensions):
+            continue
+        filenames.append(name)
+    filenames.sort(key=lambda item: item.lower())
+
+    entries = []
+    for name in filenames:
+        full_path = os.path.join(folder, name)
+        stats = os.stat(full_path)
+        indexed_item = indexed_map.get(name, {})
+        label = indexed_item.get("label") if isinstance(indexed_item, dict) else ""
+        if not label:
+            label = normalize_asset_label(name)
+        _, ext = os.path.splitext(name)
+        is_animation = kind == "images" and ext.lower() == ".gif"
+        entries.append(
+            {
+                "file": name,
+                "label": label,
+                "size": stats.st_size,
+                "mtime": timestamp_to_utc(stats.st_mtime),
+                "type": ext.lower().lstrip("."),
+                "isAnimation": is_animation,
+                "url": f"/api/assets/{kind}/{quote(name)}",
+            }
+        )
+    return entries
+
+
+def build_assets_manifest(kind: str, refresh: bool) -> dict:
+    result = {}
+    kinds = ["images", "fonts", "audio"] if kind == "all" else [kind]
+    with ASSET_LOCK:
+        if refresh:
+            sync_assets(kind if kind in ("images", "fonts", "audio") else "all")
+        for current_kind in kinds:
+            result[current_kind] = {
+                "kind": current_kind,
+                "maxBytes": ASSET_MAX_SIZE_BYTES[current_kind],
+                "extensions": sorted(list(ASSET_ALLOWED_EXTENSIONS[current_kind])),
+                "items": build_asset_entries(current_kind),
+            }
+        if kind in ("all", "fonts"):
+            gfonts_payload = read_json_file(ASSET_GFONTS_JSON) or {}
+            families = gfonts_payload.get("families", [])
+            result["googleFonts"] = families if isinstance(families, list) else []
+    return result
+
+
+def load_mdi_glyph_substitutions() -> dict:
+    if not os.path.isfile(ASSET_GLYPH_SUBS):
+        return {}
+
+    result = {}
+    pattern = re.compile(r'^\s{2}([^:\s][^:]*):\s+"([^"]+)"\s*$')
+    try:
+        with open(ASSET_GLYPH_SUBS, "r", encoding="utf-8") as handle:
+            for raw_line in handle:
+                line = raw_line.rstrip("\r\n")
+                match = pattern.match(line)
+                if not match:
+                    continue
+                key = match.group(1).strip()
+                value = match.group(2)
+                if key and value:
+                    result[key] = value
+    except Exception:
+        return {}
     return result
 
 
@@ -240,8 +481,219 @@ def save_devices(devices: List[dict]) -> None:
         handle.write("\n")
 
 
+def projects_index_path() -> str:
+    return os.path.join(PROJECT_DIR, "projects.json")
+
+
+def load_projects_index() -> dict:
+    path = projects_index_path()
+    if not os.path.isfile(path):
+        return {
+            "version": 1,
+            "updatedAt": utc_now(),
+            "folders": [{"id": "root", "name": "Projects", "parentId": None}],
+            "projectPlacement": [],
+        }
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except Exception:
+        return {
+            "version": 1,
+            "updatedAt": utc_now(),
+            "folders": [{"id": "root", "name": "Projects", "parentId": None}],
+            "projectPlacement": [],
+        }
+    if not isinstance(payload, dict):
+        return {
+            "version": 1,
+            "updatedAt": utc_now(),
+            "folders": [{"id": "root", "name": "Projects", "parentId": None}],
+            "projectPlacement": [],
+        }
+    if not isinstance(payload.get("folders"), list):
+        payload["folders"] = [{"id": "root", "name": "Projects", "parentId": None}]
+    if not isinstance(payload.get("projectPlacement"), list):
+        payload["projectPlacement"] = []
+    if "version" not in payload:
+        payload["version"] = 1
+    return payload
+
+
+def save_projects_index(index_payload: dict) -> None:
+    payload = dict(index_payload or {})
+    payload["updatedAt"] = utc_now()
+    path = projects_index_path()
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as handle:
+        json.dump(payload, handle, ensure_ascii=False, indent=2)
+        handle.write("\n")
+
+
+def remove_project_from_index(project_filename: str) -> bool:
+    index_payload = load_projects_index()
+    current = index_payload.get("projectPlacement")
+    if not isinstance(current, list):
+        current = []
+    next_items = [
+        item
+        for item in current
+        if not (isinstance(item, dict) and str(item.get("name") or "").strip() == project_filename)
+    ]
+    changed = len(next_items) != len(current)
+    if changed:
+        index_payload["projectPlacement"] = next_items
+        save_projects_index(index_payload)
+    return changed
+
+
+def unregister_device_record(
+    *,
+    yaml_name: str = "",
+    device_key: str = "",
+) -> Tuple[bool, int]:
+    normalized_yaml = normalize_yaml_filename(yaml_name) if yaml_name else ""
+    normalized_key = normalize_device_key(device_key) if device_key else ""
+    if not normalized_yaml and not normalized_key:
+        return False, 0
+
+    devices = load_devices()
+    kept = []
+    removed = 0
+    for device in devices:
+        remove = False
+        if normalized_yaml:
+            device_yaml = normalize_yaml_filename(str(device.get("yaml") or ""))
+            if device_yaml and device_yaml.lower() == normalized_yaml.lower():
+                remove = True
+        if not remove and normalized_key:
+            if canonical_device_key(device) == normalized_key:
+                remove = True
+        if remove:
+            removed += 1
+            continue
+        kept.append(device)
+
+    if removed:
+        save_devices(kept)
+        return True, removed
+    return False, 0
+
+
 def normalize_device_name_from_yaml(yaml_name: str) -> str:
     return yaml_name[:-5]
+
+
+def device_key_from_yaml(yaml_name: str) -> str:
+    normalized = normalize_yaml_filename(yaml_name)
+    if not normalized:
+        return ""
+    return normalized[:-5].strip().lower()
+
+
+def normalize_device_key(value: str) -> str:
+    raw = str(value or "").strip().lower()
+    if not raw:
+        return ""
+    if raw.endswith(".yaml"):
+        raw = raw[:-5]
+    if raw.endswith(".json"):
+        raw = raw[:-5]
+    if not raw or not VALID_DEVICE.match(raw):
+        return ""
+    return raw
+
+
+def canonical_device_key(device: dict) -> str:
+    yaml_name = str(device.get("yaml") or "").strip()
+    key_from_yaml = device_key_from_yaml(yaml_name)
+    if key_from_yaml:
+        return key_from_yaml
+    return normalize_device_key(str(device.get("name") or ""))
+
+
+def build_device_response(device: dict, checks: Optional[dict] = None) -> dict:
+    key = canonical_device_key(device)
+    yaml_name = normalize_yaml_filename(str(device.get("yaml") or ""))
+    name = str(device.get("name") or "").strip()
+    host = str(device.get("host") or "").strip()
+    status = str(device.get("status") or "").strip().lower()
+    if status not in ("online", "offline", "unknown"):
+        status = "unknown"
+    status_source = str(device.get("status_source") or "").strip().lower()
+    if status_source not in ("dns", "mdns", "ota", "unknown"):
+        status_source = "unknown"
+
+    payload = {
+        **device,
+        "device_key": key,
+        "yaml": yaml_name,
+        "name": name,
+        "host": host,
+        "status": status,
+        "status_source": status_source,
+        "checks": {
+            "dns": bool((checks or {}).get("dns", False)),
+            "mdns": bool((checks or {}).get("mdns", False)),
+            "ota": bool((checks or {}).get("ota", False)),
+        },
+    }
+    return payload
+
+
+class MDNSProbe:
+    def __init__(self) -> None:
+        self.cache = {}
+        self.zc = None
+        if Zeroconf is None:
+            return
+        try:
+            if IPVersion is not None:
+                self.zc = Zeroconf(ip_version=IPVersion.All)
+            else:
+                self.zc = Zeroconf()
+        except Exception:
+            self.zc = None
+
+    def is_online(self, host: str) -> bool:
+        normalized = str(host or "").strip().rstrip(".").lower()
+        if not normalized or not normalized.endswith(".local"):
+            return False
+        cached = self.cache.get(normalized)
+        if cached is not None:
+            return cached
+
+        if self.zc is None:
+            self.cache[normalized] = False
+            return False
+
+        node = normalized[:-6].strip()
+        if not node:
+            self.cache[normalized] = False
+            return False
+
+        online = False
+        for service_type in ("_esphomelib._tcp.local.", "_esphome._tcp.local."):
+            service_name = f"{node}.{service_type}"
+            try:
+                info = self.zc.get_service_info(service_type, service_name, timeout=1200)
+            except Exception:
+                info = None
+            if info is not None:
+                online = True
+                break
+
+        self.cache[normalized] = online
+        return online
+
+    def close(self) -> None:
+        if self.zc is None:
+            return
+        try:
+            self.zc.close()
+        except Exception:
+            pass
+        self.zc = None
 
 
 def ping_host(host: str, port: int = PING_PORT, timeout: float = PING_TIMEOUT) -> bool:
@@ -264,12 +716,24 @@ def resolve_host(host: str) -> bool:
         return False
 
 
-def evaluate_device_connectivity(host: str) -> Tuple[bool, bool, bool]:
-    """Return (online, dns_ok, ota_ok) for a device host."""
+def evaluate_device_connectivity(
+    host: str,
+    deep: bool = False,
+    mdns_probe: Optional[MDNSProbe] = None,
+) -> Tuple[bool, bool, bool, bool, str]:
+    """Return (online, dns_ok, mdns_ok, ota_ok, source) for a device host."""
     dns_ok = resolve_host(host)
-    ota_ok = ping_host(host)
-    online = dns_ok or ota_ok
-    return online, dns_ok, ota_ok
+    mdns_ok = mdns_probe.is_online(host) if mdns_probe else False
+    ota_ok = ping_host(host) if deep else False
+    online = dns_ok or mdns_ok or ota_ok
+    source = "unknown"
+    if dns_ok:
+        source = "dns"
+    elif mdns_ok:
+        source = "mdns"
+    elif ota_ok:
+        source = "ota"
+    return online, dns_ok, mdns_ok, ota_ok, source
 
 
 def find_firmware_path(node_name: str, variant: str = "ota") -> str:
@@ -316,6 +780,10 @@ def resolve_web_root() -> str:
     if WEB_ROOT and os.path.isdir(WEB_ROOT):
         return WEB_ROOT
     return ""
+
+
+def resolve_secrets_path() -> str:
+    return os.path.join(TARGET_DIR, SECRETS_FILENAME)
 
 
 def check_access():
@@ -646,6 +1114,8 @@ class JobManager:
                             line = buffer[:split_index]
                             buffer = buffer[split_index + 1 :]
                             clean_line = sanitize_log_line(line.strip("\r"))
+                            if should_skip_log_line(job.action, clean_line):
+                                continue
                             log_handle.write(clean_line + "\n")
                             log_handle.flush()
                             if clean_line:
@@ -658,7 +1128,7 @@ class JobManager:
                         break
                 if buffer:
                     clean_line = sanitize_log_line(buffer.strip("\r\n"))
-                    if clean_line:
+                    if clean_line and not should_skip_log_line(job.action, clean_line):
                         log_handle.write(clean_line + "\n")
                         log_handle.flush()
                         job.last_log_line = clean_line
@@ -675,6 +1145,8 @@ class JobManager:
                         else line.decode("utf-8", errors="replace").rstrip("\n")
                     )
                     clean_line = sanitize_log_line(raw_line)
+                    if should_skip_log_line(job.action, clean_line):
+                        continue
                     log_handle.write(clean_line + "\n")
                     log_handle.flush()
                     if clean_line:
@@ -709,11 +1181,189 @@ def api_assets_refresh():
         return access
 
     kind = str(request.args.get("kind", "all")).strip().lower()
-    if kind not in ("all", "fonts", "images"):
+    if kind not in ("all", "fonts", "images", "audio"):
         return jsonify({"status": "error", "message": "Invalid kind"}), 400
 
-    payload = sync_assets(kind)
+    with ASSET_LOCK:
+        payload = sync_assets(kind)
     return jsonify({"status": "ok", **payload})
+
+
+@app.route("/api/assets/manifest", methods=["GET", "OPTIONS"])
+def api_assets_manifest():
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    access = check_access()
+    if access:
+        return access
+
+    kind = str(request.args.get("kind", "all")).strip().lower()
+    if kind not in ("all", "images", "fonts", "audio"):
+        return json_error("Invalid kind", "ASSET_INVALID_KIND", 400)
+
+    refresh = parse_asset_refresh_flag(request.args.get("refresh", "0"))
+    payload = build_assets_manifest(kind, refresh)
+    return jsonify({"status": "ok", **payload})
+
+
+@app.route("/api/assets/mdi-substitutions", methods=["GET", "OPTIONS"])
+def api_assets_mdi_substitutions():
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    access = check_access()
+    if access:
+        return access
+
+    with ASSET_LOCK:
+        substitutions = load_mdi_glyph_substitutions()
+    return jsonify({"status": "ok", "substitutions": substitutions})
+
+
+@app.route("/api/assets/upload", methods=["POST", "OPTIONS"])
+def api_assets_upload():
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    access = check_access()
+    if access:
+        return access
+
+    kind = parse_asset_kind(request.args.get("kind", ""))
+    if not kind:
+        return json_error("Invalid kind", "ASSET_INVALID_KIND", 400)
+
+    if "file" not in request.files:
+        return json_error("Missing file", "ASSET_FILE_REQUIRED", 400)
+
+    upload = request.files["file"]
+    original_name = validate_asset_filename(upload.filename)
+    if not original_name:
+        return json_error("Invalid filename", "ASSET_INVALID_FILENAME", 400)
+
+    meta = asset_meta_for_kind(kind)
+    if not validate_asset_extension(original_name, meta["extensions"]):
+        return json_error("Unsupported extension", "ASSET_UNSUPPORTED_EXTENSION", 400)
+
+    mime_type = str(upload.mimetype or "").lower().strip()
+    if mime_type and mime_type not in meta["mime"]:
+        return json_error("Unsupported mime type", "ASSET_UNSUPPORTED_MIME", 400)
+
+    raw = upload.stream.read(meta["max_bytes"] + 1)
+    if len(raw) > meta["max_bytes"]:
+        return json_error("File too large", "ASSET_FILE_TOO_LARGE", 413)
+    if not raw:
+        return json_error("Empty file", "ASSET_EMPTY_FILE", 400)
+
+    with ASSET_LOCK:
+        os.makedirs(meta["folder"], exist_ok=True)
+        filename = ensure_asset_filename_available(meta["folder"], original_name)
+        path = os.path.join(meta["folder"], filename)
+        with open(path, "wb") as handle:
+            handle.write(raw)
+        sync_assets(kind)
+        entries = build_asset_entries(kind)
+        created = next((item for item in entries if item.get("file") == filename), None)
+
+    return jsonify(
+        {
+            "status": "ok",
+            "kind": kind,
+            "file": filename,
+            "renamed": filename != original_name,
+            "item": created,
+        }
+    )
+
+
+@app.route("/api/assets/rename", methods=["POST", "OPTIONS"])
+def api_assets_rename():
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    access = check_access()
+    if access:
+        return access
+
+    payload = request.get_json(silent=True) or {}
+    kind = parse_asset_kind(payload.get("kind", ""))
+    if not kind:
+        return json_error("Invalid kind", "ASSET_INVALID_KIND", 400)
+
+    source_name = validate_asset_filename(payload.get("from", ""))
+    target_name = validate_asset_filename(payload.get("to", ""))
+    if not source_name or not target_name:
+        return json_error("Invalid filename", "ASSET_INVALID_FILENAME", 400)
+
+    meta = asset_meta_for_kind(kind)
+    if not validate_asset_extension(source_name, meta["extensions"]):
+        return json_error("Unsupported source extension", "ASSET_UNSUPPORTED_EXTENSION", 400)
+    if not validate_asset_extension(target_name, meta["extensions"]):
+        return json_error("Unsupported target extension", "ASSET_UNSUPPORTED_EXTENSION", 400)
+
+    with ASSET_LOCK:
+        source_path = os.path.join(meta["folder"], source_name)
+        if not os.path.isfile(source_path):
+            return json_error("Source not found", "ASSET_NOT_FOUND", 404)
+
+        final_name = ensure_asset_filename_available(meta["folder"], target_name)
+        target_path = os.path.join(meta["folder"], final_name)
+        os.rename(source_path, target_path)
+        sync_assets(kind)
+        entries = build_asset_entries(kind)
+        item = next((entry for entry in entries if entry.get("file") == final_name), None)
+
+    return jsonify(
+        {
+            "status": "ok",
+            "kind": kind,
+            "from": source_name,
+            "to": final_name,
+            "renamed": final_name != target_name,
+            "item": item,
+        }
+    )
+
+
+@app.route("/api/assets/<kind>/<path:filename>", methods=["GET", "DELETE", "OPTIONS"])
+def api_assets_file(kind, filename):
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    access = check_access()
+    if access:
+        return access
+
+    parsed_kind = parse_asset_kind(kind)
+    if not parsed_kind:
+        return json_error("Invalid kind", "ASSET_INVALID_KIND", 400)
+
+    safe_name = validate_asset_filename(filename)
+    if not safe_name:
+        return json_error("Invalid filename", "ASSET_INVALID_FILENAME", 400)
+
+    meta = asset_meta_for_kind(parsed_kind)
+    if not validate_asset_extension(safe_name, meta["extensions"]):
+        return json_error("Unsupported extension", "ASSET_UNSUPPORTED_EXTENSION", 400)
+
+    if request.method == "GET":
+        target = os.path.join(meta["folder"], safe_name)
+        if not os.path.isfile(target):
+            return json_error("Not found", "ASSET_NOT_FOUND", 404)
+        guessed, _ = mimetypes.guess_type(safe_name)
+        if guessed:
+            return send_from_directory(meta["folder"], safe_name, mimetype=guessed)
+        return send_from_directory(meta["folder"], safe_name)
+
+    with ASSET_LOCK:
+        target = os.path.join(meta["folder"], safe_name)
+        if not os.path.isfile(target):
+            return json_error("Not found", "ASSET_NOT_FOUND", 404)
+        os.remove(target)
+        sync_assets(parsed_kind)
+
+    return jsonify({"status": "ok", "kind": parsed_kind, "file": safe_name})
 
 
 @app.route("/save", methods=["POST", "OPTIONS"])
@@ -742,6 +1392,92 @@ def save_yaml():
             handle.write("\n")
 
     return jsonify({"status": "ok", "path": path})
+
+
+@app.route("/yaml/load", methods=["GET", "OPTIONS"])
+def load_yaml():
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    access = check_access()
+    if access:
+        return access
+
+    name_value = request.args.get("name") or request.args.get("filename") or ""
+    filename = normalize_yaml_filename(str(name_value))
+    if not filename:
+        return jsonify({"status": "error", "message": "Invalid name"}), 400
+
+    path = os.path.join(TARGET_DIR, filename)
+    if not os.path.isfile(path):
+        return jsonify({"status": "error", "message": "Not found"}), 404
+
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            yaml_text = handle.read()
+    except Exception:
+        return jsonify({"status": "error", "message": "Read failed"}), 500
+
+    return jsonify({"status": "ok", "name": filename, "yaml": yaml_text})
+
+
+@app.route("/api/secrets/raw", methods=["GET", "OPTIONS"])
+def api_secrets_raw_get():
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    access = check_access()
+    if access:
+        return access
+
+    path = resolve_secrets_path()
+    if not os.path.isfile(path):
+        return jsonify({"content": ""})
+
+    try:
+        with open(path, "r", encoding="utf-8", newline="") as handle:
+            content = handle.read()
+    except Exception as exc:
+        return jsonify({"error": "Failed to read secrets file", "details": str(exc)}), 500
+
+    return jsonify({"content": content})
+
+
+@app.route("/api/secrets/raw", methods=["POST", "OPTIONS"])
+def api_secrets_raw_post():
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    access = check_access()
+    if access:
+        return access
+
+    payload = request.get_json(silent=True) or {}
+    content = payload.get("content")
+    if not isinstance(content, str):
+        return jsonify({"error": "Field 'content' must be a string"}), 400
+
+    if len(content.encode("utf-8")) > SECRETS_RAW_MAX_BYTES:
+        return jsonify({"error": "File too large"}), 400
+
+    path = resolve_secrets_path()
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    temp_path = f"{path}.{uuid.uuid4().hex}.tmp"
+
+    try:
+        with open(temp_path, "w", encoding="utf-8", newline="") as handle:
+            handle.write(content)
+        os.replace(temp_path, path)
+    except Exception as exc:
+        return jsonify({"error": "Failed to save secrets file", "details": str(exc)}), 500
+    finally:
+        if os.path.isfile(temp_path):
+            try:
+                os.remove(temp_path)
+            except Exception:
+                pass
+
+    return jsonify({"ok": True})
 
 
 @app.route("/projects/save", methods=["POST", "OPTIONS"])
@@ -859,6 +1595,65 @@ def delete_project():
     return jsonify({"status": "ok", "name": filename})
 
 
+@app.route("/api/projects/purge", methods=["DELETE", "OPTIONS"])
+def purge_project_bundle():
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    access = check_access()
+    if access:
+        return access
+
+    name_value = request.args.get("name") or request.args.get("filename") or ""
+    project_filename = normalize_filename(str(name_value), ".json")
+    if not project_filename:
+        return jsonify({"status": "error", "message": "Invalid name"}), 400
+    if project_filename.lower() == "projects.json":
+        return jsonify({"status": "error", "message": "Reserved project index name"}), 400
+
+    yaml_filename = normalize_yaml_filename(f"{project_filename[:-5]}.yaml")
+    if not yaml_filename:
+        return jsonify({"status": "error", "message": "Invalid derived yaml name"}), 400
+
+    project_path = os.path.join(PROJECT_DIR, project_filename)
+    yaml_path = os.path.join(TARGET_DIR, yaml_filename)
+
+    placement_updated = remove_project_from_index(project_filename)
+
+    project_deleted = False
+    if os.path.isfile(project_path):
+        try:
+            os.remove(project_path)
+            project_deleted = True
+        except Exception:
+            return jsonify({"status": "error", "message": "Project delete failed"}), 500
+
+    yaml_deleted = False
+    if os.path.isfile(yaml_path):
+        try:
+            os.remove(yaml_path)
+            yaml_deleted = True
+        except Exception:
+            return jsonify({"status": "error", "message": "YAML delete failed"}), 500
+
+    unregistered, removed_count = unregister_device_record(yaml_name=yaml_filename)
+
+    return jsonify(
+        {
+            "status": "ok",
+            "name": project_filename,
+            "yaml": yaml_filename,
+            "result": {
+                "placement_updated": placement_updated,
+                "project_deleted": project_deleted,
+                "yaml_deleted": yaml_deleted,
+                "device_unregistered": unregistered,
+                "unregistered_count": removed_count,
+            },
+        }
+    )
+
+
 @app.route("/projects/rename", methods=["POST", "OPTIONS"])
 def rename_project():
     if request.method == "OPTIONS":
@@ -920,6 +1715,34 @@ def delete_yaml():
     return jsonify({"status": "ok", "name": filename})
 
 
+@app.route("/api/devices/unregister", methods=["DELETE", "OPTIONS"])
+def api_devices_unregister():
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    access = check_access()
+    if access:
+        return access
+
+    yaml_value = request.args.get("yaml") or request.args.get("filename") or ""
+    name_value = request.args.get("name") or request.args.get("device") or ""
+    yaml_name = normalize_yaml_filename(str(yaml_value)) if yaml_value else ""
+    device_key = normalize_device_key(str(name_value)) if name_value else ""
+    if not yaml_name and not device_key:
+        return jsonify({"status": "error", "message": "Provide yaml or name"}), 400
+
+    removed, removed_count = unregister_device_record(yaml_name=yaml_name, device_key=device_key)
+    return jsonify(
+        {
+            "status": "ok",
+            "removed": removed,
+            "removed_count": removed_count,
+            "yaml": yaml_name,
+            "name": device_key,
+        }
+    )
+
+
 @app.route("/api/devices/register", methods=["POST", "OPTIONS"])
 def api_devices_register():
     if request.method == "OPTIONS":
@@ -931,11 +1754,15 @@ def api_devices_register():
 
     payload = request.get_json(silent=True) or {}
     yaml_name = normalize_yaml_filename(str(payload.get("yaml", "")))
+    key = device_key_from_yaml(yaml_name)
     name = str(payload.get("name", "")).strip()
-    if yaml_name:
-        name = normalize_device_name_from_yaml(yaml_name)
+    if key:
+        name = key
     if not name or not VALID_DEVICE.match(name):
         return jsonify({"status": "error", "message": "Invalid name"}), 400
+    name = name.strip().lower()
+    if not key:
+        key = normalize_device_key(name)
 
     host = str(payload.get("host", "")).strip()
     if host and not VALID_DEVICE.match(host):
@@ -945,8 +1772,20 @@ def api_devices_register():
     now = utc_now()
     updated = False
     for device in devices:
-        if device.get("name") == name:
+        current_key = canonical_device_key(device)
+        if current_key and current_key == key:
+            device["device_key"] = key
             device["yaml"] = yaml_name or device.get("yaml", "")
+            device["name"] = key
+            if host:
+                device["host"] = host
+            device["updated_at"] = now
+            updated = True
+            break
+        if str(device.get("name") or "").strip().lower() == name:
+            device["device_key"] = key
+            device["yaml"] = yaml_name or device.get("yaml", "")
+            device["name"] = key
             if host:
                 device["host"] = host
             device["updated_at"] = now
@@ -957,9 +1796,10 @@ def api_devices_register():
         devices.append(
             {
                 "id": uuid.uuid4().hex,
-                "name": name,
+                "device_key": key,
+                "name": key,
                 "yaml": yaml_name,
-                "host": host or f"{name}.local",
+                "host": host or f"{key}.local",
                 "status": "offline",
                 "created_at": now,
                 "updated_at": now,
@@ -979,46 +1819,149 @@ def api_devices_list():
 
     devices = load_devices()
     refresh = str(request.args.get("refresh", "0")).strip() in ("1", "true", "yes")
-    # "deep" query param is accepted for backward compatibility,
-    # but status evaluation always uses both DNS + OTA checks.
+    deep = str(request.args.get("deep", "0")).strip() in ("1", "true", "yes")
     response_devices = []
+    normalized_any = False
+
+    for device in devices:
+        key = canonical_device_key(device)
+        yaml_name = normalize_yaml_filename(str(device.get("yaml") or ""))
+        host = str(device.get("host") or "").strip()
+        if not host:
+            fallback = key or normalize_device_key(str(device.get("name") or ""))
+            if fallback:
+                host = f"{fallback}.local"
+        status = str(device.get("status") or "").strip().lower()
+        if status not in ("online", "offline", "unknown"):
+            status = "unknown"
+        status_source = str(device.get("status_source") or "").strip().lower()
+        if status_source not in ("dns", "mdns", "ota", "unknown"):
+            status_source = "unknown"
+
+        if device.get("device_key") != key:
+            device["device_key"] = key
+            normalized_any = True
+        if device.get("name") != key and key:
+            device["name"] = key
+            normalized_any = True
+        if device.get("yaml") != yaml_name:
+            device["yaml"] = yaml_name
+            normalized_any = True
+        if device.get("host") != host and host:
+            device["host"] = host
+            normalized_any = True
+        if device.get("status") != status:
+            device["status"] = status
+            normalized_any = True
+        if device.get("status_source") != status_source:
+            device["status_source"] = status_source
+            normalized_any = True
+
     if refresh:
         now = utc_now()
-        updated_any = False
-        for device in devices:
-            host = device.get("host") or f"{device.get('name', '')}.local"
-            online, dns_ok, ota_ok = evaluate_device_connectivity(host)
-            status = "online" if online else "offline"
-            if device.get("host") != host:
-                device["host"] = host
-                updated_any = True
-            if device.get("status") != status:
-                device["status"] = status
-                device["updated_at"] = now
-                updated_any = True
-            if online:
-                device["last_seen"] = now
-            response_devices.append(
-                {
-                    **device,
-                    "checks": {"dns": dns_ok, "ota": ota_ok},
-                }
-            )
+        updated_any = normalized_any
+        mdns_probe = MDNSProbe()
+        try:
+            for device in devices:
+                key = canonical_device_key(device)
+                host = str(device.get("host") or "").strip() or (f"{key}.local" if key else "")
+                online, dns_ok, mdns_ok, ota_ok, source = evaluate_device_connectivity(
+                    host,
+                    deep=deep,
+                    mdns_probe=mdns_probe,
+                )
+                status = "online" if online else "offline"
+                if device.get("host") != host:
+                    device["host"] = host
+                    updated_any = True
+                if device.get("status") != status:
+                    device["status"] = status
+                    device["updated_at"] = now
+                    updated_any = True
+                if device.get("status_source") != source:
+                    device["status_source"] = source
+                    updated_any = True
+                if online:
+                    device["last_seen"] = now
+                checks = {"dns": dns_ok, "mdns": mdns_ok, "ota": ota_ok}
+                response_devices.append(build_device_response(device, checks=checks))
+        finally:
+            mdns_probe.close()
         if updated_any:
             save_devices(devices)
-    else:
-        for device in devices:
-            host = device.get("host") or f"{device.get('name', '')}.local"
-            online, dns_ok, ota_ok = evaluate_device_connectivity(host)
-            response_devices.append(
-                {
-                    **device,
-                    "host": host,
-                    "checks": {"dns": dns_ok, "ota": ota_ok},
-                }
-            )
 
-    return jsonify({"status": "ok", "devices": response_devices})
+        return jsonify({"status": "ok", "devices": response_devices})
+
+    if normalized_any:
+        save_devices(devices)
+
+    return jsonify({"status": "ok", "devices": [build_device_response(device) for device in devices]})
+
+
+@app.route("/api/devices/status", methods=["GET"])
+def api_device_status():
+    access = check_access()
+    if access:
+        return access
+
+    yaml_query = normalize_yaml_filename(str(request.args.get("yaml", "")))
+    key_query = normalize_device_key(str(request.args.get("name", "")))
+    if not yaml_query and not key_query:
+        return jsonify({"status": "error", "message": "Invalid device selector"}), 400
+
+    devices = load_devices()
+    target = None
+    for device in devices:
+        device_yaml = normalize_yaml_filename(str(device.get("yaml") or ""))
+        device_key = canonical_device_key(device)
+        if yaml_query and device_yaml and device_yaml.lower() == yaml_query.lower():
+            target = device
+            break
+        if key_query and device_key == key_query:
+            target = device
+            break
+
+    if not target:
+        return jsonify({"status": "ok", "device": None})
+
+    refresh = str(request.args.get("refresh", "0")).strip() in ("1", "true", "yes")
+    deep = str(request.args.get("deep", "0")).strip() in ("1", "true", "yes")
+    if not refresh:
+        return jsonify({"status": "ok", "device": build_device_response(target)})
+
+    now = utc_now()
+    key = canonical_device_key(target)
+    host = str(target.get("host") or "").strip() or (f"{key}.local" if key else "")
+    mdns_probe = MDNSProbe()
+    try:
+        online, dns_ok, mdns_ok, ota_ok, source = evaluate_device_connectivity(
+            host,
+            deep=deep,
+            mdns_probe=mdns_probe,
+        )
+    finally:
+        mdns_probe.close()
+
+    status = "online" if online else "offline"
+    changed = False
+    if target.get("host") != host:
+        target["host"] = host
+        changed = True
+    if target.get("status") != status:
+        target["status"] = status
+        target["updated_at"] = now
+        changed = True
+    if target.get("status_source") != source:
+        target["status_source"] = source
+        changed = True
+    if online:
+        target["last_seen"] = now
+
+    if changed:
+        save_devices(devices)
+
+    checks = {"dns": dns_ok, "mdns": mdns_ok, "ota": ota_ok}
+    return jsonify({"status": "ok", "device": build_device_response(target, checks=checks)})
 
 
 @app.route("/api/install", methods=["POST", "OPTIONS"])

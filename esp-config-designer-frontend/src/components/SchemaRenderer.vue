@@ -19,6 +19,7 @@
         :context-component-id="contextComponentId"
         :global-store="globalStore"
         @update="handleUpdate"
+        @open-secrets="emit('open-secrets')"
       />
       <DisplayBuilder
         v-if="activeSchema?.display_builder"
@@ -26,6 +27,11 @@
         :component-config="componentConfig"
         :id-index="idIndex"
         :mdi-icons="mdiIconsList"
+        :images="displayImages"
+        :local-fonts="displayFonts"
+        :google-fonts="displayGoogleFonts"
+        :assets-base="assetsBase"
+        @open-asset-manager="emit('open-asset-manager')"
       />
     </div>
     <div v-else-if="isLoaded && !isLoading" class="missing-schema">
@@ -88,6 +94,22 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
+  displayImages: {
+    type: Array,
+    default: () => []
+  },
+  displayFonts: {
+    type: Array,
+    default: () => []
+  },
+  displayGoogleFonts: {
+    type: Array,
+    default: () => []
+  },
+  assetsBase: {
+    type: String,
+    default: ""
+  },
   gpioOptions: {
     type: Array,
     default: () => []
@@ -114,7 +136,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(["update", "update-custom"]);
+const emit = defineEmits(["update", "update-custom", "open-asset-manager", "open-secrets"]);
 
 const injectedMdiIcons = inject("mdiIcons", ref([]));
 const mdiIconsList = computed(() =>

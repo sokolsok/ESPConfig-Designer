@@ -1,6 +1,10 @@
 import { isFieldVisible } from "./schemaVisibility";
 import { colorToLambda } from "./displayColor";
 import { resolveAutoValue } from "./schemaAuto";
+import {
+  normalizeAnimationElementEncoding,
+  normalizeImageElementEncoding
+} from "./displayImageEncoding";
 
 const componentIdFromEntry = (entry) =>
   typeof entry === "string" ? entry : entry?.id || "";
@@ -539,19 +543,28 @@ const resolveImageKey = (element) => {
   if (!element || element.type !== "image") return "";
   const file = element.image || "";
   if (!file) return "";
+  const encoding = normalizeImageElementEncoding(element);
   const w = Math.max(1, Math.round(element.w || 1));
   const h = Math.max(1, Math.round(element.h || 1));
-  const type = element.imageType || "BINARY";
-  return `${file}|${w}|${h}|${type}`;
+  return [
+    file,
+    w,
+    h,
+    encoding.imageType,
+    encoding.imageTransparency,
+    encoding.imageInvertAlpha ? "1" : "0",
+    encoding.imageDither,
+    encoding.imageByteOrder
+  ].join("|");
 };
 
 const resolveAnimationKey = (element) => {
   if (!element || element.type !== "animation") return "";
   const file = element.animationFile || "";
   if (!file) return "";
+  const encoding = normalizeAnimationElementEncoding(element);
   const resizeW = Math.max(1, Math.round(element.w || 1));
   const resizeH = Math.max(1, Math.round(element.h || 1));
-  const transparency = element.animationTransparency || "opaque";
   const autoAnimate = element.autoAnimate ? "1" : "0";
   const intervalMs = element.intervalMs ?? "";
   const loopEnabled = element.loopEnabled ? "1" : "0";
@@ -562,7 +575,11 @@ const resolveAnimationKey = (element) => {
     file,
     resizeW,
     resizeH,
-    transparency,
+    encoding.animationType,
+    encoding.animationTransparency,
+    encoding.animationInvertAlpha ? "1" : "0",
+    encoding.animationDither,
+    encoding.animationByteOrder,
     autoAnimate,
     intervalMs,
     loopEnabled,
@@ -756,14 +773,18 @@ const collectDisplayAssets = (components, componentSchemas, mdiSubstitutions) =>
       .forEach((element) => {
         const key = resolveImageKey(element);
         if (!key || imagesByKey.has(key)) return;
+        const encoding = normalizeImageElementEncoding(element);
         const w = Math.max(1, Math.round(element.w || 1));
         const h = Math.max(1, Math.round(element.h || 1));
-        const type = element.imageType || "BINARY";
         imagesByKey.set(key, {
           file: element.image,
           w,
           h,
-          type
+          type: encoding.imageType,
+          transparency: encoding.imageTransparency,
+          invertAlpha: encoding.imageInvertAlpha,
+          dither: encoding.imageDither,
+          byteOrder: encoding.imageByteOrder
         });
       });
     elements
@@ -771,6 +792,7 @@ const collectDisplayAssets = (components, componentSchemas, mdiSubstitutions) =>
       .forEach((element) => {
         const key = resolveAnimationKey(element);
         if (!key || animationsByKey.has(key)) return;
+        const encoding = normalizeAnimationElementEncoding(element);
         const resizeW = Math.max(1, Math.round(element.w || 1));
         const resizeH = Math.max(1, Math.round(element.h || 1));
         animationsByKey.set(key, {
@@ -778,7 +800,11 @@ const collectDisplayAssets = (components, componentSchemas, mdiSubstitutions) =>
           id: element.animationId || "",
           resizeW,
           resizeH,
-          transparency: element.animationTransparency || "opaque",
+          type: encoding.animationType,
+          transparency: encoding.animationTransparency,
+          invertAlpha: encoding.animationInvertAlpha,
+          dither: encoding.animationDither,
+          byteOrder: encoding.animationByteOrder,
           autoAnimate: Boolean(element.autoAnimate),
           intervalMs: element.intervalMs ?? "",
           loopEnabled: Boolean(element.loopEnabled),
@@ -849,7 +875,7 @@ const buildFontSections = (displayData, textFontIdByKey) => {
   [...glyphsBySize.entries()]
     .sort(([a], [b]) => a - b)
     .forEach(([size, glyphs]) => {
-      lines.push("  - file: \"../esphome_assets/fonts/materialdesignicons-webfont.ttf\"");
+      lines.push("  - file: \"esp_assets/fonts/materialdesignicons-webfont.ttf\"");
       lines.push(`    id: mdi_font_${size}`);
       lines.push(`    size: ${size}`);
       lines.push("    bpp: 1");
@@ -870,7 +896,7 @@ const buildFontSections = (displayData, textFontIdByKey) => {
         const variant = font.variant || "regular";
         lines.push(`  - file: \"gfonts://${font.family}@${variant}\"`);
       } else {
-        lines.push(`  - file: \"../esphome_assets/fonts/${font.file}\"`);
+        lines.push(`  - file: \"esp_assets/fonts/${font.file}\"`);
       }
       lines.push(`    id: ${id}`);
       lines.push(`    size: ${font.size}`);
@@ -892,10 +918,22 @@ const buildImageSections = (displayData, imageIdByKey) => {
     .forEach(([key, image]) => {
       const id = imageIdByKey?.get(key);
       if (!id) return;
-      lines.push(`  - file: \"../esphome_assets/images/${image.file}\"`);
+      lines.push(`  - file: \"esp_assets/images/${image.file}\"`);
       lines.push(`    id: ${id}`);
       lines.push(`    resize: ${image.w}x${image.h}`);
       lines.push(`    type: ${image.type || "BINARY"}`);
+      if (image.transparency && image.transparency !== "opaque") {
+        lines.push(`    transparency: ${image.transparency}`);
+      }
+      if (image.invertAlpha) {
+        lines.push("    invert_alpha: true");
+      }
+      if (image.dither && image.dither !== "NONE") {
+        lines.push(`    dither: ${image.dither}`);
+      }
+      if (image.type === "RGB565" && image.byteOrder && image.byteOrder !== "big_endian") {
+        lines.push(`    byte_order: ${image.byteOrder}`);
+      }
     });
   lines.push("");
   return lines;
@@ -912,12 +950,21 @@ const buildAnimationSections = (displayData, animationIdByKey) => {
     .forEach(([key, animation]) => {
       const id = animationIdByKey?.get(key);
       if (!id) return;
-      lines.push(`  - file: \"../esphome_assets/images/${animation.file}\"`);
+      lines.push(`  - file: \"esp_assets/images/${animation.file}\"`);
       lines.push(`    id: ${id}`);
       lines.push(`    resize: ${animation.resizeW}x${animation.resizeH}`);
-      lines.push("    type: BINARY");
+      lines.push(`    type: ${animation.type || "BINARY"}`);
       if (animation.transparency && animation.transparency !== "opaque") {
         lines.push(`    transparency: ${animation.transparency}`);
+      }
+      if (animation.invertAlpha) {
+        lines.push("    invert_alpha: true");
+      }
+      if (animation.dither && animation.dither !== "NONE") {
+        lines.push(`    dither: ${animation.dither}`);
+      }
+      if (animation.type === "RGB565" && animation.byteOrder && animation.byteOrder !== "big_endian") {
+        lines.push(`    byte_order: ${animation.byteOrder}`);
       }
       if (animation.loopEnabled) {
         lines.push("    loop:");

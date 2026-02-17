@@ -21,6 +21,7 @@
         :context-component-id="contextComponentId"
         :global-store="globalStore"
         @update="emitUpdate"
+        @open-secrets="emitOpenSecrets"
       />
     </div>
   </div>
@@ -113,6 +114,7 @@
               :context-component-id="contextComponentId"
               :global-store="globalStore"
               @update="(payload) => updateListObjectItem(index, payload)"
+              @open-secrets="emitOpenSecrets"
             />
           </div>
         </template>
@@ -341,7 +343,7 @@
       />
     </div>
 
-    <div v-else-if="hasGenerate" class="inline">
+    <div v-else-if="showInlineAction" class="inline">
       <input
         :id="inputId"
         :type="inputType"
@@ -353,11 +355,11 @@
       <button
         type="button"
         class="secondary icon-button"
-        aria-label="Generate"
-        @click="handleGenerate"
+        :aria-label="showSecretAction ? 'Secret reference' : 'Generate'"
+        @click="showSecretAction ? handleSecretClick() : handleGenerate()"
       >
         <img
-          src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/lock-reset.svg"
+          :src="showSecretAction ? 'https://cdn.jsdelivr.net/npm/@mdi/svg/svg/lock.svg' : 'https://cdn.jsdelivr.net/npm/@mdi/svg/svg/lock-reset.svg'"
           alt=""
           class="icon-button-img"
         />
@@ -459,7 +461,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(["update"]);
+const emit = defineEmits(["update", "open-secrets"]);
 
 const fieldNotice = computed(() => {
   if (props.field?.error) {
@@ -535,6 +537,9 @@ const isAutoField = computed(() =>
 );
 const generationSpec = computed(() => resolveGenerationSpec(props.field));
 const hasGenerate = computed(() => generationSpec.value.mode !== "none");
+const hasSecretReference = computed(() => /^\s*!secret\b/.test(String(resolvedValue.value || "")));
+const showSecretAction = computed(() => hasSecretReference.value);
+const showInlineAction = computed(() => hasGenerate.value || hasSecretReference.value);
 const isFilterListField = computed(
   () => props.field.type === "list" && props.field.item?.extends === "base_filters.json"
 );
@@ -747,6 +752,7 @@ const passwordFormat = computed(() => {
 
 // Inline validation for base64 keys and duplicate IDs/names.
 const fieldError = computed(() => {
+  if (hasSecretReference.value) return "";
   const rawValue = resolvedValue.value;
   if (passwordFormat.value === "base64_44") {
     const value = typeof rawValue === "string" ? rawValue.trim() : "";
@@ -903,6 +909,10 @@ const emitUpdate = ({ path, value }) => {
   emit("update", { path, value });
 };
 
+const emitOpenSecrets = () => {
+  emit("open-secrets");
+};
+
 const sanitizeId = (value) => value.replace(/[^a-z0-9_]/g, "").slice(0, 24);
 const sanitizeSlug = (value) =>
   normalizeSlugValue(value, Number(props.field.settings?.maxLength) || 24);
@@ -956,6 +966,10 @@ const handleGenerate = () => {
   if (!generated) return;
   generateTouched.value = true;
   emit("update", { path: fieldPath.value, value: generated });
+};
+
+const handleSecretClick = () => {
+  emitOpenSecrets();
 };
 
 const onIdRefInput = (event) => {

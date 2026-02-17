@@ -11,6 +11,10 @@
       "required": true
     },
     {
+      "key": "pin",
+      "type": "gpio"
+    },	
+    {
       "key": "lambda",
       "type": "lambda",
       "required": false

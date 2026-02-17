@@ -9,20 +9,34 @@
     @confirm="confirmRemove"
     @cancel="cancelRemove"
   />
-  <ConfirmModal
-    :open="confirmNewOpen"
-    title="Confirm"
-    message="Start a new project without saving?"
-    confirm-text="Yes"
-    cancel-text="Cancel"
-    @confirm="handleNewProject"
-    @cancel="confirmNewOpen = false"
-  />
     <GpioGuideModal
       :open="gpioGuideOpen"
       :guide="gpioGuide"
       :fallback-title="gpioGuideFallbackTitle"
       @close="gpioGuideOpen = false"
+    />
+    <AssetManagerModal
+      :open="assetManagerOpen"
+      :images="displayImages"
+      :fonts="displayFonts"
+      :audio="displayAudio"
+      :loading="assetsLoading"
+      :working="assetsWorking"
+      :error="assetsError"
+      @close="assetManagerOpen = false"
+      @refresh="refreshAssets(true)"
+      @upload="handleAssetUpload"
+      @rename="handleAssetRename"
+      @delete-asset="handleAssetDelete"
+    />
+    <SecretsModal
+      :open="secretsModalOpen"
+      :content="secretsRawContent"
+      :loading="secretsLoading"
+      :saving="secretsSaving"
+      :error="secretsError"
+      @save="handleSecretsSave"
+      @close="closeSecretsModal"
     />
     <div v-if="exportErrorOpen && formErrors.length" class="notice notice--error notice--block">
       <strong>There are errors in the form. Fix them before exporting.</strong>
@@ -39,116 +53,59 @@
     <div v-else-if="projectSaveMessage" class="notice notice--warning notice--block">
       {{ projectSaveMessage }}
     </div>
-    <div v-if="installModalOpen" class="install-modal-overlay" @click.self="installModalOpen = false">
-      <div class="install-modal" role="dialog" aria-modal="true" aria-label="Install options">
-        <div class="install-modal-header">
-          <h3>Install</h3>
-          <button type="button" class="btn-standard compact" @click="installModalOpen = false">Close</button>
-        </div>
-        <div class="install-modal-body">
-          <button type="button" class="btn-standard install-option" @click="handleInstallSerialPort">
-            Via Serial Port
-          </button>
-          <button type="button" class="btn-standard install-option" @click="handleInstallOta">
-            Wireless (OTA)
-          </button>
-          <button type="button" class="btn-standard install-option" @click="handleInstallDownload">
-            Download Binary
-          </button>
-        </div>
-      </div>
-    </div>
-    <div v-if="compileModalOpen" class="compile-modal-overlay">
-      <div class="compile-modal" role="dialog" aria-modal="true" :aria-label="terminalTitle">
-        <div class="compile-modal-header">
-          <div class="compile-meta">
-            <span class="compile-title">{{ terminalTitle }}</span>
-            <span :class="compileStateClass">{{ compileStateLabel }}</span>
-          </div>
-          <div class="compile-actions">
-            <span v-if="compileIsReconnecting" class="compile-reconnect">Reconnecting...</span>
-            <button
-              type="button"
-              class="btn-standard compact"
-              @click="toggleCompileAutoscroll"
-            >
-              {{ compileAutoScroll ? "Pause autoscroll" : "Resume autoscroll" }}
-            </button>
-          </div>
-        </div>
-
-        <div class="compile-modal-body" ref="compileConsoleRef">
-          <div>
-            <div
-              v-for="line in compileLogLines"
-              :key="line.id"
-              :class="line.className"
-              v-html="line.html"
-            ></div>
-          </div>
-        </div>
-
-        <div class="compile-modal-footer">
-          <div v-if="compileJobError" class="compile-error">{{ compileJobError }}</div>
-          <div class="compile-footer-actions">
-            <button
-              v-if="canDownloadCompiledBinary"
-              type="button"
-              class="btn-standard"
-              @click="downloadBinary"
-            >
-              Download
-            </button>
-            <button
-              type="button"
-              class="btn-standard"
-              :disabled="!canCancelCompile"
-              @click="cancelCompile"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              class="btn-standard secondary"
-              :disabled="!canCloseCompile"
-              @click="closeCompileModal"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <InstallConsoleModal
+      :compile-open="compileModalOpen"
+      :terminal-title="terminalTitle"
+      :compile-state-class="compileStateClass"
+      :compile-state-label="compileStateLabel"
+      :compile-is-reconnecting="compileIsReconnecting"
+      :compile-auto-scroll="compileAutoScroll"
+      :compile-log-lines="compileLogLines"
+      :can-download-compiled-binary="canDownloadCompiledBinary"
+      :can-close-compile="canCloseCompile"
+      :on-console-ref="setCompileConsoleElement"
+      @toggle-autoscroll="toggleCompileAutoscroll"
+      @download="downloadBinary"
+      @close-compile="closeCompileModal"
+    />
     <div class="builder-shell">
       <aside class="builder-sidebar">
         <div class="sidebar-top">
-          <div class="sidebar-project-bar" ref="projectMenuRef">
-            <button
-              type="button"
-              class="secondary btn-standard project-menu-button"
-              @click="toggleProjectMenu"
-            >
-              Project
-            </button>
-            <span class="project-filename">{{ projectFilename }}</span>
-            <div v-if="projectMenuOpen" class="project-menu">
-              <button type="button" class="btn-standard" @click="requestNewProject">
-                New
-              </button>
-              <button type="button" class="btn-standard" @click="projectMenuOpen = false">
-                Open
-              </button>
-              <button type="button" class="btn-standard" :disabled="isProjectSaving" @click="handleProjectSave">
-                {{ isProjectSaving ? "Saving..." : "Save" }}
-              </button>
-              <button type="button" class="btn-standard" @click="projectMenuOpen = false">
-                Save as
-              </button>
-              <button type="button" class="btn-standard" @click="projectMenuOpen = false">
-                Settings
-              </button>
+          <button type="button" class="btn-standard secondary sidebar-back-button" @click="handleBackToDashboard">
+            <span class="sidebar-back-button-icon" aria-hidden="true"></span>
+            <span>Back to Dashboard</span>
+          </button>
+
+          <section class="sidebar-panel sidebar-panel--project" aria-label="Current project">
+            <div class="sidebar-panel__header">
+              <h4>Project</h4>
+              <span class="project-status-badge" :class="builderDeviceStatusClass">
+                {{ builderDeviceStatusLabel }}
+              </span>
             </div>
-          </div>
+            <div class="sidebar-panel__body project-summary-body">
+              <dl class="project-summary-list">
+                <div class="project-summary-item">
+                  <dt>name:</dt>
+                  <dd>{{ projectSummaryName }}</dd>
+                </div>
+                <div class="project-summary-item">
+                  <dt>file:</dt>
+                  <dd class="project-summary-file" :class="{ 'is-unsaved': !isProjectSaved }">
+                    {{ projectFilenameLabel }}
+                  </dd>
+                </div>
+                <div class="project-summary-item">
+                  <dt>platform:</dt>
+                  <dd>{{ projectSummaryPlatform }}</dd>
+                </div>
+                <div v-if="projectSummaryComment" class="project-summary-item">
+                  <dt>comment:</dt>
+                  <dd>{{ projectSummaryComment }}</dd>
+                </div>
+              </dl>
+            </div>
+          </section>
         </div>
         <div class="sidebar-middle">
           <div class="sidebar-panel sidebar-panel--components">
@@ -166,6 +123,9 @@
                     @click="activeTab = tab"
                   >
                     <span>{{ tab }}</span>
+                  </button>
+                  <button class="component-chip" type="button" @click="openAssetManagerFromSidebar">
+                    <span>Assets</span>
                   </button>
                   <div class="component-separator-line"></div>
                   <div class="component-separator">
@@ -338,6 +298,7 @@
               :context-component-id="esphomeCoreId"
               :global-store="globalStore"
               @update="handleCoreSchemaUpdate"
+              @open-secrets="openSecretsModal"
             />
             <SchemaRenderer
               :component-id="substitutionsCoreId"
@@ -353,6 +314,7 @@
               :context-component-id="substitutionsCoreId"
               :global-store="globalStore"
               @update="handleSubstitutionsSchemaUpdate"
+              @open-secrets="openSecretsModal"
             />
           </div>
         </div>
@@ -388,6 +350,7 @@
               :context-component-id="platformCoreId"
               :global-store="globalStore"
               @update="handlePlatformSchemaUpdate"
+              @open-secrets="openSecretsModal"
             />
             <SchemaRenderer
               v-if="platformDetailId"
@@ -404,6 +367,7 @@
               :context-component-id="platformDetailId"
               :global-store="globalStore"
               @update="handlePlatformSchemaUpdate"
+              @open-secrets="openSecretsModal"
             />
           </div>
         </div>
@@ -440,6 +404,7 @@
               :field-filter="['transport']"
               :global-store="globalStore"
               @update="handleNetworkSchemaUpdate"
+              @open-secrets="openSecretsModal"
             />
             <SchemaRenderer
               v-if="networkDetailId"
@@ -456,6 +421,7 @@
               :context-component-id="networkDetailId"
               :global-store="globalStore"
               @update="handleNetworkSchemaUpdate"
+              @open-secrets="openSecretsModal"
             />
             <SchemaRenderer
               :component-id="networkCoreId"
@@ -472,6 +438,7 @@
               :field-filter="['ota']"
               :global-store="globalStore"
               @update="handleNetworkSchemaUpdate"
+              @open-secrets="openSecretsModal"
             />
             <SchemaRenderer
               :component-id="networkCoreId"
@@ -488,6 +455,7 @@
               :field-filter="['web_server']"
               :global-store="globalStore"
               @update="handleNetworkSchemaUpdate"
+              @open-secrets="openSecretsModal"
             />
           </div>
         </div>
@@ -535,6 +503,7 @@
               :context-component-id="protocolDetailId"
               :global-store="globalStore"
               @update="handleProtocolDetailUpdate"
+              @open-secrets="openSecretsModal"
             />
           </div>
         </div>
@@ -586,6 +555,7 @@
               :context-component-id="bussesDetailId"
               :global-store="globalStore"
               @update="handleBussesDetailUpdate"
+              @open-secrets="openSecretsModal"
             />
           </div>
         </div>
@@ -633,6 +603,7 @@
               :context-component-id="otherDetailId"
               :global-store="globalStore"
               @update="handleOtherDetailUpdate"
+              @open-secrets="openSecretsModal"
             />
           </div>
         </div>
@@ -681,6 +652,7 @@
               :context-component-id="automationDetailId"
               :global-store="globalStore"
               @update="handleAutomationDetailUpdate"
+              @open-secrets="openSecretsModal"
             />
             <div
               v-if="
@@ -811,8 +783,14 @@
                 :gpio-title="gpioTitle"
                 :context-component-id="activeComponentId"
                 :global-store="globalStore"
+                :display-images="displayImages"
+                :display-fonts="displayFonts"
+                :display-google-fonts="displayGoogleFonts"
+                :assets-base="assetsBase"
                 @update="handleSchemaUpdate"
                 @update-custom="handleCustomConfigUpdate"
+                @open-asset-manager="openAssetManager"
+                @open-secrets="openSecretsModal"
               />
             </div>
           </div>
@@ -841,10 +819,13 @@ import {
 } from "vue";
 import hljs from "highlight.js/lib/core";
 import yaml from "highlight.js/lib/languages/yaml";
-import { ESPLoader, Transport } from "esptool-js";
 import ConfirmModal from "../components/ConfirmModal.vue";
 import GpioGuideModal from "../components/GpioGuideModal.vue";
+import InstallConsoleModal from "../components/InstallConsoleModal.vue";
+import SecretsModal from "../components/SecretsModal.vue";
 import SchemaRenderer from "../components/SchemaRenderer.vue";
+import AssetManagerModal from "../components/assets/AssetManagerModal.vue";
+import { useInstallConsoleFlow } from "../composables/useInstallConsoleFlow";
 import { loadGpioData, resolveGpioKey } from "../utils/gpioData";
 import { loadComponentSchema, loadSchemaByPath } from "../utils/schemaLoader";
 import {
@@ -855,6 +836,24 @@ import {
 import { buildGlobalRegistry, isFieldVisible as isSchemaFieldVisible } from "../utils/schemaVisibility";
 import { getRequiredInterfaces } from "../utils/schemaRequirements";
 import { generateFieldValue, resolveFieldValue, resolveGenerationSpec } from "../utils/schemaAuto";
+import { BUILDER_CONFIG_STORAGE_KEY } from "../utils/builderSession";
+import {
+  mergeDeviceStatusCache,
+  normalizeProjectKey,
+  readDeviceStatusEntry
+} from "../utils/deviceStatusCache";
+import {
+  buildAssetUrl,
+  deleteAsset,
+  fetchAssetsManifest,
+  renameAsset,
+  uploadAsset
+} from "../utils/assetsApi";
+import {
+  normalizeAnimationElementEncoding,
+  normalizeImageElementEncoding,
+  validateDisplayEncoding
+} from "../utils/displayImageEncoding";
 
 hljs.registerLanguage("yaml", yaml);
 
@@ -880,50 +879,28 @@ const activeComponentSlot = ref(null);
 const isComponentPickerOpen = ref(false);
 const confirmOpen = ref(false);
 const pendingRemoveIndex = ref(null);
-const confirmNewOpen = ref(false);
 const componentSchemas = ref({});
 const componentCatalog = ref({ categories: [] });
 const isComponentCatalogLoading = ref(true);
 const componentCatalogError = ref(null);
 const modeLevels = ["Simple", "Normal", "Advanced"];
-const projectMenuOpen = ref(false);
-const projectMenuRef = ref(null);
 const isProjectSaving = ref(false);
+const assetManagerOpen = ref(false);
+const assetsLoading = ref(false);
+const assetsWorking = ref(false);
+const assetsError = ref("");
+const secretsModalOpen = ref(false);
+const secretsRawContent = ref("");
+const secretsLoading = ref(false);
+const secretsSaving = ref(false);
+const secretsError = ref("");
 const projectSaveMessage = ref("");
 const projectSaveError = ref("");
-const lastSavedYamlName = ref("");
-const lastSavedYamlBody = ref("");
-const compileModalOpen = ref(false);
-const compileConsoleRef = ref(null);
-const compileAutoScroll = ref(true);
-const compileJobId = ref("");
-const compileJobState = ref("");
-const compileJobError = ref("");
-const compileLogLines = ref([]);
-const compileLogSeq = ref(0);
-const compileActiveAction = ref("");
-const compileIsReconnecting = ref(false);
-const installModalOpen = ref(false);
-const compileTailCheckpoint = ref(0);
-const compileSseLogSeen = ref(false);
-const compileReconnectAttempts = ref(0);
-const installPlanMode = ref("");
-const installPlanOtaHost = ref("");
-const installPlanSerialPort = ref(null);
-const installPlanDownloadReady = ref(false);
-const localFlashRunning = ref(false);
-const projectDeviceStatus = ref("unknown");
+const projectDeviceStatus = ref("offline");
 const projectDeviceHost = ref("");
 const projectDeviceName = ref("");
-let compileStreamSource = null;
-let compileStatusPollId = null;
-let compileLongPollActive = false;
-let compileTailStartTimer = null;
-let compileLogFlushHandle = null;
-let compileLogScrollHandle = null;
 let projectDevicePollId = null;
 let projectsUpdatedChannel = null;
-const compileLogQueue = [];
 
 const activeModeLevel = ref(modeLevels[0]);
 const resolveModeLevel = (value) => {
@@ -1143,6 +1120,33 @@ const buildDisplayElementIdErrors = (
     }
   };
 
+  const checkDisplayEncoding = (kind, element, componentId, pathPrefix) => {
+    if (kind === "image") {
+      const problems = validateDisplayEncoding(
+        element?.imageType,
+        element?.imageTransparency,
+        element?.imageInvertAlpha ?? element?.invert,
+        element?.imageDither,
+        element?.imageByteOrder
+      );
+      problems.forEach((message) => {
+        pushError(componentId, [...pathPrefix, "imageType"], message);
+      });
+      return;
+    }
+
+    const problems = validateDisplayEncoding(
+      element?.animationType,
+      element?.animationTransparency,
+      element?.animationInvertAlpha,
+      element?.animationDither,
+      element?.animationByteOrder
+    );
+    problems.forEach((message) => {
+      pushError(componentId, [...pathPrefix, "animationType"], message);
+    });
+  };
+
   components.forEach((entry, entryIndex) => {
     const componentId = componentIdFromEntry(entry);
     if (!componentId) return;
@@ -1187,6 +1191,7 @@ const buildDisplayElementIdErrors = (
           "No GIF animations available",
           "Please select an animation file"
         );
+        checkDisplayEncoding("animation", element, componentId, basePath);
       }
 
       if (element?.type === "image") {
@@ -1198,6 +1203,7 @@ const buildDisplayElementIdErrors = (
           "No image files available",
           "Please select an image file"
         );
+        checkDisplayEncoding("image", element, componentId, basePath);
       }
 
       if (element?.type === "icon") {
@@ -1460,6 +1466,30 @@ const projectFilename = computed(() => {
   const name = String(resolvedName || "").trim();
   if (!name) return "new_file.yaml";
   return name.toLowerCase().endsWith(".yaml") ? name : `${name}.yaml`;
+});
+const isProjectSaved = computed(() => config.value?.isSaved === true);
+const projectFilenameLabel = computed(() =>
+  isProjectSaved.value ? projectFilename.value : `${projectFilename.value}*`
+);
+const projectSummaryName = computed(() => {
+  const coreValue = config.value.esphomeCore || {};
+  const coreFields = esphomeCoreSchema.value?.fields || [];
+  const friendly = String(resolveFieldValue("friendly_name", coreValue, coreFields, config.value) || "").trim();
+  if (friendly) return friendly;
+  const name = String(resolveFieldValue("name", coreValue, coreFields, config.value) || "").trim();
+  return name || "-";
+});
+const projectSummaryComment = computed(() => {
+  const coreValue = config.value.esphomeCore || {};
+  const coreFields = esphomeCoreSchema.value?.fields || [];
+  return String(resolveFieldValue("comment", coreValue, coreFields, config.value) || "").trim();
+});
+const projectSummaryPlatform = computed(() => {
+  const platform = String(platformCoreConfig.value?.platform || "").trim().toUpperCase();
+  const variant = String(platformCoreConfig.value?.variant || "").trim().toUpperCase();
+  if (!platform) return "Unknown";
+  if (!variant || variant === platform) return platform;
+  return `${platform} (${variant})`;
 });
 
 
@@ -1834,6 +1864,9 @@ const gpioTitle = computed(() => gpioGuide.value?.title || "GPIO Guide");
 
 const mdiSubstitutions = ref({});
 const displayImages = ref([]);
+const displayFonts = ref([]);
+const displayAudio = ref([]);
+const displayGoogleFonts = ref([]);
 const mdiIcons = ref([]);
 
 provide("mdiIcons", mdiIcons);
@@ -2034,41 +2067,12 @@ const handleSelectBlur = (event) => {
   event?.target?.blur?.();
 };
 
-const toggleProjectMenu = () => {
-  projectMenuOpen.value = !projectMenuOpen.value;
-};
-
-const requestNewProject = () => {
-  projectMenuOpen.value = false;
-  confirmNewOpen.value = true;
-};
-
-const handleProjectMenuOutside = (event) => {
-  if (!projectMenuOpen.value) return;
-  const target = event.target;
-  if (projectMenuRef.value && projectMenuRef.value.contains(target)) return;
-  projectMenuOpen.value = false;
-};
-
-const handleNewProject = () => {
-  confirmNewOpen.value = false;
-  projectMenuOpen.value = false;
-  isHydrating.value = true;
-  config.value = defaultConfig();
-  activeTab.value = tabs[0];
-  activeComponentSlot.value = null;
-  isComponentPickerOpen.value = false;
-  componentsQuery.value = "";
-  splitPreviewEnabled.value = Boolean(config.value.ui?.splitPreview);
-  activeModeLevel.value = resolveModeLevel(config.value.ui?.modeLevel);
-  isHydrating.value = false;
-  try {
-    localStorage.removeItem("vebBuilderDeviceConfig");
-  } catch (error) {
-    console.error("Failed to clear stored config", error);
-  }
-  lastSavedYamlName.value = "";
-  lastSavedYamlBody.value = "";
+const handleBackToDashboard = () => {
+  window.dispatchEvent(
+    new CustomEvent("app:route-switch-request", {
+      detail: { routeName: "dashboard" }
+    })
+  );
 };
 
 
@@ -2158,6 +2162,7 @@ const ensureComponentSchema = (componentId) => {
 
 const defaultConfig = () => ({
   schemaVersion: 1,
+  isSaved: false,
   esphomeCore: {},
   substitutions: {},
   automation: {},
@@ -2190,6 +2195,34 @@ const defaultConfig = () => ({
     deviceHost: ""
   }
 });
+
+const cloneConfigForPersistence = (source) => {
+  if (!source || typeof source !== "object") return defaultConfig();
+  let payload;
+  try {
+    payload = JSON.parse(safeStringify(source));
+  } catch {
+    payload = defaultConfig();
+  }
+  if (!payload || typeof payload !== "object") {
+    payload = defaultConfig();
+  }
+  delete payload.isModified;
+  if (payload.ui && typeof payload.ui === "object") {
+    delete payload.ui.isModified;
+    delete payload.ui.isSaved;
+  }
+  payload.isSaved = payload.isSaved === true;
+  return payload;
+};
+
+const buildConfigFingerprint = (source) => {
+  const payload = cloneConfigForPersistence(source);
+  delete payload.isSaved;
+  return safeStringify(payload);
+};
+
+const persistedConfigFingerprint = ref("");
 
 const resolveEmitModeForGeneration = (field) => {
   const mode = field?.emitYAML;
@@ -3300,12 +3333,13 @@ onMounted(() => {
   updatePreviewScrollbar();
   initProjectsUpdatedChannel();
   window.addEventListener("resize", updatePreviewScrollbar);
+  window.addEventListener("keydown", handleBuilderKeydown);
+  document.addEventListener("visibilitychange", handleBuilderVisibilityChange);
   window.addEventListener("app:builder-export", handleAppExport);
-  window.addEventListener("app:builder-compile", handleAppCompile);
-  window.addEventListener("app:builder-install", handleAppInstall);
+  window.addEventListener("app:install-option", handleAppInstallOption);
   window.addEventListener("app:builder-logs", handleAppLogs);
+  window.addEventListener("app:builder-save-request", handleBuilderSaveRequest);
   emitCompileState();
-  refreshCurrentDeviceStatus();
   startDeviceStatusPolling();
 });
 
@@ -3350,8 +3384,8 @@ const handleAppExport = () => {
 const saveConfig = () => {
   if (isHydrating.value) return;
   try {
-    const payload = safeStringify(config.value);
-    localStorage.setItem("vebBuilderDeviceConfig", payload);
+    const payload = safeStringify(cloneConfigForPersistence(config.value));
+    localStorage.setItem(BUILDER_CONFIG_STORAGE_KEY, payload);
   } catch (error) {
     console.error("Failed to save config", error);
   }
@@ -3362,6 +3396,7 @@ const ADDON_ROOT_FOLDER_LABEL = "Projects";
 const PROJECTS_UPDATED_STORAGE_KEY = "vebProjectsUpdatedSignal";
 const PROJECTS_UPDATED_CHANNEL = "ecd-projects";
 const addonBaseUrl = new URL("./", window.location.href).toString();
+const assetsBase = new URL("api/assets/", addonBaseUrl).toString();
 
 const buildAddonUrl = (path) => new URL(path, addonBaseUrl).toString();
 
@@ -3370,6 +3405,324 @@ const addonFetch = async (path, options = {}) => {
     credentials: "include",
     ...options
   });
+};
+
+const deriveVariantStyle = (variant) => {
+  const value = String(variant || "regular").toLowerCase();
+  const style = value.includes("italic") ? "italic" : "normal";
+  const numeric = Number.parseInt(value, 10);
+  const weight = Number.isFinite(numeric) ? numeric : value === "regular" ? 400 : 400;
+  return { style, weight };
+};
+
+const toAssetFileSet = (items) =>
+  new Set(
+    (items || [])
+      .map((item) => String(item?.file || "").trim())
+      .filter((value) => Boolean(value))
+  );
+
+const getDefaultGoogleFont = () => {
+  const first = displayGoogleFonts.value[0];
+  if (!first) return null;
+  const variant = first.variants?.includes("regular") ? "regular" : first.variants?.[0] || "regular";
+  const { style, weight } = deriveVariantStyle(variant);
+  return {
+    source: "google",
+    family: first.family || "",
+    variant,
+    url: first.files?.[variant] || "",
+    style,
+    weight
+  };
+};
+
+const applyTextFontFallback = (element, defaultGoogleFont) => {
+  if (!defaultGoogleFont) {
+    element.fontSource = "";
+    element.fontFamily = "";
+    element.fontVariant = "regular";
+    element.fontUrl = "";
+    element.fontFile = "";
+    element.fontWeight = 400;
+    element.fontStyle = "normal";
+    return;
+  }
+  element.fontSource = "google";
+  element.fontFamily = defaultGoogleFont.family;
+  element.fontVariant = defaultGoogleFont.variant;
+  element.fontUrl = defaultGoogleFont.url;
+  element.fontFile = "";
+  element.fontWeight = defaultGoogleFont.weight;
+  element.fontStyle = defaultGoogleFont.style;
+};
+
+const applyLegendFontFallback = (element, prefix, defaultGoogleFont) => {
+  if (!defaultGoogleFont) {
+    element[`${prefix}FontSource`] = "";
+    element[`${prefix}FontFamily`] = "";
+    element[`${prefix}FontVariant`] = "regular";
+    element[`${prefix}FontUrl`] = "";
+    element[`${prefix}FontFile`] = "";
+    element[`${prefix}FontWeight`] = 400;
+    element[`${prefix}FontStyle`] = "normal";
+    return;
+  }
+  element[`${prefix}FontSource`] = "google";
+  element[`${prefix}FontFamily`] = defaultGoogleFont.family;
+  element[`${prefix}FontVariant`] = defaultGoogleFont.variant;
+  element[`${prefix}FontUrl`] = defaultGoogleFont.url;
+  element[`${prefix}FontFile`] = "";
+  element[`${prefix}FontWeight`] = defaultGoogleFont.weight;
+  element[`${prefix}FontStyle`] = defaultGoogleFont.style;
+};
+
+const validateCurrentProjectAssetReferences = () => {
+  const imageFiles = toAssetFileSet(displayImages.value);
+  const animationFiles = new Set([...imageFiles].filter((file) => file.toLowerCase().endsWith(".gif")));
+  const fontFiles = toAssetFileSet(displayFonts.value);
+  const defaultGoogleFont = getDefaultGoogleFont();
+  let changed = false;
+
+  (config.value.components || []).forEach((entry) => {
+    const layout = entry?.config?._display_builder;
+    if (!layout || !Array.isArray(layout.elements)) return;
+    layout.elements.forEach((element) => {
+      if (!element || typeof element !== "object") return;
+      if (element.type === "image") {
+        const normalized = normalizeImageElementEncoding(element);
+        if (
+          element.imageType !== normalized.imageType ||
+          element.imageTransparency !== normalized.imageTransparency ||
+          Boolean(element.imageInvertAlpha ?? element.invert) !== normalized.imageInvertAlpha ||
+          element.imageDither !== normalized.imageDither ||
+          element.imageByteOrder !== normalized.imageByteOrder
+        ) {
+          Object.assign(element, normalized);
+          changed = true;
+        }
+        const file = String(element.image || "").trim();
+        if (file && !imageFiles.has(file)) {
+          element.image = "";
+          element.imageUrl = "";
+          changed = true;
+        }
+      }
+      if (element.type === "animation") {
+        const normalized = normalizeAnimationElementEncoding(element);
+        if (
+          element.animationType !== normalized.animationType ||
+          element.animationTransparency !== normalized.animationTransparency ||
+          Boolean(element.animationInvertAlpha) !== normalized.animationInvertAlpha ||
+          element.animationDither !== normalized.animationDither ||
+          element.animationByteOrder !== normalized.animationByteOrder
+        ) {
+          Object.assign(element, normalized);
+          changed = true;
+        }
+        const file = String(element.animationFile || "").trim();
+        if (file && !animationFiles.has(file)) {
+          element.animationFile = "";
+          element.animationUrl = "";
+          changed = true;
+        }
+      }
+      if (element.type === "text") {
+        const fontFile = String(element.fontFile || "").trim();
+        if (String(element.fontSource || "") === "local" && fontFile && !fontFiles.has(fontFile)) {
+          applyTextFontFallback(element, defaultGoogleFont);
+          changed = true;
+        }
+      }
+      if (element.type === "graph") {
+        const nameFile = String(element.legendNameFontFile || "").trim();
+        if (String(element.legendNameFontSource || "") === "local" && nameFile && !fontFiles.has(nameFile)) {
+          applyLegendFontFallback(element, "legendName", defaultGoogleFont);
+          changed = true;
+        }
+        const valueFile = String(element.legendValueFontFile || "").trim();
+        if (String(element.legendValueFontSource || "") === "local" && valueFile && !fontFiles.has(valueFile)) {
+          applyLegendFontFallback(element, "legendValue", defaultGoogleFont);
+          changed = true;
+        }
+      }
+    });
+  });
+
+  if (changed) {
+    config.value.isSaved = false;
+    saveConfig();
+  }
+
+  return changed;
+};
+
+const refreshAssets = async (refresh = false, validateProject = false) => {
+  assetsError.value = "";
+  assetsLoading.value = true;
+  try {
+    const payload = await fetchAssetsManifest(addonFetch, { kind: "all", refresh });
+    const images = Array.isArray(payload?.images?.items) ? payload.images.items : [];
+    const fonts = Array.isArray(payload?.fonts?.items) ? payload.fonts.items : [];
+    const audio = Array.isArray(payload?.audio?.items) ? payload.audio.items : [];
+    displayImages.value = images.map((item) => ({
+      ...item,
+      url: buildAssetUrl(buildAddonUrl, "images", item.file)
+    }));
+    displayFonts.value = fonts.map((item) => ({
+      ...item,
+      url: buildAssetUrl(buildAddonUrl, "fonts", item.file)
+    }));
+    displayAudio.value = audio.map((item) => ({
+      ...item,
+      url: buildAssetUrl(buildAddonUrl, "audio", item.file)
+    }));
+    displayGoogleFonts.value = Array.isArray(payload?.googleFonts) ? payload.googleFonts : [];
+    if (validateProject) {
+      validateCurrentProjectAssetReferences();
+    }
+  } catch (error) {
+    assetsError.value = error instanceof Error ? error.message : "Assets load failed";
+    displayImages.value = [];
+    displayFonts.value = [];
+    displayAudio.value = [];
+    displayGoogleFonts.value = [];
+  } finally {
+    assetsLoading.value = false;
+  }
+};
+
+const openAssetManager = () => {
+  assetManagerOpen.value = true;
+};
+
+const openAssetManagerFromSidebar = () => {
+  openAssetManager();
+};
+
+const readApiError = async (response, fallbackMessage) => {
+  try {
+    const payload = await response.json();
+    const error = typeof payload?.error === "string" ? payload.error.trim() : "";
+    const details = typeof payload?.details === "string" ? payload.details.trim() : "";
+    if (error && details) return `${error}: ${details}`;
+    if (error) return error;
+    if (details) return details;
+  } catch {
+    // ignore JSON parse errors
+  }
+  return fallbackMessage;
+};
+
+const loadSecretsRaw = async () => {
+  secretsError.value = "";
+  secretsLoading.value = true;
+  try {
+    const response = await addonFetch("api/secrets/raw");
+    if (!response.ok) {
+      throw new Error(await readApiError(response, `Secrets load failed (${response.status})`));
+    }
+    const payload = await response.json();
+    secretsRawContent.value = typeof payload?.content === "string" ? payload.content : "";
+  } catch (error) {
+    secretsError.value = error instanceof Error ? error.message : "Secrets load failed";
+    secretsRawContent.value = "";
+  } finally {
+    secretsLoading.value = false;
+  }
+};
+
+const openSecretsModal = async () => {
+  if (secretsLoading.value || secretsSaving.value) return;
+  secretsModalOpen.value = true;
+  await loadSecretsRaw();
+};
+
+const closeSecretsModal = () => {
+  if (secretsSaving.value) return;
+  secretsModalOpen.value = false;
+  secretsError.value = "";
+};
+
+const handleSecretsSave = async (content) => {
+  if (secretsLoading.value || secretsSaving.value) return;
+  secretsError.value = "";
+  secretsSaving.value = true;
+  try {
+    const response = await addonFetch("api/secrets/raw", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: typeof content === "string" ? content : "" })
+    });
+    if (!response.ok) {
+      throw new Error(await readApiError(response, `Secrets save failed (${response.status})`));
+    }
+    secretsRawContent.value = typeof content === "string" ? content : "";
+  } catch (error) {
+    secretsError.value = error instanceof Error ? error.message : "Secrets save failed";
+  } finally {
+    secretsSaving.value = false;
+  }
+};
+
+const handleAssetUpload = async ({ kind, file }) => {
+  const normalizedKind = ["images", "fonts", "audio"].includes(String(kind || "").toLowerCase())
+    ? String(kind).toLowerCase()
+    : "";
+  if (!normalizedKind || !file) {
+    assetsError.value = "Invalid kind";
+    return;
+  }
+  assetsError.value = "";
+  assetsWorking.value = true;
+  try {
+    await uploadAsset(addonFetch, { kind: normalizedKind, file });
+    await refreshAssets(true, true);
+  } catch (error) {
+    assetsError.value = error instanceof Error ? error.message : "Asset upload failed";
+  } finally {
+    assetsWorking.value = false;
+  }
+};
+
+const handleAssetRename = async ({ kind, from, to }) => {
+  const normalizedKind = ["images", "fonts", "audio"].includes(String(kind || "").toLowerCase())
+    ? String(kind).toLowerCase()
+    : "";
+  if (!normalizedKind) {
+    assetsError.value = "Invalid kind";
+    return;
+  }
+  assetsError.value = "";
+  assetsWorking.value = true;
+  try {
+    await renameAsset(addonFetch, { kind: normalizedKind, from, to });
+    await refreshAssets(true, true);
+  } catch (error) {
+    assetsError.value = error instanceof Error ? error.message : "Asset rename failed";
+  } finally {
+    assetsWorking.value = false;
+  }
+};
+
+const handleAssetDelete = async ({ kind, file }) => {
+  const normalizedKind = ["images", "fonts", "audio"].includes(String(kind || "").toLowerCase())
+    ? String(kind).toLowerCase()
+    : "";
+  if (!normalizedKind) {
+    assetsError.value = "Invalid kind";
+    return;
+  }
+  assetsError.value = "";
+  assetsWorking.value = true;
+  try {
+    await deleteAsset(addonFetch, { kind: normalizedKind, file });
+    await refreshAssets(true, true);
+  } catch (error) {
+    assetsError.value = error instanceof Error ? error.message : "Asset delete failed";
+  } finally {
+    assetsWorking.value = false;
+  }
 };
 
 const initProjectsUpdatedChannel = () => {
@@ -3420,12 +3773,8 @@ const isLocalHostname = (host) => {
   return isPrivateIp(normalized);
 };
 
-const preferCompileLongPoll = !isLocalHostname(window.location.hostname || "");
-const compileMaxLogLines = 5000;
-const compileLogChunkSize = 200;
-const compileMaxReconnectAttempts = 6;
-
 const currentYamlDeviceName = computed(() => String(projectFilename.value || "").replace(/\.yaml$/i, ""));
+const currentProjectKey = computed(() => normalizeProjectKey(projectFilename.value));
 const hostFromYamlName = (yamlName) => {
   const normalized = String(yamlName || "").trim();
   if (!normalized) return "";
@@ -3439,70 +3788,111 @@ const preferredDeviceHost = computed(() => {
   return hostFromYamlName(projectFilename.value);
 });
 
+const applyCachedCurrentDeviceStatus = () => {
+  const key = currentProjectKey.value;
+  if (!key) {
+    projectDeviceStatus.value = "offline";
+    projectDeviceHost.value = "";
+    projectDeviceName.value = "";
+    return;
+  }
+  const cached = readDeviceStatusEntry(key);
+  if (!cached) {
+    projectDeviceStatus.value = "offline";
+    projectDeviceHost.value = "";
+    projectDeviceName.value = "";
+    return;
+  }
+  projectDeviceStatus.value = String(cached.status || "").toLowerCase() === "online" ? "online" : "offline";
+  projectDeviceHost.value = String(cached.host || "").trim();
+  projectDeviceName.value = String(cached.name || currentYamlDeviceName.value).trim();
+};
+
+const cacheCurrentDeviceStatus = ({ status, host = "", name = "" }) => {
+  const key = currentProjectKey.value;
+  if (!key) return;
+  mergeDeviceStatusCache({
+    [key]: {
+      status: status === "online" ? "online" : "offline",
+      host: String(host || "").trim(),
+      name: String(name || "").trim(),
+      updatedAt: Date.now()
+    }
+  });
+};
+
 const registerCurrentDevice = async (yamlName) => {
   if (!yamlName) return;
-  try {
-    const host = hostFromYamlName(yamlName);
-    await addonFetch("api/devices/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        yaml: yamlName,
-        ...(host ? { host } : {})
-      })
-    });
-  } catch {
-    // ignore registration errors
+  const host = hostFromYamlName(yamlName);
+  const response = await addonFetch("api/devices/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      yaml: yamlName,
+      ...(host ? { host } : {})
+    })
+  });
+  if (!response.ok) {
+    throw new Error(await parseResponseMessage(response, "Device registration failed"));
   }
 };
 
 const refreshCurrentDeviceStatus = async ({ refresh = false } = {}) => {
   const yamlName = String(projectFilename.value || "").trim();
   if (!yamlName) {
-    projectDeviceStatus.value = "unknown";
+    projectDeviceStatus.value = "offline";
     projectDeviceHost.value = "";
     projectDeviceName.value = "";
     return;
   }
 
   try {
-    const response = await addonFetch(`api/devices/list?refresh=${refresh ? 1 : 0}`);
+    const response = await addonFetch(
+      `api/devices/status?yaml=${encodeURIComponent(yamlName)}&refresh=${refresh ? 1 : 0}`
+    );
     if (!response.ok) {
-      projectDeviceStatus.value = "unknown";
+      projectDeviceStatus.value = "offline";
+      projectDeviceHost.value = "";
+      projectDeviceName.value = "";
+      cacheCurrentDeviceStatus({ status: "offline" });
       return;
     }
     const payload = await response.json();
-    const devices = Array.isArray(payload?.devices) ? payload.devices : [];
     const fallbackName = currentYamlDeviceName.value;
-    const match = devices.find((device) => {
-      const deviceYaml = String(device?.yaml || "").trim();
-      const deviceName = String(device?.name || "").trim();
-      if (deviceYaml && deviceYaml.toLowerCase() === yamlName.toLowerCase()) return true;
-      if (deviceName && deviceName.toLowerCase() === fallbackName.toLowerCase()) return true;
-      return false;
-    });
+    const match = payload?.device && typeof payload.device === "object" ? payload.device : null;
     if (!match) {
-      projectDeviceStatus.value = "unknown";
+      projectDeviceStatus.value = "offline";
       projectDeviceHost.value = "";
       projectDeviceName.value = "";
+      cacheCurrentDeviceStatus({ status: "offline" });
       return;
     }
-    projectDeviceStatus.value = String(match.status || "").toLowerCase() || "unknown";
+    const nextStatus = String(match.status || "").toLowerCase() === "online" ? "online" : "offline";
+    projectDeviceStatus.value = nextStatus;
     projectDeviceHost.value = String(match.host || "").trim();
     projectDeviceName.value = String(match.name || fallbackName).trim();
+    cacheCurrentDeviceStatus({
+      status: nextStatus,
+      host: projectDeviceHost.value,
+      name: projectDeviceName.value
+    });
   } catch {
-    projectDeviceStatus.value = "unknown";
+    projectDeviceStatus.value = "offline";
+    projectDeviceHost.value = "";
+    projectDeviceName.value = "";
+    cacheCurrentDeviceStatus({ status: "offline" });
   }
 };
 
 const startDeviceStatusPolling = () => {
+  if (document.visibilityState !== "visible") return;
   if (projectDevicePollId) return;
   projectDevicePollId = setInterval(() => {
     if (compileIsActive.value) return;
     refreshCurrentDeviceStatus({ refresh: true });
-  }, 10000);
+  }, 12000);
 };
 
 const stopDeviceStatusPolling = () => {
@@ -3511,730 +3901,164 @@ const stopDeviceStatusPolling = () => {
   projectDevicePollId = null;
 };
 
-const canCompileSavedProject = computed(() => {
-  const currentName = String(projectFilename.value || "").trim();
-  const currentYaml = String(yamlPreview.value || "");
-  if (!currentName || !currentYaml) return false;
-  if (!lastSavedYamlName.value || !lastSavedYamlBody.value) return false;
-  return currentName === lastSavedYamlName.value && currentYaml === lastSavedYamlBody.value;
-});
+const handleBuilderVisibilityChange = () => {
+  if (document.visibilityState === "visible") {
+    refreshCurrentDeviceStatus({ refresh: true });
+    startDeviceStatusPolling();
+    return;
+  }
+  stopDeviceStatusPolling();
+};
 
 const canInstallProject = computed(() => {
   const currentName = String(projectFilename.value || "").trim();
   const currentYaml = String(yamlPreview.value || "").trim();
   return Boolean(currentName && currentYaml);
 });
+const canUseOtaInstall = computed(
+  () => projectDeviceStatus.value === "online" && Boolean(preferredDeviceHost.value)
+);
 
 const canLogsForCurrentDevice = computed(
-  () => canCompileSavedProject.value && projectDeviceStatus.value === "online"
+  () => projectDeviceStatus.value === "online"
 );
+const builderDeviceStatusLabel = computed(() => {
+  if (projectDeviceStatus.value === "online") return "Online";
+  return "Offline";
+});
+const builderDeviceStatusClass = computed(() => {
+  if (projectDeviceStatus.value === "online") return "is-online";
+  return "is-offline";
+});
 
-const compileIsActive = computed(() => ["queued", "running"].includes(compileJobState.value));
-const canCancelCompile = computed(() => Boolean(compileJobId.value) && compileIsActive.value);
-const canDownloadCompiledBinary = computed(
-  () =>
-    compileModalOpen.value &&
-    installPlanMode.value === "download" &&
-    installPlanDownloadReady.value &&
-    compileJobState.value === "success"
-);
-const canCloseCompile = computed(
-  () =>
-    Boolean(compileModalOpen.value) &&
-    !localFlashRunning.value &&
-    ["success", "failed", "canceled"].includes(compileJobState.value)
-);
-const terminalTitle = computed(() => {
-  if (compileActiveAction.value === "flash") return "Flash Console";
-  if (compileActiveAction.value === "ota") return "OTA Console";
-  if (compileActiveAction.value === "logs") return "Logs Console";
-  return "Compile Console";
-});
-const compileStateLabel = computed(() => {
-  if (!compileJobState.value) return "Idle";
-  if (compileJobState.value === "queued") return "Queued";
-  if (compileJobState.value === "running") return "Running";
-  if (compileJobState.value === "success") return "Success";
-  if (compileJobState.value === "failed") return "Failed";
-  if (compileJobState.value === "canceled") return "Canceled";
-  return compileJobState.value;
-});
-const compileStateClass = computed(() => {
-  if (compileJobState.value === "running") return "job-state running";
-  if (compileJobState.value === "queued") return "job-state queued";
-  if (compileJobState.value === "success") return "job-state success";
-  if (compileJobState.value === "failed") return "job-state failed";
-  if (compileJobState.value === "canceled") return "job-state failed";
-  return "job-state";
-});
-const serialSupported = computed(() => "serial" in navigator);
-const serialSecure = computed(() => window.isSecureContext === true);
-const serialPolicyAllowed = computed(() => {
-  const policy = document.permissionsPolicy;
-  if (!policy || typeof policy.allowsFeature !== "function") return true;
-  try {
-    return policy.allowsFeature("serial");
-  } catch {
+const installFlow = useInstallConsoleFlow({
+  canInstall: () => canInstallProject.value,
+  canUseOta: () => canUseOtaInstall.value,
+  canLogs: () => canLogsForCurrentDevice.value,
+  getYamlName: () => projectFilename.value,
+  getDeviceHost: () => preferredDeviceHost.value,
+  fetchApi: addonFetch,
+  streamUrl: buildAddonUrl,
+  setError: (message) => {
+    projectSaveError.value = message;
+  },
+  clearError: () => {
+    projectSaveError.value = "";
+  },
+  prepareBeforeJob: async () => {
+    await saveCurrentYamlFile();
+    const saved = await handleProjectSave(true);
+    if (!saved) {
+      throw new Error(projectSaveError.value || "Project save failed before install");
+    }
+    await registerCurrentDevice(projectFilename.value);
     return true;
-  }
+  },
+  preferLongPoll: !isLocalHostname(window.location.hostname || "")
 });
+
+const {
+  compileModalOpen,
+  compileAutoScroll,
+  compileLogLines,
+  compileIsReconnecting,
+  localFlashRunning,
+  compileIsActive,
+  canDownloadCompiledBinary,
+  canCloseCompile,
+  terminalTitle,
+  compileStateLabel,
+  compileStateClass,
+  setCompileConsoleElement,
+  toggleCompileAutoscroll,
+  closeCompileModal,
+  handleInstallSerialPort,
+  handleInstallOta,
+  startLogs,
+  handleInstallDownload,
+  downloadBinary,
+  dispose: disposeInstallFlow
+} = installFlow;
 
 const emitCompileState = () => {
   window.dispatchEvent(
     new CustomEvent("app:builder-compile-state", {
       detail: {
-        canCompile: canCompileSavedProject.value,
         canInstall: canInstallProject.value,
+        canUseOta: canUseOtaInstall.value,
         canLogs: canLogsForCurrentDevice.value,
-        running: compileIsActive.value || localFlashRunning.value
+        canExport: true,
+        running: compileIsActive.value || localFlashRunning.value,
+        hasUnsavedChanges: !isProjectSaved.value
       }
     })
   );
 };
 
-const escapeHtml = (value) =>
-  String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
-    .replace(/'/g, "&#39;");
 
-const compileLineClass = (line) => {
-  const classes = ["compile-line"];
-  const normalized = String(line || "");
-  const levelMatch = normalized.match(/^\[[0-9:.]+\]\[([A-Z])\]/);
-  if (levelMatch) {
-    const level = levelMatch[1];
-    if (level === "E") return classes.concat("line-error");
-    if (level === "W") return classes.concat("line-warn");
-    if (level === "I") return classes.concat("line-info");
-    if (level === "D") return classes.concat("line-debug");
-    if (level === "C") return classes.concat("line-success");
-  }
-  if (/^\s*(error|failed|exception)\b/i.test(normalized)) return classes.concat("line-error");
-  if (/^\s*(warn|warning)\b/i.test(normalized)) return classes.concat("line-warn");
-  if (/^\s*(success|ok)\b/i.test(normalized)) return classes.concat("line-success");
-  if (/^\s*info\b/i.test(normalized)) return classes.concat("line-info");
-  return classes;
-};
-
-const formatCompileLine = (line) => {
-  const normalized = String(line || "");
-  const bracketMatch = normalized.match(/^\[([0-9:.]+)\]\[([A-Z])\](.*)$/);
-  if (bracketMatch) {
-    const [, ts, level, rest] = bracketMatch;
-    const safeLevel = escapeHtml(level);
-    return (
-      `<span class="log-ts">[${escapeHtml(ts)}]</span>` +
-      `<span class="log-rest log-rest-${safeLevel}">${escapeHtml(`[${level}]${rest}`)}</span>`
-    );
-  }
-  return escapeHtml(normalized);
-};
-
-const scrollCompileToBottom = () => {
-  if (!compileAutoScroll.value || !compileConsoleRef.value) return;
-  compileConsoleRef.value.scrollTop = compileConsoleRef.value.scrollHeight;
-};
-
-const scheduleCompileLogScroll = () => {
-  if (compileLogScrollHandle) return;
-  compileLogScrollHandle = requestAnimationFrame(() => {
-    compileLogScrollHandle = null;
-    scrollCompileToBottom();
-  });
-};
-
-const flushCompileLogQueue = () => {
-  compileLogFlushHandle = null;
-  if (!compileLogQueue.length) return;
-  const chunk = compileLogQueue.splice(0, compileLogChunkSize);
-  chunk.forEach((line) => {
-    const text = String(line ?? "");
-    const id = compileLogSeq.value;
-    compileLogSeq.value += 1;
-    compileLogLines.value.push({
-      id,
-      className: compileLineClass(text).join(" "),
-      html: formatCompileLine(text)
-    });
-  });
-  if (compileLogLines.value.length > compileMaxLogLines) {
-    compileLogLines.value.splice(0, compileLogLines.value.length - compileMaxLogLines);
-  }
-  scheduleCompileLogScroll();
-  if (compileLogQueue.length) {
-    compileLogFlushHandle = requestAnimationFrame(flushCompileLogQueue);
-  }
-};
-
-const queueCompileLogLines = (lines) => {
-  if (!Array.isArray(lines) || !lines.length) return;
-  compileLogQueue.push(...lines);
-  if (!compileLogFlushHandle) {
-    compileLogFlushHandle = requestAnimationFrame(flushCompileLogQueue);
-  }
-};
-
-const appendCompileLogLine = (line) => {
-  queueCompileLogLines([line]);
-};
-
-const clearCompileLogQueue = () => {
-  compileLogQueue.length = 0;
-  if (compileLogFlushHandle) {
-    cancelAnimationFrame(compileLogFlushHandle);
-    compileLogFlushHandle = null;
-  }
-  if (compileLogScrollHandle) {
-    cancelAnimationFrame(compileLogScrollHandle);
-    compileLogScrollHandle = null;
-  }
-};
-
-const resetCompileConsole = () => {
-  clearCompileLogQueue();
-  compileLogLines.value = [];
-  compileLogSeq.value = 0;
-};
-
-const stopCompileStatusPoll = () => {
-  if (!compileStatusPollId) return;
-  clearInterval(compileStatusPollId);
-  compileStatusPollId = null;
-};
-
-const stopCompileStream = () => {
-  if (compileTailStartTimer) {
-    clearTimeout(compileTailStartTimer);
-    compileTailStartTimer = null;
-  }
-  if (compileStreamSource) {
-    compileStreamSource.close();
-    compileStreamSource = null;
-  }
-  compileIsReconnecting.value = false;
-};
-
-const stopCompileLongPoll = () => {
-  compileLongPollActive = false;
-};
-
-const resetInstallPlan = () => {
-  installPlanMode.value = "";
-  installPlanOtaHost.value = "";
-  installPlanSerialPort.value = null;
-  installPlanDownloadReady.value = false;
-};
-
-const updateCompileJob = (payload) => {
-  const jobPayload = payload?.job && typeof payload.job === "object" ? payload.job : payload;
-  if (!jobPayload || typeof jobPayload !== "object") return;
-  if (jobPayload.id) compileJobId.value = jobPayload.id;
-  if (jobPayload.state) compileJobState.value = jobPayload.state;
-  if (typeof jobPayload.error_summary === "string") {
-    compileJobError.value = jobPayload.error_summary;
-  }
-};
-
-const fetchCompileJobStatus = async (jobId) => {
-  if (!jobId) return;
-  try {
-    const response = await addonFetch(`api/jobs/${jobId}`);
-    if (!response.ok) return;
-    const payload = await response.json();
-    updateCompileJob(payload);
-  } catch {
-    // ignore status polling errors
-  }
-};
-
-const fetchCompileLogTailWait = async (jobId) => {
-  if (!jobId) return false;
-  try {
-    const response = await addonFetch(
-      `api/jobs/${jobId}/tail-wait?since=${encodeURIComponent(compileTailCheckpoint.value)}&timeout=5&limit=200`
-    );
-    if (!response.ok) return false;
-    const payload = await response.json();
-    const lines = Array.isArray(payload?.lines) ? payload.lines : [];
-    if (lines.length) {
-      queueCompileLogLines(lines);
-    }
-    const nextSeq = Number(payload?.next_seq || 0);
-    compileTailCheckpoint.value = Number.isFinite(nextSeq) ? nextSeq : compileTailCheckpoint.value;
-    updateCompileJob(payload?.job || payload);
-    const jobPayload = payload?.job && typeof payload.job === "object" ? payload.job : payload;
-    return jobPayload?.state && ["queued", "running"].includes(jobPayload.state);
-  } catch {
-    return false;
-  }
-};
-
-const startCompileLongPoll = (jobId) => {
-  stopCompileLongPoll();
-  compileTailCheckpoint.value = 0;
-  if (!jobId) return;
-  compileLongPollActive = true;
-  compileIsReconnecting.value = false;
-  const loop = async () => {
-    while (compileLongPollActive) {
-      const shouldContinue = await fetchCompileLogTailWait(jobId);
-      if (!shouldContinue) break;
-    }
-    compileLongPollActive = false;
-    await fetchCompileJobStatus(jobId);
-  };
-  loop();
-};
-
-const startCompileStatusPoll = (jobId) => {
-  stopCompileStatusPoll();
-  compileStatusPollId = setInterval(() => {
-    fetchCompileJobStatus(jobId);
-  }, 1500);
-};
-
-const startCompileStream = (jobId) => {
-  stopCompileStream();
-  stopCompileLongPoll();
-  if (!jobId) return;
-
-  compileReconnectAttempts.value = 0;
-  compileSseLogSeen.value = false;
-
-  if (preferCompileLongPoll) {
-    startCompileLongPoll(jobId);
-    return;
-  }
-
-  const streamUrl = buildAddonUrl(`api/jobs/${jobId}/stream`);
-  compileStreamSource = new EventSource(streamUrl, { withCredentials: true });
-  compileIsReconnecting.value = false;
-
-  compileStreamSource.addEventListener("log", (event) => {
-    compileSseLogSeen.value = true;
-    stopCompileLongPoll();
-    appendCompileLogLine(event.data || "");
-  });
-
-  compileStreamSource.addEventListener("done", async (event) => {
-    stopCompileStream();
-    try {
-      const payload = JSON.parse(event.data || "{}");
-      updateCompileJob(payload);
-    } catch {
-      // ignore parse errors
-    }
-    await fetchCompileJobStatus(jobId);
-  });
-
-  compileStreamSource.onerror = async () => {
-    stopCompileStream();
-    if (!compileIsActive.value) return;
-    compileReconnectAttempts.value += 1;
-    if (compileReconnectAttempts.value >= 2) {
-      startCompileLongPoll(jobId);
-      return;
-    }
-    if (compileReconnectAttempts.value > compileMaxReconnectAttempts) {
-      compileJobError.value = "Log stream disconnected. Check network/proxy path.";
-      return;
-    }
-    compileIsReconnecting.value = true;
-    await fetchCompileJobStatus(jobId);
-    if (!compileIsActive.value) {
-      compileIsReconnecting.value = false;
-      return;
-    }
-    setTimeout(() => {
-      if (compileIsActive.value) {
-        startCompileStream(jobId);
-      }
-    }, 1500);
-  };
-
-  compileTailStartTimer = setTimeout(() => {
-    if (!compileSseLogSeen.value && compileIsActive.value) {
-      startCompileLongPoll(jobId);
-    }
-  }, 2000);
-};
-
-const closeCompileModal = () => {
-  if (!canCloseCompile.value) return;
-  stopCompileStream();
-  stopCompileLongPoll();
-  stopCompileStatusPoll();
-  compileModalOpen.value = false;
-  compileJobId.value = "";
-  compileJobState.value = "";
-  compileJobError.value = "";
-  resetCompileConsole();
-  localFlashRunning.value = false;
-  resetInstallPlan();
-};
-
-const toggleCompileAutoscroll = () => {
-  compileAutoScroll.value = !compileAutoScroll.value;
-  if (compileAutoScroll.value) {
-    nextTick(scrollCompileToBottom);
-  }
-};
-
-const cancelCompile = async () => {
-  if (!canCancelCompile.value) return;
-  try {
-    const response = await addonFetch(`api/jobs/${compileJobId.value}/cancel`, {
-      method: "POST"
-    });
-    if (!response.ok) {
-      throw new Error(await parseResponseMessage(response, "Cancel failed"));
-    }
-    await fetchCompileJobStatus(compileJobId.value);
-  } catch (error) {
-    compileJobError.value = error instanceof Error ? error.message : "Cancel failed";
-  }
-};
-
-const startInstallJob = async ({ action, device = "", resetConsole = true, introLine = "" }) => {
-  if (!canInstallProject.value || compileIsActive.value || localFlashRunning.value) return;
-
-  compileModalOpen.value = true;
-  compileAutoScroll.value = true;
-  compileJobId.value = "";
-  compileJobState.value = "queued";
-  compileJobError.value = "";
-  compileActiveAction.value = action;
-  compileTailCheckpoint.value = 0;
-  compileReconnectAttempts.value = 0;
-  compileSseLogSeen.value = false;
-  if (resetConsole) {
-    resetCompileConsole();
-  }
-  if (introLine) {
-    appendCompileLogLine(introLine);
-  }
-
-  try {
-    const response = await addonFetch("api/install", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        yaml: projectFilename.value,
-        action,
-        ...(device ? { device } : {})
-      })
-    });
-    if (!response.ok) {
-      throw new Error(await parseResponseMessage(response, `${action.toUpperCase()} start failed`));
-    }
-
-    const payload = await response.json();
-    const responseJob = payload?.job && typeof payload.job === "object" ? payload.job : null;
-    compileJobId.value = responseJob?.id || payload?.job_id || "";
-    compileJobState.value = responseJob?.state || payload?.state || "queued";
-    compileJobError.value = "";
-
-    if (!compileJobId.value) {
-      throw new Error("Missing job id");
-    }
-
-    startCompileStatusPoll(compileJobId.value);
-    startCompileStream(compileJobId.value);
-  } catch (error) {
-    compileJobState.value = "failed";
-    compileJobError.value = error instanceof Error ? error.message : `${action.toUpperCase()} start failed`;
-    appendCompileLogLine(`ERROR ${compileJobError.value}`);
-    resetInstallPlan();
-  }
-};
-
-const startCompile = async () => {
-  resetInstallPlan();
-  await startInstallJob({
-    action: "compile",
-    introLine: `INFO Starting compile for ${projectFilename.value}`
-  });
-};
-
-const prepareSerialInstall = async () => {
-  if (!canInstallProject.value || compileIsActive.value || localFlashRunning.value) return;
-  if (!serialSupported.value) {
-    projectSaveError.value = "Your browser does not support Web Serial.";
-    return;
-  }
-  if (!serialSecure.value) {
-    projectSaveError.value = "Web Serial requires HTTPS or localhost.";
-    return;
-  }
-  if (!serialPolicyAllowed.value) {
-    projectSaveError.value = "Web Serial is blocked by Permissions-Policy.";
-    return;
-  }
-
-  let port = null;
-  try {
-    port = await navigator.serial.requestPort();
-  } catch (error) {
-    if (error?.name === "NotFoundError") {
-      return;
-    }
-    projectSaveError.value = error instanceof Error ? error.message : "Port selection failed";
-    return;
-  }
-
-  installModalOpen.value = false;
-  installPlanMode.value = "serial";
-  installPlanSerialPort.value = port;
-  installPlanDownloadReady.value = false;
-  await startInstallJob({
-    action: "compile",
-    introLine: `INFO Selected serial port. Starting compile for ${projectFilename.value}`
-  });
-};
-
-const runLocalFlashWithSelectedPort = async () => {
-  const port = installPlanSerialPort.value;
-  if (!port) {
-    throw new Error("Serial port is not selected.");
-  }
-
-  localFlashRunning.value = true;
-  compileJobState.value = "running";
-  compileActiveAction.value = "flash";
-  compileJobError.value = "";
-  let transport = null;
-  try {
-    appendCompileLogLine("INFO Downloading factory firmware from add-on...");
-    const response = await addonFetch(
-      `api/firmware?yaml=${encodeURIComponent(projectFilename.value)}&variant=factory`
-    );
-    if (response.status === 404) {
-      throw new Error("Factory firmware not found. Compile project first.");
-    }
-    if (!response.ok) {
-      throw new Error(await parseResponseMessage(response, "Firmware download failed"));
-    }
-    const firmwareData = await response.arrayBuffer();
-    const firmwareBytes = new Uint8Array(firmwareData);
-    if (!firmwareBytes.byteLength) {
-      throw new Error("Downloaded firmware is empty.");
-    }
-
-    appendCompileLogLine("INFO Starting flash...");
-    transport = new Transport(port);
-    if (!transport.device) {
-      transport.device = port;
-    }
-    const terminal = {
-      clean: () => {},
-      write: (data) => appendCompileLogLine(data?.toString?.() || String(data)),
-      writeLine: (data) => appendCompileLogLine(data?.toString?.() || String(data))
-    };
-    const loader = new ESPLoader({
-      transport,
-      baudrate: 921600,
-      terminal
-    });
-    const firmwareString = loader.ui8ToBstr
-      ? loader.ui8ToBstr(firmwareBytes)
-      : String.fromCharCode(...firmwareBytes);
-    await loader.main();
-    await loader.writeFlash({
-      fileArray: [
-        {
-          data: firmwareString,
-          address: 0x0
-        }
-      ],
-      flashSize: "keep",
-      flashMode: "keep",
-      flashFreq: "keep",
-      eraseAll: false,
-      compress: true
-    });
-    compileJobState.value = "success";
-    appendCompileLogLine("INFO Flash completed successfully.");
-  } catch (error) {
-    compileJobState.value = "failed";
-    compileJobError.value = error instanceof Error ? error.message : "Flash failed";
-    appendCompileLogLine(`ERROR ${compileJobError.value}`);
-  } finally {
-    if (transport) {
-      try {
-        await transport.disconnect();
-      } catch {
-        // ignore disconnect errors
-      }
-    }
-    localFlashRunning.value = false;
-    resetInstallPlan();
-  }
-};
-
-const downloadBinary = async () => {
-  projectSaveError.value = "";
-  try {
-    const response = await addonFetch(
-      `api/firmware?yaml=${encodeURIComponent(projectFilename.value)}&variant=factory`
-    );
-    if (response.status === 404) {
-      throw new Error("Factory firmware not found. Compile project first.");
-    }
-    if (!response.ok) {
-      throw new Error(await parseResponseMessage(response, "Firmware download failed"));
-    }
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = projectFilename.value.replace(/\.yaml$/i, ".bin");
-    anchor.click();
-    URL.revokeObjectURL(url);
-    appendCompileLogLine("INFO Firmware download started.");
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Firmware download failed";
-    if (compileModalOpen.value) {
-      compileJobError.value = message;
-      appendCompileLogLine(`ERROR ${message}`);
-    } else {
-      projectSaveError.value = message;
-    }
-  }
-};
-
-const handleInstallSerialPort = async () => {
-  await prepareSerialInstall();
-};
-
-const handleInstallOta = async () => {
-  const device = preferredDeviceHost.value;
-  if (!device) {
-    projectSaveError.value = "No saved device host. Save once after setting a reachable host.";
-    return;
-  }
-  installModalOpen.value = false;
-  installPlanMode.value = "ota";
-  installPlanOtaHost.value = device.trim();
-  installPlanDownloadReady.value = false;
-  await startInstallJob({
-    action: "compile",
-    introLine: `INFO Starting compile before OTA for ${projectFilename.value}`
-  });
-};
-
-const startLogs = async () => {
-  if (!canLogsForCurrentDevice.value) return;
-  const device = preferredDeviceHost.value;
-  if (!device) {
-    projectSaveError.value = "No device host found for logs.";
-    return;
-  }
-  resetInstallPlan();
-  await startInstallJob({
-    action: "logs",
-    device,
-    introLine: `INFO Starting logs for ${projectFilename.value}`
-  });
-};
-
-const handleInstallDownload = async () => {
-  installModalOpen.value = false;
-  installPlanMode.value = "download";
-  installPlanDownloadReady.value = false;
-  await startInstallJob({
-    action: "compile",
-    introLine: `INFO Starting compile before firmware download for ${projectFilename.value}`
-  });
-};
-
-const handleAppCompile = () => {
-  startCompile();
-};
-
-const handleAppInstall = () => {
+const handleAppInstallOption = (event) => {
   if (!canInstallProject.value || compileIsActive.value || localFlashRunning.value || isProjectSaving.value) return;
-  handleProjectSave(true).then((saved) => {
-    if (saved) {
-      installModalOpen.value = true;
-    }
-  });
+  const detail = event?.detail && typeof event.detail === "object" ? event.detail : {};
+  const mode = typeof detail.mode === "string" ? detail.mode : "";
+  if (mode === "ota") {
+    if (!canUseOtaInstall.value) return;
+    handleInstallOta();
+    return;
+  }
+  if (mode === "download") {
+    handleInstallDownload();
+    return;
+  }
+  handleInstallSerialPort();
 };
 
 const handleAppLogs = () => {
   startLogs();
 };
 
-const handleTerminalActionFinished = async (finalState, finishedAction) => {
-  stopCompileStream();
-  stopCompileLongPoll();
-  stopCompileStatusPoll();
-
-  if (finalState !== "success") {
-    if (finishedAction === "compile") {
-      resetInstallPlan();
-    }
-    compileActiveAction.value = "";
-    return;
-  }
-
-  if (finishedAction === "compile") {
-    if (installPlanMode.value === "serial") {
-      appendCompileLogLine("INFO Compile successful. Starting serial flash...");
-      await runLocalFlashWithSelectedPort();
-      return;
-    }
-    if (installPlanMode.value === "ota") {
-      appendCompileLogLine("INFO Compile successful. Starting OTA...");
-      await startInstallJob({
-        action: "ota",
-        device: installPlanOtaHost.value,
-        resetConsole: false,
-        introLine: `INFO Starting ota for ${projectFilename.value}`
-      });
-      return;
-    }
-    if (installPlanMode.value === "download") {
-      installPlanDownloadReady.value = true;
-      appendCompileLogLine("INFO Compile successful. Use Download button to get firmware.");
-      compileActiveAction.value = "";
-      return;
-    }
-  }
-
-  if (finishedAction === "ota" || finishedAction === "flash") {
-    resetInstallPlan();
-  }
-  compileActiveAction.value = "";
+const handleBuilderKeydown = (event) => {
+  if (event.defaultPrevented) return;
+  const key = String(event.key || "").toLowerCase();
+  const saveShortcutPressed = (event.ctrlKey || event.metaKey) && key === "s";
+  if (!saveShortcutPressed || event.altKey) return;
+  event.preventDefault();
+  if (event.repeat) return;
+  handleProjectSave(true);
 };
 
-watch(
-  () => compileJobState.value,
-  async (nextState, prevState) => {
-    if (nextState === prevState) return;
-    if (!["success", "failed", "canceled"].includes(nextState)) return;
-    if (compileIsActive.value) return;
-    const actionFinished = compileActiveAction.value;
-    if (!actionFinished) return;
-    await handleTerminalActionFinished(nextState, actionFinished);
+const handleBuilderSaveRequest = async (event) => {
+  const detail = event?.detail && typeof event.detail === "object" ? event.detail : {};
+  const requestId = typeof detail.requestId === "string" ? detail.requestId : "";
+  if (!requestId) return;
+
+  let success = false;
+  let message = "";
+  try {
+    success = await handleProjectSave(true);
+    if (!success) {
+      message = projectSaveError.value || "Project save failed.";
+    }
+  } catch (error) {
+    success = false;
+    message = error instanceof Error ? error.message : "Project save failed.";
   }
-);
+
+  window.dispatchEvent(
+    new CustomEvent("app:builder-save-response", {
+      detail: { requestId, success, message }
+    })
+  );
+};
 
 watch(
   () => [
     canInstallProject.value,
-    canCompileSavedProject.value,
     canLogsForCurrentDevice.value,
     compileIsActive.value,
     localFlashRunning.value,
     projectFilename.value,
     yamlPreview.value,
-    lastSavedYamlName.value,
-    lastSavedYamlBody.value
+    isProjectSaved.value
   ],
   () => {
     emitCompileState();
@@ -4243,14 +4067,34 @@ watch(
 );
 
 watch(
+  () => config.value,
+  () => {
+    if (isHydrating.value) return;
+    if (!isProjectSaved.value) return;
+    if (!persistedConfigFingerprint.value) return;
+    const currentFingerprint = buildConfigFingerprint(config.value);
+    if (currentFingerprint === persistedConfigFingerprint.value) return;
+    config.value.isSaved = false;
+    saveConfig();
+  },
+  { deep: true }
+);
+
+watch(
   () => projectFilename.value,
   (nextName) => {
     const host = hostFromYamlName(nextName);
+    const currentHost = String(config.value?.ui?.deviceHost || "").trim();
+    applyCachedCurrentDeviceStatus();
+    if (currentHost === host) {
+      refreshCurrentDeviceStatus({ refresh: true });
+      return;
+    }
     config.value.ui = {
       ...(config.value.ui || {}),
       deviceHost: host
     };
-    refreshCurrentDeviceStatus();
+    refreshCurrentDeviceStatus({ refresh: true });
   },
   { immediate: true }
 );
@@ -4285,6 +4129,15 @@ const parseResponseMessage = async (response, fallback) => {
     // ignore non-json responses
   }
   return `${fallback} (HTTP ${response.status})`;
+};
+
+const sanitizeLastEditedAt = (value) => {
+  if (typeof value !== "string") return "";
+  const normalized = value.trim();
+  if (!normalized) return "";
+  const timestamp = Date.parse(normalized);
+  if (!Number.isFinite(timestamp)) return "";
+  return new Date(timestamp).toISOString();
 };
 
 const createDefaultProjectsIndex = () => ({
@@ -4351,7 +4204,12 @@ const normalizeProjectsIndexForSave = (source) => {
         typeof entry.folderId === "string" && validFolderIds.has(entry.folderId)
           ? entry.folderId
           : ADDON_ROOT_FOLDER_ID;
-      placementByName.set(name, { name, folderId });
+      const lastEditedAt = sanitizeLastEditedAt(entry.lastEditedAt);
+      placementByName.set(name, {
+        name,
+        folderId,
+        ...(lastEditedAt ? { lastEditedAt } : {})
+      });
     });
   }
 
@@ -4363,11 +4221,16 @@ const normalizeProjectsIndexForSave = (source) => {
   };
 };
 
-const upsertProjectInRoot = (indexData, projectJsonName) => {
+const upsertProjectInRoot = (indexData, projectJsonName, lastEditedAt) => {
   const normalized = normalizeProjectsIndexForSave(indexData);
   const placement = Array.isArray(normalized.projectPlacement) ? [...normalized.projectPlacement] : [];
   const existingIndex = placement.findIndex((entry) => entry.name === projectJsonName);
-  const rootEntry = { name: projectJsonName, folderId: ADDON_ROOT_FOLDER_ID };
+  const normalizedLastEditedAt = sanitizeLastEditedAt(lastEditedAt);
+  const rootEntry = {
+    name: projectJsonName,
+    folderId: ADDON_ROOT_FOLDER_ID,
+    ...(normalizedLastEditedAt ? { lastEditedAt: normalizedLastEditedAt } : {})
+  };
   if (existingIndex >= 0) {
     placement.splice(existingIndex, 1, rootEntry);
   } else {
@@ -4379,22 +4242,11 @@ const upsertProjectInRoot = (indexData, projectJsonName) => {
 };
 
 const buildProjectConfigPayload = () => {
-  try {
-    return JSON.parse(safeStringify(config.value));
-  } catch {
-    return config.value;
-  }
+  return cloneConfigForPersistence(config.value);
 };
 
-const saveCurrentProjectAndYaml = async (silent = false) => {
+const saveCurrentYamlFile = async () => {
   const yamlName = projectFilename.value || "config.yaml";
-  const projectJsonName = yamlFilenameToProjectFilename(yamlName);
-  const hostToPersist = hostFromYamlName(yamlName);
-  config.value.ui = {
-    ...(config.value.ui || {}),
-    ...(hostToPersist ? { deviceHost: hostToPersist } : {})
-  };
-
   const saveYamlResponse = await addonFetch("save", {
     method: "POST",
     headers: {
@@ -4408,6 +4260,22 @@ const saveCurrentProjectAndYaml = async (silent = false) => {
   if (!saveYamlResponse.ok) {
     throw new Error(await parseResponseMessage(saveYamlResponse, "Failed to save YAML"));
   }
+};
+
+const saveCurrentProjectAndYaml = async (silent = false) => {
+  const yamlName = projectFilename.value || "config.yaml";
+  const projectJsonName = yamlFilenameToProjectFilename(yamlName);
+  const savedAt = new Date().toISOString();
+  const hostToPersist = hostFromYamlName(yamlName);
+  const currentHost = String(config.value?.ui?.deviceHost || "").trim();
+  if (hostToPersist && currentHost !== hostToPersist) {
+    config.value.ui = {
+      ...(config.value.ui || {}),
+      deviceHost: hostToPersist
+    };
+  }
+
+  await saveCurrentYamlFile();
 
   const saveProjectResponse = await addonFetch("projects/save", {
     method: "POST",
@@ -4416,7 +4284,10 @@ const saveCurrentProjectAndYaml = async (silent = false) => {
     },
     body: JSON.stringify({
       name: projectJsonName,
-      data: buildProjectConfigPayload()
+      data: {
+        ...buildProjectConfigPayload(),
+        isSaved: true
+      }
     })
   });
   if (!saveProjectResponse.ok) {
@@ -4438,7 +4309,7 @@ const saveCurrentProjectAndYaml = async (silent = false) => {
     throw new Error(await parseResponseMessage(loadProjectsIndexResponse, "Failed to load projects index"));
   }
 
-  const nextProjectsIndex = upsertProjectInRoot(projectsIndex, projectJsonName);
+  const nextProjectsIndex = upsertProjectInRoot(projectsIndex, projectJsonName, savedAt);
   const saveProjectsIndexResponse = await addonFetch("projects/save", {
     method: "POST",
     headers: {
@@ -4453,8 +4324,9 @@ const saveCurrentProjectAndYaml = async (silent = false) => {
     throw new Error(await parseResponseMessage(saveProjectsIndexResponse, "Failed to update projects.json"));
   }
 
-  lastSavedYamlName.value = yamlName;
-  lastSavedYamlBody.value = yamlPreview.value;
+  persistedConfigFingerprint.value = buildConfigFingerprint(config.value);
+  config.value.isSaved = true;
+  saveConfig();
   await registerCurrentDevice(yamlName);
   await refreshCurrentDeviceStatus();
   emitProjectsUpdated();
@@ -4467,12 +4339,19 @@ const saveCurrentProjectAndYaml = async (silent = false) => {
 const handleProjectSave = async (silent = false) => {
   if (isProjectSaving.value) return false;
 
+  if (isProjectSaved.value) {
+    if (!silent) {
+      projectSaveError.value = "";
+      projectSaveMessage.value = `${projectFilename.value} is already saved.`;
+    }
+    return true;
+  }
+
   isProjectSaving.value = true;
   projectSaveError.value = "";
   if (!silent) {
     projectSaveMessage.value = "";
   }
-  projectMenuOpen.value = false;
 
   try {
     await saveCurrentProjectAndYaml(silent);
@@ -4508,10 +4387,15 @@ const normalizeConfig = (raw) => {
   }
 
   const { logger: legacyLogger, otherCore: legacyOtherCore, ...rawWithoutLegacy } = raw;
+  delete rawWithoutLegacy.isModified;
 
   const merged = {
     ...fallback,
     ...rawWithoutLegacy,
+    isSaved:
+      typeof rawWithoutLegacy.isSaved === "boolean"
+        ? rawWithoutLegacy.isSaved
+        : true,
     device: {
       ...fallback.device,
       ...(raw.device ?? {})
@@ -4537,6 +4421,11 @@ const normalizeConfig = (raw) => {
     }
   };
 
+  if (merged.ui && typeof merged.ui === "object") {
+    delete merged.ui.isModified;
+    delete merged.ui.isSaved;
+  }
+
   if (!merged.system?.logger || Object.keys(merged.system.logger || {}).length === 0) {
     if (legacyLogger && Object.keys(legacyLogger).length) {
       merged.system = {
@@ -4553,7 +4442,7 @@ const normalizeConfig = (raw) => {
 };
 
 const loadConfig = () => {
-  const stored = localStorage.getItem("vebBuilderDeviceConfig");
+  const stored = localStorage.getItem(BUILDER_CONFIG_STORAGE_KEY);
   if (!stored) {
     const storedPreview = localStorage.getItem("vebBuilderSplitPreview");
     if (storedPreview !== null) {
@@ -4568,6 +4457,7 @@ const loadConfig = () => {
       config.value.ui = {};
     }
     config.value.ui.modeLevel = activeModeLevel.value;
+    persistedConfigFingerprint.value = "";
     isHydrating.value = false;
     return;
   }
@@ -4576,7 +4466,10 @@ const loadConfig = () => {
     if (parsed?.schemaVersion === 1) {
       config.value = normalizeConfig(parsed);
       try {
-        localStorage.setItem("vebBuilderDeviceConfig", safeStringify(config.value));
+        localStorage.setItem(
+          BUILDER_CONFIG_STORAGE_KEY,
+          safeStringify(cloneConfigForPersistence(config.value))
+        );
       } catch (error) {
         console.error("Failed to clean stored config", error);
       }
@@ -4596,8 +4489,10 @@ const loadConfig = () => {
       config.value.ui = {};
     }
     config.value.ui.modeLevel = activeModeLevel.value;
+    persistedConfigFingerprint.value = isProjectSaved.value ? buildConfigFingerprint(config.value) : "";
     isHydrating.value = false;
   } catch (error) {
+    persistedConfigFingerprint.value = "";
     isHydrating.value = false;
     // ignore invalid stored data
   }
@@ -4773,7 +4668,6 @@ watch(
 onMounted(async () => {
   loadConfig();
   window.addEventListener("resize", updatePreviewTabLayout);
-  window.addEventListener("click", handleProjectMenuOutside);
   updatePreviewTabLayout();
   try {
     const baseUrl = import.meta.env.BASE_URL || "/";
@@ -4792,24 +4686,19 @@ onMounted(async () => {
     isComponentCatalogLoading.value = false;
   }
   try {
-    const baseUrl = import.meta.env.BASE_URL || "/";
-    const normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-    const response = await fetch(
-      `${normalizedBaseUrl}runtime/esp_assets/mdi_glyph_substitutions.yaml`
-    );
+    const response = await addonFetch("api/assets/mdi-substitutions");
     if (response.ok) {
-      const text = await response.text();
-      const map = {};
-      text.split(/\r?\n/).forEach((line) => {
-        if (!line.startsWith("  ")) return;
-        const match = line.match(/^\s{2}([^:]+):\s+\"([^\"]+)\"/);
-        if (!match) return;
-        map[match[1]] = match[2];
-      });
-      mdiSubstitutions.value = map;
+      const payload = await response.json();
+      mdiSubstitutions.value =
+        payload?.substitutions && typeof payload.substitutions === "object"
+          ? payload.substitutions
+          : {};
+    } else {
+      mdiSubstitutions.value = {};
     }
   } catch (error) {
     console.error("MDI substitutions load failed", error);
+    mdiSubstitutions.value = {};
   }
   try {
     const response = await fetch("https://cdn.jsdelivr.net/npm/@mdi/svg/meta.json");
@@ -4824,42 +4713,7 @@ onMounted(async () => {
     console.error("MDI icon list load failed", error);
     mdiIcons.value = [];
   }
-  try {
-    let loaded = false;
-    try {
-      const apiResponse = await addonFetch("api/assets/refresh?kind=images", {
-        method: "POST"
-      });
-      if (apiResponse.ok) {
-        const apiPayload = await apiResponse.json();
-        const imagesFromApi = apiPayload?.images?.images;
-        if (Array.isArray(imagesFromApi)) {
-          displayImages.value = imagesFromApi;
-          loaded = true;
-        }
-      }
-    } catch {
-      // fallback to static runtime file below
-    }
-
-    if (!loaded) {
-      const baseUrl = import.meta.env.BASE_URL || "/";
-      const normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-      const response = await fetch(`${normalizedBaseUrl}runtime/esp_assets/images.json`);
-      if (!response.ok) {
-        throw new Error(`Display images load failed (${response.status})`);
-      }
-      const contentType = response.headers.get("content-type") || "";
-      if (!contentType.toLowerCase().includes("json")) {
-        throw new Error("Display images source is not JSON");
-      }
-      const payload = await response.json();
-      displayImages.value = Array.isArray(payload?.images) ? payload.images : [];
-    }
-  } catch (error) {
-    console.error("Display images load failed", error);
-    displayImages.value = [];
-  }
+  await refreshAssets(true, true);
   try {
     gpioData.value = await loadGpioData();
   } catch (error) {
@@ -4953,7 +4807,6 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", updatePreviewTabLayout);
-  window.removeEventListener("click", handleProjectMenuOutside);
 });
 
 watch(
@@ -5281,19 +5134,25 @@ onBeforeUnmount(() => {
     clearTimeout(copyResetTimer);
   }
   window.removeEventListener("resize", updatePreviewScrollbar);
+  window.removeEventListener("keydown", handleBuilderKeydown);
+  document.removeEventListener("visibilitychange", handleBuilderVisibilityChange);
   window.removeEventListener("app:builder-export", handleAppExport);
-  window.removeEventListener("app:builder-compile", handleAppCompile);
-  window.removeEventListener("app:builder-install", handleAppInstall);
+  window.removeEventListener("app:install-option", handleAppInstallOption);
   window.removeEventListener("app:builder-logs", handleAppLogs);
-  stopCompileStream();
-  stopCompileLongPoll();
-  stopCompileStatusPoll();
+  window.removeEventListener("app:builder-save-request", handleBuilderSaveRequest);
+  disposeInstallFlow();
   stopDeviceStatusPolling();
   closeProjectsUpdatedChannel();
-  clearCompileLogQueue();
   window.dispatchEvent(
     new CustomEvent("app:builder-compile-state", {
-      detail: { canCompile: false, canInstall: false, canLogs: false, running: false }
+      detail: {
+        canInstall: false,
+        canUseOta: false,
+        canLogs: false,
+        canExport: false,
+        running: false,
+        hasUnsavedChanges: false
+      }
     })
   );
 });

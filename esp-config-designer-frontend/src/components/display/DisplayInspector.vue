@@ -264,8 +264,8 @@
         <div v-if="selectedElement.type === 'text' && (selectedElement.fontSource || 'local') === 'local'">
           <label for="fontLocal">Font</label>
           <select id="fontLocal" :value="selectedElement.fontFile" @change="handleLocalFontChange">
-            <option v-for="font in localFonts" :key="font.file" :value="font.file">
-              {{ font.label }}
+            <option v-for="font in visibleLocalFonts" :key="font.file" :value="font.file" :title="font.file">
+              {{ formatFileOptionLabel(font.file) }}
             </option>
           </select>
         </div>
@@ -305,8 +305,8 @@
             @change="handleImageChange"
           >
             <option value="">Select image</option>
-            <option v-for="image in images" :key="image.file" :value="image.file">
-              {{ image.label }}
+            <option v-for="image in images" :key="image.file" :value="image.file" :title="image.file">
+              {{ formatFileOptionLabel(image.file) }}
             </option>
           </select>
           <div v-if="imageFileRequiredError" class="field-error-text">
@@ -318,23 +318,57 @@
           <label for="imageType">Image type</label>
           <select
             id="imageType"
-            :value="selectedElement.imageType || 'BINARY'"
-            @change="updateText('imageType', $event)"
+            :value="selectedImageType"
+            @change="handleImageTypeChange"
           >
-            <option value="BINARY">BINARY</option>
-            <option value="TRANSPARENT_BINARY">TRANSPARENT_BINARY</option>
+            <option v-for="type in imageTypes" :key="`image-type-${type}`" :value="type">{{ type }}</option>
           </select>
         </div>
 
         <div v-if="selectedElement.type === 'image'">
-          <label for="imageInvert">Invert</label>
+          <label for="imageTransparency">Transparency</label>
           <select
-            id="imageInvert"
-            :value="Boolean(selectedElement.invert).toString()"
-            @change="updateBoolSelect('invert', $event)"
+            id="imageTransparency"
+            :value="selectedElement.imageTransparency || 'opaque'"
+            @change="updateText('imageTransparency', $event)"
+          >
+            <option v-for="value in imageTransparencyOptions" :key="`image-transparency-${value}`" :value="value">
+              {{ value }}
+            </option>
+          </select>
+        </div>
+
+        <div v-if="selectedElement.type === 'image' && imageSupportsInvertAlpha">
+          <label for="imageInvertAlpha">invert_alpha</label>
+          <select
+            id="imageInvertAlpha"
+            :value="Boolean(selectedElement.imageInvertAlpha ?? selectedElement.invert).toString()"
+            @change="updateBoolSelect('imageInvertAlpha', $event)"
           >
             <option value="true">TRUE</option>
             <option value="false">FALSE</option>
+          </select>
+        </div>
+
+        <div v-if="selectedElement.type === 'image' && imageSupportsDither">
+          <label for="imageDither">Dither</label>
+          <select
+            id="imageDither"
+            :value="selectedElement.imageDither || 'NONE'"
+            @change="updateText('imageDither', $event)"
+          >
+            <option v-for="value in ditherValues" :key="`image-dither-${value}`" :value="value">{{ value }}</option>
+          </select>
+        </div>
+
+        <div v-if="selectedElement.type === 'image' && imageSupportsByteOrder">
+          <label for="imageByteOrder">byte_order</label>
+          <select
+            id="imageByteOrder"
+            :value="selectedElement.imageByteOrder || 'big_endian'"
+            @change="updateText('imageByteOrder', $event)"
+          >
+            <option v-for="value in byteOrderValues" :key="`image-byte-order-${value}`" :value="value">{{ value }}</option>
           </select>
         </div>
 
@@ -363,13 +397,24 @@
               @change="handleAnimationFileChange"
             >
               <option value="">Select animation</option>
-              <option v-for="file in animationFiles" :key="file" :value="file">
-                {{ file }}
+              <option v-for="file in animationFiles" :key="file" :value="file" :title="file">
+                {{ formatFileOptionLabel(file) }}
               </option>
             </select>
             <div v-if="animationFileRequiredError" class="field-error-text">
               {{ animationFileErrorText }}
             </div>
+          </div>
+
+          <div>
+            <label for="animationType">Type</label>
+            <select
+              id="animationType"
+              :value="selectedAnimationType"
+              @change="handleAnimationTypeChange"
+            >
+              <option v-for="type in imageTypes" :key="`animation-type-${type}`" :value="type">{{ type }}</option>
+            </select>
           </div>
 
           <div>
@@ -379,9 +424,43 @@
               :value="selectedElement.animationTransparency || 'opaque'"
               @change="updateText('animationTransparency', $event)"
             >
-              <option value="opaque">opaque</option>
-              <option value="chroma_key">chroma_key</option>
-              <option v-if="!isMonochrome" value="alpha_channel">alpha_channel</option>
+              <option v-for="value in animationTransparencyOptions" :key="`animation-transparency-${value}`" :value="value">
+                {{ value }}
+              </option>
+            </select>
+          </div>
+
+          <div v-if="animationSupportsInvertAlpha">
+            <label for="animationInvertAlpha">invert_alpha</label>
+            <select
+              id="animationInvertAlpha"
+              :value="Boolean(selectedElement.animationInvertAlpha).toString()"
+              @change="updateBoolSelect('animationInvertAlpha', $event)"
+            >
+              <option value="true">TRUE</option>
+              <option value="false">FALSE</option>
+            </select>
+          </div>
+
+          <div v-if="animationSupportsDither">
+            <label for="animationDither">Dither</label>
+            <select
+              id="animationDither"
+              :value="selectedElement.animationDither || 'NONE'"
+              @change="updateText('animationDither', $event)"
+            >
+              <option v-for="value in ditherValues" :key="`animation-dither-${value}`" :value="value">{{ value }}</option>
+            </select>
+          </div>
+
+          <div v-if="animationSupportsByteOrder">
+            <label for="animationByteOrder">byte_order</label>
+            <select
+              id="animationByteOrder"
+              :value="selectedElement.animationByteOrder || 'big_endian'"
+              @change="updateText('animationByteOrder', $event)"
+            >
+              <option v-for="value in byteOrderValues" :key="`animation-byte-order-${value}`" :value="value">{{ value }}</option>
             </select>
           </div>
 
@@ -784,8 +863,8 @@
                   @change="handleLegendNameFontFileChange"
                 >
                   <option value="">Select font</option>
-                  <option v-for="font in localFonts" :key="font.file" :value="font.file">
-                    {{ font.label }}
+                  <option v-for="font in visibleLocalFonts" :key="font.file" :value="font.file" :title="font.file">
+                    {{ formatFileOptionLabel(font.file) }}
                   </option>
                 </select>
               </div>
@@ -856,8 +935,8 @@
                   @change="handleLegendValueFontFileChange"
                 >
                   <option value="">Select font</option>
-                  <option v-for="font in localFonts" :key="font.file" :value="font.file">
-                    {{ font.label }}
+                  <option v-for="font in visibleLocalFonts" :key="font.file" :value="font.file" :title="font.file">
+                    {{ formatFileOptionLabel(font.file) }}
                   </option>
                 </select>
               </div>
@@ -1059,10 +1138,21 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import IconPicker from "../IconPicker.vue";
 import ColorPickerModal from "../ColorPickerModal.vue";
 import { colorToCss } from "../../utils/displayColor";
+import {
+  DISPLAY_DITHER_VALUES,
+  DISPLAY_IMAGE_TYPES,
+  DISPLAY_BYTE_ORDER_VALUES,
+  allowedTransparencyForType,
+  normalizeAnimationElementEncoding,
+  normalizeImageElementEncoding,
+  supportsByteOrder,
+  supportsDither,
+  supportsInvertAlpha
+} from "../../utils/displayImageEncoding";
 
 const props = defineProps({
   selectedElement: {
@@ -1117,12 +1207,30 @@ const props = defineProps({
 
 const emit = defineEmits(["update"]);
 
+const PROTECTED_LOCAL_FONT_FILE = "materialdesignicons-webfont.ttf";
+
 const iconPickerOpen = ref(false);
 const colorPickerOpen = ref(false);
 const traceColorPickerOpen = ref(false);
 const activeTraceIndex = ref(null);
 
 const rotationOptions = [0, 90, 180, 270];
+const visibleLocalFonts = computed(() =>
+  (props.localFonts || []).filter(
+    (font) => String(font?.file || "").trim().toLowerCase() !== PROTECTED_LOCAL_FONT_FILE
+  )
+);
+
+const findVisibleLocalFont = (file) => visibleLocalFonts.value.find((item) => item.file === file);
+
+const firstVisibleLocalFont = () => visibleLocalFonts.value[0];
+
+const formatFileOptionLabel = (value, maxLength = 28) => {
+  const text = String(value || "");
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, maxLength - 3)}...`;
+};
+
 const showRotation = computed(() =>
   ["shape"].includes(props.selectedElement?.type)
 );
@@ -1174,7 +1282,48 @@ const updateBool = (key, event) => {
 };
 
 const updateBoolSelect = (key, event) => {
-  emit("update", { [key]: event.target.value === "true" });
+  const next = event.target.value === "true";
+  if (key === "imageInvertAlpha") {
+    emit("update", { imageInvertAlpha: next, invert: next });
+    return;
+  }
+  emit("update", { [key]: next });
+};
+
+const imageTypes = DISPLAY_IMAGE_TYPES;
+const ditherValues = DISPLAY_DITHER_VALUES;
+const byteOrderValues = DISPLAY_BYTE_ORDER_VALUES;
+
+const selectedImageType = computed(() => normalizeImageElementEncoding(props.selectedElement || {}).imageType);
+const selectedAnimationType = computed(() =>
+  normalizeAnimationElementEncoding(props.selectedElement || {}).animationType
+);
+
+const imageTransparencyOptions = computed(() => allowedTransparencyForType(selectedImageType.value));
+const animationTransparencyOptions = computed(() => allowedTransparencyForType(selectedAnimationType.value));
+
+const imageSupportsInvertAlpha = computed(() => supportsInvertAlpha(selectedImageType.value));
+const imageSupportsDither = computed(() => supportsDither(selectedImageType.value));
+const imageSupportsByteOrder = computed(() => supportsByteOrder(selectedImageType.value));
+
+const animationSupportsInvertAlpha = computed(() => supportsInvertAlpha(selectedAnimationType.value));
+const animationSupportsDither = computed(() => supportsDither(selectedAnimationType.value));
+const animationSupportsByteOrder = computed(() => supportsByteOrder(selectedAnimationType.value));
+
+const handleImageTypeChange = (event) => {
+  const patch = normalizeImageElementEncoding({
+    ...(props.selectedElement || {}),
+    imageType: event.target.value
+  });
+  emit("update", patch);
+};
+
+const handleAnimationTypeChange = (event) => {
+  const patch = normalizeAnimationElementEncoding({
+    ...(props.selectedElement || {}),
+    animationType: event.target.value
+  });
+  emit("update", patch);
 };
 
 const addTrace = () => {
@@ -1445,7 +1594,7 @@ const handleFontSourceChange = (event) => {
     return;
   }
 
-  const local = props.localFonts[0];
+  const local = firstVisibleLocalFont();
   const styleInfo = deriveLocalStyle(local?.label, local?.file);
   updatePatch({
     fontSource: "local",
@@ -1460,7 +1609,7 @@ const handleFontSourceChange = (event) => {
 
 const handleLocalFontChange = (event) => {
   const file = event.target.value;
-  const font = props.localFonts.find((item) => item.file === file);
+  const font = findVisibleLocalFont(file);
   const styleInfo = deriveLocalStyle(font?.label, font?.file);
   updatePatch({
     fontSource: "local",
@@ -1522,7 +1671,7 @@ const handleLegendNameFontSourceChange = (event) => {
     });
     return;
   }
-  const local = props.localFonts[0];
+  const local = firstVisibleLocalFont();
   const styleInfo = deriveLocalStyle(local?.label, local?.file);
   updatePatch({
     legendNameFontSource: "local",
@@ -1553,7 +1702,7 @@ const handleLegendValueFontSourceChange = (event) => {
     });
     return;
   }
-  const local = props.localFonts[0];
+  const local = firstVisibleLocalFont();
   const styleInfo = deriveLocalStyle(local?.label, local?.file);
   updatePatch({
     legendValueFontSource: "local",
@@ -1568,7 +1717,7 @@ const handleLegendValueFontSourceChange = (event) => {
 
 const handleLegendNameFontFileChange = (event) => {
   const file = event.target.value;
-  const font = props.localFonts.find((item) => item.file === file);
+  const font = findVisibleLocalFont(file);
   const styleInfo = deriveLocalStyle(font?.label, font?.file);
   updatePatch({
     legendNameFontSource: "local",
@@ -1583,7 +1732,7 @@ const handleLegendNameFontFileChange = (event) => {
 
 const handleLegendValueFontFileChange = (event) => {
   const file = event.target.value;
-  const font = props.localFonts.find((item) => item.file === file);
+  const font = findVisibleLocalFont(file);
   const styleInfo = deriveLocalStyle(font?.label, font?.file);
   updatePatch({
     legendValueFontSource: "local",
@@ -1686,7 +1835,7 @@ const handleAnimationFileChange = (event) => {
 };
 
 const getDefaultLegendFont = (size) => {
-  const local = props.localFonts[0];
+  const local = firstVisibleLocalFont();
   if (local) {
     const styleInfo = deriveLocalStyle(local?.label, local?.file);
     return {

@@ -2,7 +2,7 @@
   "name": "ESPConfig Designer",
   "slug": "esp-config-designer",
   "description": "Ingress-only ESPHome config designer. Build YAML, compile, and flash devices with live logs.",
-  "version": "1.2.3",
+  "version": "1.0.12",
   "build": "Dockerfile",
   "arch": ["amd64", "aarch64"],
   "startup": "services",
@@ -15,7 +15,7 @@
   "logo": "logo.png",
   "icon": "logo.png",
   "panel_icon": "mdi:home-automation",
-  "panel_title": "ESP Config Designer",
+  "panel_title": "ESPConfig Designer",
   "map": ["config:rw"],
   "options": {
     "use_esphome_shared_path": false
