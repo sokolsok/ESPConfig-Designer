@@ -1,0 +1,36 @@
+{
+  "id": "hlk_fm22x.enroll",
+  "fields": [
+    {
+      "key": "id",
+      "label": "HLK-FM22x",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "hlk_fm22x_id",
+      "domain": "hlk_fm22x",
+      "lvl": "normal"
+    },
+    {
+      "key": "name",
+      "label": "Name",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "John"
+    },
+    {
+      "key": "direction",
+      "label": "Direction",
+      "type": "select",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "IN",
+        "OUT",
+        "BOTH"
+      ]
+    }
+  ]
+}

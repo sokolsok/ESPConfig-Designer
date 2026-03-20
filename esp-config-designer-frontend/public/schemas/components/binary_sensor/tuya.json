@@ -1,0 +1,16 @@
+{
+  "id": "binary_sensor.tuya",
+  "domain": "binary_sensor",
+  "platform": "tuya",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/binary_sensor/tuya/",
+  "extends": "base_binary_sensor.json",
+  "fields": [
+    {
+      "key": "sensor_datapoint",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    }
+  ]
+}

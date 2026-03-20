@@ -1,0 +1,13 @@
+{
+  "id": "lambda",
+  "fields": [
+    {
+      "key": "value",
+      "label": "Lambda",
+      "placeholder": "return id(sensor).state > 0;",
+      "type": "lambda",
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

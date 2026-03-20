@@ -1,0 +1,14 @@
+{
+  "id": "at581x.reset",
+  "fields": [
+    {
+      "key": "id",
+      "label": "At581x",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "at581x_id",
+      "domain": "at581x",
+      "lvl": "normal"
+    }
+  ]
+}

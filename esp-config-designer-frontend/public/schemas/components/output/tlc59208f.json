@@ -1,0 +1,43 @@
+{
+  "id": "output.tlc59208f",
+  "domain": "output",
+  "platform": "tlc59208f",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/output/tlc59208f/",
+  "extends": "base_output_float.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "tlc59208f",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_tlc59208f.json"
+    },
+    {
+      "key": "tlc59208f_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "tlc59208f",
+      "allowSelfReference": true,
+      "default": "tlc59208f_hub"
+    },
+    {
+      "key": "channel",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    }
+  ]
+}

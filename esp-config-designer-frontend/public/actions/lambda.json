@@ -1,0 +1,13 @@
+{
+  "id": "lambda",
+  "fields": [
+    {
+      "key": "value",
+      "label": "Lambda",
+      "type": "lambda",
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "return;"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "homeassistant.event",
+  "fields": [
+    {
+      "key": "event",
+      "label": "Event",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "esphome.device_ping"
+    },
+    {
+      "key": "data",
+      "label": "Data",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "root[\"device\"] = App.get_name().c_str();"
+    },
+    {
+      "key": "data_template",
+      "label": "Data template",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "root[\"device\"] = App.get_name().c_str();"
+    },
+    {
+      "key": "variables",
+      "label": "Variables",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "root[\"room\"] = \"kitchen\";"
+    }
+  ]
+}

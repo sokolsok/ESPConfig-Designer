@@ -1,0 +1,91 @@
+{
+  "id": "sensor.hydreon_rgxx",
+  "domain": "sensor",
+  "platform": "hydreon_rgxx",
+  "requires": [
+    "uart"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/hydreon_rgxx/",
+  "fields": [
+    {
+      "key": "model",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "disable_led",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor"
+    },
+    {
+      "key": "moisture",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "temperature",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "resolution",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "acc",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "event_acc",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "total_acc",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "r_int",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

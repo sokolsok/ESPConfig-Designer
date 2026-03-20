@@ -145,6 +145,7 @@
       "type": "id",
       "required": false,
       "lvl": "normal",
+      "default": "uart_id",
       "dependsOn": {
         "key": "enabled",
         "value": true

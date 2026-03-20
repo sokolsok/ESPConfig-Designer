@@ -1,0 +1,219 @@
+{
+  "id": "sensor.havells_solar",
+  "domain": "sensor",
+  "platform": "havells_solar",
+  "requires": [
+    "uart"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/havells_solar/",
+  "fields": [
+    {
+      "key": "phase_a",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "current",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "voltage",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "phase_b",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "phase_c",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "pv1",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "current",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "voltage",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "active_power",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "voltage_sampled_by_secondary_cpu",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "insulation_of_p_to_ground",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "pv2",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "active_power",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "reactive_power",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "frequency",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "energy_production_day",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "total_energy_production",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "total_generation_time",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "today_generation_time",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "inverter_module_temp",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "inverter_inner_temp",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "inverter_bus_voltage",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "insulation_of_pv_n_to_ground",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "gfci_value",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "dci_of_r",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "dci_of_s",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "dci_of_t",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "1"
+    }
+  ]
+}

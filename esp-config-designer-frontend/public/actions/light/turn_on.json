@@ -1,0 +1,152 @@
+{
+  "id": "light.turn_on",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Light",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "light_id",
+      "domain": "light",
+      "lvl": "normal"
+    },
+    {
+      "key": "transition_length",
+      "label": "Transition length",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "500ms",
+      "lambdaPlaceholder": "return 500;"
+    },
+    {
+      "key": "flash_length",
+      "label": "Flash length",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1s",
+      "lambdaPlaceholder": "return 1000;"
+    },
+    {
+      "key": "effect",
+      "label": "Effect",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "Rainbow"
+    },
+    {
+      "key": "color_mode",
+      "label": "Color mode",
+      "type": "select",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "ON_OFF",
+        "BRIGHTNESS",
+        "WHITE",
+        "COLOR_TEMPERATURE",
+        "COLD_WARM_WHITE",
+        "RGB",
+        "RGB_WHITE",
+        "RGB_COLOR_TEMPERATURE",
+        "RGB_COLD_WARM_WHITE"
+      ]
+    },
+    {
+      "key": "brightness",
+      "label": "Brightness",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "75%",
+      "lambdaPlaceholder": "return 0.75;"
+    },
+    {
+      "key": "color_brightness",
+      "label": "Color brightness",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "60%",
+      "lambdaPlaceholder": "return 0.6;"
+    },
+    {
+      "key": "red",
+      "label": "Red",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "100%",
+      "lambdaPlaceholder": "return 1.0;"
+    },
+    {
+      "key": "green",
+      "label": "Green",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "50%",
+      "lambdaPlaceholder": "return 0.5;"
+    },
+    {
+      "key": "blue",
+      "label": "Blue",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "25%",
+      "lambdaPlaceholder": "return 0.25;"
+    },
+    {
+      "key": "white",
+      "label": "White",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "80%",
+      "lambdaPlaceholder": "return 0.8;"
+    },
+    {
+      "key": "color_temperature",
+      "label": "Color temperature",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "350 mired",
+      "lambdaPlaceholder": "return 350;"
+    },
+    {
+      "key": "cold_white",
+      "label": "Cold white",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "90%",
+      "lambdaPlaceholder": "return 0.9;"
+    },
+    {
+      "key": "warm_white",
+      "label": "Warm white",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "40%",
+      "lambdaPlaceholder": "return 0.4;"
+    }
+  ]
+}

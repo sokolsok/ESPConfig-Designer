@@ -1,0 +1,69 @@
+{
+  "id": "base.button",
+  "domain": "button",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Button Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "id",
+      "placeholder": "button_id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "icon",
+      "placeholder": "mdi:gesture-tap-button",
+      "type": "icon",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "internal",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "disabled_by_default",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "entity_category",
+      "placeholder": "config, diagnostic",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "device_class",
+      "placeholder": "identify, restart, update",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "on_press",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "helpUrl": "https://esphome.io/components/button/",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

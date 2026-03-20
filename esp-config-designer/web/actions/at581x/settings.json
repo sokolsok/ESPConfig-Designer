@@ -1,0 +1,64 @@
+{
+  "id": "at581x.settings",
+  "fields": [
+    {
+      "key": "id",
+      "label": "AT581x",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "at581x_id",
+      "domain": "at581x",
+      "lvl": "normal"
+    },
+    {
+      "key": "frequency",
+      "label": "Frequency",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "5800",
+      "lambdaPlaceholder": "return 5800;"
+    },
+    {
+      "key": "sensing_distance",
+      "label": "Sensing distance",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "5",
+      "lambdaPlaceholder": "return 5;"
+    },
+    {
+      "key": "poweron_selfcheck_time",
+      "label": "Self-check time",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "2s",
+      "lambdaPlaceholder": "return 2000;"
+    },
+    {
+      "key": "protect_time",
+      "label": "Protect time",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "500ms",
+      "lambdaPlaceholder": "return 500;"
+    },
+    {
+      "key": "stage_gain",
+      "label": "Stage gain",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "3",
+      "lambdaPlaceholder": "return 3;"
+    }
+  ]
+}

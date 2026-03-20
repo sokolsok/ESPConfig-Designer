@@ -1,0 +1,66 @@
+{
+  "id": "text_sensor.nextion",
+  "domain": "text_sensor",
+  "platform": "nextion",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/text_sensor/nextion/",
+  "extends": "base_text_sensor.json",
+  "fields": [
+    {
+      "key": "nextion_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "display",
+      "placeholder": "nextion_display_id"
+    },
+    {
+      "key": "component_name",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "page0.text0",
+      "note": "Set only one of component_name or variable_name"
+    },
+    {
+      "key": "variable_name",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "my_text_var"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "4s"
+    },
+    {
+      "key": "background_color",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "BLACK"
+    },
+    {
+      "key": "foreground_color",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "WHITE"
+    },
+    {
+      "key": "font_id",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "visible",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

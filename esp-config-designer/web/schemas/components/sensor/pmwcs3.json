@@ -1,0 +1,57 @@
+{
+  "id": "sensor.pmwcs3",
+  "domain": "sensor",
+  "platform": "pmwcs3",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/pmwcs3/",
+  "fields": [
+    {
+      "key": "e25",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "ec",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "temperature",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "vwc",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x63"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

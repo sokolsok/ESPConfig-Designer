@@ -1,0 +1,18 @@
+{
+  "id": "switch.ble_client",
+  "domain": "switch",
+  "platform": "ble_client",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/switch/ble_client/",
+  "extends": "base_switch.json",
+  "fields": [
+    {
+      "key": "ble_client_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "ble_client",
+      "placeholder": "ble_client_id"
+    }
+  ]
+}

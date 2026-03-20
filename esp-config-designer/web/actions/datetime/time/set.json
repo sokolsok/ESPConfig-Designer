@@ -1,0 +1,23 @@
+{
+  "id": "datetime.time.set",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Time",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "time_id",
+      "domain": "time",
+      "lvl": "normal"
+    },
+    {
+      "key": "time",
+      "label": "Time",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "14:30:00"
+    }
+  ]
+}

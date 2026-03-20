@@ -1,0 +1,66 @@
+{
+  "id": "display.ssd1351",
+  "domain": "display",
+  "platform": "ssd1351",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/display/ssd1351/",
+  "extends": "base_display.json",
+  "display_builder": true,
+  "displayType": "color",
+  "model_meta": {
+    "SSD1351 128x128": {
+      "w": 128,
+      "h": 128
+    },
+    "SSD1351 128x96": {
+      "w": 128,
+      "h": 96
+    }
+  },
+  "fields": [
+    {
+      "key": "model",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "SSD1351 128x128",
+      "options": [
+        "SSD1351 128x128",
+        "SSD1351 128x96"
+      ]
+    },
+    {
+      "key": "dc_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "reset_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "pages",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "5s"
+    }
+  ]
+}

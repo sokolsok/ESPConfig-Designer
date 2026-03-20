@@ -1,0 +1,46 @@
+{
+  "id": "binary_sensor.esp32_touch",
+  "domain": "binary_sensor",
+  "platform": "esp32_touch",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/binary_sensor/esp32_touch/",
+  "extends": "base_binary_sensor.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "esp32_touch",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_esp32_touch.json",
+      "helpUrl": "https://esphome.io/components/binary_sensor/esp32_touch/"
+    },
+    {
+      "key": "pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "helpUrl": "https://esphome.io/guides/configuration-types#pin-schema"
+    },
+    {
+      "key": "threshold",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "wakeup_threshold",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "id": "sensor.ccs811",
+  "domain": "sensor",
+  "platform": "ccs811",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/ccs811/",
+  "fields": [
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "version",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x5A"
+    },
+    {
+      "key": "baseline",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "temperature",
+      "type": "id",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "external_temperature_id"
+    },
+    {
+      "key": "humidity",
+      "type": "id",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "external_humidity_id"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "eco2",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "tvoc",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    }
+  ]
+}

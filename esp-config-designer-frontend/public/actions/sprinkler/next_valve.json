@@ -1,0 +1,14 @@
+{
+  "id": "sprinkler.next_valve",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Sprinkler",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "sprinkler_id",
+      "domain": "sprinkler",
+      "lvl": "normal"
+    }
+  ]
+}

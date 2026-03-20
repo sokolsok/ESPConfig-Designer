@@ -1,0 +1,77 @@
+{
+  "id": "valve.template",
+  "domain": "valve",
+  "platform": "template",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/valve/template/",
+  "extends": "base_valve.json",
+  "fields": [
+    {
+      "key": "lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "open_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "close_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "stop_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "optimistic",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "restore_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "NO_RESTORE",
+      "options": [
+        "NO_RESTORE",
+        "RESTORE",
+        "RESTORE_AND_CALL"
+      ]
+    },
+    {
+      "key": "assumed_state",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "has_position",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "position_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "has_position",
+        "value": true
+      }
+    }
+  ]
+}

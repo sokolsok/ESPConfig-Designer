@@ -1,0 +1,19 @@
+{
+  "id": "sensor.ld2420",
+  "domain": "sensor",
+  "platform": "ld2420",
+  "requires": [
+    "uart"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/ld2420/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    }
+  ]
+}

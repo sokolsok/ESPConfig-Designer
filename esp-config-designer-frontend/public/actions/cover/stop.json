@@ -1,0 +1,14 @@
+{
+  "id": "cover.stop",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Cover",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "cover_id",
+      "domain": "cover",
+      "lvl": "normal"
+    }
+  ]
+}

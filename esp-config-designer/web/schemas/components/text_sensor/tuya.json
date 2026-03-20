@@ -1,0 +1,16 @@
+{
+  "id": "text_sensor.tuya",
+  "domain": "text_sensor",
+  "platform": "tuya",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/text_sensor/tuya/",
+  "extends": "base_text_sensor.json",
+  "fields": [
+    {
+      "key": "sensor_datapoint",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    }
+  ]
+}

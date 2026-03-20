@@ -1,0 +1,24 @@
+{
+  "id": "output.set_level",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Output",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "output_id",
+      "domain": "output",
+      "lvl": "normal"
+    },
+    {
+      "key": "level",
+      "label": "Level",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "75%",
+      "lambdaPlaceholder": "return 0.75;"
+    }
+  ]
+}

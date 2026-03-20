@@ -1,0 +1,36 @@
+{
+  "id": "dfplayer",
+  "domain": "dfplayer",
+  "requires": [
+    "uart"
+  ],
+  "helpUrl": "https://esphome.io/components/dfplayer/",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal",
+      "idDomain": "dfplayer"
+    },
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "uart"
+    },
+    {
+      "key": "on_finished_playback",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

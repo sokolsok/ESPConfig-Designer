@@ -1,0 +1,85 @@
+{
+  "id": "cover.template",
+  "domain": "cover",
+  "platform": "template",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/cover/template/",
+  "extends": "base_cover.json",
+  "fields": [
+    {
+      "key": "lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "open_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "close_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "stop_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "toggle_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "optimistic",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "assumed_state",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "has_position",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "tilt_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "tilt_lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "position_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

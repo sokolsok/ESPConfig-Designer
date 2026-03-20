@@ -15,26 +15,10 @@
       "helpUrl": "https://esphome.io/components/spi/"
     },
     {
-      "key": "type",
-      "type": "select",
-      "required": false,
-      "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
-      "options": [
-        "single",
-        "quad",
-        "octal"
-      ],
-      "default": "single"
-    },
-    {
       "key": "mosi_pin",
       "type": "gpio",
-      "required": true,
-      "lvl": "normal",
+      "required": false,
+      "lvl": "simple",
       "dependsOn": {
         "key": "enabled",
         "value": true
@@ -44,8 +28,8 @@
     {
       "key": "miso_pin",
       "type": "gpio",
-      "required": true,
-      "lvl": "normal",
+      "required": false,
+      "lvl": "simple",
       "dependsOn": {
         "key": "enabled",
         "value": true
@@ -56,7 +40,7 @@
       "key": "clk_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "normal",
+      "lvl": "simple",
       "dependsOn": {
         "key": "enabled",
         "value": true
@@ -64,17 +48,14 @@
       "placeholder": "GPIOXX"
     },
     {
-      "key": "data_pins",
-      "type": "list",
+      "key": "id",
+      "type": "id",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
+      "default": "spi_id",
       "dependsOn": {
         "key": "enabled",
         "value": true
-      },
-      "item": {
-        "type": "gpio",
-        "placeholder": "GPIOXX"
       }
     },
     {
@@ -97,13 +78,33 @@
       "default": "any"
     },
     {
-      "key": "id",
-      "type": "id",
+      "key": "type",
+      "type": "select",
       "required": false,
       "lvl": "normal",
       "dependsOn": {
         "key": "enabled",
         "value": true
+      },
+      "options": [
+        "single",
+        "quad",
+        "octal"
+      ],
+      "default": "single"
+    },
+    {
+      "key": "data_pins",
+      "type": "list",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "item": {
+        "type": "gpio",
+        "placeholder": "GPIOXX"
       }
     }
   ]

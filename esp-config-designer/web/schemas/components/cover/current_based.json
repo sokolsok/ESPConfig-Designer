@@ -1,0 +1,117 @@
+{
+  "id": "cover.current_based",
+  "domain": "cover",
+  "platform": "current_based",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/cover/current_based/",
+  "extends": "base_cover.json",
+  "fields": [
+    {
+      "key": "open_sensor",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "sensor"
+    },
+    {
+      "key": "open_action",
+      "type": "yaml",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "open_duration",
+      "type": "duration",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "open_moving_current_threshold",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "open_obstacle_current_threshold",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "close_sensor",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "sensor"
+    },
+    {
+      "key": "close_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "close_duration",
+      "type": "duration",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "close_moving_current_threshold",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "close_obstacle_current_threshold",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "stop_action",
+      "type": "yaml",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "max_duration",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "start_sensing_delay",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "default": "500ms"
+    },
+    {
+      "key": "obstacle_rollback",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "default": 10
+    },
+    {
+      "key": "malfunction_detection",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": true
+    },
+    {
+      "key": "malfunction_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

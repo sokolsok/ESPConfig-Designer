@@ -1,0 +1,37 @@
+{
+  "id": "number.operation",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Number",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "number_id",
+      "domain": "number",
+      "lvl": "normal"
+    },
+    {
+      "key": "operation",
+      "label": "Operation",
+      "type": "select",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "options": [
+        "INCREMENT",
+        "DECREMENT",
+        "TO_MIN",
+        "TO_MAX"
+      ]
+    },
+    {
+      "key": "cycle",
+      "label": "Cycle",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

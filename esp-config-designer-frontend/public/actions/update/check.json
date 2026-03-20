@@ -1,0 +1,23 @@
+{
+  "id": "update.check",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Update",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "update_id",
+      "domain": "update",
+      "lvl": "normal"
+    },
+    {
+      "key": "force",
+      "label": "Force",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

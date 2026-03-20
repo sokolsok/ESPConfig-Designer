@@ -1,0 +1,117 @@
+{
+  "id": "sensor.as5600",
+  "domain": "sensor",
+  "platform": "as5600",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/as5600/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "dir_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "direction",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "clockwise",
+        "counterclockwise"
+      ]
+    },
+    {
+      "key": "start_position",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "end_position",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "range",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "hysteresis",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "none",
+        "lsb1",
+        "lsb2",
+        "lsb3"
+      ]
+    },
+    {
+      "key": "power_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "nominal",
+        "low1",
+        "low2",
+        "low3"
+      ]
+    },
+    {
+      "key": "watchdog",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "slow_filter",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "16x",
+        "8x",
+        "4x",
+        "2x"
+      ]
+    },
+    {
+      "key": "fast_filter",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "none",
+        "lsb6",
+        "lsb7",
+        "lsb9",
+        "lsb18",
+        "lsb21",
+        "lsb24",
+        "lsb10"
+      ]
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple"
+    }
+  ]
+}

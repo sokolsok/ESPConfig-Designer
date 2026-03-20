@@ -1,0 +1,100 @@
+{
+  "id": "http_request.post",
+  "fields": [
+    {
+      "key": "id",
+      "label": "HTTP request component",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "http_request_id",
+      "domain": "http_request",
+      "lvl": "normal"
+    },
+    {
+      "key": "url",
+      "label": "URL",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "https://example.com/api"
+    },
+    {
+      "key": "headers",
+      "label": "Headers",
+      "type": "yaml",
+      "templatable": false,
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "Content-Type: application/json"
+    },
+    {
+      "key": "body",
+      "label": "Body",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "{\"online\":true}"
+    },
+    {
+      "key": "json",
+      "label": "JSON builder",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "root[\"online\"] = true;"
+    },
+    {
+      "key": "capture_response",
+      "label": "Capture response",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "collect_headers",
+      "label": "Collect headers",
+      "type": "yaml",
+      "templatable": false,
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "- Content-Type\n- ETag"
+    },
+    {
+      "key": "max_response_buffer_size",
+      "label": "Max response buffer",
+      "type": "number",
+      "templatable": false,
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "1024"
+    },
+    {
+      "key": "on_response",
+      "label": "On response",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      }
+    },
+    {
+      "key": "on_error",
+      "label": "On error",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      }
+    }
+  ]
+}

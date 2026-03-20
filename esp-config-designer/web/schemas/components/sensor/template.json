@@ -1,0 +1,30 @@
+{
+  "id": "sensor.template",
+  "domain": "sensor",
+  "platform": "template",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/template/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

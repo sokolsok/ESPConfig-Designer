@@ -1,0 +1,18 @@
+{
+  "id": "switch.output",
+  "domain": "switch",
+  "platform": "output",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/switch/output/",
+  "extends": "base_switch.json",
+  "fields": [
+    {
+      "key": "output",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output",
+      "placeholder": "generic_out"
+    }
+  ]
+}

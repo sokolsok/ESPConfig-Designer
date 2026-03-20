@@ -1,0 +1,91 @@
+{
+  "id": "base.valve",
+  "domain": "valve",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal",
+      "idDomain": "valve"
+    },
+    {
+      "key": "device_class",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "water"
+    },
+    {
+      "key": "icon",
+      "type": "icon",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "internal",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "disabled_by_default",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "entity_category",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "position_state_topic",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "position_command_topic",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "on_open",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_closed",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

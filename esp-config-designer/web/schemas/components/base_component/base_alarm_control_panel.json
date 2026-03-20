@@ -1,0 +1,166 @@
+{
+  "id": "base.alarm_control_panel",
+  "domain": "alarm_control_panel",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Alarm Panel",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "id",
+      "placeholder": "alarm_panel_id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "on_state",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "helpUrl": "https://esphome.io/components/alarm_control_panel/",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_arming",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "helpUrl": "https://esphome.io/components/alarm_control_panel/",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_pending",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "helpUrl": "https://esphome.io/components/alarm_control_panel/",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_armed_home",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "helpUrl": "https://esphome.io/components/alarm_control_panel/",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_armed_night",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "helpUrl": "https://esphome.io/components/alarm_control_panel/",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_armed_away",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "helpUrl": "https://esphome.io/components/alarm_control_panel/",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_triggered",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "helpUrl": "https://esphome.io/components/alarm_control_panel/",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_disarmed",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "helpUrl": "https://esphome.io/components/alarm_control_panel/",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_cleared",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "helpUrl": "https://esphome.io/components/alarm_control_panel/",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_ready",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "helpUrl": "https://esphome.io/components/alarm_control_panel/",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_chime",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "helpUrl": "https://esphome.io/components/alarm_control_panel/",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

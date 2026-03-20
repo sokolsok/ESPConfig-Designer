@@ -1,0 +1,43 @@
+{
+  "id": "display.tm1638",
+  "domain": "display",
+  "platform": "tm1638",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/display/tm1638/",
+  "extends": "base_display.json",
+  "display_builder": false,
+  "fields": [
+    {
+      "key": "stb_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "clk_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "dio_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "intensity",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 7
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "1s"
+    }
+  ]
+}

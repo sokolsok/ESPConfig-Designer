@@ -1,0 +1,48 @@
+{
+  "id": "sensor.ufire_ise",
+  "domain": "sensor",
+  "platform": "ufire_ise",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/ufire_ise/",
+  "fields": [
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x3f"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "temperature_sensor",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor"
+    },
+    {
+      "key": "ph",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "temperature",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    }
+  ]
+}

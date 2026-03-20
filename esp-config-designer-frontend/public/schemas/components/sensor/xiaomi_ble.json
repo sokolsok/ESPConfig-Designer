@@ -1,0 +1,108 @@
+{
+  "id": "sensor.xiaomi_ble",
+  "domain": "sensor",
+  "platform": "xiaomi_ble",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/xiaomi_ble/",
+  "embedded": [
+    {
+      "key": "ble_tracker",
+      "domain": "esp32_ble_tracker",
+      "emitAs": "map",
+      "singleton": true,
+      "alwaysEmit": true,
+      "defaultPayload": {},
+      "merge": "first"
+    }
+  ],
+  "fields": [
+    {
+      "key": "ble_tracker",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "uiHidden": true,
+      "emitYAML": "never",
+      "extends": "hub_esp32_ble_tracker.json"
+    },
+    {
+      "key": "mac_address",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "AA:BB:CC:DD:EE:FF"
+    },
+    {
+      "key": "bindkey",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "00112233445566778899aabbccddeeff",
+      "note": "Required for encrypted Xiaomi sensors."
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "humidity",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "moisture",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "illuminance",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "conductivity",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "tablet",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "formaldehyde",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "battery_level",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    }
+  ]
+}

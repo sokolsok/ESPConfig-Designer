@@ -1,0 +1,73 @@
+{
+  "id": "number.tuya",
+  "domain": "number",
+  "platform": "tuya",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/number/tuya/",
+  "extends": "base_number.json",
+  "fields": [
+    {
+      "key": "number_datapoint",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "min_value",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "max_value",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "step",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 1
+    },
+    {
+      "key": "multiply",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "datapoint_hidden",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "datapoint_type",
+          "type": "select",
+          "required": true,
+          "lvl": "normal",
+          "options": [
+            "int",
+            "uint",
+            "enum"
+          ]
+        },
+        {
+          "key": "initial_value",
+          "type": "number",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "restore_value",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal",
+          "default": false
+        }
+      ]
+    }
+  ]
+}

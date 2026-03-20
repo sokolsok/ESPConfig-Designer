@@ -1,0 +1,17 @@
+{
+  "id": "text_sensor.version",
+  "domain": "text_sensor",
+  "platform": "version",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/text_sensor/version/",
+  "extends": "base_text_sensor.json",
+  "fields": [
+    {
+      "key": "hide_timestamp",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "or",
+  "fields": [
+    {
+      "key": "conditions",
+      "label": "Conditions",
+      "type": "list",
+      "required": true,
+      "lvl": "normal",
+      "emitKey": "inline",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_conditions.json"
+      }
+    }
+  ]
+}

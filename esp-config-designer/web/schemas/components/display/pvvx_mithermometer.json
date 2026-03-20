@@ -1,0 +1,52 @@
+{
+  "id": "display.pvvx_mithermometer",
+  "domain": "display",
+  "platform": "pvvx_mithermometer",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/display/pvvx_mithermometer/",
+  "extends": "base_display.json",
+  "display_builder": false,
+  "fields": [
+    {
+      "key": "ble_client_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "ble_client"
+    },
+    {
+      "key": "time_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "time"
+    },
+    {
+      "key": "disconnect_delay",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "5s"
+    },
+    {
+      "key": "validity_period",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "5min"
+    },
+    {
+      "key": "auto_clear_enabled",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    }
+  ]
+}

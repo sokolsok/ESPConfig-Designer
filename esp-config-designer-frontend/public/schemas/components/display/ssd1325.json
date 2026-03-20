@@ -1,0 +1,76 @@
+{
+  "id": "display.ssd1325",
+  "domain": "display",
+  "platform": "ssd1325",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/display/ssd1325/",
+  "extends": "base_display.json",
+  "display_builder": true,
+  "displayType": "monochrome",
+  "model_meta": {
+    "SSD1325 128x32": {
+      "w": 128,
+      "h": 32
+    },
+    "SSD1325 128x64": {
+      "w": 128,
+      "h": 64
+    },
+    "SSD1325 96x16": {
+      "w": 96,
+      "h": 16
+    },
+    "SSD1325 64x48": {
+      "w": 64,
+      "h": 48
+    }
+  },
+  "fields": [
+    {
+      "key": "model",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "SSD1325 128x64",
+      "options": [
+        "SSD1325 128x32",
+        "SSD1325 128x64",
+        "SSD1325 96x16",
+        "SSD1325 64x48"
+      ]
+    },
+    {
+      "key": "dc_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "reset_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "pages",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "5s"
+    }
+  ]
+}

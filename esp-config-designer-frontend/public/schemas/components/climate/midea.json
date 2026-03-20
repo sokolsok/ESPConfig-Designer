@@ -1,0 +1,160 @@
+{
+  "id": "climate.midea",
+  "domain": "climate",
+  "platform": "midea",
+  "requires": [
+    "uart"
+  ],
+  "helpUrl": "https://esphome.io/components/climate/midea/",
+  "extends": "base_climate.json",
+  "fields": [
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "uart"
+    },
+    {
+      "key": "transmitter_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "remote_transmitter"
+    },
+    {
+      "key": "period",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "1s"
+    },
+    {
+      "key": "timeout",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "2s"
+    },
+    {
+      "key": "num_attempts",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 3
+    },
+    {
+      "key": "autoconf",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    },
+    {
+      "key": "beeper",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "supported_modes",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "select",
+        "options": [
+          "HEAT_COOL",
+          "COOL",
+          "HEAT",
+          "DRY",
+          "FAN_ONLY"
+        ]
+      }
+    },
+    {
+      "key": "custom_fan_modes",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "select",
+        "options": [
+          "SILENT",
+          "TURBO"
+        ]
+      }
+    },
+    {
+      "key": "supported_presets",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "select",
+        "options": [
+          "ECO",
+          "BOOST",
+          "SLEEP"
+        ]
+      }
+    },
+    {
+      "key": "custom_presets",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "select",
+        "options": [
+          "FREEZE_PROTECTION"
+        ]
+      }
+    },
+    {
+      "key": "supported_swing_modes",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "select",
+        "options": [
+          "VERTICAL",
+          "HORIZONTAL",
+          "BOTH"
+        ]
+      }
+    },
+    {
+      "key": "outdoor_temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "power_usage",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "humidity_setpoint",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

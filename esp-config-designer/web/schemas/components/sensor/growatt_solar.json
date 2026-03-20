@@ -1,0 +1,153 @@
+{
+  "id": "sensor.growatt_solar",
+  "domain": "sensor",
+  "platform": "growatt_solar",
+  "requires": [
+    "uart"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/growatt_solar/",
+  "fields": [
+    {
+      "key": "inverter_status",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "protocol_version",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "phase_a",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "current",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "voltage",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "active_power",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "phase_b",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "phase_c",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "pv1",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "current",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "voltage",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "active_power",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "pv2",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "active_power",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "pv_active_power",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "frequency",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "energy_production_day",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "total_energy_production",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "inverter_module_temp",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "10s"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "1"
+    }
+  ]
+}

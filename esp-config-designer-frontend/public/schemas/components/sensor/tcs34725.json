@@ -1,0 +1,87 @@
+{
+  "id": "sensor.tcs34725",
+  "domain": "sensor",
+  "platform": "tcs34725",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/tcs34725/",
+  "fields": [
+    {
+      "key": "red_channel",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "green_channel",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "blue_channel",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "clear_channel",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "illuminance",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "color_temperature",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "gain",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "integration_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "glass_attenuation_factor",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x29"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

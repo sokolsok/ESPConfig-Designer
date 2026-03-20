@@ -1,0 +1,24 @@
+{
+  "id": "climate.haier.start_self_cleaning",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Climate",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "climate_id",
+      "domain": "climate",
+      "lvl": "normal"
+    },
+    {
+      "key": "duration",
+      "label": "Duration",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "20min",
+      "lambdaPlaceholder": "return 1200000;"
+    }
+  ]
+}

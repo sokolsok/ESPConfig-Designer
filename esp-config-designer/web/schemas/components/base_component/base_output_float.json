@@ -1,0 +1,31 @@
+{
+  "id": "base.output_float",
+  "domain": "output",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "extends": "base_output.json",
+  "fields": [
+    {
+      "key": "min_power",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 0
+    },
+    {
+      "key": "max_power",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 1
+    },
+    {
+      "key": "zero_means_zero",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

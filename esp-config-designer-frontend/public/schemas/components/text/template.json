@@ -1,0 +1,64 @@
+{
+  "id": "text.template",
+  "domain": "text",
+  "platform": "template",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/text/template/",
+  "extends": "base_text.json",
+  "fields": [
+    {
+      "key": "min_length",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 0
+    },
+    {
+      "key": "max_length",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 255
+    },
+    {
+      "key": "lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "set_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "- logger.log:\n    format: \"%s\"\n    args: [\"x.c_str()\"]"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    },
+    {
+      "key": "optimistic",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "restore_value",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "initial_value",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

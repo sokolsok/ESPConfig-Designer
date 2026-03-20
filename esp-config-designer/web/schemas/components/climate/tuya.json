@@ -1,0 +1,230 @@
+{
+  "id": "climate.tuya",
+  "domain": "climate",
+  "platform": "tuya",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/climate/tuya/",
+  "extends": "base_climate.json",
+  "fields": [
+    {
+      "key": "supports_heat",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    },
+    {
+      "key": "supports_cool",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "switch_datapoint",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "active_state",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "datapoint",
+          "type": "number",
+          "required": true,
+          "lvl": "normal"
+        },
+        {
+          "key": "heating_value",
+          "type": "number",
+          "required": false,
+          "lvl": "normal",
+          "default": 1
+        },
+        {
+          "key": "cooling_value",
+          "type": "number",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "drying_value",
+          "type": "number",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "fanonly_value",
+          "type": "number",
+          "required": false,
+          "lvl": "normal"
+        }
+      ]
+    },
+    {
+      "key": "preset",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "eco",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "fields": [
+            {
+              "key": "datapoint",
+              "type": "number",
+              "required": true,
+              "lvl": "normal"
+            },
+            {
+              "key": "temperature",
+              "type": "number",
+              "required": false,
+              "lvl": "normal"
+            }
+          ]
+        },
+        {
+          "key": "sleep",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "fields": [
+            {
+              "key": "datapoint",
+              "type": "number",
+              "required": true,
+              "lvl": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "swing_mode",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "vertical_datapoint",
+          "type": "number",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "horizontal_datapoint",
+          "type": "number",
+          "required": false,
+          "lvl": "normal"
+        }
+      ]
+    },
+    {
+      "key": "fan_mode",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "datapoint",
+          "type": "number",
+          "required": true,
+          "lvl": "normal"
+        },
+        {
+          "key": "auto_value",
+          "type": "number",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "low_value",
+          "type": "number",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "medium_value",
+          "type": "number",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "middle_value",
+          "type": "number",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "high_value",
+          "type": "number",
+          "required": false,
+          "lvl": "normal"
+        }
+      ]
+    },
+    {
+      "key": "heating_state_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "cooling_state_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "target_temperature_datapoint",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "current_temperature_datapoint",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "temperature_multiplier",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "reports_fahrenheit",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "current_temperature_multiplier",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "target_temperature_multiplier",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

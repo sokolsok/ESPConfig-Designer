@@ -1,0 +1,23 @@
+{
+  "id": "script.execute",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Script",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "script_id",
+      "domain": "script",
+      "lvl": "normal"
+    },
+    {
+      "key": "parameters",
+      "label": "Parameters",
+      "type": "yaml",
+      "templatable": false,
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "brightness: 50\nmode: auto"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "id": "time.ds1307",
+  "domain": "time",
+  "platform": "ds1307",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/time/ds1307/",
+  "extends": "base_time.json",
+  "fields": [
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x68",
+      "suppressQuotes": true
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "advanced",
+      "domain": "i2c"
+    }
+  ]
+}

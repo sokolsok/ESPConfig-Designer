@@ -1,0 +1,77 @@
+{
+  "id": "display.sdl",
+  "domain": "display",
+  "platform": "sdl",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/display/sdl/",
+  "extends": "base_display.json",
+  "display_builder": true,
+  "displayType": "color",
+  "model_meta": {
+    "SDL 320x240": {
+      "w": 320,
+      "h": 240
+    },
+    "SDL 480x320": {
+      "w": 480,
+      "h": 320
+    },
+    "SDL 800x480": {
+      "w": 800,
+      "h": 480
+    }
+  },
+  "fields": [
+    {
+      "key": "model",
+      "type": "select",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "default": "SDL 320x240",
+      "options": [
+        "SDL 320x240",
+        "SDL 480x320",
+        "SDL 800x480"
+      ]
+    },
+    {
+      "key": "sdl_options",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "window_options",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "rotation",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "0",
+      "options": [
+        "0",
+        "90",
+        "180",
+        "270"
+      ]
+    },
+    {
+      "key": "pages",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "1s"
+    }
+  ]
+}

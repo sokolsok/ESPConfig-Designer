@@ -1,0 +1,14 @@
+{
+  "id": "component.update",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Component",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "component_id",
+      "domain": "",
+      "lvl": "normal"
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "id": "binary_sensor.ttp229",
+  "domain": "binary_sensor",
+  "platform": "ttp229_bsf",
+  "platformByBus": {
+    "ttp229_bsf": "ttp229_bsf",
+    "ttp229_lsf": "ttp229_lsf"
+  },
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/binary_sensor/ttp229/",
+  "extends": "base_binary_sensor.json",
+  "embedded": [
+    {
+      "key": "hub_bsf",
+      "domain": "ttp229_bsf",
+      "dedupeBy": "id"
+    },
+    {
+      "key": "hub_lsf",
+      "domain": "ttp229_lsf",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "bus",
+      "label": "Variant",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "ttp229_bsf",
+      "options": [
+        "ttp229_bsf",
+        "ttp229_lsf"
+      ]
+    },
+    {
+      "key": "hub_bsf",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_ttp229_bsf.json",
+      "dependsOn": {
+        "key": "bus",
+        "value": "ttp229_bsf"
+      }
+    },
+    {
+      "key": "hub_lsf",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_ttp229_lsf.json",
+      "dependsOn": {
+        "key": "bus",
+        "value": "ttp229_lsf"
+      }
+    },
+    {
+      "key": "ttp229_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "ttp229",
+      "allowSelfReference": true,
+      "default": "ttp229_component"
+    },
+    {
+      "key": "channel",
+      "type": "number",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "0"
+    }
+  ]
+}

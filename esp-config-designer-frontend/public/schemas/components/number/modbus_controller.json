@@ -1,0 +1,126 @@
+{
+  "id": "number.modbus_controller",
+  "domain": "number",
+  "platform": "modbus_controller",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/number/modbus_controller/",
+  "extends": "base_number.json",
+  "fields": [
+    {
+      "key": "modbus_controller_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "modbus_controller",
+      "placeholder": "modbus_controller_id"
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "0x9001"
+    },
+    {
+      "key": "value_type",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "options": [
+        "U_WORD",
+        "S_WORD",
+        "U_DWORD",
+        "S_DWORD",
+        "U_DWORD_R",
+        "S_DWORD_R",
+        "U_QWORD",
+        "S_QWORD",
+        "U_QWORD_R",
+        "S_QWORD_R",
+        "FP32",
+        "FP32_R"
+      ]
+    },
+    {
+      "key": "min_value",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "max_value",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "step",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 1
+    },
+    {
+      "key": "multiply",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "use_write_multiple",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "skip_updates",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "register_count",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 1
+    },
+    {
+      "key": "response_size",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "force_new_range",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "offset",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "custom_command",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "- 0x01\n- 0x06\n- 0x90\n- 0x01\n- 0x00\n- 0x00"
+    },
+    {
+      "key": "lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "write_lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

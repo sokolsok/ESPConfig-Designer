@@ -1,0 +1,31 @@
+{
+  "id": "sun_gtil2",
+  "domain": "sun_gtil2",
+  "requires": [
+    "uart"
+  ],
+  "helpUrl": "https://esphome.io/components/sun_gtil2/",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "idDomain": "sun_gtil2"
+    },
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "uart"
+    },
+    {
+      "key": "raw_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "# Optional advanced keys from docs\n# Add raw YAML lines inside this sun_gtil2 entry"
+    }
+  ]
+}

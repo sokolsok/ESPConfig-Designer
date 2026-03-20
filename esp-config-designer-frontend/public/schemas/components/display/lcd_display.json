@@ -1,0 +1,102 @@
+{
+  "id": "display.lcd_display",
+  "domain": "display",
+  "platform": "lcd_pcf8574",
+  "platformByBus": {
+    "i2c": "lcd_pcf8574",
+    "gpio": "lcd_gpio"
+  },
+  "requires": [],
+  "requiresByBus": {
+    "i2c": [
+      "i2c"
+    ],
+    "gpio": []
+  },
+  "helpUrl": "https://esphome.io/components/display/lcd_display/",
+  "extends": "base_display.json",
+  "display_builder": false,
+  "fields": [
+    {
+      "key": "bus",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "i2c",
+      "options": [
+        "i2c",
+        "gpio"
+      ]
+    },
+    {
+      "key": "dimensions",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "16x2"
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x3F",
+      "dependsOn": {
+        "key": "bus",
+        "value": "i2c"
+      }
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2c",
+      "dependsOn": {
+        "key": "bus",
+        "value": "i2c"
+      }
+    },
+    {
+      "key": "data_pins",
+      "type": "yaml",
+      "required": true,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "bus",
+        "value": "gpio"
+      },
+      "placeholder": "- GPIOXX\n- GPIOXX\n- GPIOXX\n- GPIOXX"
+    },
+    {
+      "key": "enable_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "bus",
+        "value": "gpio"
+      }
+    },
+    {
+      "key": "rs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "bus",
+        "value": "gpio"
+      }
+    },
+    {
+      "key": "rw_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "bus",
+        "value": "gpio"
+      }
+    }
+  ]
+}

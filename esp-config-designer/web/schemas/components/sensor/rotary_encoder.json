@@ -1,0 +1,98 @@
+{
+  "id": "sensor.rotary_encoder",
+  "domain": "sensor",
+  "platform": "rotary_encoder",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/rotary_encoder/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "pin_a",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "pin_b",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "pin_reset",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "resolution",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "1",
+        "2",
+        "4"
+      ]
+    },
+    {
+      "key": "min_value",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "max_value",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "publish_initial_value",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "restore_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "RESTORE_DEFAULT_ZERO",
+        "ALWAYS_ZERO"
+      ]
+    },
+    {
+      "key": "on_clockwise",
+      "type": "list",
+      "required": false,
+      "lvl": "normal",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_anticlockwise",
+      "type": "list",
+      "required": false,
+      "lvl": "normal",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "sensor.m5stack_8angle",
+  "domain": "sensor",
+  "platform": "m5stack_8angle",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/m5stack_8angle/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x43"
+    }
+  ]
+}

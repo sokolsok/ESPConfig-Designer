@@ -1,0 +1,14 @@
+{
+  "id": "climate.pid.reset_integral_term",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Climate",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "climate_id",
+      "domain": "climate",
+      "lvl": "normal"
+    }
+  ]
+}

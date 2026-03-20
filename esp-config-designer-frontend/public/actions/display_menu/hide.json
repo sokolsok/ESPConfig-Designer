@@ -1,0 +1,14 @@
+{
+  "id": "display_menu.hide",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Display Menu",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "display_menu_id",
+      "domain": "display_menu",
+      "lvl": "normal"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "dfplayer.play_folder",
+  "fields": [
+    {
+      "key": "id",
+      "label": "DFPlayer",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "dfplayer_id",
+      "domain": "dfplayer",
+      "lvl": "normal"
+    },
+    {
+      "key": "folder",
+      "label": "Folder",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "1",
+      "lambdaPlaceholder": "return 1;"
+    },
+    {
+      "key": "file",
+      "label": "File",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1",
+      "lambdaPlaceholder": "return 1;"
+    },
+    {
+      "key": "loop",
+      "label": "Loop",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

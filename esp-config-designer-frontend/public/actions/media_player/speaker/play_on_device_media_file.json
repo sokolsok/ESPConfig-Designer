@@ -1,0 +1,41 @@
+{
+  "id": "media_player.speaker.play_on_device_media_file",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Media Player",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "media_player_id",
+      "domain": "media_player",
+      "lvl": "normal"
+    },
+    {
+      "key": "media_file",
+      "label": "Media file",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "alarm.wav"
+    },
+    {
+      "key": "announcement",
+      "label": "Announcement",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "enqueue",
+      "label": "Enqueue",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    }
+  ]
+}

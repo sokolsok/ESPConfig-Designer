@@ -39,6 +39,14 @@
         >
           Save
         </button>
+        <button
+          v-if="showActionButtons"
+          class="btn-standard action-validate"
+          :disabled="!topbarCanValidate || topbarBusy"
+          @click="triggerValidate"
+        >
+          Validate
+        </button>
         <div v-if="showActionButtons" ref="installMenuRef" class="topbar-install-menu">
           <button
             class="btn-standard action-install"
@@ -88,10 +96,12 @@ const isBuilderRoute = computed(() => route.name === "builder");
 const isDashboardRoute = computed(() => route.name === "dashboard");
 const showActionButtons = computed(() => isBuilderRoute.value || isDashboardRoute.value);
 const builderCanInstall = ref(false);
+const builderCanValidate = ref(false);
 const builderCanUseOta = ref(false);
 const builderCanLogs = ref(false);
 const builderBusy = ref(false);
 const dashboardCanInstall = ref(false);
+const dashboardCanValidate = ref(false);
 const dashboardCanUseOta = ref(false);
 const dashboardCanLogs = ref(false);
 const dashboardCanEdit = ref(false);
@@ -108,6 +118,9 @@ const pendingSwitchRouteName = ref("");
 const topbarCanInstall = computed(() =>
   isBuilderRoute.value ? builderCanInstall.value : dashboardCanInstall.value
 );
+const topbarCanValidate = computed(() =>
+  isBuilderRoute.value ? builderCanValidate.value : dashboardCanValidate.value
+);
 const topbarCanUseOta = computed(() =>
   isBuilderRoute.value ? builderCanUseOta.value : dashboardCanUseOta.value
 );
@@ -123,6 +136,7 @@ const canTopbarSave = computed(
 const handleCompileState = (event) => {
   const detail = event?.detail && typeof event.detail === "object" ? event.detail : {};
   builderCanInstall.value = detail.canInstall === true;
+  builderCanValidate.value = detail.canValidate === true;
   builderCanUseOta.value = detail.canUseOta === true;
   builderCanLogs.value = detail.canLogs === true;
   builderBusy.value = detail.running === true;
@@ -132,6 +146,7 @@ const handleCompileState = (event) => {
 const handleDashboardActionsState = (event) => {
   const detail = event?.detail && typeof event.detail === "object" ? event.detail : {};
   dashboardCanInstall.value = detail.canInstall === true;
+  dashboardCanValidate.value = detail.canValidate === true;
   dashboardCanUseOta.value = detail.canUseOta === true;
   dashboardCanLogs.value = detail.canLogs === true;
   dashboardCanEdit.value = detail.canEdit === true;
@@ -174,6 +189,10 @@ const triggerBuilderLogs = () => {
 
 const triggerDashboardEdit = () => {
   window.dispatchEvent(new CustomEvent("app:dashboard-edit"));
+};
+
+const triggerValidate = () => {
+  window.dispatchEvent(new CustomEvent("app:validate"));
 };
 
 const handleGlobalClick = (event) => {

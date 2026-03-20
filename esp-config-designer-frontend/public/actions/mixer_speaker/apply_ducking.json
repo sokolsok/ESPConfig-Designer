@@ -1,0 +1,34 @@
+{
+  "id": "mixer_speaker.apply_ducking",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Mixer speaker",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "mixer_speaker_id",
+      "domain": "mixer_speaker",
+      "lvl": "normal"
+    },
+    {
+      "key": "decibel_reduction",
+      "label": "Decibel reduction",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "12",
+      "lambdaPlaceholder": "return 12;"
+    },
+    {
+      "key": "duration",
+      "label": "Duration",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "500ms",
+      "lambdaPlaceholder": "return 500;"
+    }
+  ]
+}

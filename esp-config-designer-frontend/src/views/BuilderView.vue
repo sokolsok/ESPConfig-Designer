@@ -2,10 +2,10 @@
   <div class="builder-layout">
   <ConfirmModal
     :open="confirmOpen"
-    title="Confirm"
-    message="Are you sure?"
-    confirm-text="Yes"
-    cancel-text="Cancel"
+    :title="confirmTitle"
+    :message="confirmMessage"
+    :confirm-text="confirmConfirmText"
+    :cancel-text="confirmCancelText"
     @confirm="confirmRemove"
     @cancel="cancelRemove"
   />
@@ -38,14 +38,18 @@
       @save="handleSecretsSave"
       @close="closeSecretsModal"
     />
-    <div v-if="exportErrorOpen && formErrors.length" class="notice notice--error notice--block">
-      <strong>There are errors in the form. Fix them before exporting.</strong>
-      <ul>
-        <li v-for="(error, index) in formErrors" :key="`${error.path}-${index}`">
-          {{ error.path }} = "{{ error.message }}"
-        </li>
-      </ul>
-    </div>
+    <FormErrorsModal
+      :open="formErrorsModalOpen"
+      :errors="formErrors"
+      @close="formErrorsModalOpen = false"
+    />
+    <FormErrorsModal
+      :open="importSummaryModalOpen"
+      :errors="importSummaryModalRows"
+      :message="importSummaryModalMessage"
+      tone="neutral"
+      @close="importSummaryModalOpen = false"
+    />
     <div v-if="projectSaveError" class="notice notice--error notice--block">
       <strong>Project save failed.</strong>
       <div>{{ projectSaveError }}</div>
@@ -119,7 +123,13 @@
                     v-for="tab in tabs"
                     :key="`tab-${tab}`"
                     class="component-chip"
-                    :class="{ active: activeTab === tab, 'component-chip--pulse': tab === 'Busses' && busTabPulse }"
+                    :class="{
+                      active: activeTab === tab,
+                      'component-chip--pulse':
+                        (tab === 'Busses' && busTabPulse) ||
+                        (tab === 'Protocols' && protocolTabPulse),
+                      'component-chip--error': hasTabErrors(tab)
+                    }"
                     @click="activeTab = tab"
                   >
                     <span>{{ tab }}</span>
@@ -146,10 +156,13 @@
                     :key="`${componentIdFromEntry(componentEntry) || 'component'}-${index}`"
                     class="component-chip"
                     type="button"
-                    :class="{ active: activeComponentSlot === index && activeTab === 'Components' }"
+                    :class="{
+                      active: activeComponentSlot === index && activeTab === 'Components',
+                      'component-chip--error': hasComponentErrors(index)
+                    }"
                     @click="openComponentViewer(index)"
                   >
-                    <span>{{ componentLabel(componentIdFromEntry(componentEntry)) }}</span>
+                    <span>{{ componentEntryLabel(componentEntry) }}</span>
                   </button>
                 </div>
               </div>
@@ -245,6 +258,18 @@
                     </a>
                   </span>
                 </div>
+                <div v-if="showHubNotice" class="preview-callout hljs">
+                  <span class="hljs-comment">
+                    # One or more components require HUB configuration -
+                    <a
+                      href="#"
+                      class="preview-callout-link"
+                      @click.prevent="switchPreviewTab('hubs')"
+                    >
+                      LINK
+                    </a>
+                  </span>
+                </div>
                 <div class="yaml-scroll-inner" ref="previewScrollInner">
                   <pre><code class="hljs" v-html="highlightedYaml"></code></pre>
                 </div>
@@ -296,9 +321,13 @@
               :gpio-usage="gpioUsageIndex"
               :gpio-title="gpioTitle"
               :context-component-id="esphomeCoreId"
+              :context-scope-id="esphomeCoreScopeId"
+              :mode-upgrade-section="'core'"
+              :mode-upgrade-key="'esphome'"
               :global-store="globalStore"
               @update="handleCoreSchemaUpdate"
               @open-secrets="openSecretsModal"
+              @mode-upgrade-availability="handleModeUpgradeAvailability"
             />
             <SchemaRenderer
               :component-id="substitutionsCoreId"
@@ -312,10 +341,22 @@
               :gpio-usage="gpioUsageIndex"
               :gpio-title="gpioTitle"
               :context-component-id="substitutionsCoreId"
+              :context-scope-id="substitutionsCoreScopeId"
+              :mode-upgrade-section="'core'"
+              :mode-upgrade-key="'substitutions'"
               :global-store="globalStore"
               @update="handleSubstitutionsSchemaUpdate"
               @open-secrets="openSecretsModal"
+              @mode-upgrade-availability="handleModeUpgradeAvailability"
             />
+            <button
+              v-if="shouldShowModeUpgrade('core')"
+              type="button"
+              class="btn-standard module-mode-upgrade"
+              @click="promoteModeLevel"
+            >
+              {{ modeUpgradeButtonLabel }}
+            </button>
           </div>
         </div>
 
@@ -348,9 +389,13 @@
               :gpio-usage="gpioUsageIndex"
               :gpio-title="gpioTitle"
               :context-component-id="platformCoreId"
+              :context-scope-id="platformCoreScopeId"
+              :mode-upgrade-section="'platform'"
+              :mode-upgrade-key="'core'"
               :global-store="globalStore"
               @update="handlePlatformSchemaUpdate"
               @open-secrets="openSecretsModal"
+              @mode-upgrade-availability="handleModeUpgradeAvailability"
             />
             <SchemaRenderer
               v-if="platformDetailId"
@@ -365,10 +410,22 @@
               :gpio-usage="gpioUsageIndex"
               :gpio-title="gpioTitle"
               :context-component-id="platformDetailId"
+              :context-scope-id="platformDetailScopeId"
+              :mode-upgrade-section="'platform'"
+              :mode-upgrade-key="'detail'"
               :global-store="globalStore"
               @update="handlePlatformSchemaUpdate"
               @open-secrets="openSecretsModal"
+              @mode-upgrade-availability="handleModeUpgradeAvailability"
             />
+            <button
+              v-if="shouldShowModeUpgrade('platform')"
+              type="button"
+              class="btn-standard module-mode-upgrade"
+              @click="promoteModeLevel"
+            >
+              {{ modeUpgradeButtonLabel }}
+            </button>
           </div>
         </div>
 
@@ -401,10 +458,14 @@
               :gpio-usage="gpioUsageIndex"
               :gpio-title="gpioTitle"
               :context-component-id="networkCoreId"
+              :context-scope-id="networkTransportScopeId"
               :field-filter="['transport']"
+              :mode-upgrade-section="'network'"
+              :mode-upgrade-key="'transport'"
               :global-store="globalStore"
               @update="handleNetworkSchemaUpdate"
               @open-secrets="openSecretsModal"
+              @mode-upgrade-availability="handleModeUpgradeAvailability"
             />
             <SchemaRenderer
               v-if="networkDetailId"
@@ -419,9 +480,13 @@
               :gpio-usage="gpioUsageIndex"
               :gpio-title="gpioTitle"
               :context-component-id="networkDetailId"
+              :context-scope-id="networkDetailScopeId"
+              :mode-upgrade-section="'network'"
+              :mode-upgrade-key="'detail'"
               :global-store="globalStore"
               @update="handleNetworkSchemaUpdate"
               @open-secrets="openSecretsModal"
+              @mode-upgrade-availability="handleModeUpgradeAvailability"
             />
             <SchemaRenderer
               :component-id="networkCoreId"
@@ -435,10 +500,14 @@
               :gpio-usage="gpioUsageIndex"
               :gpio-title="gpioTitle"
               :context-component-id="networkCoreId"
+              :context-scope-id="networkOtaScopeId"
               :field-filter="['ota']"
+              :mode-upgrade-section="'network'"
+              :mode-upgrade-key="'ota'"
               :global-store="globalStore"
               @update="handleNetworkSchemaUpdate"
               @open-secrets="openSecretsModal"
+              @mode-upgrade-availability="handleModeUpgradeAvailability"
             />
             <SchemaRenderer
               :component-id="networkCoreId"
@@ -452,11 +521,23 @@
               :gpio-usage="gpioUsageIndex"
               :gpio-title="gpioTitle"
               :context-component-id="networkCoreId"
+              :context-scope-id="networkWebServerScopeId"
               :field-filter="['web_server']"
+              :mode-upgrade-section="'network'"
+              :mode-upgrade-key="'web_server'"
               :global-store="globalStore"
               @update="handleNetworkSchemaUpdate"
               @open-secrets="openSecretsModal"
+              @mode-upgrade-availability="handleModeUpgradeAvailability"
             />
+            <button
+              v-if="shouldShowModeUpgrade('network')"
+              type="button"
+              class="btn-standard module-mode-upgrade"
+              @click="promoteModeLevel"
+            >
+              {{ modeUpgradeButtonLabel }}
+            </button>
           </div>
         </div>
 
@@ -501,10 +582,22 @@
               :gpio-usage="gpioUsageIndex"
               :gpio-title="gpioTitle"
               :context-component-id="protocolDetailId"
+              :context-scope-id="protocolDetailScopeId"
+              :mode-upgrade-section="'protocols'"
+              :mode-upgrade-key="'detail'"
               :global-store="globalStore"
               @update="handleProtocolDetailUpdate"
               @open-secrets="openSecretsModal"
+              @mode-upgrade-availability="handleModeUpgradeAvailability"
             />
+            <button
+              v-if="shouldShowModeUpgrade('protocols')"
+              type="button"
+              class="btn-standard module-mode-upgrade"
+              @click="promoteModeLevel"
+            >
+              {{ modeUpgradeButtonLabel }}
+            </button>
           </div>
         </div>
 
@@ -553,10 +646,22 @@
               :gpio-usage="gpioUsageIndex"
               :gpio-title="gpioTitle"
               :context-component-id="bussesDetailId"
+              :context-scope-id="bussesDetailScopeId"
+              :mode-upgrade-section="'busses'"
+              :mode-upgrade-key="'detail'"
               :global-store="globalStore"
               @update="handleBussesDetailUpdate"
               @open-secrets="openSecretsModal"
+              @mode-upgrade-availability="handleModeUpgradeAvailability"
             />
+            <button
+              v-if="shouldShowModeUpgrade('busses')"
+              type="button"
+              class="btn-standard module-mode-upgrade"
+              @click="promoteModeLevel"
+            >
+              {{ modeUpgradeButtonLabel }}
+            </button>
           </div>
         </div>
 
@@ -601,10 +706,22 @@
               :gpio-usage="gpioUsageIndex"
               :gpio-title="gpioTitle"
               :context-component-id="otherDetailId"
+              :context-scope-id="otherDetailScopeId"
+              :mode-upgrade-section="'system'"
+              :mode-upgrade-key="'detail'"
               :global-store="globalStore"
               @update="handleOtherDetailUpdate"
               @open-secrets="openSecretsModal"
+              @mode-upgrade-availability="handleModeUpgradeAvailability"
             />
+            <button
+              v-if="shouldShowModeUpgrade('system')"
+              type="button"
+              class="btn-standard module-mode-upgrade"
+              @click="promoteModeLevel"
+            >
+              {{ modeUpgradeButtonLabel }}
+            </button>
           </div>
         </div>
 
@@ -650,9 +767,13 @@
               :gpio-usage="gpioUsageIndex"
               :gpio-title="gpioTitle"
               :context-component-id="automationDetailId"
+              :context-scope-id="automationDetailScopeId"
+              :mode-upgrade-section="'automation'"
+              :mode-upgrade-key="'detail'"
               :global-store="globalStore"
               @update="handleAutomationDetailUpdate"
               @open-secrets="openSecretsModal"
+              @mode-upgrade-availability="handleModeUpgradeAvailability"
             />
             <div
               v-if="
@@ -678,6 +799,14 @@
                 </div>
               </div>
             </div>
+            <button
+              v-if="shouldShowModeUpgrade('automation')"
+              type="button"
+              class="btn-standard module-mode-upgrade"
+              @click="promoteModeLevel"
+            >
+              {{ modeUpgradeButtonLabel }}
+            </button>
           </div>
         </div>
 
@@ -696,15 +825,31 @@
                 ?
               </a>
             </div>
-            <div v-if="!isComponentPickerOpen" class="components-actions">
+            <div class="components-actions">
               <button
-                v-if="activeComponentSlot !== null"
+                v-if="isComponentPickerOpen"
+                type="button"
+                class="secondary compact btn-standard"
+                :disabled="isComponentsImporting"
+                @click="openComponentsZipPicker"
+              >
+                {{ isComponentsImporting ? "Uploading..." : "Upload Components" }}
+              </button>
+              <button
+                v-if="!isComponentPickerOpen && activeComponentSlot !== null"
                 type="button"
                 class="secondary compact btn-standard"
                 @click="requestRemoveComponent(activeComponentSlot)"
               >
                 Remove
               </button>
+              <input
+                ref="componentsZipInput"
+                type="file"
+                accept=".zip,application/zip"
+                class="components-upload-input"
+                @change="handleComponentsZipSelected"
+              />
             </div>
           </div>
           <div :class="['module-card__body', { 'module-card__body--picker': isComponentPickerOpen }]">
@@ -716,7 +861,7 @@
                     placeholder="Search components"
                   />
                   <div v-if="componentCatalogError" class="notice notice--error components-error">
-                    components_list.json not found
+                    {{ componentCatalogError?.message || "Component catalog not available" }}
                   </div>
                   <div class="components-list">
                     <details
@@ -727,17 +872,39 @@
                     >
                       <summary>{{ category.title }}</summary>
                       <div class="components-items" v-if="category.items.length">
-                        <button
+                        <div
                           v-for="(item, itemIndex) in category.items"
                           :key="`${item.id}-${category.slug}-${itemIndex}`"
-                          type="button"
-                          class="component-item"
-                          :class="{ selected: selectedComponentIds.has(item.id) }"
-                          @click="selectComponent(item)"
+                          class="component-item-row"
                         >
-                          <span>{{ item.name }}</span>
-                          <span class="component-id">{{ item.id }}</span>
-                        </button>
+                          <button
+                            type="button"
+                            class="component-item"
+                            :class="{
+                              selected: selectedComponentIds.has(item.id),
+                              unavailable: !isComponentAvailable(item)
+                            }"
+                            :disabled="!isComponentAvailable(item) || isResolvingComponentSelection"
+                            :title="!isComponentAvailable(item) ? 'Component not available' : ''"
+                            @click="selectComponent(item)"
+                          >
+                            <span>{{ item.name }}</span>
+                            <span class="component-id">{{ item.id }}</span>
+                          </button>
+                          <button
+                            v-if="isSavedCustomComponentItem(item)"
+                            type="button"
+                            class="component-item-delete"
+                            title="Delete saved component"
+                            :disabled="deletingCustomComponentId === item.id"
+                            @click.stop="requestDeleteSavedCustomComponent(item)"
+                          >
+                            <img
+                              src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/delete-forever.svg"
+                              alt=""
+                            />
+                          </button>
+                        </div>
                       </div>
                       <div
                         v-for="(subcategory, subIndex) in category.subcategories"
@@ -746,17 +913,39 @@
                       >
                         <h3>{{ subcategory.title }}</h3>
                         <div class="components-items">
-                          <button
+                          <div
                             v-for="(item, itemIndex) in subcategory.items"
                             :key="`${item.id}-${subcategory.slug}-${itemIndex}`"
-                            class="component-item"
-                            type="button"
-                            :class="{ selected: selectedComponentIds.has(item.id) }"
-                            @click="selectComponent(item)"
+                            class="component-item-row"
                           >
-                            <span>{{ item.name }}</span>
-                            <span class="component-id">{{ item.id }}</span>
-                          </button>
+                            <button
+                              class="component-item"
+                              type="button"
+                              :class="{
+                                selected: selectedComponentIds.has(item.id),
+                                unavailable: !isComponentAvailable(item)
+                              }"
+                              :disabled="!isComponentAvailable(item) || isResolvingComponentSelection"
+                              :title="!isComponentAvailable(item) ? 'Component not available' : ''"
+                              @click="selectComponent(item)"
+                            >
+                              <span>{{ item.name }}</span>
+                              <span class="component-id">{{ item.id }}</span>
+                            </button>
+                            <button
+                              v-if="isSavedCustomComponentItem(item)"
+                              type="button"
+                              class="component-item-delete"
+                              title="Delete saved component"
+                              :disabled="deletingCustomComponentId === item.id"
+                              @click.stop="requestDeleteSavedCustomComponent(item)"
+                            >
+                              <img
+                                src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/delete-forever.svg"
+                                alt=""
+                              />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </details>
@@ -764,15 +953,29 @@
                 </div>
             </div>
             <div v-else class="component-form">
-              <div v-if="activeComponentBusLabels" class="notice notice--warning component-bus-note">
-                Make sure {{ activeComponentBusLabels }} is configured correctly.
-                <a href="#" class="preview-callout-link" @click.prevent="focusRequiredBus">
-                  LINK
-                </a>
+              <div
+                v-if="activeComponentBusLabels || activeComponentProtocolLabels"
+                class="notice notice--warning component-bus-note"
+              >
+                <template v-if="activeComponentBusLabels">
+                  Make sure {{ activeComponentBusLabels }} is configured correctly.
+                  <a href="#" class="preview-callout-link" @click.prevent="focusRequiredBus">
+                    BUSSES
+                  </a>
+                </template>
+                <template v-if="activeComponentProtocolLabels">
+                  <span v-if="activeComponentBusLabels"> </span>
+                  Make sure {{ activeComponentProtocolLabels }} is configured correctly.
+                  <a href="#" class="preview-callout-link" @click.prevent="focusRequiredProtocol">
+                    PROTOCOLS
+                  </a>
+                </template>
               </div>
               <SchemaRenderer
                 :component-id="activeComponentId"
+                :schema-path="activeComponentSchemaPath"
                 :component-config="activeComponentConfig"
+                :field-errors="activeComponentFieldErrors"
                 :custom-config="activeComponentCustomConfig"
                 :mode-level="activeModeLevel"
                 :id-registry="idRegistry"
@@ -782,16 +985,41 @@
                 :gpio-usage="gpioUsageIndex"
                 :gpio-title="gpioTitle"
                 :context-component-id="activeComponentId"
+                :context-scope-id="activeComponentScopeId"
                 :global-store="globalStore"
                 :display-images="displayImages"
                 :display-fonts="displayFonts"
                 :display-google-fonts="displayGoogleFonts"
                 :assets-base="assetsBase"
+                :mode-upgrade-section="'components'"
+                :mode-upgrade-key="'main'"
                 @update="handleSchemaUpdate"
                 @update-custom="handleCustomConfigUpdate"
                 @open-asset-manager="openAssetManager"
                 @open-secrets="openSecretsModal"
+                @mode-upgrade-availability="handleModeUpgradeAvailability"
               />
+              <button
+                v-if="shouldShowModeUpgrade('components')"
+                type="button"
+                class="btn-standard module-mode-upgrade"
+                @click="promoteModeLevel"
+              >
+                {{ modeUpgradeButtonLabel }}
+              </button>
+              <div v-if="showSaveCustomComponentAction" class="component-save-custom">
+                <button
+                  type="button"
+                  class="btn-standard"
+                  :disabled="!canSaveCustomComponent"
+                  @click="saveCustomComponentTemplate"
+                >
+                  {{ isSavingCustomComponent ? "Saving..." : customComponentActionLabel }}
+                </button>
+                <div v-if="customComponentSaveError" class="notice notice--error">
+                  {{ customComponentSaveError }}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -820,6 +1048,7 @@ import {
 import hljs from "highlight.js/lib/core";
 import yaml from "highlight.js/lib/languages/yaml";
 import ConfirmModal from "../components/ConfirmModal.vue";
+import FormErrorsModal from "../components/FormErrorsModal.vue";
 import GpioGuideModal from "../components/GpioGuideModal.vue";
 import InstallConsoleModal from "../components/InstallConsoleModal.vue";
 import SecretsModal from "../components/SecretsModal.vue";
@@ -836,12 +1065,25 @@ import {
 import { buildGlobalRegistry, isFieldVisible as isSchemaFieldVisible } from "../utils/schemaVisibility";
 import { getRequiredInterfaces } from "../utils/schemaRequirements";
 import { generateFieldValue, resolveFieldValue, resolveGenerationSpec } from "../utils/schemaAuto";
-import { BUILDER_CONFIG_STORAGE_KEY } from "../utils/builderSession";
+import {
+  BUILDER_CONFIG_STORAGE_KEY,
+  readBuilderSessionProjectName,
+  writeBuilderSessionProjectName
+} from "../utils/builderSession";
 import {
   mergeDeviceStatusCache,
   normalizeProjectKey,
   readDeviceStatusEntry
 } from "../utils/deviceStatusCache";
+import {
+  computePendingPromotion,
+  computePostInstallDeploymentUpdate,
+  createDeploymentIdentityFromYaml,
+  readProjectDeploymentState,
+  resolveActiveDeploymentHost,
+  resolveActiveDeploymentKey,
+  writeProjectDeploymentState
+} from "../utils/projectDeploymentState";
 import {
   buildAssetUrl,
   deleteAsset,
@@ -851,9 +1093,9 @@ import {
 } from "../utils/assetsApi";
 import {
   normalizeAnimationElementEncoding,
-  normalizeImageElementEncoding,
-  validateDisplayEncoding
+  normalizeImageElementEncoding
 } from "../utils/displayImageEncoding";
+import { isDevOffline } from "../utils/devFlags";
 
 hljs.registerLanguage("yaml", yaml);
 
@@ -870,9 +1112,12 @@ const lastPreviewTabKeys = ref([]);
 const previewScrollInner = ref(null);
 const hasPreviewScrollbar = ref(false);
 const componentsQuery = ref("");
+const protocolTabPulse = ref(false);
+let protocolTabPulseTimer = null;
+const pendingProtocolPulseEntries = new Map();
 const busTabPulse = ref(false);
 let busTabPulseTimer = null;
-const pendingBusPulseIds = new Set();
+const pendingBusPulseEntries = new Map();
 const copySuccess = ref(false);
 let copyResetTimer = null;
 const activeComponentSlot = ref(null);
@@ -883,7 +1128,30 @@ const componentSchemas = ref({});
 const componentCatalog = ref({ categories: [] });
 const isComponentCatalogLoading = ref(true);
 const componentCatalogError = ref(null);
+const componentsZipInput = ref(null);
+const isComponentsImporting = ref(false);
+const importSummaryModalOpen = ref(false);
+const importSummaryModalMessage = ref("Import completed.");
+const importSummaryModalRows = ref([]);
+const isSavingCustomComponent = ref(false);
+const customComponentSaveError = ref("");
+const deletingCustomComponentId = ref("");
+const pendingDeleteCustomItem = ref(null);
+const confirmAction = ref(null);
+const isResolvingComponentSelection = ref(false);
+const componentSchemaStatus = ref({});
+const componentSchemaLoadPromises = new Map();
 const modeLevels = ["Simple", "Normal", "Advanced"];
+const nextModeLevelByMode = {
+  Simple: "Normal",
+  Normal: "Advanced",
+  Advanced: "Advanced"
+};
+const modeUpgradeButtonLabelByMode = {
+  Simple: "Show Normal configuration",
+  Normal: "Show Advanced configuration"
+};
+const modeUpgradeAvailability = ref({});
 const isProjectSaving = ref(false);
 const assetManagerOpen = ref(false);
 const assetsLoading = ref(false);
@@ -896,11 +1164,14 @@ const secretsSaving = ref(false);
 const secretsError = ref("");
 const projectSaveMessage = ref("");
 const projectSaveError = ref("");
+const sourceProjectFilename = ref("");
 const projectDeviceStatus = ref("offline");
 const projectDeviceHost = ref("");
 const projectDeviceName = ref("");
 let projectDevicePollId = null;
 let projectsUpdatedChannel = null;
+let deploymentSyncInFlight = false;
+let deviceStatusRefreshPromise = null;
 
 const activeModeLevel = ref(modeLevels[0]);
 const resolveModeLevel = (value) => {
@@ -910,7 +1181,32 @@ const resolveModeLevel = (value) => {
   const stripped = trimmed.replace(/\s*mode$/i, "");
   return modeLevels.includes(stripped) ? stripped : modeLevels[0];
 };
-const exportErrorOpen = ref(false);
+const modeUpgradeButtonLabel = computed(
+  () => modeUpgradeButtonLabelByMode[resolveModeLevel(activeModeLevel.value)] || ""
+);
+const handleModeUpgradeAvailability = ({ section, key, available }) => {
+  if (!section || !key) return;
+  const next = {
+    ...(modeUpgradeAvailability.value[section] || {}),
+    [key]: Boolean(available)
+  };
+  modeUpgradeAvailability.value = {
+    ...modeUpgradeAvailability.value,
+    [section]: next
+  };
+};
+const shouldShowModeUpgrade = (section) => {
+  if (!modeUpgradeButtonLabel.value) return false;
+  const sectionState = modeUpgradeAvailability.value[section] || {};
+  return Object.values(sectionState).some(Boolean);
+};
+const promoteModeLevel = () => {
+  const current = resolveModeLevel(activeModeLevel.value);
+  const next = nextModeLevelByMode[current] || modeLevels[0];
+  if (next === current) return;
+  activeModeLevel.value = next;
+};
+const formErrorsModalOpen = ref(false);
 const gpioGuideOpen = ref(false);
 const gpioData = ref({ sections: {} });
 const esphomeCoreSchema = ref(null);
@@ -924,12 +1220,28 @@ const bussesSchemas = ref({});
 const otherSchemas = ref({});
 const automationSchemas = ref({});
 
+const toPathLabel = (label, path) => (path.length ? `${label}.${path.join(".")}` : label);
+
+// Use the same effective ID value users see in the form.
+// For required id fields we fall back to schema default when config is still empty.
+const resolveRegistryFieldValue = (field, configValue) => {
+  if (!field?.key) return undefined;
+  const explicitValue = configValue?.[field.key];
+  if (explicitValue !== undefined) {
+    return explicitValue;
+  }
+  if (field.type === "id" && field.required === true && typeof field.default === "string") {
+    return field.default;
+  }
+  return undefined;
+};
+
 // Build a registry of values (used for duplicate id/name detection).
-const buildValueRegistry = (components, schemas, match) => {
+const buildValueRegistry = (entries, match) => {
   const counts = {};
 
   const addValue = (value) => {
-    if (!value) return;
+    if (!value || typeof value !== "string") return;
     const key = value.toLowerCase();
     counts[key] = (counts[key] || 0) + 1;
   };
@@ -937,12 +1249,17 @@ const buildValueRegistry = (components, schemas, match) => {
   const walkFields = (configValue, fields) => {
     if (!fields?.length) return;
     fields.forEach((field) => {
-      const value = configValue?.[field.key];
+      if (!field?.key) return;
+      if (!isFieldVisible(field, configValue, fields)) return;
+      const value = resolveRegistryFieldValue(field, configValue);
       if (match(field, value)) {
         addValue(value);
       }
       if (field.type === "object") {
-        walkFields(value || {}, field.fields || []);
+        const nestedValue = configValue?.[field.key];
+        if (nestedValue && typeof nestedValue === "object" && !Array.isArray(nestedValue)) {
+          walkFields(nestedValue, field.fields || []);
+        }
       }
       if (
         field.type === "list" &&
@@ -955,23 +1272,33 @@ const buildValueRegistry = (components, schemas, match) => {
     });
   };
 
-  components.forEach((entry) => {
-    const componentId = componentIdFromEntry(entry);
-    if (!componentId) return;
-    const schema = schemas[componentId];
-    if (!schema?.fields) return;
-    walkFields(entry?.config || {}, schema.fields);
+  (entries || []).forEach((entry) => {
+    if (!entry?.fields) return;
+    walkFields(entry.config || {}, entry.fields);
   });
 
   return counts;
 };
 
-const buildIdOptions = (idIndex, domain, contextComponentId) => {
+const buildIdOptions = (
+  idIndex,
+  domain,
+  contextComponentId,
+  allowSelfReference = false,
+  contextScopeId = ""
+) => {
   const seen = new Set();
   const options = [];
 
   (idIndex || []).forEach((entry) => {
-    if (contextComponentId && entry.componentId === contextComponentId) return;
+    if (!allowSelfReference) {
+      if (contextScopeId && entry.scopeId === contextScopeId) {
+        return;
+      }
+      if (!contextScopeId && contextComponentId && entry.componentId === contextComponentId) {
+        return;
+      }
+    }
     if (domain && entry.domain !== domain) return;
     if (seen.has(entry.idLower)) return;
     seen.add(entry.idLower);
@@ -982,19 +1309,28 @@ const buildIdOptions = (idIndex, domain, contextComponentId) => {
 };
 
 // Validate id_ref fields against the current id registry.
-const buildIdRefErrors = (components, schemas, idIndex) => {
+const buildIdRefErrors = (entries, idIndex) => {
   const errors = [];
 
-  const pushError = (componentId, path, message) => {
-    const label = componentId ? componentId.split(/[./]/).pop() : "component";
-    const pathLabel = path.length ? `${label}.${path.join(".")}` : label;
-    errors.push({ path: pathLabel, message });
+  const pushError = (entry, path, message) => {
+    errors.push({
+      path: toPathLabel(entry?.label || "component", path),
+      message,
+      scopeId: entry?.scopeId || ""
+    });
   };
 
-  const checkIdRef = (value, field, componentId, path) => {
-    const options = buildIdOptions(idIndex, field.domain, componentId);
+  const checkIdRef = (value, field, entry, path) => {
+    if (field?.required !== true) return;
+    const options = buildIdOptions(
+      idIndex,
+      field.domain,
+      entry?.componentId,
+      Boolean(field?.allowSelfReference),
+      entry?.scopeId || ""
+    );
     if (!options.length) {
-      pushError(componentId, path, "No matching identifiers available");
+      pushError(entry, path, "No matching identifiers available");
       return;
     }
     if (!value || typeof value !== "string") {
@@ -1002,22 +1338,24 @@ const buildIdRefErrors = (components, schemas, idIndex) => {
     }
     const match = options.some((option) => option.toLowerCase() === value.toLowerCase());
     if (!match) {
-      pushError(componentId, path, "No matching identifiers available");
+      pushError(entry, path, "No matching identifiers available");
     }
   };
 
-  const walkFields = (configValue, fields, componentId, path = []) => {
+  const walkFields = (configValue, fields, entry, path = []) => {
     if (!fields?.length) return;
     fields.forEach((field) => {
+      if (!field?.key) return;
       const value = configValue?.[field.key];
       const nextPath = [...path, field.key];
+      if (!isFieldVisible(field, configValue, fields)) return;
 
       if (field.type === "id_ref") {
-        checkIdRef(value, field, componentId, nextPath);
+        checkIdRef(value, field, entry, nextPath);
       }
 
       if (field.type === "object") {
-        walkFields(value || {}, field.fields || [], componentId, nextPath);
+        walkFields(value || {}, field.fields || [], entry, nextPath);
       }
 
       if (
@@ -1027,39 +1365,33 @@ const buildIdRefErrors = (components, schemas, idIndex) => {
         field.item?.fields
       ) {
         value.forEach((item, index) => {
-          walkFields(item || {}, field.item.fields, componentId, [...nextPath, String(index)]);
+          walkFields(item || {}, field.item.fields, entry, [...nextPath, String(index)]);
         });
       }
 
-      if (field.item?.extends === "base_actions.json" && Array.isArray(value)) {
-        value.forEach((action, index) => {
-          const actionFields = Array.isArray(action?.fields) ? action.fields : [];
-          const actionConfig = action?.config || {};
-          actionFields.forEach((actionField) => {
-            if (actionField.type !== "id_ref") return;
-            const actionPath = [...nextPath, String(index), actionField.key];
-            const actionValue = actionConfig[actionField.key];
-            checkIdRef(actionValue, actionField, componentId, actionPath);
-          });
+      if (
+        (field.item?.extends === "base_actions.json" || field.item?.extends === "base_conditions.json") &&
+        Array.isArray(value)
+      ) {
+        value.forEach((catalogEntry, index) => {
+          const catalogFields = Array.isArray(catalogEntry?.fields) ? catalogEntry.fields : [];
+          const catalogConfig = catalogEntry?.config || {};
+          walkFields(catalogConfig, catalogFields, entry, [...nextPath, String(index)]);
         });
       }
     });
   };
 
-  components.forEach((entry) => {
-    const componentId = componentIdFromEntry(entry);
-    if (!componentId) return;
-    const schema = schemas[componentId];
-    if (!schema?.fields) return;
-    walkFields(entry?.config || {}, schema.fields, componentId, []);
+  (entries || []).forEach((entry) => {
+    if (!entry?.fields) return;
+    walkFields(entry.config || {}, entry.fields, entry, []);
   });
 
   return errors;
 };
 
 const buildDisplayElementIdErrors = (
-  components,
-  schemas,
+  entries,
   idIndex,
   imageFiles,
   animationFiles,
@@ -1067,147 +1399,125 @@ const buildDisplayElementIdErrors = (
 ) => {
   const errors = [];
 
-  const pushError = (componentId, path, message) => {
-    const label = componentId ? componentId.split(/[./]/).pop() : "component";
-    const pathLabel = path.length ? `${label}.${path.join(".")}` : label;
-    errors.push({ path: pathLabel, message });
+  const pushError = (entry, path, message) => {
+    errors.push({
+      path: toPathLabel(entry?.label || "component", path),
+      message,
+      scopeId: entry?.scopeId || ""
+    });
   };
 
   const hasOptionMatch = (value, options) =>
     options.some((option) => option.toLowerCase() === String(value || "").toLowerCase());
 
-  const checkIdSelection = (value, options, componentId, path, message) => {
+  const checkIdSelection = (value, options, entry, path, message) => {
     if (!options.length) {
-      pushError(componentId, path, "No matching identifiers available");
+      pushError(entry, path, "No matching identifiers available");
       return;
     }
     if (!value || !String(value).trim()) {
-      pushError(componentId, path, message || "Please select an ID");
+      pushError(entry, path, message || "Please select an ID");
       return;
     }
     if (!hasOptionMatch(value, options)) {
-      pushError(componentId, path, "No matching identifiers available");
+      pushError(entry, path, "No matching identifiers available");
     }
   };
 
-  const checkFileSelection = (value, options, componentId, path, emptyMessage, missingMessage) => {
+  const checkFileSelection = (value, options, entry, path, emptyMessage, missingMessage) => {
     if (!options.length) {
-      pushError(componentId, path, emptyMessage);
+      pushError(entry, path, emptyMessage);
       return;
     }
     if (!value || !String(value).trim()) {
-      pushError(componentId, path, missingMessage);
+      pushError(entry, path, missingMessage);
       return;
     }
     if (!options.includes(value)) {
-      pushError(componentId, path, emptyMessage);
+      pushError(entry, path, emptyMessage);
     }
   };
 
-  const checkIconSelection = (value, icons, componentId, path) => {
+  const checkIconSelection = (value, icons, entry, path) => {
     if (!icons.length) {
-      pushError(componentId, path, "No MDI icons available");
+      pushError(entry, path, "No MDI icons available");
       return;
     }
     const name = String(value || "").trim();
     const trimmed = name.startsWith("mdi:") ? name.slice(4) : name;
     if (!trimmed) {
-      pushError(componentId, path, "Please select an icon");
+      pushError(entry, path, "Please select an icon");
       return;
     }
     if (!icons.some((icon) => icon.toLowerCase() === trimmed.toLowerCase())) {
-      pushError(componentId, path, "Invalid MDI icon name");
+      pushError(entry, path, "Invalid MDI icon name");
     }
   };
 
-  const checkDisplayEncoding = (kind, element, componentId, pathPrefix) => {
-    if (kind === "image") {
-      const problems = validateDisplayEncoding(
-        element?.imageType,
-        element?.imageTransparency,
-        element?.imageInvertAlpha ?? element?.invert,
-        element?.imageDither,
-        element?.imageByteOrder
-      );
-      problems.forEach((message) => {
-        pushError(componentId, [...pathPrefix, "imageType"], message);
-      });
-      return;
-    }
-
-    const problems = validateDisplayEncoding(
-      element?.animationType,
-      element?.animationTransparency,
-      element?.animationInvertAlpha,
-      element?.animationDither,
-      element?.animationByteOrder
-    );
-    problems.forEach((message) => {
-      pushError(componentId, [...pathPrefix, "animationType"], message);
-    });
-  };
-
-  components.forEach((entry, entryIndex) => {
-    const componentId = componentIdFromEntry(entry);
-    if (!componentId) return;
-    const schema = schemas?.[componentId];
-    if (schema?.domain !== "display") return;
+  (entries || []).forEach((entry) => {
+    if (entry?.domain !== "display") return;
     const layout = entry?.config?._display_builder;
     const elements = Array.isArray(layout?.elements) ? layout.elements : [];
     if (!elements.length) return;
+    const contextComponentId = entry.componentId;
+    const contextScopeId = entry.scopeId;
 
     elements.forEach((element, index) => {
       const basePath = ["_display_builder", "elements", String(index)];
       if (element?.type === "text" && element?.textMode === "dynamic") {
-        const options = buildIdOptions(idIndex, element?.dynamicDomain || "", componentId);
-        checkIdSelection(element?.dynamicId, options, componentId, [...basePath, "dynamicId"], "Please select a source ID");
+        const options = buildIdOptions(
+          idIndex,
+          element?.dynamicDomain || "",
+          contextComponentId,
+          false,
+          contextScopeId
+        );
+        checkIdSelection(element?.dynamicId, options, entry, [...basePath, "dynamicId"], "Please select a source ID");
       }
 
       if (element?.type === "graph") {
         if (!String(element?.graphId || "").trim()) {
-          pushError(componentId, [...basePath, "graphId"], "Please provide a graph ID");
+          pushError(entry, [...basePath, "graphId"], "Please provide a graph ID");
         }
         if (element?.useTraces) {
           const traces = Array.isArray(element?.traces) ? element.traces : [];
           traces.forEach((trace, traceIndex) => {
-            const options = buildIdOptions(idIndex, "sensor", componentId);
-            checkIdSelection(trace?.sensor, options, componentId, [...basePath, "traces", String(traceIndex), "sensor"], "Please select a sensor ID");
+            const options = buildIdOptions(idIndex, "sensor", contextComponentId, false, contextScopeId);
+            checkIdSelection(trace?.sensor, options, entry, [...basePath, "traces", String(traceIndex), "sensor"], "Please select a sensor ID");
           });
         } else {
-          const options = buildIdOptions(idIndex, "sensor", componentId);
-          checkIdSelection(element?.sensor, options, componentId, [...basePath, "sensor"], "Please select a sensor ID");
+          const options = buildIdOptions(idIndex, "sensor", contextComponentId, false, contextScopeId);
+          checkIdSelection(element?.sensor, options, entry, [...basePath, "sensor"], "Please select a sensor ID");
         }
       }
 
       if (element?.type === "animation") {
         if (!String(element?.animationId || "").trim()) {
-          pushError(componentId, [...basePath, "animationId"], "Please provide an animation ID");
+          pushError(entry, [...basePath, "animationId"], "Please provide an animation ID");
         }
         checkFileSelection(
           element?.animationFile,
           animationFiles || [],
-          componentId,
+          entry,
           [...basePath, "animationFile"],
           "No GIF animations available",
           "Please select an animation file"
         );
-        checkDisplayEncoding("animation", element, componentId, basePath);
       }
 
       if (element?.type === "image") {
         checkFileSelection(
           element?.image,
           imageFiles || [],
-          componentId,
+          entry,
           [...basePath, "image"],
           "No image files available",
           "Please select an image file"
         );
-        checkDisplayEncoding("image", element, componentId, basePath);
       }
 
       if (element?.type === "icon") {
-        checkIconSelection(element?.icon, iconNames || [], componentId, [...basePath, "icon"]);
+        checkIconSelection(element?.icon, iconNames || [], entry, [...basePath, "icon"]);
       }
     });
   });
@@ -1240,30 +1550,60 @@ const isFieldVisible = (field, contextValue, contextFields) => {
 const buildValidationErrors = (entries) => {
   const errors = [];
 
-  const pushError = (label, path, message) => {
-    const pathLabel = path.length ? `${label}.${path.join(".")}` : label;
-    errors.push({ path: pathLabel, message });
+  const pushError = (entry, path, message) => {
+    errors.push({
+      path: toPathLabel(entry?.label || "schema", path),
+      message,
+      scopeId: entry?.scopeId || ""
+    });
   };
 
-  const validateField = (value, field, label, path) => {
+  const validateField = (value, field, entry, path) => {
     if (field?.type === "password" && field?.settings?.format === "base64_44") {
       const content = typeof value === "string" ? value.trim() : "";
       if (!/^[A-Za-z0-9+/]{43}=$/.test(content)) {
-        pushError(label, path, "Key must be base64 (44 chars, ending with =)." );
+        pushError(entry, path, "Key must be base64 (44 chars, ending with =).");
       }
     }
   };
 
-  const walkFields = (configValue, fields, label, path = []) => {
+  const hasText = (value) => typeof value === "string" && value.trim().length > 0;
+  const isMacAddress = (value) => /^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/.test(String(value || "").trim());
+  const isHex32 = (value) => /^[0-9A-Fa-f]{32}$/.test(String(value || "").trim());
+  const isBleUuid = (value) => {
+    const normalized = String(value || "").trim();
+    return (
+      /^[0-9A-Fa-f]{4}$/.test(normalized) ||
+      /^[0-9A-Fa-f]{8}$/.test(normalized) ||
+      /^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/.test(
+        normalized
+      )
+    );
+  };
+  const isUuid128 = (value) =>
+    /^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/.test(
+      String(value || "").trim()
+    );
+  const isIntegerLike = (value) => {
+    if (value === undefined || value === null || value === "") return false;
+    const parsed = Number(value);
+    return Number.isInteger(parsed);
+  };
+  const hasTruthyObjectValue = (value) => {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+    return Object.values(value).some((item) => item === true || (typeof item === "string" && item.trim()) || typeof item === "number");
+  };
+
+  const walkFields = (configValue, fields, entry, path = []) => {
     if (!fields?.length) return;
     fields.forEach((field) => {
       if (!field?.key) return;
       const value = configValue?.[field.key];
       const nextPath = [...path, field.key];
       if (!isFieldVisible(field, configValue, fields)) return;
-      validateField(value, field, label, nextPath);
+      validateField(value, field, entry, nextPath);
       if (field.type === "object") {
-        walkFields(value || {}, field.fields || [], label, nextPath);
+        walkFields(value || {}, field.fields || [], entry, nextPath);
       }
       if (
         field.type === "list" &&
@@ -1272,15 +1612,128 @@ const buildValidationErrors = (entries) => {
         field.item?.fields
       ) {
         value.forEach((item, index) => {
-          walkFields(item || {}, field.item.fields, label, [...nextPath, String(index)]);
+          walkFields(item || {}, field.item.fields, entry, [...nextPath, String(index)]);
         });
       }
     });
   };
 
   entries.forEach((entry) => {
-    if (!entry?.schema?.fields) return;
-    walkFields(entry.config || {}, entry.schema.fields, entry.label, []);
+    if (!entry?.fields) return;
+    walkFields(entry.config || {}, entry.fields, entry, []);
+
+    if (entry.componentId === "sensor/ble_rssi") {
+      const config = entry.config || {};
+      const identityKeys = ["mac_address", "irk", "service_uuid", "ibeacon_uuid"];
+      const setCount = identityKeys.filter((key) => hasText(config[key])).length;
+
+      if (setCount !== 1) {
+        pushError(
+          entry,
+          ["mac_address"],
+          "Set exactly one identity: mac_address, irk, service_uuid or ibeacon_uuid."
+        );
+      }
+
+      if (hasText(config.mac_address) && !isMacAddress(config.mac_address)) {
+        pushError(entry, ["mac_address"], "MAC address must use format AA:BB:CC:DD:EE:FF.");
+      }
+      if (hasText(config.irk) && !isHex32(config.irk)) {
+        pushError(entry, ["irk"], "IRK must be a 32-character hexadecimal string.");
+      }
+      if (hasText(config.service_uuid) && !isBleUuid(config.service_uuid)) {
+        pushError(entry, ["service_uuid"], "Service UUID must be 16-bit, 32-bit, or 128-bit UUID.");
+      }
+      if (hasText(config.ibeacon_uuid) && !isUuid128(config.ibeacon_uuid)) {
+        pushError(entry, ["ibeacon_uuid"], "iBeacon UUID must be a 128-bit UUID.");
+      }
+      if (config.ibeacon_major !== undefined && config.ibeacon_major !== "" && !isIntegerLike(config.ibeacon_major)) {
+        pushError(entry, ["ibeacon_major"], "iBeacon major must be an integer.");
+      }
+      if (config.ibeacon_minor !== undefined && config.ibeacon_minor !== "" && !isIntegerLike(config.ibeacon_minor)) {
+        pushError(entry, ["ibeacon_minor"], "iBeacon minor must be an integer.");
+      }
+    }
+
+    if (entry.componentId === "sensor/ble_client") {
+      const config = entry.config || {};
+      const type = String(config.type || "").trim();
+      const isCharacteristic = type === "characteristic";
+
+      if (isCharacteristic) {
+        if (!hasText(config.service_uuid)) {
+          pushError(entry, ["service_uuid"], "Service UUID is required for characteristic type.");
+        }
+        if (!hasText(config.characteristic_uuid)) {
+          pushError(
+            entry,
+            ["characteristic_uuid"],
+            "Characteristic UUID is required for characteristic type."
+          );
+        }
+      }
+
+      if (hasText(config.service_uuid) && !isBleUuid(config.service_uuid)) {
+        pushError(entry, ["service_uuid"], "Service UUID must be 16-bit, 32-bit, or 128-bit UUID.");
+      }
+      if (hasText(config.characteristic_uuid) && !isBleUuid(config.characteristic_uuid)) {
+        pushError(
+          entry,
+          ["characteristic_uuid"],
+          "Characteristic UUID must be 16-bit, 32-bit, or 128-bit UUID."
+        );
+      }
+      if (hasText(config.descriptor_uuid) && !isBleUuid(config.descriptor_uuid)) {
+        pushError(
+          entry,
+          ["descriptor_uuid"],
+          "Descriptor UUID must be 16-bit, 32-bit, or 128-bit UUID."
+        );
+      }
+      if (config.on_notify && config.notify !== true) {
+        pushError(entry, ["on_notify"], "Enable notify=true to use on_notify automation.");
+      }
+    }
+
+    if (entry.componentId === "sensor/xiaomi_ble") {
+      const config = entry.config || {};
+      if (hasText(config.mac_address) && !isMacAddress(config.mac_address)) {
+        pushError(entry, ["mac_address"], "MAC address must use format AA:BB:CC:DD:EE:FF.");
+      }
+      if (hasText(config.bindkey) && !isHex32(config.bindkey)) {
+        pushError(entry, ["bindkey"], "Bindkey must be a 32-character hexadecimal string.");
+      }
+    }
+
+    if (entry.componentId === "display/ili9xxx") {
+      const config = entry.config || {};
+      const model = String(config.model || "").trim();
+      const dimensions = config.dimensions;
+      const hasDimensionsWidth = Number.isFinite(Number(dimensions?.width)) && Number(dimensions.width) > 0;
+      const hasDimensionsHeight = Number.isFinite(Number(dimensions?.height)) && Number(dimensions.height) > 0;
+      const hasTransform = hasTruthyObjectValue(config.transform);
+
+      if (config.rotation !== undefined && config.rotation !== "" && config.rotation !== "0" && hasTransform) {
+        pushError(entry, ["transform"], "Use either rotation or transform, not both.");
+      }
+
+      if (hasText(config.color_palette_images) && config.color_palette !== "IMAGE_ADAPTIVE") {
+        pushError(
+          entry,
+          ["color_palette_images"],
+          "color_palette_images is only valid when color_palette is IMAGE_ADAPTIVE."
+        );
+      }
+
+      if (model === "CUSTOM") {
+        if (!hasDimensionsWidth || !hasDimensionsHeight) {
+          pushError(entry, ["dimensions"], "Custom model requires dimensions.width and dimensions.height.");
+        }
+        if (!hasText(config.init_sequence)) {
+          pushError(entry, ["init_sequence"], "Custom model requires init_sequence.");
+        }
+      }
+    }
   });
 
   return errors;
@@ -1336,28 +1789,36 @@ const buildGpioUsageIndex = (components, schemas, extraConfigs = []) => {
 };
 
 // Flatten all ids with component context for id_ref lookups.
-const buildIdIndex = (components, schemas) => {
-  const entries = [];
+const buildIdIndex = (entries) => {
+  const idEntries = [];
 
-  const addEntry = (value, schema, componentId) => {
+  const addEntry = (value, entry, domainOverride = "") => {
     if (!value) return;
-    entries.push({
+    idEntries.push({
       id: value,
       idLower: value.toLowerCase(),
-      domain: schema?.domain || componentId.split(/[./]/)[0] || "",
-      componentId
+      domain: domainOverride || entry?.domain || entry?.componentId?.split(/[./]/)[0] || "",
+      componentId: entry?.componentId || "",
+      scopeId: entry?.scopeId || ""
     });
   };
 
-  const walkFields = (configValue, fields, schema, componentId) => {
+  const walkFields = (configValue, fields, entry) => {
     if (!fields?.length) return;
     fields.forEach((field) => {
-      const value = configValue?.[field.key];
+      if (!field?.key) return;
+      const value = resolveRegistryFieldValue(field, configValue);
+      if (!isFieldVisible(field, configValue, fields)) return;
       if (field.type === "id" && typeof value === "string" && value.trim()) {
-        addEntry(value, schema, componentId);
+        const idDomain =
+          typeof field.idDomain === "string" && field.idDomain.trim() ? field.idDomain.trim() : "";
+        addEntry(value, entry, idDomain);
       }
       if (field.type === "object") {
-        walkFields(value || {}, field.fields || [], schema, componentId);
+        const nestedValue = configValue?.[field.key];
+        if (nestedValue && typeof nestedValue === "object" && !Array.isArray(nestedValue)) {
+          walkFields(nestedValue, field.fields || [], entry);
+        }
       }
       if (
         field.type === "list" &&
@@ -1365,53 +1826,57 @@ const buildIdIndex = (components, schemas) => {
         field.item?.type === "object" &&
         field.item?.fields
       ) {
-        value.forEach((item) => walkFields(item || {}, field.item.fields, schema, componentId));
+        value.forEach((item) => walkFields(item || {}, field.item.fields, entry));
       }
     });
   };
 
-  components.forEach((entry) => {
-    const componentId = componentIdFromEntry(entry);
-    if (!componentId) return;
-    const schema = schemas[componentId];
-    if (!schema?.fields) return;
-    walkFields(entry?.config || {}, schema.fields, schema, componentId);
+  (entries || []).forEach((entry) => {
+    if (!entry?.fields) return;
+    walkFields(entry.config || {}, entry.fields, entry);
   });
 
-  return entries;
+  return idEntries;
 };
 
-const buildDuplicateErrors = (components, schemas, idCounts, nameCounts) => {
+const buildDuplicateErrors = (entries, idCounts, nameCounts) => {
   const errors = [];
 
-  const pushError = (componentId, path, message) => {
-    const label = componentId ? componentId.split(/[./]/).pop() : "component";
-    const pathLabel = path.length ? `${label}.${path.join(".")}` : label;
-    errors.push({ path: pathLabel, message });
+  const pushError = (entry, path, message) => {
+    errors.push({
+      path: toPathLabel(entry?.label || "component", path),
+      message,
+      scopeId: entry?.scopeId || ""
+    });
   };
 
-  const walkFields = (configValue, fields, componentId, path = []) => {
+  const walkFields = (configValue, fields, entry, path = []) => {
     if (!fields?.length) return;
     fields.forEach((field) => {
-      const value = configValue?.[field.key];
+      if (!field?.key) return;
+      const value = resolveRegistryFieldValue(field, configValue);
       const nextPath = [...path, field.key];
+      if (!isFieldVisible(field, configValue, fields)) return;
 
       if (field.type === "id" && typeof value === "string" && value.trim()) {
         const key = value.toLowerCase();
         if ((idCounts[key] || 0) > 1) {
-          pushError(componentId, nextPath, "ID already used");
+          pushError(entry, nextPath, "ID already used");
         }
       }
 
       if (field.key === "name" && typeof value === "string" && value.trim()) {
         const key = value.toLowerCase();
         if ((nameCounts[key] || 0) > 1) {
-          pushError(componentId, nextPath, "Name already used");
+          pushError(entry, nextPath, "Name already used");
         }
       }
 
       if (field.type === "object") {
-        walkFields(value || {}, field.fields || [], componentId, nextPath);
+        const nestedValue = configValue?.[field.key];
+        if (nestedValue && typeof nestedValue === "object" && !Array.isArray(nestedValue)) {
+          walkFields(nestedValue, field.fields || [], entry, nextPath);
+        }
       }
 
       if (
@@ -1421,18 +1886,15 @@ const buildDuplicateErrors = (components, schemas, idCounts, nameCounts) => {
         field.item?.fields
       ) {
         value.forEach((item, index) => {
-          walkFields(item || {}, field.item.fields, componentId, [...nextPath, String(index)]);
+          walkFields(item || {}, field.item.fields, entry, [...nextPath, String(index)]);
         });
       }
     });
   };
 
-  components.forEach((entry) => {
-    const componentId = componentIdFromEntry(entry);
-    if (!componentId) return;
-    const schema = schemas[componentId];
-    if (!schema?.fields) return;
-    walkFields(entry?.config || {}, schema.fields, componentId, []);
+  (entries || []).forEach((entry) => {
+    if (!entry?.fields) return;
+    walkFields(entry.config || {}, entry.fields, entry, []);
   });
 
   return errors;
@@ -1446,18 +1908,69 @@ const matchesQuery = (item, query) => {
   );
 };
 
-const componentIndex = computed(() => {
+const isComponentAvailable = (item) => item?.available !== false;
+const isSavedCustomComponentItem = (item) => {
+  const id = String(item?.id || "").trim().toLowerCase();
+  return id.startsWith("custom/") && id !== "custom/empty";
+};
+
+const normalizeSchemaPath = (value) => {
+  if (typeof value !== "string") return "";
+  const trimmed = value.trim();
+  return trimmed || "";
+};
+
+const componentCatalogItemsById = computed(() => {
   const map = new Map();
   componentCatalog.value?.categories?.forEach((category) => {
-    category.items.forEach((item) => map.set(item.id, item.name));
+    category.items.forEach((item) => {
+      if (!map.has(item.id)) {
+        map.set(item.id, item);
+      }
+    });
     category.subcategories.forEach((subcategory) => {
-      subcategory.items.forEach((item) => map.set(item.id, item.name));
+      subcategory.items.forEach((item) => {
+        if (!map.has(item.id)) {
+          map.set(item.id, item);
+        }
+      });
     });
   });
   return map;
 });
 
+const catalogItemById = (componentId) => componentCatalogItemsById.value.get(componentId) || null;
+
+const catalogSchemaPathById = (componentId) =>
+  normalizeSchemaPath(catalogItemById(componentId)?.schemaPath);
+
+const componentIndex = computed(() => {
+  const map = new Map();
+  componentCatalogItemsById.value.forEach((item, itemId) => {
+    map.set(itemId, item.name);
+  });
+  return map;
+});
+
 const componentLabel = (id) => (id ? componentIndex.value.get(id) ?? id : "");
+
+const componentEntryLabel = (entry) => {
+  const componentId = componentIdFromEntry(entry);
+  if (!componentId) return "";
+  const schema = componentSchemas.value?.[componentId];
+  const labelField = typeof schema?.uiLabelField === "string" ? schema.uiLabelField.trim() : "";
+  if (labelField) {
+    const candidate = entry?.config?.[labelField];
+    if (typeof candidate === "string" && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+  const fallbackLabel =
+    typeof schema?.defaultLabel === "string" && schema.defaultLabel.trim()
+      ? schema.defaultLabel.trim()
+      : "";
+  return componentLabel(componentId) || fallbackLabel || componentId;
+};
 
 const projectFilename = computed(() => {
   const coreValue = config.value.esphomeCore || {};
@@ -1514,11 +2027,24 @@ const selectedComponentIds = computed(
 
 const componentsHeader = computed(() => {
   if (activeComponentSlot.value === null) return "Components";
-  const componentId = componentIdFromEntry(
-    config.value.components[activeComponentSlot.value]
-  );
-  return componentId ? componentLabel(componentId) : "Add";
+  const entry = config.value.components[activeComponentSlot.value];
+  return entry ? componentEntryLabel(entry) : "Add";
 });
+
+const confirmTitle = computed(() =>
+  confirmAction.value === "delete-custom" ? "Delete saved component" : "Confirm"
+);
+const confirmMessage = computed(() => {
+  if (confirmAction.value === "delete-custom") {
+    const name = pendingDeleteCustomItem.value?.name || "this component";
+    return `Are you sure you want to delete \"${name}\"?`;
+  }
+  return "Are you sure?";
+});
+const confirmConfirmText = computed(() =>
+  confirmAction.value === "delete-custom" ? "Delete" : "Yes"
+);
+const confirmCancelText = computed(() => "Cancel");
 
 const schemaHelpUrl = (schema) => {
   const url = schema?.helpUrl;
@@ -1570,17 +2096,78 @@ const activeComponentEntry = computed(() => {
 });
 
 const activeComponentId = computed(() => componentIdFromEntry(activeComponentEntry.value));
+const activeComponentScopeId = computed(() =>
+  activeComponentSlot.value === null ? "" : `component:${activeComponentSlot.value}`
+);
+const activeComponentSchemaPath = computed(() => catalogSchemaPathById(activeComponentId.value));
 
 const activeComponentConfig = computed(() => activeComponentEntry.value?.config || {});
 const activeComponentCustomConfig = computed(
   () => activeComponentEntry.value?.customConfig || ""
 );
+const activeComponentSchema = computed(() => componentSchemas.value?.[activeComponentId.value] || null);
+const activeCustomComponentId = computed(() => {
+  const componentId = String(activeComponentId.value || "").trim().toLowerCase();
+  if (!componentId.startsWith("custom/")) return "";
+  return componentId;
+});
+const isSavedCustomComponentActive = computed(
+  () => Boolean(activeCustomComponentId.value) && activeCustomComponentId.value !== "custom/empty"
+);
+const showSaveCustomComponentAction = computed(
+  () =>
+    Boolean(activeCustomComponentId.value) &&
+    activeComponentSchema.value?.renderStrategy === "verbatim_root"
+);
+const customComponentActionLabel = computed(() =>
+  isSavedCustomComponentActive.value ? "Update Component" : "Save Component"
+);
+const activeCustomComponentName = computed(() => {
+  const value = activeComponentConfig.value?.name;
+  return typeof value === "string" ? value.trim() : "";
+});
+const existingSavedCustomNames = computed(() => {
+  const names = new Map();
+  componentCatalogItemsById.value.forEach((item, id) => {
+    const normalizedId = String(id || "").trim().toLowerCase();
+    if (!normalizedId.startsWith("custom/") || normalizedId === "custom/empty") return;
+    const value = String(item?.name || "").trim().toLowerCase();
+    if (value) {
+      names.set(normalizedId, value);
+    }
+  });
+  return names;
+});
+const isActiveCustomNameDuplicate = computed(() => {
+  const normalized = activeCustomComponentName.value.toLowerCase();
+  if (!normalized) return false;
+  for (const [componentId, name] of existingSavedCustomNames.value.entries()) {
+    if (componentId === activeCustomComponentId.value) continue;
+    if (name === normalized) return true;
+  }
+  return false;
+});
+const activeComponentFieldErrors = computed(() => {
+  if (!showSaveCustomComponentAction.value) return {};
+  if (!isActiveCustomNameDuplicate.value) return {};
+  return { name: "Component name already exists" };
+});
+const canSaveCustomComponent = computed(() => {
+  if (!showSaveCustomComponentAction.value) return false;
+  if (!activeCustomComponentName.value) return false;
+  if (isActiveCustomNameDuplicate.value) return false;
+  return !isSavingCustomComponent.value;
+});
 
 const esphomeCoreId = "general/core/core";
+const esphomeCoreScopeId = "tab:Core:esphome";
 const esphomeCoreConfig = computed(() => config.value.esphomeCore || {});
 const substitutionsCoreId = "general/core/substitutions";
+const substitutionsCoreScopeId = "tab:Core:substitutions";
 const substitutionsCoreConfig = computed(() => config.value.substitutions || {});
 const platformCoreId = "general/platform/platform";
+const platformCoreScopeId = "tab:Platform:core";
+const platformDetailScopeId = "tab:Platform:detail";
 const platformCoreConfig = computed(() => config.value.platformCore || {});
 const platformDetailId = computed(() => {
   const platform = platformCoreConfig.value?.platform;
@@ -1588,6 +2175,10 @@ const platformDetailId = computed(() => {
   return `general/platform/${platform}`;
 });
 const networkCoreId = "general/network/network";
+const networkTransportScopeId = "tab:Network:transport";
+const networkDetailScopeId = "tab:Network:detail";
+const networkOtaScopeId = "tab:Network:ota";
+const networkWebServerScopeId = "tab:Network:web_server";
 const networkCoreConfig = computed(() => config.value.networkCore || {});
 const networkDetailId = computed(() => {
   const transport = networkCoreConfig.value?.transport;
@@ -1600,6 +2191,13 @@ const protocolDefinitions = [
   { key: "mqtt", label: "MQTT", schemaId: "general/protocols/mqtt" },
   { key: "espnow", label: "ESP-NOW", schemaId: "general/protocols/esp-now" }
 ];
+const supportedProtocols = new Set(protocolDefinitions.map((entry) => entry.key));
+const autoManagedProtocolKeys = new Set(["mqtt", "espnow"]);
+const supportedAutoProtocols = new Set(
+  protocolDefinitions
+    .map((entry) => entry.key)
+    .filter((key) => autoManagedProtocolKeys.has(key))
+);
 const activeProtocolKey = ref(protocolDefinitions[0]?.key || "");
 const resolveProtocolEnabled = (key) => {
   const configEntry = protocolsCoreConfig.value?.[key] || {};
@@ -1619,6 +2217,9 @@ const protocolDetailId = computed(() => {
   const entry = protocolDefinitions.find((item) => item.key === activeProtocolKey.value);
   return entry?.schemaId || "";
 });
+const protocolDetailScopeId = computed(() =>
+  activeProtocolKey.value ? `tab:Protocols:${activeProtocolKey.value}` : "tab:Protocols"
+);
 const protocolDetailConfig = computed(() => {
   if (!activeProtocolKey.value) return {};
   return protocolsCoreConfig.value?.[activeProtocolKey.value] || {};
@@ -1662,6 +2263,26 @@ const activeComponentBusLabels = computed(() => {
   return labels.join("/");
 });
 const primaryRequiredBusKey = computed(() => activeComponentRequiredBusses.value[0] || "");
+const activeComponentRequiredProtocols = computed(() => {
+  if (!activeComponentEntry.value) return [];
+  const componentId = activeComponentId.value;
+  if (!componentId || !componentSchemas.value?.[componentId]) return [];
+  return Array.from(
+    getRequiredInterfaces({
+      components: [activeComponentEntry.value],
+      componentSchemas: componentSchemas.value,
+      supported: supportedProtocols
+    })
+  );
+});
+const activeComponentProtocolLabels = computed(() => {
+  if (!activeComponentRequiredProtocols.value.length) return "";
+  const labels = activeComponentRequiredProtocols.value.map(
+    (key) => protocolDefinitions.find((entry) => entry.key === key)?.label || key
+  );
+  return labels.join("/");
+});
+const primaryRequiredProtocolKey = computed(() => activeComponentRequiredProtocols.value[0] || "");
 
 const focusRequiredBus = () => {
   activeTab.value = "Busses";
@@ -1670,24 +2291,59 @@ const focusRequiredBus = () => {
   }
 };
 
-const componentIdList = computed(() =>
-  (config.value.components || []).map((entry) => componentIdFromEntry(entry)).filter(Boolean)
-);
+const focusRequiredProtocol = () => {
+  activeTab.value = "Protocols";
+  if (primaryRequiredProtocolKey.value) {
+    activeProtocolKey.value = primaryRequiredProtocolKey.value;
+  }
+};
 
-const triggerPulseIfComponentNeedsBus = (componentId) => {
-  if (!componentId) return;
-  const entry = (config.value.components || []).find(
-    (item) => componentIdFromEntry(item) === componentId
-  );
-  if (!entry) return;
-  const schema = componentSchemas.value?.[componentId];
-  if (!schema) return;
+const componentNeedsBus = (entry, componentId) => {
+  if (!entry || !componentId) return false;
+  if (!componentSchemas.value?.[componentId]) return false;
   const required = getRequiredInterfaces({
     components: [entry],
     componentSchemas: componentSchemas.value,
     supported: supportedBusses
   });
-  if (required.size) {
+  return required.size > 0;
+};
+
+const componentNeedsProtocol = (entry, componentId) => {
+  if (!entry || !componentId) return false;
+  if (!componentSchemas.value?.[componentId]) return false;
+  const required = getRequiredInterfaces({
+    components: [entry],
+    componentSchemas: componentSchemas.value,
+    supported: supportedProtocols
+  });
+  return required.size > 0;
+};
+
+const queueProtocolPulseForAddedComponent = (entry, componentId) => {
+  if (!entry || !componentId) return;
+  const schema = componentSchemas.value?.[componentId];
+  if (schema === undefined) {
+    const queue = pendingProtocolPulseEntries.get(componentId) || [];
+    queue.push(entry);
+    pendingProtocolPulseEntries.set(componentId, queue);
+    return;
+  }
+  if (componentNeedsProtocol(entry, componentId)) {
+    triggerProtocolTabPulse();
+  }
+};
+
+const queueBusPulseForAddedComponent = (entry, componentId) => {
+  if (!entry || !componentId) return;
+  const schema = componentSchemas.value?.[componentId];
+  if (schema === undefined) {
+    const queue = pendingBusPulseEntries.get(componentId) || [];
+    queue.push(entry);
+    pendingBusPulseEntries.set(componentId, queue);
+    return;
+  }
+  if (componentNeedsBus(entry, componentId)) {
     triggerBusTabPulse();
   }
 };
@@ -1703,6 +2359,21 @@ const triggerBusTabPulse = () => {
     busTabPulseTimer = setTimeout(() => {
       busTabPulse.value = false;
       busTabPulseTimer = null;
+    }, 3000);
+  });
+};
+
+const triggerProtocolTabPulse = () => {
+  if (protocolTabPulseTimer) {
+    clearTimeout(protocolTabPulseTimer);
+    protocolTabPulseTimer = null;
+  }
+  protocolTabPulse.value = false;
+  requestAnimationFrame(() => {
+    protocolTabPulse.value = true;
+    protocolTabPulseTimer = setTimeout(() => {
+      protocolTabPulse.value = false;
+      protocolTabPulseTimer = null;
     }, 3000);
   });
 };
@@ -1726,6 +2397,19 @@ const requiredBusses = computed(() => {
   });
 });
 const requiredBussesList = computed(() => Array.from(requiredBusses.value).sort());
+const requiredProtocols = computed(() => {
+  return getRequiredInterfaces({
+    components: config.value.components,
+    componentSchemas: componentSchemas.value,
+    networkConfig: networkCoreConfig.value,
+    networkSchema: networkDetailSchema.value,
+    protocolsConfig: protocolsCoreConfig.value,
+    enabledProtocols: enabledProtocolKeys.value,
+    protocolsSchemas: protocolsSchemas.value,
+    supported: supportedAutoProtocols
+  });
+});
+const requiredProtocolsList = computed(() => Array.from(requiredProtocols.value).sort());
 const bussesTabs = computed(() =>
   bussesDefinitions.map((entry) => ({ key: entry.key, label: entry.label }))
 );
@@ -1733,6 +2417,9 @@ const bussesDetailId = computed(() => {
   const entry = bussesDefinitions.find((item) => item.key === activeBussesKey.value);
   return entry?.schemaId || "";
 });
+const bussesDetailScopeId = computed(() =>
+  activeBussesKey.value ? `tab:Busses:${activeBussesKey.value}` : "tab:Busses"
+);
 const bussesDetailConfig = computed(() => {
   if (!activeBussesKey.value) return {};
   return bussesCoreConfig.value?.[activeBussesKey.value] || {};
@@ -1751,6 +2438,9 @@ const otherDetailId = computed(() => {
   const entry = otherDefinitions.find((item) => item.key === activeOtherKey.value);
   return entry?.schemaId || "";
 });
+const otherDetailScopeId = computed(() =>
+  activeOtherKey.value ? `tab:System:${activeOtherKey.value}` : "tab:System"
+);
 const otherDetailConfig = computed(() => {
   if (!activeOtherKey.value) return {};
   const current = systemConfig.value?.[activeOtherKey.value] || {};
@@ -1788,6 +2478,9 @@ const automationDetailId = computed(() => {
   const entry = automationDefinitions.find((item) => item.key === activeAutomationKey.value);
   return entry?.schemaId || "";
 });
+const automationDetailScopeId = computed(() =>
+  activeAutomationKey.value ? `tab:Automation:${activeAutomationKey.value}` : "tab:Automation"
+);
 const automationDetailSchema = computed(() => {
   if (!activeAutomationKey.value) return null;
   return automationSchemas.value?.[activeAutomationKey.value] || null;
@@ -1815,6 +2508,60 @@ const showDisplayAutomationNotice = computed(() =>
   splitPreviewEnabled.value &&
   activePreviewTab.value === "display" &&
   (generatedAutomation.value?.interval || []).length > 0
+);
+
+const embeddedDomainsByComponentDomain = computed(() => {
+  const map = new Map();
+
+  (config.value.components || []).forEach((entry) => {
+    const componentId = componentIdFromEntry(entry);
+    if (!componentId) return;
+    const schema = componentSchemas.value?.[componentId];
+    if (!schema || schema.domain === "display") return;
+
+    const embedded = Array.isArray(schema.embedded) ? schema.embedded : [];
+    if (!embedded.length) return;
+
+    const componentDomain = String(schema.domain || parseComponentId(componentId).domain || "").trim();
+    if (!componentDomain) return;
+
+    const fields = Array.isArray(schema.fields) ? schema.fields : [];
+    if (!fields.length) return;
+    const fieldByKey = new Map(fields.map((field) => [field?.key, field]));
+    const componentConfig =
+      entry?.config && typeof entry.config === "object" && !Array.isArray(entry.config)
+        ? entry.config
+        : {};
+
+    embedded.forEach((definition) => {
+      const key = typeof definition?.key === "string" ? definition.key.trim() : "";
+      const domain = typeof definition?.domain === "string" ? definition.domain.trim() : "";
+      if (!key || !domain) return;
+
+      const sourceField = fieldByKey.get(key);
+      if (!sourceField || sourceField.type !== "object") return;
+      if (!isSchemaFieldVisible(sourceField, componentConfig, fields, globalStore.value)) return;
+
+      if (!map.has(componentDomain)) {
+        map.set(componentDomain, new Set());
+      }
+      map.get(componentDomain).add(domain);
+    });
+  });
+
+  return map;
+});
+
+const hubDomainsInUse = computed(() => {
+  const domains = new Set();
+  embeddedDomainsByComponentDomain.value.forEach((domainSet) => {
+    domainSet.forEach((domain) => domains.add(domain));
+  });
+  return domains;
+});
+
+const componentDomainsUsingHubs = computed(
+  () => new Set(Array.from(embeddedDomainsByComponentDomain.value.keys()))
 );
 
 const formatGeneratedLine = (entry, field) => {
@@ -1871,13 +2618,129 @@ const mdiIcons = ref([]);
 
 provide("mdiIcons", mdiIcons);
 
+const schemaEntries = computed(() => {
+  const entries = [];
+
+  const pushEntry = ({ scopeId, label, componentId, config, schema }) => {
+    const fields = schema?.fields || [];
+    if (!fields.length) return;
+    entries.push({
+      scopeId,
+      label,
+      componentId,
+      config: config || {},
+      fields,
+      domain: schema?.domain || ""
+    });
+  };
+
+  pushEntry({
+    scopeId: "tab:Core",
+    label: "core.esphome",
+    componentId: esphomeCoreId,
+    config: esphomeCoreConfig.value,
+    schema: esphomeCoreSchema.value
+  });
+  pushEntry({
+    scopeId: "tab:Core",
+    label: "core.substitutions",
+    componentId: substitutionsCoreId,
+    config: substitutionsCoreConfig.value,
+    schema: substitutionsCoreSchema.value
+  });
+  pushEntry({
+    scopeId: "tab:Platform",
+    label: "platform.core",
+    componentId: platformCoreId,
+    config: platformCoreConfig.value,
+    schema: platformCoreSchema.value
+  });
+  pushEntry({
+    scopeId: "tab:Platform",
+    label: "platform.detail",
+    componentId: platformDetailId.value,
+    config: platformCoreConfig.value,
+    schema: platformDetailSchema.value
+  });
+  pushEntry({
+    scopeId: "tab:Network",
+    label: "network.core",
+    componentId: networkCoreId,
+    config: networkCoreConfig.value,
+    schema: networkCoreSchema.value
+  });
+  pushEntry({
+    scopeId: "tab:Network",
+    label: "network.detail",
+    componentId: networkDetailId.value,
+    config: networkCoreConfig.value,
+    schema: networkDetailSchema.value
+  });
+
+  protocolDefinitions.forEach((entry) => {
+    pushEntry({
+      scopeId: "tab:Protocols",
+      label: `protocols.${entry.key}`,
+      componentId: entry.schemaId,
+      config: protocolsCoreConfig.value?.[entry.key] || {},
+      schema: protocolsSchemas.value?.[entry.key]
+    });
+  });
+
+  bussesDefinitions.forEach((entry) => {
+    pushEntry({
+      scopeId: "tab:Busses",
+      label: `busses.${entry.key}`,
+      componentId: entry.schemaId,
+      config: bussesCoreConfig.value?.[entry.key] || {},
+      schema: bussesSchemas.value?.[entry.key]
+    });
+  });
+
+  otherDefinitions.forEach((entry) => {
+    pushEntry({
+      scopeId: "tab:System",
+      label: `system.${entry.key}`,
+      componentId: entry.schemaId,
+      config: systemConfig.value || {},
+      schema: otherSchemas.value?.[entry.key]
+    });
+  });
+
+  automationDefinitions.forEach((entry) => {
+    pushEntry({
+      scopeId: `tab:Automation:${entry.key}`,
+      label: `automation.${entry.key}`,
+      componentId: entry.schemaId,
+      config: automationCoreConfig.value || {},
+      schema: automationSchemas.value?.[entry.key]
+    });
+  });
+
+  (config.value.components || []).forEach((entry, index) => {
+    const componentId = componentIdFromEntry(entry);
+    if (!componentId) return;
+    const schema = componentSchemas.value?.[componentId];
+    const name = componentEntryLabel(entry) || componentId.split(/[./]/).pop() || "component";
+    pushEntry({
+      scopeId: `component:${index}`,
+      label: name,
+      componentId,
+      config: entry?.config || {},
+      schema
+    });
+  });
+
+  return entries;
+});
+
 const idRegistry = computed(() =>
-  buildValueRegistry(config.value.components, componentSchemas.value, (field, value) =>
+  buildValueRegistry(schemaEntries.value, (field, value) =>
     field.type === "id" && typeof value === "string" && value.trim()
   )
 );
 
-const idIndex = computed(() => buildIdIndex(config.value.components, componentSchemas.value));
+const idIndex = computed(() => buildIdIndex(schemaEntries.value));
 
 const displayImageFiles = computed(() =>
   displayImages.value
@@ -1890,32 +2753,20 @@ const displayAnimationFiles = computed(() =>
 );
 
 const nameRegistry = computed(() =>
-  buildValueRegistry(config.value.components, componentSchemas.value, (field, value) =>
+  buildValueRegistry(schemaEntries.value, (field, value) =>
     field.key === "name" && typeof value === "string" && value.trim()
   )
 );
 
 const duplicateErrors = computed(() =>
-  buildDuplicateErrors(
-    config.value.components,
-    componentSchemas.value,
-    idRegistry.value,
-    nameRegistry.value
-  )
+  buildDuplicateErrors(schemaEntries.value, idRegistry.value, nameRegistry.value)
 );
 
-const idRefErrors = computed(() =>
-  buildIdRefErrors(
-    config.value.components,
-    componentSchemas.value,
-    idIndex.value
-  )
-);
+const idRefErrors = computed(() => buildIdRefErrors(schemaEntries.value, idIndex.value));
 
 const displayElementIdErrors = computed(() =>
   buildDisplayElementIdErrors(
-    config.value.components,
-    componentSchemas.value,
+    schemaEntries.value,
     idIndex.value,
     displayImageFiles.value,
     displayAnimationFiles.value,
@@ -1982,18 +2833,7 @@ const globalStore = computed(() => {
   return buildGlobalRegistry(entries);
 });
 
-const validationErrors = computed(() => {
-  const entries = [];
-  const apiSchema = protocolsSchemas.value?.api || null;
-  if (enabledProtocolKeys.value.includes("api") && apiSchema?.fields) {
-    entries.push({
-      label: "protocols.api",
-      config: protocolsCoreConfig.value?.api || {},
-      schema: apiSchema
-    });
-  }
-  return buildValidationErrors(entries);
-});
+const validationErrors = computed(() => buildValidationErrors(schemaEntries.value));
 
 const formErrors = computed(() => [
   ...duplicateErrors.value,
@@ -2001,6 +2841,14 @@ const formErrors = computed(() => [
   ...displayElementIdErrors.value,
   ...validationErrors.value
 ]);
+
+const formErrorScopeIds = computed(
+  () => new Set(formErrors.value.map((entry) => entry.scopeId).filter(Boolean))
+);
+
+const hasTabErrors = (tab) => formErrorScopeIds.value.has(`tab:${tab}`);
+
+const hasComponentErrors = (index) => formErrorScopeIds.value.has(`component:${index}`);
 
 const previewMode = computed({
   get: () => (splitPreviewEnabled.value ? "tabs" : "single"),
@@ -2076,35 +2924,62 @@ const handleBackToDashboard = () => {
 };
 
 
-const selectComponent = (item) => {
+const selectComponent = async (item) => {
   if (activeComponentSlot.value === null) return;
-  const index = activeComponentSlot.value;
-  const existing = config.value.components[index];
-  const existingId = componentIdFromEntry(existing);
-  const nextEntry = {
-    id: item.id,
-    config: existingId === item.id ? existing?.config || {} : {},
-    customConfig: existingId === item.id ? existing?.customConfig || "" : ""
-  };
-  if (index >= config.value.components.length) {
-    config.value.components.push(nextEntry);
-  } else {
-    config.value.components.splice(index, 1, nextEntry);
+  if (!isComponentAvailable(item)) return;
+  if (isResolvingComponentSelection.value) return;
+  isResolvingComponentSelection.value = true;
+  try {
+    const index = activeComponentSlot.value;
+    const isNewComponent = index >= config.value.components.length;
+    const existing = config.value.components[index];
+    const existingId = componentIdFromEntry(existing);
+    const prefillConfig =
+      existingId === item.id
+        ? null
+        : item?.prefillConfig && typeof item.prefillConfig === "object"
+          ? JSON.parse(JSON.stringify(item.prefillConfig))
+          : null;
+    const schemaResolution = await ensureComponentSchema(item.id, normalizeSchemaPath(item.schemaPath));
+    if (schemaResolution.status !== "ready") {
+      return;
+    }
+    const nextEntry = {
+      id: item.id,
+      config: existingId === item.id ? existing?.config || {} : prefillConfig || {},
+      customConfig: existingId === item.id ? existing?.customConfig || "" : ""
+    };
+    if (index >= config.value.components.length) {
+      config.value.components.push(nextEntry);
+    } else {
+      config.value.components.splice(index, 1, nextEntry);
+    }
+    if (isNewComponent) {
+      queueProtocolPulseForAddedComponent(nextEntry, item.id);
+      queueBusPulseForAddedComponent(nextEntry, item.id);
+    }
+    isComponentPickerOpen.value = false;
+  } finally {
+    isResolvingComponentSelection.value = false;
   }
-  ensureComponentSchema(item.id);
-  isComponentPickerOpen.value = false;
 };
 
 const requestRemoveComponent = (index) => {
   pendingRemoveIndex.value = index;
+  confirmAction.value = "remove-component";
   confirmOpen.value = true;
 };
 
-const confirmRemove = () => {
+const confirmRemove = async () => {
+  if (confirmAction.value === "delete-custom") {
+    await deleteSavedCustomComponent();
+    return;
+  }
   if (pendingRemoveIndex.value === null) return;
   config.value.components.splice(pendingRemoveIndex.value, 1);
   activeComponentSlot.value = null;
   pendingRemoveIndex.value = null;
+  confirmAction.value = null;
   confirmOpen.value = false;
   addComponentSlot();
   saveConfig();
@@ -2112,6 +2987,8 @@ const confirmRemove = () => {
 
 const cancelRemove = () => {
   pendingRemoveIndex.value = null;
+  pendingDeleteCustomItem.value = null;
+  confirmAction.value = null;
   confirmOpen.value = false;
 };
 
@@ -2143,21 +3020,57 @@ const filteredCategories = computed(() => {
 });
 
 // Lazy-load schema for a component when first needed.
-const ensureComponentSchema = (componentId) => {
-  if (!componentId || componentSchemas.value[componentId]) return;
-  loadComponentSchema(componentId)
+const ensureComponentSchema = async (componentId, schemaPath = "") => {
+  if (!componentId) {
+    return { status: "error", schema: null };
+  }
+  if (componentSchemas.value[componentId]) {
+    componentSchemaStatus.value = {
+      ...componentSchemaStatus.value,
+      [componentId]: "ready"
+    };
+    return { status: "ready", schema: componentSchemas.value[componentId] };
+  }
+
+  const existingPromise = componentSchemaLoadPromises.get(componentId);
+  if (existingPromise) {
+    return existingPromise;
+  }
+
+  componentSchemaStatus.value = {
+    ...componentSchemaStatus.value,
+    [componentId]: "loading"
+  };
+
+  const loadingPromise = loadComponentSchema(componentId, schemaPath || catalogSchemaPathById(componentId))
     .then((schema) => {
       componentSchemas.value = {
         ...componentSchemas.value,
         [componentId]: schema
       };
+      componentSchemaStatus.value = {
+        ...componentSchemaStatus.value,
+        [componentId]: "ready"
+      };
+      return { status: "ready", schema };
     })
     .catch(() => {
       componentSchemas.value = {
         ...componentSchemas.value,
         [componentId]: null
       };
+      componentSchemaStatus.value = {
+        ...componentSchemaStatus.value,
+        [componentId]: "error"
+      };
+      return { status: "error", schema: null };
+    })
+    .finally(() => {
+      componentSchemaLoadPromises.delete(componentId);
     });
+
+  componentSchemaLoadPromises.set(componentId, loadingPromise);
+  return loadingPromise;
 };
 
 const defaultConfig = () => ({
@@ -2219,6 +3132,9 @@ const cloneConfigForPersistence = (source) => {
 const buildConfigFingerprint = (source) => {
   const payload = cloneConfigForPersistence(source);
   delete payload.isSaved;
+  // Runtime deployment metadata is persisted, but it must not mark the editor dirty.
+  // Dirty/saved reflects user-editable project content only.
+  delete payload.deployment;
   return safeStringify(payload);
 };
 
@@ -2492,7 +3408,7 @@ watch(
   () => formErrors.value.length,
   (count) => {
     if (!count) {
-      exportErrorOpen.value = false;
+      formErrorsModalOpen.value = false;
     }
   }
 );
@@ -2571,7 +3487,15 @@ const filterConfigBySchema = (sourceValue, fields) => {
       filtered[field.key] = filterConfigBySchema(value, field.fields || []);
       return;
     }
-    if (field.type === "list" && Array.isArray(value) && field.item?.fields) {
+    if (
+      field.type === "list" &&
+      Array.isArray(value) &&
+      (field.item?.extends === "base_actions.json" || field.item?.extends === "base_filters.json")
+    ) {
+      filtered[field.key] = value;
+      return;
+    }
+    if (field.type === "list" && Array.isArray(value) && Array.isArray(field.item?.fields)) {
       filtered[field.key] = value.map((item) => {
         if (item && typeof item === "object") {
           return filterConfigBySchema(item, field.item.fields || []);
@@ -2820,24 +3744,6 @@ const yamlPreview = computed(() => {
 const otherSchemaMap = otherSchemas.value || {};
 const otherConfig = systemConfig.value || {};
 
-  const appendOtherSection = (sectionKey, label, configValue) => {
-    const schema = otherSchemaMap[sectionKey];
-    const fields = schema?.fields || [];
-    if (!fields.length) return;
-    const filteredValue = filterConfigBySchema(configValue || {}, fields);
-    const sectionLines = buildSchemaYaml(
-      filteredValue,
-      fields,
-      2,
-      config.value,
-      globalStore.value
-    );
-    if (!sectionLines.length) return;
-    lines.push("");
-    lines.push(`${label}:`);
-    lines.push(...sectionLines);
-  };
-
   const otherEntries = [
     { key: "logger", label: "logger" },
     { key: "status_led", label: "status_led" },
@@ -2867,24 +3773,6 @@ const otherConfig = systemConfig.value || {};
   const automationConfig = automationCoreConfig.value || {};
   const generated = generatedAutomation.value || {};
 
-  const appendAutomationSection = (sectionKey, label, configValue) => {
-    const schema = automationSchemaMap[sectionKey];
-    const fields = schema?.fields || [];
-    if (!fields.length) return;
-    const filteredValue = filterConfigBySchema(configValue || {}, fields);
-    const sectionLines = buildSchemaYaml(
-      filteredValue,
-      fields,
-      2,
-      config.value,
-      globalStore.value
-    );
-    if (!sectionLines.length) return;
-    lines.push("");
-    lines.push(`${label}:`);
-    lines.push(...sectionLines);
-  };
-
   const buildAutomationListLines = (items, itemFields) => {
     const listLines = [];
     items.forEach((item) => {
@@ -2913,14 +3801,32 @@ const otherConfig = systemConfig.value || {};
     return [];
   };
 
+  const automationItemSignature = (item, itemFields) => {
+    const objectLines = buildSchemaYaml(item || {}, itemFields, 0, config.value, globalStore.value);
+    return objectLines.join("\n");
+  };
+
+  const dedupeAutomationItems = (items, itemFields, seen) =>
+    items.filter((item) => {
+      const signature = automationItemSignature(item, itemFields);
+      if (!signature) return true;
+      if (seen.has(signature)) return false;
+      seen.add(signature);
+      return true;
+    });
+
   automationDefinitions.forEach((entry) => {
     const schema = automationSchemaMap[entry.key];
     const fields = schema?.fields || [];
     const listField = fields.find((field) => field.key === entry.key);
     const itemFields = listField?.item?.fields || [];
-    const generatedItems = normalizeAutomationItems(generated[entry.key]);
-    const manualItems = normalizeAutomationItems(automationConfig[entry.key]);
-    if (!itemFields.length || (!generatedItems.length && !manualItems.length)) return;
+    const generatedItemsRaw = normalizeAutomationItems(generated[entry.key]);
+    const manualItemsRaw = normalizeAutomationItems(automationConfig[entry.key]);
+    if (!itemFields.length || (!generatedItemsRaw.length && !manualItemsRaw.length)) return;
+    const seen = new Set();
+    const generatedItems = dedupeAutomationItems(generatedItemsRaw, itemFields, seen);
+    const manualItems = dedupeAutomationItems(manualItemsRaw, itemFields, seen);
+    if (!generatedItems.length && !manualItems.length) return;
     lines.push("");
     lines.push(`${entry.key}:`);
     if (generatedItems.length) {
@@ -2962,6 +3868,7 @@ const otherConfig = systemConfig.value || {};
   const componentLines = buildComponentsYaml(
     config.value.components,
     componentSchemas.value,
+    componentSchemaStatus.value,
     globalStore.value,
     mdiSubstitutions.value
   );
@@ -2989,11 +3896,27 @@ const parseYamlBlocks = (yamlText) => {
     return trimmed.includes(":");
   };
 
+  const isTopLevelValueLine = (line) => {
+    if (!line || /^\s/.test(line)) return false;
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) return false;
+    return !trimmed.includes(":");
+  };
+
   lines.forEach((line) => {
     if (isTopLevelKey(line)) {
       if (current) blocks.push(current);
       const key = line.split(":")[0].trim();
       current = { key, lines: [line] };
+      return;
+    }
+    if (isTopLevelValueLine(line)) {
+      if (!current || current.key !== "__root_misc__") {
+        if (current) blocks.push(current);
+        current = { key: "__root_misc__", lines: [line] };
+        return;
+      }
+      current.lines.push(line);
       return;
     }
     if (current) {
@@ -3006,6 +3929,54 @@ const parseYamlBlocks = (yamlText) => {
 };
 
 const yamlBlocks = computed(() => parseYamlBlocks(yamlPreview.value));
+
+const parseTopLevelKeysFromYamlSnippet = (yamlText) => {
+  const keys = [];
+  const lines = (yamlText || "").split(/\r?\n/);
+  lines.forEach((line) => {
+    if (!line || /^\s/.test(line)) return;
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#") || !trimmed.includes(":")) return;
+    const key = trimmed.split(":")[0].trim();
+    if (key) keys.push(key);
+  });
+  return keys;
+};
+
+const customPreviewBlockKeys = computed(() => {
+  const keys = new Set();
+  (config.value.components || []).forEach((entry) => {
+    const componentId = componentIdFromEntry(entry);
+    if (!componentId) return;
+    const schema = componentSchemas.value?.[componentId];
+    if (schema?.renderStrategy !== "verbatim_root") return;
+    const rawField = typeof schema?.verbatimField === "string" && schema.verbatimField.trim()
+      ? schema.verbatimField.trim()
+      : "custom_config";
+    const rawYaml = typeof entry?.config?.[rawField] === "string" ? entry.config[rawField] : "";
+    parseTopLevelKeysFromYamlSnippet(rawYaml).forEach((key) => keys.add(key));
+  });
+  return keys;
+});
+
+const customPreviewBlocks = computed(() => {
+  const blocks = [];
+  (config.value.components || []).forEach((entry, index) => {
+    const componentId = componentIdFromEntry(entry);
+    if (!componentId) return;
+    const schema = componentSchemas.value?.[componentId];
+    if (schema?.renderStrategy !== "verbatim_root") return;
+    const rawField =
+      typeof schema?.verbatimField === "string" && schema.verbatimField.trim()
+        ? schema.verbatimField.trim()
+        : "custom_config";
+    const rawYaml = typeof entry?.config?.[rawField] === "string" ? entry.config[rawField] : "";
+    const normalized = rawYaml.replace(/\r\n/g, "\n").replace(/\r/g, "\n").trimEnd();
+    if (!normalized.trim()) return;
+    blocks.push({ key: `custom-${index}`, lines: normalized.split("\n") });
+  });
+  return blocks;
+});
 
 const coreBlockKeys = computed(() => {
   const keys = new Set([
@@ -3103,6 +4074,12 @@ const previewTabs = computed(() => {
     bussesBlocks.forEach((block) => used.add(block.key));
   }
 
+  const hubsBlocks = blocks.filter((block) => hubDomainsInUse.value.has(block.key));
+  if (hubsBlocks.length) {
+    tabs.push({ key: "hubs", label: "Hubs", blocks: hubsBlocks });
+    hubsBlocks.forEach((block) => used.add(block.key));
+  }
+
   const substitutionsBlocks = blocks.filter((block) => substitutionsBlockKeys.has(block.key));
   const displayBlocks = blocks.filter((block) => block.key === "display");
   const combinedDisplayBlocks = [...substitutionsBlocks, ...displayBlocks];
@@ -3111,13 +4088,30 @@ const previewTabs = computed(() => {
     combinedDisplayBlocks.forEach((block) => used.add(block.key));
   }
 
+  const customBlocks = customPreviewBlocks.value;
+  if (customBlocks.length) {
+    tabs.push({ key: "custom", label: "Custom", blocks: customBlocks });
+    customPreviewBlockKeys.value.forEach((key) => used.add(key));
+    used.add("__root_misc__");
+  }
+
   blocks.forEach((block) => {
     if (used.has(block.key)) return;
-    tabs.push({ key: block.key, label: humanizePreviewKey(block.key), blocks: [block] });
+    const groupedBlocks = blocks.filter((candidate) => candidate.key === block.key);
+    tabs.push({ key: block.key, label: humanizePreviewKey(block.key), blocks: groupedBlocks });
     used.add(block.key);
   });
 
   return tabs;
+});
+
+const hasHubsPreviewTab = computed(() => previewTabs.value.some((tab) => tab.key === "hubs"));
+
+const showHubNotice = computed(() => {
+  if (!splitPreviewEnabled.value) return false;
+  if (activePreviewTab.value === "hubs") return false;
+  if (!hasHubsPreviewTab.value) return false;
+  return componentDomainsUsingHubs.value.has(activePreviewTab.value);
 });
 
 onBeforeUpdate(() => {
@@ -3204,7 +4198,12 @@ const resolvePreviewTabKeyFromMain = () => {
   if (activeTab.value === "Busses") return "busses";
   if (activeTab.value === "Automation") return "automation";
   if (activeTab.value === "Components") {
-    const { domain } = parseComponentId(activeComponentId.value || "");
+    const componentId = activeComponentId.value || "";
+    const schema = componentSchemas.value?.[componentId];
+    if (schema?.renderStrategy === "verbatim_root") {
+      return "custom";
+    }
+    const { domain } = parseComponentId(componentId);
     if (!domain) return "";
     return domain === "display" ? "display" : domain;
   }
@@ -3238,7 +4237,7 @@ watch(
     }
     if (!addedKey) return;
     if (isHydrating.value) return;
-    if (addedKey === "busses") return;
+    if (["busses", "hubs"].includes(addedKey)) return;
     const addedIndex = keys.indexOf(addedKey);
     if (addedIndex === -1) return;
     activePreviewTab.value = addedKey;
@@ -3338,6 +4337,7 @@ onMounted(() => {
   window.addEventListener("app:builder-export", handleAppExport);
   window.addEventListener("app:install-option", handleAppInstallOption);
   window.addEventListener("app:builder-logs", handleAppLogs);
+  window.addEventListener("app:validate", handleAppValidate);
   window.addEventListener("app:builder-save-request", handleBuilderSaveRequest);
   emitCompileState();
   startDeviceStatusPolling();
@@ -3365,7 +4365,7 @@ const highlightedYaml = computed(() => {
 
 const exportYaml = () => {
   if (formErrors.value.length) {
-    exportErrorOpen.value = true;
+    formErrorsModalOpen.value = true;
     return;
   }
   const blob = new Blob([yamlPreview.value], { type: "text/yaml" });
@@ -3391,12 +4391,26 @@ const saveConfig = () => {
   }
 };
 
+const markProjectDirty = () => {
+  if (config.value?.isSaved !== false) {
+    config.value.isSaved = false;
+  }
+  saveConfig();
+};
+
+const markProjectSavedFromCurrentState = () => {
+  persistedConfigFingerprint.value = buildConfigFingerprint(config.value);
+  config.value.isSaved = true;
+  saveConfig();
+};
+
 const ADDON_ROOT_FOLDER_ID = "root";
 const ADDON_ROOT_FOLDER_LABEL = "Projects";
 const PROJECTS_UPDATED_STORAGE_KEY = "vebProjectsUpdatedSignal";
 const PROJECTS_UPDATED_CHANNEL = "ecd-projects";
 const addonBaseUrl = new URL("./", window.location.href).toString();
 const assetsBase = new URL("api/assets/", addonBaseUrl).toString();
+const localComponentCatalogUrl = new URL("components_list/components_list.json", window.location.href).toString();
 
 const buildAddonUrl = (path) => new URL(path, addonBaseUrl).toString();
 
@@ -3405,6 +4419,109 @@ const addonFetch = async (path, options = {}) => {
     credentials: "include",
     ...options
   });
+};
+
+const encodePathSegments = (value) =>
+  String(value || "")
+    .split("/")
+    .filter((segment) => segment.length > 0)
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+
+const toApiErrorMessage = (payload, fallback) => {
+  const message = typeof payload?.message === "string" ? payload.message.trim() : "";
+  if (message) return message;
+  return fallback;
+};
+
+const refreshComponentCatalog = async () => {
+  isComponentCatalogLoading.value = true;
+  try {
+    if (isDevOffline) {
+      const localUrl = `${localComponentCatalogUrl}?t=${Date.now()}`;
+      const response = await fetch(localUrl, {
+        cache: "no-store",
+        credentials: "same-origin"
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok || !payload || typeof payload !== "object") {
+        throw new Error(`Component catalog load failed (${response.status})`);
+      }
+      componentCatalog.value = payload;
+      componentCatalogError.value = null;
+      return;
+    }
+    const response = await addonFetch("api/component-catalog");
+    const payload = await response.json().catch(() => null);
+    if (!response.ok || !payload?.catalog || typeof payload.catalog !== "object") {
+      throw new Error(toApiErrorMessage(payload, `Component catalog load failed (${response.status})`));
+    }
+    componentCatalog.value = payload.catalog;
+    componentCatalogError.value = null;
+  } catch (error) {
+    componentCatalogError.value = error;
+    componentCatalog.value = { categories: [] };
+    console.error("Component catalog load failed", error);
+  } finally {
+    isComponentCatalogLoading.value = false;
+  }
+};
+
+const openComponentsZipPicker = () => {
+  if (isComponentsImporting.value) return;
+  componentsZipInput.value?.click();
+};
+
+const handleComponentsZipSelected = async (event) => {
+  const input = event?.target;
+  const file = input?.files?.[0] || null;
+  if (!file) return;
+  customComponentSaveError.value = "";
+  importSummaryModalOpen.value = false;
+  isComponentsImporting.value = true;
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await addonFetch("api/components/import-zip", {
+      method: "POST",
+      body: formData
+    });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      throw new Error(toApiErrorMessage(payload, "Components import failed"));
+    }
+    const summary = {
+      imported: Number(payload?.summary?.imported || 0),
+      updated: Number(payload?.summary?.updated || 0),
+      skipped: Number(payload?.summary?.skipped || 0),
+      errors: Array.isArray(payload?.summary?.errors) ? payload.summary.errors : []
+    };
+    const hasWarnings = summary.errors.length > 0 || summary.skipped > 0;
+    const hasChanges = summary.imported > 0 || summary.updated > 0;
+    if (hasWarnings) {
+      importSummaryModalMessage.value = "Import completed with warnings. Please review the notes below.";
+    } else if (hasChanges) {
+      importSummaryModalMessage.value = "Import completed successfully.";
+    } else {
+      importSummaryModalMessage.value = "Import finished. No component changes were detected.";
+    }
+    importSummaryModalRows.value = [
+      {
+        path: "",
+        message: `Added: ${summary.imported}, Updated: ${summary.updated}, Skipped: ${summary.skipped}`
+      },
+      ...summary.errors.map((entry) => ({ path: "Note", message: String(entry) }))
+    ];
+    await refreshComponentCatalog();
+    importSummaryModalOpen.value = true;
+  } catch (error) {
+    customComponentSaveError.value = error instanceof Error ? error.message : "Components import failed";
+  } finally {
+    isComponentsImporting.value = false;
+    if (input) {
+      input.value = "";
+    }
+  }
 };
 
 const deriveVariantStyle = (variant) => {
@@ -3550,8 +4667,7 @@ const validateCurrentProjectAssetReferences = () => {
   });
 
   if (changed) {
-    config.value.isSaved = false;
-    saveConfig();
+    markProjectDirty();
   }
 
   return changed;
@@ -3787,9 +4903,18 @@ const preferredDeviceHost = computed(() => {
   if (explicit) return explicit;
   return hostFromYamlName(projectFilename.value);
 });
+const deploymentState = computed(() => readProjectDeploymentState(config.value));
+const activeDeploymentKey = computed(() =>
+  resolveActiveDeploymentKey(deploymentState.value, currentProjectKey.value)
+);
+const statusLookupProjectKey = computed(() => activeDeploymentKey.value || currentProjectKey.value);
+const activeConnectionHost = computed(() => {
+  const fallbackHost = projectDeviceHost.value || preferredDeviceHost.value;
+  return resolveActiveDeploymentHost(deploymentState.value, new Map(), fallbackHost);
+});
 
 const applyCachedCurrentDeviceStatus = () => {
-  const key = currentProjectKey.value;
+  const key = statusLookupProjectKey.value;
   if (!key) {
     projectDeviceStatus.value = "offline";
     projectDeviceHost.value = "";
@@ -3809,7 +4934,7 @@ const applyCachedCurrentDeviceStatus = () => {
 };
 
 const cacheCurrentDeviceStatus = ({ status, host = "", name = "" }) => {
-  const key = currentProjectKey.value;
+  const key = statusLookupProjectKey.value;
   if (!key) return;
   mergeDeviceStatusCache({
     [key]: {
@@ -3821,68 +4946,293 @@ const cacheCurrentDeviceStatus = ({ status, host = "", name = "" }) => {
   });
 };
 
-const registerCurrentDevice = async (yamlName) => {
-  if (!yamlName) return;
-  const host = hostFromYamlName(yamlName);
+const parseDeploymentResponseMessage = async (response, fallback) => {
+  try {
+    const payload = await response.json();
+    if (payload && typeof payload.message === "string" && payload.message.trim()) {
+      return payload.message;
+    }
+  } catch {
+    // ignore non-json responses
+  }
+  return `${fallback} (HTTP ${response.status})`;
+};
+
+const registerDeploymentIdentity = async (identity) => {
+  if (!identity?.yaml) return;
   const response = await addonFetch("api/devices/register", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      yaml: yamlName,
-      ...(host ? { host } : {})
+      yaml: identity.yaml,
+      ...(identity.host ? { host: identity.host } : {})
     })
   });
   if (!response.ok) {
-    throw new Error(await parseResponseMessage(response, "Device registration failed"));
+    throw new Error(await parseDeploymentResponseMessage(response, "Device registration failed"));
   }
 };
 
-const refreshCurrentDeviceStatus = async ({ refresh = false } = {}) => {
-  const yamlName = String(projectFilename.value || "").trim();
-  if (!yamlName) {
-    projectDeviceStatus.value = "offline";
-    projectDeviceHost.value = "";
-    projectDeviceName.value = "";
+const unregisterDeviceByKey = async (deviceKey) => {
+  const normalized = normalizeProjectKey(deviceKey);
+  if (!normalized) return;
+  const response = await addonFetch(`api/devices/unregister?name=${encodeURIComponent(normalized)}`, {
+    method: "DELETE"
+  });
+  if (!response.ok) {
+    throw new Error(await parseDeploymentResponseMessage(response, "Device unregister failed"));
+  }
+};
+
+const resolveCurrentProjectJsonName = (yamlName = "") => {
+  const sanitizeJson = (value) => {
+    const normalized = String(value || "").trim();
+    if (!normalized) return "";
+    if (!normalized.toLowerCase().endsWith(".json")) return "";
+    return normalized;
+  };
+  const yamlToJson = (value) => {
+    const normalized = String(value || "").trim();
+    if (!normalized) return "";
+    if (normalized.toLowerCase().endsWith(".yaml")) {
+      return `${normalized.slice(0, -5)}.json`;
+    }
+    return `${normalized}.json`;
+  };
+
+  const source = sanitizeJson(sourceProjectFilename.value);
+  if (source) return source;
+  const fromYaml = sanitizeJson(yamlToJson(yamlName || projectFilename.value || "config.yaml"));
+  return fromYaml;
+};
+
+const loadProjectDataForDeployment = async (projectJsonName) => {
+  const response = await addonFetch(`projects/load?name=${encodeURIComponent(projectJsonName)}`);
+  if (!response.ok) {
+    throw new Error(await parseDeploymentResponseMessage(response, "Failed to load project"));
+  }
+  const payload = await response.json();
+  const data = payload?.data;
+  if (!data || typeof data !== "object") {
+    throw new Error("Invalid project payload");
+  }
+  return JSON.parse(JSON.stringify(data));
+};
+
+const saveProjectDataForDeployment = async (projectJsonName, data) => {
+  const response = await addonFetch("projects/save", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      name: projectJsonName,
+      data
+    })
+  });
+  if (!response.ok) {
+    throw new Error(await parseDeploymentResponseMessage(response, "Failed to persist deployment state"));
+  }
+};
+
+const applyLocalDeploymentState = (nextState) => {
+  const localPayload = {};
+  writeProjectDeploymentState(localPayload, nextState);
+  if (localPayload.deployment) {
+    config.value.deployment = localPayload.deployment;
+  } else {
+    delete config.value.deployment;
+  }
+  saveConfig();
+};
+
+const persistCurrentProjectDeploymentState = async (nextState, yamlName = "") => {
+  const projectJsonName = resolveCurrentProjectJsonName(yamlName);
+  if (!projectJsonName) {
+    throw new Error("Invalid project name for deployment state");
+  }
+  const data = await loadProjectDataForDeployment(projectJsonName);
+  writeProjectDeploymentState(data, nextState);
+  await saveProjectDataForDeployment(projectJsonName, data);
+  applyLocalDeploymentState(readProjectDeploymentState(data));
+  sourceProjectFilename.value = projectJsonName;
+  writeBuilderSessionProjectName(projectJsonName);
+};
+
+const fetchDeviceStatusBySelector = async ({ deviceKey = "", yamlName = "", refresh = false } = {}) => {
+  const key = normalizeProjectKey(deviceKey);
+  const yaml = String(yamlName || "").trim();
+  if (!key && !yaml) {
+    return null;
+  }
+  const selector = key
+    ? `name=${encodeURIComponent(key)}`
+    : `yaml=${encodeURIComponent(yaml)}`;
+  const response = await addonFetch(`api/devices/status?${selector}&refresh=${refresh ? 1 : 0}`);
+  if (!response.ok) {
+    return null;
+  }
+  const payload = await response.json();
+  const match = payload?.device && typeof payload.device === "object" ? payload.device : null;
+  if (!match) return null;
+  return {
+    deviceKey: normalizeProjectKey(match.device_key || match.name || match.yaml || key || yaml),
+    status: String(match.status || "").toLowerCase() === "online" ? "online" : "offline",
+    host: String(match.host || "").trim(),
+    name: String(match.name || "").trim()
+  };
+};
+
+const persistDeploymentAfterInstallSuccess = async ({ action, yaml } = {}) => {
+  if (!["ota", "flash", "download"].includes(String(action || ""))) {
     return;
   }
+  const yamlName = String(yaml || projectFilename.value || "").trim();
+  if (!yamlName) return;
+  const nextIdentity = createDeploymentIdentityFromYaml(
+    yamlName,
+    preferredDeviceHost.value || hostFromYamlName(yamlName)
+  );
+  if (!nextIdentity) return;
 
+  const currentState = deploymentState.value;
+  const transition = computePostInstallDeploymentUpdate({
+    action,
+    currentState,
+    nextIdentity
+  });
+
+  deploymentSyncInFlight = true;
   try {
-    const response = await addonFetch(
-      `api/devices/status?yaml=${encodeURIComponent(yamlName)}&refresh=${refresh ? 1 : 0}`
-    );
-    if (!response.ok) {
+    if (transition.register) {
+      await registerDeploymentIdentity(transition.register);
+    }
+    if (transition.changed) {
+      await persistCurrentProjectDeploymentState(transition.state, yamlName);
+    }
+    for (const key of transition.unregisterKeys) {
+      try {
+        await unregisterDeviceByKey(key);
+      } catch (error) {
+        console.warn("Failed to unregister old deployment key", key, error);
+      }
+    }
+  } finally {
+    deploymentSyncInFlight = false;
+  }
+
+  const forceStatusRefresh = action === "ota" || action === "flash";
+  await refreshCurrentDeviceStatus({ refresh: forceStatusRefresh });
+  emitProjectsUpdated();
+};
+
+const refreshCurrentDeviceStatus = async ({ refresh = false } = {}) => {
+  if (deviceStatusRefreshPromise) {
+    return deviceStatusRefreshPromise;
+  }
+
+  const run = async () => {
+    const yamlName = String(projectFilename.value || "").trim();
+    const state = deploymentState.value;
+    const activeKey = resolveActiveDeploymentKey(state, currentProjectKey.value);
+    const pendingKey = normalizeProjectKey(state?.pending?.deviceKey || "");
+    if (!yamlName && !activeKey && !pendingKey) {
+      projectDeviceStatus.value = "offline";
+      projectDeviceHost.value = "";
+      projectDeviceName.value = "";
+      return;
+    }
+
+    try {
+      const shouldCheckPending = Boolean(pendingKey && pendingKey !== activeKey);
+      const [activeStatus, pendingStatus] = await Promise.all([
+        fetchDeviceStatusBySelector({
+          deviceKey: activeKey,
+          yamlName: activeKey ? "" : yamlName,
+          refresh
+        }),
+        shouldCheckPending ? fetchDeviceStatusBySelector({ deviceKey: pendingKey, refresh }) : Promise.resolve(null)
+      ]);
+
+      const onlineKeys = new Set();
+      if (activeStatus?.status === "online" && activeStatus.deviceKey) {
+        onlineKeys.add(activeStatus.deviceKey);
+      }
+      if (pendingStatus?.status === "online" && pendingStatus.deviceKey) {
+        onlineKeys.add(pendingStatus.deviceKey);
+      }
+
+      let effectiveState = state;
+      let effectiveActiveStatus = activeStatus;
+      const promotion = computePendingPromotion({
+        currentState: state,
+        onlineKeys
+      });
+      if (promotion.shouldPromote && !deploymentSyncInFlight) {
+        deploymentSyncInFlight = true;
+        try {
+          await persistCurrentProjectDeploymentState(promotion.state, yamlName);
+          effectiveState = promotion.state;
+          effectiveActiveStatus = pendingStatus || activeStatus;
+          for (const key of promotion.unregisterKeys) {
+            try {
+              await unregisterDeviceByKey(key);
+            } catch (error) {
+              console.warn("Failed to unregister old deployment key", key, error);
+            }
+          }
+          emitProjectsUpdated();
+        } catch (error) {
+          console.warn("Failed to promote pending deployment", error);
+        } finally {
+          deploymentSyncInFlight = false;
+        }
+      }
+
+      const displayStatus = effectiveActiveStatus || pendingStatus || activeStatus;
+      const online = Boolean(
+        (effectiveActiveStatus?.status || "") === "online" || (pendingStatus?.status || "") === "online"
+      );
+
+      projectDeviceStatus.value = online ? "online" : "offline";
+      projectDeviceHost.value = String(
+        displayStatus?.host || resolveActiveDeploymentHost(effectiveState, new Map(), preferredDeviceHost.value)
+      ).trim();
+      projectDeviceName.value = String(displayStatus?.name || currentYamlDeviceName.value).trim();
+
+      const cacheEntries = {};
+      if (activeKey) {
+        cacheEntries[activeKey] = {
+          status: activeStatus?.status || "offline",
+          host: String(activeStatus?.host || "").trim(),
+          name: String(activeStatus?.name || activeKey).trim(),
+          updatedAt: Date.now()
+        };
+      }
+      if (pendingKey && pendingKey !== activeKey) {
+        cacheEntries[pendingKey] = {
+          status: pendingStatus?.status || "offline",
+          host: String(pendingStatus?.host || "").trim(),
+          name: String(pendingStatus?.name || pendingKey).trim(),
+          updatedAt: Date.now()
+        };
+      }
+      mergeDeviceStatusCache(cacheEntries);
+    } catch {
       projectDeviceStatus.value = "offline";
       projectDeviceHost.value = "";
       projectDeviceName.value = "";
       cacheCurrentDeviceStatus({ status: "offline" });
-      return;
     }
-    const payload = await response.json();
-    const fallbackName = currentYamlDeviceName.value;
-    const match = payload?.device && typeof payload.device === "object" ? payload.device : null;
-    if (!match) {
-      projectDeviceStatus.value = "offline";
-      projectDeviceHost.value = "";
-      projectDeviceName.value = "";
-      cacheCurrentDeviceStatus({ status: "offline" });
-      return;
-    }
-    const nextStatus = String(match.status || "").toLowerCase() === "online" ? "online" : "offline";
-    projectDeviceStatus.value = nextStatus;
-    projectDeviceHost.value = String(match.host || "").trim();
-    projectDeviceName.value = String(match.name || fallbackName).trim();
-    cacheCurrentDeviceStatus({
-      status: nextStatus,
-      host: projectDeviceHost.value,
-      name: projectDeviceName.value
-    });
-  } catch {
-    projectDeviceStatus.value = "offline";
-    projectDeviceHost.value = "";
-    projectDeviceName.value = "";
-    cacheCurrentDeviceStatus({ status: "offline" });
+  };
+
+  deviceStatusRefreshPromise = run();
+  try {
+    await deviceStatusRefreshPromise;
+  } finally {
+    deviceStatusRefreshPromise = null;
   }
 };
 
@@ -3916,7 +5266,7 @@ const canInstallProject = computed(() => {
   return Boolean(currentName && currentYaml);
 });
 const canUseOtaInstall = computed(
-  () => projectDeviceStatus.value === "online" && Boolean(preferredDeviceHost.value)
+  () => projectDeviceStatus.value === "online" && Boolean(activeConnectionHost.value)
 );
 
 const canLogsForCurrentDevice = computed(
@@ -3933,10 +5283,11 @@ const builderDeviceStatusClass = computed(() => {
 
 const installFlow = useInstallConsoleFlow({
   canInstall: () => canInstallProject.value,
+  canValidate: () => canInstallProject.value,
   canUseOta: () => canUseOtaInstall.value,
   canLogs: () => canLogsForCurrentDevice.value,
   getYamlName: () => projectFilename.value,
-  getDeviceHost: () => preferredDeviceHost.value,
+  getDeviceHost: () => activeConnectionHost.value,
   fetchApi: addonFetch,
   streamUrl: buildAddonUrl,
   setError: (message) => {
@@ -3946,13 +5297,14 @@ const installFlow = useInstallConsoleFlow({
     projectSaveError.value = "";
   },
   prepareBeforeJob: async () => {
-    await saveCurrentYamlFile();
     const saved = await handleProjectSave(true);
     if (!saved) {
       throw new Error(projectSaveError.value || "Project save failed before install");
     }
-    await registerCurrentDevice(projectFilename.value);
     return true;
+  },
+  onInstallSuccess: async (payload) => {
+    await persistDeploymentAfterInstallSuccess(payload);
   },
   preferLongPoll: !isLocalHostname(window.location.hostname || "")
 });
@@ -3975,6 +5327,7 @@ const {
   handleInstallSerialPort,
   handleInstallOta,
   startLogs,
+  startValidate,
   handleInstallDownload,
   downloadBinary,
   dispose: disposeInstallFlow
@@ -3985,6 +5338,7 @@ const emitCompileState = () => {
     new CustomEvent("app:builder-compile-state", {
       detail: {
         canInstall: canInstallProject.value,
+        canValidate: canInstallProject.value,
         canUseOta: canUseOtaInstall.value,
         canLogs: canLogsForCurrentDevice.value,
         canExport: true,
@@ -3998,6 +5352,10 @@ const emitCompileState = () => {
 
 const handleAppInstallOption = (event) => {
   if (!canInstallProject.value || compileIsActive.value || localFlashRunning.value || isProjectSaving.value) return;
+  if (formErrors.value.length) {
+    formErrorsModalOpen.value = true;
+    return;
+  }
   const detail = event?.detail && typeof event.detail === "object" ? event.detail : {};
   const mode = typeof detail.mode === "string" ? detail.mode : "";
   if (mode === "ota") {
@@ -4014,6 +5372,15 @@ const handleAppInstallOption = (event) => {
 
 const handleAppLogs = () => {
   startLogs();
+};
+
+const handleAppValidate = () => {
+  if (!canInstallProject.value || compileIsActive.value || localFlashRunning.value || isProjectSaving.value) return;
+  if (formErrors.value.length) {
+    formErrorsModalOpen.value = true;
+    return;
+  }
+  startValidate();
 };
 
 const handleBuilderKeydown = (event) => {
@@ -4074,8 +5441,7 @@ watch(
     if (!persistedConfigFingerprint.value) return;
     const currentFingerprint = buildConfigFingerprint(config.value);
     if (currentFingerprint === persistedConfigFingerprint.value) return;
-    config.value.isSaved = false;
-    saveConfig();
+    markProjectDirty();
   },
   { deep: true }
 );
@@ -4117,6 +5483,13 @@ const yamlFilenameToProjectFilename = (yamlFilename) => {
     return `${normalized.slice(0, -5)}.json`;
   }
   return `${normalized}.json`;
+};
+
+const sanitizeProjectJsonFilename = (value) => {
+  const normalized = String(value || "").trim();
+  if (!normalized) return "";
+  if (!normalized.toLowerCase().endsWith(".json")) return "";
+  return normalized;
 };
 
 const parseResponseMessage = async (response, fallback) => {
@@ -4225,10 +5598,11 @@ const upsertProjectInRoot = (indexData, projectJsonName, lastEditedAt) => {
   const normalized = normalizeProjectsIndexForSave(indexData);
   const placement = Array.isArray(normalized.projectPlacement) ? [...normalized.projectPlacement] : [];
   const existingIndex = placement.findIndex((entry) => entry.name === projectJsonName);
+  const existingEntry = existingIndex >= 0 ? placement[existingIndex] : null;
   const normalizedLastEditedAt = sanitizeLastEditedAt(lastEditedAt);
   const rootEntry = {
     name: projectJsonName,
-    folderId: ADDON_ROOT_FOLDER_ID,
+    folderId: existingEntry?.folderId || ADDON_ROOT_FOLDER_ID,
     ...(normalizedLastEditedAt ? { lastEditedAt: normalizedLastEditedAt } : {})
   };
   if (existingIndex >= 0) {
@@ -4262,9 +5636,37 @@ const saveCurrentYamlFile = async () => {
   }
 };
 
+const resolveSourceProjectFilename = () => {
+  const explicit = sanitizeProjectJsonFilename(sourceProjectFilename.value);
+  if (explicit) return explicit;
+  return yamlFilenameToProjectFilename(projectFilename.value || "config.yaml");
+};
+
+const renameProjectBundleIfNeeded = async (fromProjectName, toProjectName) => {
+  const from = sanitizeProjectJsonFilename(fromProjectName);
+  const to = sanitizeProjectJsonFilename(toProjectName);
+  if (!from || !to || from === to) {
+    return;
+  }
+  const response = await addonFetch("projects/rename", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      old_name: from,
+      new_name: to
+    })
+  });
+  if (!response.ok) {
+    throw new Error(await parseResponseMessage(response, "Failed to rename project bundle"));
+  }
+};
+
 const saveCurrentProjectAndYaml = async (silent = false) => {
   const yamlName = projectFilename.value || "config.yaml";
   const projectJsonName = yamlFilenameToProjectFilename(yamlName);
+  const sourceProjectName = resolveSourceProjectFilename();
   const savedAt = new Date().toISOString();
   const hostToPersist = hostFromYamlName(yamlName);
   const currentHost = String(config.value?.ui?.deviceHost || "").trim();
@@ -4275,6 +5677,9 @@ const saveCurrentProjectAndYaml = async (silent = false) => {
     };
   }
 
+  await renameProjectBundleIfNeeded(sourceProjectName, projectJsonName);
+  sourceProjectFilename.value = projectJsonName;
+  writeBuilderSessionProjectName(projectJsonName);
   await saveCurrentYamlFile();
 
   const saveProjectResponse = await addonFetch("projects/save", {
@@ -4324,10 +5729,9 @@ const saveCurrentProjectAndYaml = async (silent = false) => {
     throw new Error(await parseResponseMessage(saveProjectsIndexResponse, "Failed to update projects.json"));
   }
 
-  persistedConfigFingerprint.value = buildConfigFingerprint(config.value);
-  config.value.isSaved = true;
-  saveConfig();
-  await registerCurrentDevice(yamlName);
+  markProjectSavedFromCurrentState();
+  sourceProjectFilename.value = projectJsonName;
+  writeBuilderSessionProjectName(projectJsonName);
   await refreshCurrentDeviceStatus();
   emitProjectsUpdated();
   if (!silent) {
@@ -4378,6 +5782,64 @@ const normalizeComponentEntry = (entry) => {
   }
 
   return null;
+};
+
+const isPlainObject = (value) =>
+  Boolean(value) && typeof value === "object" && !Array.isArray(value);
+
+const isActionTriggerKey = (key) => typeof key === "string" && key.startsWith("on_");
+
+const looksLikeFlatActionEntry = (value) => {
+  if (!isPlainObject(value)) return false;
+  if (Object.prototype.hasOwnProperty.call(value, "then")) return false;
+  return (
+    typeof value.type === "string" ||
+    Object.prototype.hasOwnProperty.call(value, "schemaUrl") ||
+    Object.prototype.hasOwnProperty.call(value, "fields") ||
+    Object.prototype.hasOwnProperty.call(value, "config") ||
+    Object.prototype.hasOwnProperty.call(value, "definitionError")
+  );
+};
+
+const looksLikeThenOnlyTriggerEntry = (value) => {
+  if (!isPlainObject(value)) return false;
+  const keys = Object.keys(value);
+  if (!keys.length) return true;
+  if (keys.some((key) => key !== "then")) return false;
+  return value.then === undefined || Array.isArray(value.then);
+};
+
+const normalizeAutomationTriggerShape = (root) => {
+  const visit = (node) => {
+    if (Array.isArray(node)) {
+      node.forEach((item) => visit(item));
+      return;
+    }
+    if (!isPlainObject(node)) return;
+
+    Object.keys(node).forEach((key) => {
+      const value = node[key];
+      if (isActionTriggerKey(key) && Array.isArray(value) && value.length > 0) {
+        const isFlatList = value.every((item) => looksLikeFlatActionEntry(item));
+        if (isFlatList) {
+          return;
+        }
+
+        const isThenOnlyList = value.every((item) => looksLikeThenOnlyTriggerEntry(item));
+        if (isThenOnlyList) {
+          node[key] = value.flatMap((item) =>
+            Array.isArray(item?.then)
+              ? item.then.filter((entry) => looksLikeFlatActionEntry(entry))
+              : []
+          );
+        }
+      }
+
+      visit(node[key]);
+    });
+  };
+
+  visit(root);
 };
 
 const normalizeConfig = (raw) => {
@@ -4438,12 +5900,16 @@ const normalizeConfig = (raw) => {
     }
   }
 
+  normalizeAutomationTriggerShape(merged);
+
   return merged;
 };
 
 const loadConfig = () => {
   const stored = localStorage.getItem(BUILDER_CONFIG_STORAGE_KEY);
   if (!stored) {
+    sourceProjectFilename.value = "";
+    writeBuilderSessionProjectName("");
     const storedPreview = localStorage.getItem("vebBuilderSplitPreview");
     if (storedPreview !== null) {
       splitPreviewEnabled.value = storedPreview === "1";
@@ -4463,6 +5929,7 @@ const loadConfig = () => {
   }
   try {
     const parsed = JSON.parse(stored);
+    sourceProjectFilename.value = sanitizeProjectJsonFilename(readBuilderSessionProjectName());
     if (parsed?.schemaVersion === 1) {
       config.value = normalizeConfig(parsed);
       try {
@@ -4492,6 +5959,7 @@ const loadConfig = () => {
     persistedConfigFingerprint.value = isProjectSaved.value ? buildConfigFingerprint(config.value) : "";
     isHydrating.value = false;
   } catch (error) {
+    sourceProjectFilename.value = "";
     persistedConfigFingerprint.value = "";
     isHydrating.value = false;
     // ignore invalid stored data
@@ -4533,6 +6001,9 @@ const updateRootField = (targetRoot, path, value) => {
 const handleSchemaUpdate = ({ path, value }) => {
   if (activeComponentSlot.value === null) return;
   updateComponentField(activeComponentSlot.value, path, value);
+  if (showSaveCustomComponentAction.value) {
+    customComponentSaveError.value = "";
+  }
   if (path[path.length - 1] === "bus") {
     const entry = config.value.components[activeComponentSlot.value];
     if (!entry?.config) return;
@@ -4631,7 +6102,99 @@ const handleCustomConfigUpdate = (value) => {
   const entry = config.value.components[activeComponentSlot.value];
   if (!entry) return;
   entry.customConfig = value;
+  customComponentSaveError.value = "";
   saveConfig();
+};
+
+const saveCustomComponentTemplate = async () => {
+  if (!canSaveCustomComponent.value) return;
+  const isUpdate = isSavedCustomComponentActive.value;
+  const activeSlot = activeComponentSlot.value;
+  const submittedName = activeCustomComponentName.value;
+  const submittedCustomConfig =
+    typeof activeComponentConfig.value?.custom_config === "string"
+      ? activeComponentConfig.value.custom_config
+      : "";
+  customComponentSaveError.value = "";
+  isSavingCustomComponent.value = true;
+  try {
+    const endpoint = isUpdate
+      ? `api/custom-components/${encodePathSegments(activeCustomComponentId.value)}`
+      : "api/custom-components";
+    const response = await addonFetch(endpoint, {
+      method: isUpdate ? "PUT" : "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name: submittedName,
+        custom_config: submittedCustomConfig
+      })
+    });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      throw new Error(toApiErrorMessage(payload, "Failed to save component"));
+    }
+    const savedItem = payload?.item && typeof payload.item === "object" ? payload.item : null;
+    const savedId = typeof savedItem?.id === "string" ? savedItem.id.trim() : "";
+    if (activeSlot !== null) {
+      const entry = config.value.components[activeSlot];
+      if (entry && typeof entry === "object") {
+        if (savedId) {
+          entry.id = savedId;
+        }
+        if (!entry.config || typeof entry.config !== "object") {
+          entry.config = {};
+        }
+        entry.config.name = submittedName;
+        entry.config.custom_config = submittedCustomConfig;
+      }
+    }
+    await refreshComponentCatalog();
+    if (savedId) {
+      ensureComponentSchema(savedId, normalizeSchemaPath(savedItem?.schemaPath || ""));
+    }
+  } catch (error) {
+    customComponentSaveError.value =
+      error instanceof Error ? error.message : "Failed to save component";
+  } finally {
+    isSavingCustomComponent.value = false;
+  }
+};
+
+const requestDeleteSavedCustomComponent = (item) => {
+  if (!isSavedCustomComponentItem(item)) return;
+  pendingDeleteCustomItem.value = item;
+  confirmAction.value = "delete-custom";
+  confirmOpen.value = true;
+};
+
+const deleteSavedCustomComponent = async () => {
+  const item = pendingDeleteCustomItem.value;
+  if (!isSavedCustomComponentItem(item)) return;
+  const componentId = String(item?.id || "").trim();
+  const key = componentId.split("/").pop() || "";
+  if (!key || deletingCustomComponentId.value) return;
+  confirmOpen.value = false;
+  deletingCustomComponentId.value = componentId;
+  customComponentSaveError.value = "";
+  try {
+    const response = await addonFetch(`api/custom-components/${encodeURIComponent(key)}`, {
+      method: "DELETE"
+    });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      throw new Error(toApiErrorMessage(payload, "Failed to delete component"));
+    }
+    await refreshComponentCatalog();
+  } catch (error) {
+    customComponentSaveError.value =
+      error instanceof Error ? error.message : "Failed to delete component";
+  } finally {
+    deletingCustomComponentId.value = "";
+    pendingDeleteCustomItem.value = null;
+    confirmAction.value = null;
+  }
 };
 
 
@@ -4669,25 +6232,11 @@ onMounted(async () => {
   loadConfig();
   window.addEventListener("resize", updatePreviewTabLayout);
   updatePreviewTabLayout();
-  try {
-    const baseUrl = import.meta.env.BASE_URL || "/";
-    const normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-    const response = await fetch(`${normalizedBaseUrl}components_list/components_list.json`);
-    if (!response.ok) {
-      throw new Error(`Component catalog load failed (${response.status})`);
-    }
-    componentCatalog.value = await response.json();
-    componentCatalogError.value = null;
-  } catch (error) {
-    componentCatalogError.value = error;
-    componentCatalog.value = { categories: [] };
-    console.error("Component catalog load failed", error);
-  } finally {
-    isComponentCatalogLoading.value = false;
-  }
+  await refreshComponentCatalog();
   try {
     const response = await addonFetch("api/assets/mdi-substitutions");
-    if (response.ok) {
+    const contentType = response.headers.get("content-type") || "";
+    if (response.ok && contentType.includes("application/json")) {
       const payload = await response.json();
       mdiSubstitutions.value =
         payload?.substitutions && typeof payload.substitutions === "object"
@@ -4695,6 +6244,9 @@ onMounted(async () => {
           : {};
     } else {
       mdiSubstitutions.value = {};
+      if (response.ok && !contentType.includes("application/json")) {
+        console.warn("MDI substitutions endpoint returned non-JSON response");
+      }
     }
   } catch (error) {
     console.error("MDI substitutions load failed", error);
@@ -5095,38 +6647,69 @@ watch(
 );
 
 watch(
-  () => componentIdList.value,
-  (next, prev) => {
-    const prevSet = new Set(prev || []);
-    (next || []).forEach((componentId) => {
-      if (!componentId || prevSet.has(componentId)) return;
-      ensureComponentSchema(componentId);
-      const schema = componentSchemas.value?.[componentId];
-      if (schema === undefined) {
-        pendingBusPulseIds.add(componentId);
+  () => requiredProtocolsList.value,
+  (requiredList) => {
+    if (!areComponentSchemasReady.value) return;
+    if (!config.value.protocolsCore || typeof config.value.protocolsCore !== "object") {
+      config.value.protocolsCore = {};
+    }
+    const requiredSet = new Set(requiredList || []);
+    protocolDefinitions.forEach((entry) => {
+      if (!supportedAutoProtocols.has(entry.key)) return;
+      const shouldEnable = requiredSet.has(entry.key);
+      if (
+        !config.value.protocolsCore[entry.key] ||
+        typeof config.value.protocolsCore[entry.key] !== "object"
+      ) {
+        config.value.protocolsCore[entry.key] = {};
+      }
+      const protocolConfig = config.value.protocolsCore[entry.key];
+      if (shouldEnable && protocolConfig.enabled !== true) {
+        protocolConfig.enabled = true;
         return;
       }
-      triggerPulseIfComponentNeedsBus(componentId);
+      if (!shouldEnable && protocolConfig.enabled !== false) {
+        protocolConfig.enabled = false;
+      }
     });
-  }
+  },
+  { immediate: true }
 );
 
 watch(
   () => componentSchemas.value,
   () => {
-    if (!pendingBusPulseIds.size) return;
-    Array.from(pendingBusPulseIds).forEach((componentId) => {
+    if (!pendingBusPulseEntries.size && !pendingProtocolPulseEntries.size) return;
+
+    Array.from(pendingBusPulseEntries.entries()).forEach(([componentId, queuedEntries]) => {
       const schema = componentSchemas.value?.[componentId];
       if (schema === undefined) return;
-      pendingBusPulseIds.delete(componentId);
+      pendingBusPulseEntries.delete(componentId);
       if (!schema) return;
-      triggerPulseIfComponentNeedsBus(componentId);
+      if ((queuedEntries || []).some((entry) => componentNeedsBus(entry, componentId))) {
+        triggerBusTabPulse();
+      }
+    });
+
+    Array.from(pendingProtocolPulseEntries.entries()).forEach(([componentId, queuedEntries]) => {
+      const schema = componentSchemas.value?.[componentId];
+      if (schema === undefined) return;
+      pendingProtocolPulseEntries.delete(componentId);
+      if (!schema) return;
+      if ((queuedEntries || []).some((entry) => componentNeedsProtocol(entry, componentId))) {
+        triggerProtocolTabPulse();
+      }
     });
   },
   { deep: true }
 );
 
 onBeforeUnmount(() => {
+  pendingProtocolPulseEntries.clear();
+  pendingBusPulseEntries.clear();
+  if (protocolTabPulseTimer) {
+    clearTimeout(protocolTabPulseTimer);
+  }
   if (busTabPulseTimer) {
     clearTimeout(busTabPulseTimer);
   }
@@ -5139,6 +6722,7 @@ onBeforeUnmount(() => {
   window.removeEventListener("app:builder-export", handleAppExport);
   window.removeEventListener("app:install-option", handleAppInstallOption);
   window.removeEventListener("app:builder-logs", handleAppLogs);
+  window.removeEventListener("app:validate", handleAppValidate);
   window.removeEventListener("app:builder-save-request", handleBuilderSaveRequest);
   disposeInstallFlow();
   stopDeviceStatusPolling();
@@ -5147,6 +6731,7 @@ onBeforeUnmount(() => {
     new CustomEvent("app:builder-compile-state", {
       detail: {
         canInstall: false,
+        canValidate: false,
         canUseOta: false,
         canLogs: false,
         canExport: false,

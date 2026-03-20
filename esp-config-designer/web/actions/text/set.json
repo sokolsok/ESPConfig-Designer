@@ -1,0 +1,23 @@
+{
+  "id": "text.set",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Text",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "text_id",
+      "domain": "text",
+      "lvl": "normal"
+    },
+    {
+      "key": "value",
+      "label": "Value",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "Hello"
+    }
+  ]
+}

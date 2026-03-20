@@ -1,0 +1,86 @@
+{
+  "id": "sensor.as3935",
+  "domain": "sensor",
+  "platform": "as3935",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/as3935/",
+  "fields": [
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "irq_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "indoor",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "noise_level",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "2"
+    },
+    {
+      "key": "spike_rejection",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "lightning_threshold",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1"
+    },
+    {
+      "key": "mask_disturber",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "div_ratio",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0"
+    },
+    {
+      "key": "capacitance",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0"
+    },
+    {
+      "key": "watchdog_threshold",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "2"
+    },
+    {
+      "key": "tune_antenna",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "calibration",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

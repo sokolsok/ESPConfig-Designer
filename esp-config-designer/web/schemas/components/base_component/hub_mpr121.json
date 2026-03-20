@@ -1,0 +1,58 @@
+{
+  "id": "hub.mpr121",
+  "domain": "mpr121",
+  "platform": "",
+  "requires": ["i2c"],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "default": "mpr121_hub_id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "idDomain": "mpr121"
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+	  "suppressQuotes": true,
+      "default": "0x5A",
+      "placeholder": "0x5A"
+    },
+    {
+      "key": "touch_debounce",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "default": 0,
+      "placeholder": "0"
+    },
+    {
+      "key": "release_debounce",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "default": 0,
+      "placeholder": "0"
+    },
+    {
+      "key": "touch_threshold",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 12,
+      "placeholder": "12"
+    },
+    {
+      "key": "release_threshold",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 6,
+      "placeholder": "6"
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "id": "sensor.mopeka_pro_check",
+  "domain": "sensor",
+  "platform": "mopeka_pro_check",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/mopeka_pro_check/",
+  "embedded": [
+    {
+      "key": "ble_tracker",
+      "domain": "esp32_ble_tracker",
+      "emitAs": "map",
+      "singleton": true,
+      "alwaysEmit": true,
+      "defaultPayload": {},
+      "merge": "first"
+    }
+  ],
+  "fields": [
+    {
+      "key": "ble_tracker",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "uiHidden": true,
+      "emitYAML": "never",
+      "extends": "hub_esp32_ble_tracker.json"
+    },
+    {
+      "key": "mac_address",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "tank_type",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "20LB_V",
+      "options": [
+        "20LB_V",
+        "30LB_V",
+        "40LB_V",
+        "EUROPE_6KG",
+        "EUROPE_11KG",
+        "EUROPE_14KG",
+        "CUSTOM"
+      ]
+    },
+    {
+      "key": "custom_distance_full",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "40cm",
+      "dependsOn": {
+        "key": "tank_type",
+        "value": "CUSTOM"
+      }
+    },
+    {
+      "key": "custom_distance_empty",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "10mm",
+      "dependsOn": {
+        "key": "tank_type",
+        "value": "CUSTOM"
+      }
+    },
+    {
+      "key": "minimum_signal_quality",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "MEDIUM",
+      "options": [
+        "HIGH",
+        "MEDIUM",
+        "LOW",
+        "ZERO"
+      ]
+    },
+    {
+      "key": "level",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "distance",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "battery_level",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "signal_quality",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "ignored_reads",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    }
+  ]
+}

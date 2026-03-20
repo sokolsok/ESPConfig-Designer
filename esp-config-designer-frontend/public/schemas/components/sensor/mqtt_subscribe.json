@@ -1,0 +1,33 @@
+{
+  "id": "sensor.mqtt_subscribe",
+  "domain": "sensor",
+  "platform": "mqtt_subscribe",
+  "requires": [
+    "mqtt"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/mqtt_subscribe/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "topic",
+      "type": "text",
+      "required": true,
+      "suppressQuotes": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "qos",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0"
+    }
+  ]
+}

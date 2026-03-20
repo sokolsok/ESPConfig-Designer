@@ -1,0 +1,24 @@
+{
+  "id": "ags10.set_zero_point",
+  "fields": [
+    {
+      "key": "id",
+      "label": "AGS10",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "ags10_id",
+      "domain": "ags10",
+      "lvl": "normal"
+    },
+    {
+      "key": "value",
+      "label": "Zero point",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "0",
+      "lambdaPlaceholder": "return 0;"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "id": "time.homeassistant",
+  "domain": "time",
+  "platform": "homeassistant",
+  "requires": [
+    "api"
+  ],
+  "helpUrl": "https://esphome.io/components/time/homeassistant/",
+  "extends": "base_time.json",
+  "fields": []
+}

@@ -1,0 +1,48 @@
+{
+  "id": "rf_bridge",
+  "domain": "rf_bridge",
+  "requires": [
+    "uart"
+  ],
+  "helpUrl": "https://esphome.io/components/rf_bridge/",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal",
+      "idDomain": "rf_bridge"
+    },
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "uart"
+    },
+    {
+      "key": "on_code_received",
+      "type": "list",
+      "required": false,
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_advanced_code_received",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

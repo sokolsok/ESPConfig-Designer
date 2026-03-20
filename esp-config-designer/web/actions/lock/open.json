@@ -1,0 +1,23 @@
+{
+  "id": "lock.open",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Lock",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "lock_id",
+      "domain": "lock",
+      "lvl": "normal"
+    },
+    {
+      "key": "code",
+      "label": "Code",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1234"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "climate.pid.autotune",
+  "fields": [
+    {
+      "key": "id",
+      "label": "PID climate",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "climate_pid_id",
+      "domain": "climate.pid",
+      "lvl": "normal"
+    },
+    {
+      "key": "noiseband",
+      "label": "Noiseband",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0.5",
+      "lambdaPlaceholder": "return 0.5;"
+    },
+    {
+      "key": "positive_output",
+      "label": "Positive output",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1.0",
+      "lambdaPlaceholder": "return 1.0;"
+    },
+    {
+      "key": "negative_output",
+      "label": "Negative output",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "-1.0",
+      "lambdaPlaceholder": "return -1.0;"
+    }
+  ]
+}

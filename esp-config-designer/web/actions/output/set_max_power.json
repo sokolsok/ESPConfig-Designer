@@ -1,0 +1,22 @@
+{
+  "id": "output.set_max_power",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Output",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "output_id",
+      "domain": "output",
+      "lvl": "normal"
+    },
+    {
+      "key": "max_power",
+      "label": "Max Power",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

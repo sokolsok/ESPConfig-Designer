@@ -1,0 +1,43 @@
+{
+  "id": "output.dac7678",
+  "domain": "output",
+  "platform": "dac7678",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/output/dac7678/",
+  "extends": "base_output_float.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "dac7678",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_dac7678.json"
+    },
+    {
+      "key": "dac7678_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "dac7678",
+      "allowSelfReference": true,
+      "default": "dac7678_hub"
+    },
+    {
+      "key": "channel",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "pulse_meter.set_total_pulses",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Pulse Meter",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "pulse_meter_id",
+      "domain": "pulse_meter",
+      "lvl": "normal"
+    },
+    {
+      "key": "total_pulses",
+      "label": "Total Pulses",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "audio_dac.mute_on",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Audio Dac",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "audio_dac_id",
+      "domain": "audio_dac",
+      "lvl": "normal"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "id": "sensor.ags10",
+  "domain": "sensor",
+  "platform": "ags10",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/ags10/",
+  "fields": [
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x1A"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "version",
+      "required": false,
+      "lvl": "normal",
+      "type": "text"
+    },
+    {
+      "key": "resistance",
+      "required": false,
+      "lvl": "normal",
+      "type": "text"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "tvoc",
+      "type": "object",
+      "required": true,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    }
+  ]
+}

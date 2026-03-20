@@ -1,0 +1,14 @@
+{
+  "id": "pcf85063.write_time",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Pcf85063",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "pcf85063_id",
+      "domain": "pcf85063",
+      "lvl": "normal"
+    }
+  ]
+}

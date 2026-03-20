@@ -1,0 +1,78 @@
+{
+  "id": "media_player.i2s_audio",
+  "domain": "media_player",
+  "platform": "i2s_audio",
+  "requires": [
+    "i2s_audio"
+  ],
+  "helpUrl": "https://esphome.io/components/media_player/i2s_audio/",
+  "extends": "base_media_player.json",
+  "fields": [
+    {
+      "key": "dac_type",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "external",
+      "options": [
+        "external",
+        "internal"
+      ]
+    },
+    {
+      "key": "i2s_audio_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "i2s_audio"
+    },
+    {
+      "key": "mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "mono",
+      "options": [
+        "left",
+        "right",
+        "stereo",
+        "mono"
+      ]
+    },
+    {
+      "key": "i2s_dout_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "dac_type",
+        "value": "external"
+      }
+    },
+    {
+      "key": "mute_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "dac_type",
+        "value": "external"
+      }
+    },
+    {
+      "key": "i2s_comm_fmt",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "msb",
+      "options": [
+        "msb",
+        "lsb"
+      ],
+      "dependsOn": {
+        "key": "dac_type",
+        "value": "external"
+      }
+    }
+  ]
+}

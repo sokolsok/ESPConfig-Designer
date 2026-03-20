@@ -1,0 +1,23 @@
+{
+  "id": "ble_server.characteristic.set_value",
+  "fields": [
+    {
+      "key": "id",
+      "label": "BLE characteristic",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "ble_server_characteristic_id",
+      "domain": "ble_server.characteristic",
+      "lvl": "normal"
+    },
+    {
+      "key": "value",
+      "label": "Value",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "hello"
+    }
+  ]
+}

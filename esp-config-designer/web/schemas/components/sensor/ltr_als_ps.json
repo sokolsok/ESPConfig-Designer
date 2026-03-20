@@ -1,0 +1,149 @@
+{
+  "id": "sensor.ltr_als_ps",
+  "domain": "sensor",
+  "platform": "ltr_als_ps",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/ltr_als_ps/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "type",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "auto_mode",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "gain",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "integration_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "glass_attenuation_factor",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "ps_cooldown",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "5s"
+    },
+    {
+      "key": "ps_gain",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "ps_high_threshold",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "65535"
+    },
+    {
+      "key": "ps_low_threshold",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0"
+    },
+    {
+      "key": "on_ps_high_threshold",
+      "type": "list",
+      "required": false,
+      "lvl": "normal",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_ps_low_threshold",
+      "type": "list",
+      "required": false,
+      "lvl": "normal",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "ambient_light",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "infrared_counts",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "full_spectrum_counts",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "actual_gain",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "actual_integration_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "ps_counts",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

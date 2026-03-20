@@ -1,0 +1,115 @@
+{
+  "id": "display.st7735",
+  "domain": "display",
+  "platform": "st7735",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/display/st7735/",
+  "extends": "base_display.json",
+  "display_builder": true,
+  "displayType": "color",
+  "model_meta": {
+    "INITR_BLACKTAB": {
+      "w": 128,
+      "h": 160
+    },
+    "INITR_GREENTAB": {
+      "w": 128,
+      "h": 160
+    },
+    "INITR_REDTAB": {
+      "w": 128,
+      "h": 160
+    },
+    "INITR_MINI160X80": {
+      "w": 80,
+      "h": 160
+    }
+  },
+  "fields": [
+    {
+      "key": "model",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "INITR_BLACKTAB",
+      "options": [
+        "INITR_BLACKTAB",
+        "INITR_GREENTAB",
+        "INITR_REDTAB",
+        "INITR_MINI160X80",
+        "INITR_18BLACKTAB"
+      ]
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "dc_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "device_width",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 128
+    },
+    {
+      "key": "device_height",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 160
+    },
+    {
+      "key": "col_start",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "row_start",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "use_bgr",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "invert_colors",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "eight_bit_color",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "reset_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "1s"
+    }
+  ]
+}

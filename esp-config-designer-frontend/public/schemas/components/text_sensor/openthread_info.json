@@ -1,0 +1,81 @@
+{
+  "id": "text_sensor.openthread_info",
+  "domain": "text_sensor",
+  "platform": "openthread_info",
+  "requires": [
+    "openthread"
+  ],
+  "helpUrl": "https://esphome.io/components/text_sensor/openthread_info/",
+  "fields": [
+    {
+      "key": "ip_address",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_text_sensor.json"
+    },
+    {
+      "key": "channel",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_text_sensor.json"
+    },
+    {
+      "key": "role",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_text_sensor.json"
+    },
+    {
+      "key": "rloc16",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_text_sensor.json"
+    },
+    {
+      "key": "ext_addr",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_text_sensor.json"
+    },
+    {
+      "key": "eui64",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_text_sensor.json"
+    },
+    {
+      "key": "network_name",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_text_sensor.json"
+    },
+    {
+      "key": "network_key",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "extends": "base_text_sensor.json"
+    },
+    {
+      "key": "pan_id",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_text_sensor.json"
+    },
+    {
+      "key": "ext_pan_id",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_text_sensor.json"
+    }
+  ]
+}

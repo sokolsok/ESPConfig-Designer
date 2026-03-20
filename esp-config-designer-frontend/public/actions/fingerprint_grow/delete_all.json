@@ -1,0 +1,14 @@
+{
+  "id": "fingerprint_grow.delete_all",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Fingerprint sensor",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "fingerprint_grow_id",
+      "domain": "fingerprint_grow",
+      "lvl": "normal"
+    }
+  ]
+}

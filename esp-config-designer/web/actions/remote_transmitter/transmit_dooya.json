@@ -1,0 +1,82 @@
+{
+  "id": "remote_transmitter.transmit_dooya",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Remote transmitter",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "remote_transmitter_id",
+      "domain": "remote_transmitter",
+      "lvl": "normal"
+    },
+    {
+      "key": "remote_id",
+      "label": "Remote ID",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "0x123456",
+      "lambdaPlaceholder": "return 0x123456;"
+    },
+    {
+      "key": "channel",
+      "label": "Channel",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "1",
+      "lambdaPlaceholder": "return 1;"
+    },
+    {
+      "key": "button",
+      "label": "Button",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "UP"
+    },
+    {
+      "key": "check",
+      "label": "Check",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0",
+      "lambdaPlaceholder": "return 0;"
+    },
+    {
+      "key": "repeat",
+      "label": "Repeat",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "times",
+          "label": "Times",
+          "type": "number",
+          "templatable": true,
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "2",
+          "lambdaPlaceholder": "return 2;"
+        },
+        {
+          "key": "wait_time",
+          "label": "Wait time",
+          "type": "duration",
+          "templatable": true,
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "25ms",
+          "lambdaPlaceholder": "return 25;"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "id": "sensor.gp2y1010au0f",
+  "domain": "sensor",
+  "platform": "gp2y1010au0f",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/gp2y1010au0f/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "sensor",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "sensor",
+      "placeholder": "adc_sensor_id"
+    },
+    {
+      "key": "output",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "sensor",
+      "placeholder": "output_sensor_id"
+    },
+    {
+      "key": "adc_voltage_offset",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0"
+    },
+    {
+      "key": "adc_voltage_multiplier",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1.0"
+    }
+  ]
+}

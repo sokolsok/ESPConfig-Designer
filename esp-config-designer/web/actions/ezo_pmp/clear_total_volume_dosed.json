@@ -1,0 +1,14 @@
+{
+  "id": "ezo_pmp.clear_total_volume_dosed",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Ezo Pmp",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "ezo_pmp_id",
+      "domain": "ezo_pmp",
+      "lvl": "normal"
+    }
+  ]
+}

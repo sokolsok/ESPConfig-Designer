@@ -1,0 +1,63 @@
+{
+  "id": "remote_transmitter.transmit_samsung",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Remote transmitter",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "remote_transmitter_id",
+      "domain": "remote_transmitter",
+      "lvl": "normal"
+    },
+    {
+      "key": "data",
+      "label": "Data",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "0xA90",
+      "lambdaPlaceholder": "return 0xA90;"
+    },
+    {
+      "key": "nbits",
+      "label": "Bits",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "12",
+      "lambdaPlaceholder": "return 12;"
+    },
+    {
+      "key": "repeat",
+      "label": "Repeat",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "times",
+          "label": "Times",
+          "type": "number",
+          "templatable": true,
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "2",
+          "lambdaPlaceholder": "return 2;"
+        },
+        {
+          "key": "wait_time",
+          "label": "Wait time",
+          "type": "duration",
+          "templatable": true,
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "25ms",
+          "lambdaPlaceholder": "return 25;"
+        }
+      ]
+    }
+  ]
+}

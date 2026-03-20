@@ -1,0 +1,152 @@
+{
+  "id": "sensor.mlx90393",
+  "domain": "sensor",
+  "platform": "mlx90393",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/mlx90393/",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "x_axis",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "resolution",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "DIV_4"
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "y_axis",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "resolution",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "DIV_4"
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "z_axis",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "resolution",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "DIV_4"
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "oversampling",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0"
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "drdy_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "gain",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "options": [
+        "1X",
+        "1_25X",
+        "1_67X",
+        "2X",
+        "2_5X",
+        "3X",
+        "3_75X",
+        "5X"
+      ]
+    },
+    {
+      "key": "oversampling",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0"
+    },
+    {
+      "key": "filter",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "6"
+    },
+    {
+      "key": "temperature_compensation",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "hallconf",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0xC"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x0C"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor"
+    }
+  ]
+}

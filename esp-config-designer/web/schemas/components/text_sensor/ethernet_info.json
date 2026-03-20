@@ -1,0 +1,69 @@
+{
+  "id": "text_sensor.ethernet_info",
+  "domain": "text_sensor",
+  "platform": "ethernet_info",
+  "requires": [
+    "ethernet"
+  ],
+  "helpUrl": "https://esphome.io/components/text_sensor/ethernet_info/",
+  "fields": [
+    {
+      "key": "ip_address",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_text_sensor.json",
+      "fields": [
+        {
+          "key": "address_0",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_text_sensor.json"
+        },
+        {
+          "key": "address_1",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_text_sensor.json"
+        },
+        {
+          "key": "address_2",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_text_sensor.json"
+        },
+        {
+          "key": "address_3",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_text_sensor.json"
+        },
+        {
+          "key": "address_4",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_text_sensor.json"
+        }
+      ]
+    },
+    {
+      "key": "dns_address",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_text_sensor.json"
+    },
+    {
+      "key": "mac_address",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_text_sensor.json"
+    }
+  ]
+}

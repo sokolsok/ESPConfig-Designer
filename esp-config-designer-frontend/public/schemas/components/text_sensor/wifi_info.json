@@ -1,0 +1,97 @@
+{
+  "id": "text_sensor.wifi_info",
+  "domain": "text_sensor",
+  "platform": "wifi_info",
+  "requires": [
+    "wifi"
+  ],
+  "helpUrl": "https://esphome.io/components/text_sensor/wifi_info/",
+  "fields": [
+    {
+      "key": "ip_address",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_text_sensor.json",
+      "fields": [
+        {
+          "key": "address_0",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_text_sensor.json"
+        },
+        {
+          "key": "address_1",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_text_sensor.json"
+        },
+        {
+          "key": "address_2",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_text_sensor.json"
+        },
+        {
+          "key": "address_3",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_text_sensor.json"
+        },
+        {
+          "key": "address_4",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_text_sensor.json"
+        }
+      ]
+    },
+    {
+      "key": "ssid",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_text_sensor.json"
+    },
+    {
+      "key": "bssid",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_text_sensor.json"
+    },
+    {
+      "key": "mac_address",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_text_sensor.json"
+    },
+    {
+      "key": "scan_results",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "extends": "base_text_sensor.json"
+    },
+    {
+      "key": "dns_address",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_text_sensor.json"
+    },
+    {
+      "key": "power_save_mode",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_text_sensor.json"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "sensor.duty_time.reset",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Sensor",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "sensor_id",
+      "domain": "sensor",
+      "lvl": "normal"
+    }
+  ]
+}

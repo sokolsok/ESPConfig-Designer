@@ -1,0 +1,151 @@
+{
+  "id": "base.cover",
+  "domain": "cover",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Cover Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "id",
+      "placeholder": "cover_id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "device_class",
+      "placeholder": "garage, gate, blind, curtain",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "icon",
+      "placeholder": "mdi:garage",
+      "type": "icon",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "internal",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "disabled_by_default",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "entity_category",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "mqtt_json_state_payload",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "position_state_topic",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "position_command_topic",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "tilt_state_topic",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "tilt_command_topic",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "on_opened",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "helpUrl": "https://esphome.io/components/cover/",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_closed",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "helpUrl": "https://esphome.io/components/cover/",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_opening",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "helpUrl": "https://esphome.io/components/cover/",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_closing",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "helpUrl": "https://esphome.io/components/cover/",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_idle",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "helpUrl": "https://esphome.io/components/cover/",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

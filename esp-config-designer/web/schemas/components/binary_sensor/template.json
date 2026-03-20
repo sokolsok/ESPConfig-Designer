@@ -1,0 +1,24 @@
+{
+  "id": "binary_sensor.template",
+  "domain": "binary_sensor",
+  "platform": "template",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/binary_sensor/template/",
+  "extends": "base_binary_sensor.json",
+  "fields": [
+    {
+      "key": "lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "simple",
+      "note": "Use either lambda or condition"
+    },
+    {
+      "key": "condition",
+      "type": "yaml",
+      "required": false,
+      "lvl": "simple",
+      "note": "Use either condition or lambda"
+    }
+  ]
+}

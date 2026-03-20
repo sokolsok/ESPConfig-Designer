@@ -1,0 +1,22 @@
+{
+  "id": "online_image.set_url",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Online Image",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "online_image_id",
+      "domain": "online_image",
+      "lvl": "normal"
+    },
+    {
+      "key": "url",
+      "label": "Url",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

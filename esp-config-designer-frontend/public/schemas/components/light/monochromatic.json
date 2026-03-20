@@ -1,0 +1,17 @@
+{
+  "id": "light.monochromatic",
+  "domain": "light",
+  "platform": "monochromatic",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/light/monochromatic/",
+  "extends": "base_light.json",
+  "fields": [
+    {
+      "key": "output",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    }
+  ]
+}

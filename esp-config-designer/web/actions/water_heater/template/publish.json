@@ -1,0 +1,59 @@
+{
+  "id": "water_heater.template.publish",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Water Heater",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "water_heater_id",
+      "domain": "water_heater",
+      "lvl": "normal"
+    },
+    {
+      "key": "current_temperature",
+      "label": "Current temperature",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "45",
+      "lambdaPlaceholder": "return 45;"
+    },
+    {
+      "key": "target_temperature",
+      "label": "Target temperature",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "55",
+      "lambdaPlaceholder": "return 55;"
+    },
+    {
+      "key": "mode",
+      "label": "Mode",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "HEAT"
+    },
+    {
+      "key": "away",
+      "label": "Away",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "is_on",
+      "label": "Is on",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

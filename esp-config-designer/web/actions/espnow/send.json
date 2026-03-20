@@ -1,0 +1,32 @@
+{
+  "id": "espnow.send",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Espnow",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "espnow_id",
+      "domain": "espnow",
+      "lvl": "normal"
+    },
+    {
+      "key": "mac_address",
+      "label": "MAC address",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "AA:BB:CC:DD:EE:FF"
+    },
+    {
+      "key": "data",
+      "label": "Data",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "payload"
+    }
+  ]
+}

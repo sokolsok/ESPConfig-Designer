@@ -1,0 +1,32 @@
+{
+  "id": "media_player.play_media",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Media Player",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "media_player_id",
+      "domain": "media_player",
+      "lvl": "normal"
+    },
+    {
+      "key": "media_url",
+      "label": "Media URL",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "https://example.com/track.mp3"
+    },
+    {
+      "key": "announcement",
+      "label": "Announcement",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

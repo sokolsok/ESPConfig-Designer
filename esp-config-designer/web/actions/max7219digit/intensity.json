@@ -1,0 +1,24 @@
+{
+  "id": "max7219digit.intensity",
+  "fields": [
+    {
+      "key": "id",
+      "label": "MAX7219 Digit",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "max7219digit_id",
+      "domain": "max7219digit",
+      "lvl": "normal"
+    },
+    {
+      "key": "intensity",
+      "label": "Intensity",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "8",
+      "lambdaPlaceholder": "return 8;"
+    }
+  ]
+}

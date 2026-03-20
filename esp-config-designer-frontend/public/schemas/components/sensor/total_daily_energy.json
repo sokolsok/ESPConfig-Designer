@@ -1,0 +1,40 @@
+{
+  "id": "sensor.total_daily_energy",
+  "domain": "sensor",
+  "platform": "total_daily_energy",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/total_daily_energy/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "power_id",
+      "type": "duration",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "restore",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "method",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "trapezoid",
+        "left",
+        "right"
+      ]
+    }
+  ]
+}

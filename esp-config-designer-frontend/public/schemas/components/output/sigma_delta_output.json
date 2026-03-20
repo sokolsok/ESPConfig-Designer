@@ -1,0 +1,43 @@
+{
+  "id": "output.sigma_delta_output",
+  "domain": "output",
+  "platform": "sigma_delta_output",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/output/sigma_delta_output/",
+  "extends": "base_output_float.json",
+  "fields": [
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "state_change_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "- logger.log: !lambda 'return state ? \"ON\" : \"OFF\";'"
+    },
+    {
+      "key": "turn_on_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "- output.turn_on: relay_output"
+    },
+    {
+      "key": "turn_off_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "- output.turn_off: relay_output"
+    }
+  ]
+}

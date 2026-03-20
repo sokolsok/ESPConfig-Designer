@@ -1,0 +1,41 @@
+{
+  "id": "output.my9231",
+  "domain": "output",
+  "platform": "my9231",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/output/my9231/",
+  "extends": "base_output_float.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "my9231",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_my9231.json"
+    },
+    {
+      "key": "my9231_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "my9231",
+      "allowSelfReference": true,
+      "default": "my9231_hub"
+    },
+    {
+      "key": "channel",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    }
+  ]
+}

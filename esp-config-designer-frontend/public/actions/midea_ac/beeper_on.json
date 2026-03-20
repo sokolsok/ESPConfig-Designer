@@ -1,0 +1,14 @@
+{
+  "id": "midea_ac.beeper_on",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Midea Ac",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "midea_ac_id",
+      "domain": "midea_ac",
+      "lvl": "normal"
+    }
+  ]
+}

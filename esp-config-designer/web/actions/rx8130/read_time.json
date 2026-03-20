@@ -1,0 +1,14 @@
+{
+  "id": "rx8130.read_time",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Rx8130",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "rx8130_id",
+      "domain": "rx8130",
+      "lvl": "normal"
+    }
+  ]
+}

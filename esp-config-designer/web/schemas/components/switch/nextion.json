@@ -1,0 +1,73 @@
+{
+  "id": "switch.nextion",
+  "domain": "switch",
+  "platform": "nextion",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/switch/nextion/",
+  "extends": "base_switch.json",
+  "fields": [
+    {
+      "key": "nextion_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "display",
+      "placeholder": "nextion_display_id"
+    },
+    {
+      "key": "component_name",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "page0.r0",
+      "note": "Set only one of component_name or variable_name"
+    },
+    {
+      "key": "variable_name",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "darkmode"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "background_color",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "BLACK"
+    },
+    {
+      "key": "background_pressed_color",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "GRAY"
+    },
+    {
+      "key": "foreground_color",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "WHITE"
+    },
+    {
+      "key": "foreground_pressed_color",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "WHITE"
+    },
+    {
+      "key": "visible",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

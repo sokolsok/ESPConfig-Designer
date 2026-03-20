@@ -1,0 +1,50 @@
+{
+  "id": "rf_bridge.send_code",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Rf Bridge",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "rf_bridge_id",
+      "domain": "rf_bridge",
+      "lvl": "normal"
+    },
+    {
+      "key": "sync",
+      "label": "Sync",
+      "type": "number",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "12220"
+    },
+    {
+      "key": "low",
+      "label": "Low",
+      "type": "number",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "440"
+    },
+    {
+      "key": "high",
+      "label": "High",
+      "type": "number",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "1212"
+    },
+    {
+      "key": "code",
+      "label": "Code",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "011001010101"
+    }
+  ]
+}

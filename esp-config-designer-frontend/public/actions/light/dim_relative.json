@@ -1,0 +1,75 @@
+{
+  "id": "light.dim_relative",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Light",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "light_id",
+      "domain": "light",
+      "lvl": "normal"
+    },
+    {
+      "key": "relative_brightness",
+      "label": "Relative brightness",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "10%",
+      "lambdaPlaceholder": "return 0.1;"
+    },
+    {
+      "key": "transition_length",
+      "label": "Transition length",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "500ms",
+      "lambdaPlaceholder": "return 500;"
+    },
+    {
+      "key": "brightness_limits",
+      "label": "Brightness limits",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "min_brightness",
+          "label": "Min brightness",
+          "type": "text",
+          "templatable": true,
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "10%",
+          "lambdaPlaceholder": "return 0.1;"
+        },
+        {
+          "key": "max_brightness",
+          "label": "Max brightness",
+          "type": "text",
+          "templatable": true,
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "100%",
+          "lambdaPlaceholder": "return 1.0;"
+        },
+        {
+          "key": "limit_mode",
+          "label": "Limit mode",
+          "type": "select",
+          "templatable": false,
+          "required": false,
+          "lvl": "normal",
+          "options": [
+            "CLAMP",
+            "DO_NOTHING"
+          ]
+        }
+      ]
+    }
+  ]
+}

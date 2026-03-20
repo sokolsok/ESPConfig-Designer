@@ -1,0 +1,23 @@
+{
+  "id": "sim800l.dial",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Sim800l",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "sim800l_id",
+      "domain": "sim800l",
+      "lvl": "normal"
+    },
+    {
+      "key": "recipient",
+      "label": "Recipient",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "+48123456789"
+    }
+  ]
+}

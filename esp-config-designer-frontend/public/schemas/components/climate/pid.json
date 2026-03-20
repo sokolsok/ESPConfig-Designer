@@ -1,0 +1,160 @@
+{
+  "id": "climate.pid",
+  "domain": "climate",
+  "platform": "pid",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/climate/pid/",
+  "extends": "base_climate.json",
+  "fields": [
+    {
+      "key": "sensor",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "sensor"
+    },
+    {
+      "key": "humidity_sensor",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor"
+    },
+    {
+      "key": "default_target_temperature",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "heat_output",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "output"
+    },
+    {
+      "key": "cool_output",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "output"
+    },
+    {
+      "key": "control_parameters",
+      "type": "object",
+      "required": true,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "kp",
+          "type": "number",
+          "required": true,
+          "lvl": "simple"
+        },
+        {
+          "key": "ki",
+          "type": "number",
+          "required": false,
+          "lvl": "normal",
+          "default": 0
+        },
+        {
+          "key": "kd",
+          "type": "number",
+          "required": false,
+          "lvl": "normal",
+          "default": 0
+        },
+        {
+          "key": "min_integral",
+          "type": "number",
+          "required": false,
+          "lvl": "normal",
+          "default": -1
+        },
+        {
+          "key": "max_integral",
+          "type": "number",
+          "required": false,
+          "lvl": "normal",
+          "default": 1
+        },
+        {
+          "key": "starting_integral_term",
+          "type": "number",
+          "required": false,
+          "lvl": "advanced"
+        },
+        {
+          "key": "output_averaging_samples",
+          "type": "number",
+          "required": false,
+          "lvl": "advanced",
+          "default": 1
+        },
+        {
+          "key": "derivative_averaging_samples",
+          "type": "number",
+          "required": false,
+          "lvl": "advanced",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "key": "deadband_parameters",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "threshold_low",
+          "type": "number",
+          "required": true,
+          "lvl": "normal"
+        },
+        {
+          "key": "threshold_high",
+          "type": "number",
+          "required": true,
+          "lvl": "normal"
+        },
+        {
+          "key": "kp_multiplier",
+          "type": "number",
+          "required": false,
+          "lvl": "normal",
+          "default": 0
+        },
+        {
+          "key": "ki_multiplier",
+          "type": "number",
+          "required": false,
+          "lvl": "normal",
+          "default": 0
+        },
+        {
+          "key": "kd_multiplier",
+          "type": "number",
+          "required": false,
+          "lvl": "normal",
+          "default": 0
+        },
+        {
+          "key": "deadband_output_averaging_samples",
+          "type": "number",
+          "required": false,
+          "lvl": "advanced",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

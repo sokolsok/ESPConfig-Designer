@@ -1,0 +1,67 @@
+{
+  "id": "cover.control",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Cover",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "cover_id",
+      "domain": "cover",
+      "lvl": "normal"
+    },
+    {
+      "key": "stop",
+      "label": "Stop",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "note": "Use stop by itself to halt movement immediately."
+    },
+    {
+      "key": "state",
+      "label": "State",
+      "type": "select",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "stop",
+        "notValue": true
+      },
+      "options": [
+        "OPEN",
+        "CLOSE"
+      ]
+    },
+    {
+      "key": "position",
+      "label": "Position",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "50%",
+      "lambdaPlaceholder": "return 0.5;",
+      "dependsOn": {
+        "key": "stop",
+        "notValue": true
+      }
+    },
+    {
+      "key": "tilt",
+      "label": "Tilt",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "25%",
+      "lambdaPlaceholder": "return 0.25;",
+      "dependsOn": {
+        "key": "stop",
+        "notValue": true
+      }
+    }
+  ]
+}

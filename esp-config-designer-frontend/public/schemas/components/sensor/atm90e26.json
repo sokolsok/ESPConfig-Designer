@@ -1,0 +1,136 @@
+{
+  "id": "sensor.atm90e26",
+  "domain": "sensor",
+  "platform": "atm90e26",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/atm90e26/",
+  "fields": [
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "line_frequency",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "options": [
+        "50Hz",
+        "60Hz"
+      ]
+    },
+    {
+      "key": "meter_constant",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "voltage",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "current",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "power",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "reactive_power",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "power_factor",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "forward_active_energy",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "reverse_active_energy",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "frequency",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "pl_const",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1429876"
+    },
+    {
+      "key": "gain_metering",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "7481"
+    },
+    {
+      "key": "gain_voltage",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "26400"
+    },
+    {
+      "key": "gain_ct",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "31251"
+    },
+    {
+      "key": "gain_pga",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1X"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "spi_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "id": "lightwaverf.send_raw",
+  "fields": [
+    {
+      "key": "id",
+      "label": "LightWaveRF",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "lightwaverf_id",
+      "domain": "lightwaverf",
+      "lvl": "normal"
+    },
+    {
+      "key": "name",
+      "label": "Name",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "lamp"
+    },
+    {
+      "key": "code",
+      "label": "Code",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "0101F0AA"
+    },
+    {
+      "key": "repeat",
+      "label": "Repeat",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "3",
+      "lambdaPlaceholder": "return 3;"
+    },
+    {
+      "key": "inverted",
+      "label": "Inverted",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

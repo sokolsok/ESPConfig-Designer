@@ -1,0 +1,14 @@
+{
+  "id": "pzemac.reset_energy",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Pzemac",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "pzemac_id",
+      "domain": "pzemac",
+      "lvl": "normal"
+    }
+  ]
+}

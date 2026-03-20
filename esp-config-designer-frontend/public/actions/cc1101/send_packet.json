@@ -1,0 +1,23 @@
+{
+  "id": "cc1101.send_packet",
+  "fields": [
+    {
+      "key": "id",
+      "label": "CC1101",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "cc1101_id",
+      "domain": "cc1101",
+      "lvl": "normal"
+    },
+    {
+      "key": "data",
+      "label": "Data",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "payload"
+    }
+  ]
+}

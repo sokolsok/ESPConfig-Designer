@@ -1,0 +1,27 @@
+{
+  "id": "grove_tb6612fng.break",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Grove TB6612FNG",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "grove_tb6612fng_id",
+      "domain": "grove_tb6612fng",
+      "lvl": "normal"
+    },
+    {
+      "key": "channel",
+      "label": "Channel",
+      "type": "select",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "options": [
+        "A",
+        "B",
+        "BOTH"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "output.esp8266_pwm",
+  "domain": "output",
+  "platform": "esp8266_pwm",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/output/esp8266_pwm/",
+  "extends": "base_output_float.json",
+  "fields": [
+    {
+      "key": "pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "frequency",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "1kHz"
+    }
+  ]
+}

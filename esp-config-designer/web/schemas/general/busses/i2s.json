@@ -85,6 +85,7 @@
       "type": "id",
       "required": false,
       "lvl": "normal",
+      "default": "i2s_id",
       "dependsOn": {
         "key": "enabled",
         "value": true

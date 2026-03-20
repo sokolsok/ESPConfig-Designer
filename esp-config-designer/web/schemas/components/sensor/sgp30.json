@@ -1,0 +1,109 @@
+{
+  "id": "sensor.sgp30",
+  "domain": "sensor",
+  "platform": "sgp30",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/sgp30/",
+  "fields": [
+    {
+      "key": "eco2",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "tvoc",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "store_baseline",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x58"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "baseline",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "eco2_baseline",
+          "type": "text",
+          "required": true,
+          "lvl": "simple"
+        },
+        {
+          "key": "tvoc_baseline",
+          "type": "text",
+          "required": true,
+          "lvl": "simple"
+        }
+      ]
+    },
+    {
+      "key": "eco2_baseline",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "tvoc_baseline",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "compensation",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "temperature_source",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "humidity_source",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "id": "sensor.ina3221",
+  "domain": "sensor",
+  "platform": "ina3221",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/ina3221/",
+  "fields": [
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x40"
+    },
+    {
+      "key": "channel_1",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "shunt_resistance",
+          "type": "number",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0.1 ohm"
+        },
+        {
+          "key": "current",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "power",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "bus_voltage",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "shunt_voltage",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "channel_2",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "channel_3",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

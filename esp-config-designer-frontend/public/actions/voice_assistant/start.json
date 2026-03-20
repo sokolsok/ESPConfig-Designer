@@ -1,0 +1,32 @@
+{
+  "id": "voice_assistant.start",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Voice assistant",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "voice_assistant_id",
+      "domain": "voice_assistant",
+      "lvl": "normal"
+    },
+    {
+      "key": "silence_detection",
+      "label": "Silence detection",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    },
+    {
+      "key": "wake_word",
+      "label": "Wake word",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "okay_nabu"
+    }
+  ]
+}

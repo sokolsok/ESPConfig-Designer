@@ -16,17 +16,32 @@
               ?
             </a>
           </div>
-          <p class="icon-picker-sub"></p>
         </div>
         <button type="button" class="secondary compact" @click="handleClose">Close</button>
       </header>
 
       <div class="icon-picker-search">
         <input ref="searchInput" v-model="query" type="text" :placeholder="searchPlaceholder" />
-        <div class="icon-picker-meta"></div>
       </div>
 
-      <div v-if="filteredItems.length" class="filter-grid">
+      <div v-if="useSections && filteredSections.length" class="picker-sections">
+        <section v-for="section in filteredSections" :key="section.id" class="picker-section">
+          <h4 class="picker-section-title">{{ section.title }}</h4>
+          <div class="filter-grid">
+            <button
+              v-for="item in section.items"
+              :key="`${section.id}:${item.id}`"
+              type="button"
+              class="filter-card"
+              :title="item.description || item.label || item.id"
+              @click="selectItem(item)"
+            >
+              <span class="filter-title">{{ item.label || item.id }}</span>
+            </button>
+          </div>
+        </section>
+      </div>
+      <div v-else-if="filteredItems.length" class="filter-grid">
         <button
           v-for="item in filteredItems"
           :key="item.id"
@@ -55,6 +70,14 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
+  sections: {
+    type: Array,
+    default: () => []
+  },
+  useSections: {
+    type: Boolean,
+    default: false
+  },
   title: {
     type: String,
     default: "Choose"
@@ -74,10 +97,6 @@ const props = defineProps({
   emptyLabel: {
     type: String,
     default: "No items to show."
-  },
-  initialQuery: {
-    type: String,
-    default: ""
   }
 });
 
@@ -96,6 +115,30 @@ const filteredItems = computed(() => {
   });
 });
 
+const filteredSections = computed(() => {
+  if (!props.useSections) return [];
+  const term = query.value.trim().toLowerCase();
+  const sections = Array.isArray(props.sections) ? props.sections : [];
+  if (!term) {
+    return sections.filter((section) => Array.isArray(section?.items) && section.items.length);
+  }
+
+  return sections
+    .map((section) => {
+      const items = (Array.isArray(section?.items) ? section.items : []).filter((item) => {
+        const id = String(item.id || "").toLowerCase();
+        const label = String(item.label || "").toLowerCase();
+        return id.includes(term) || label.includes(term);
+      });
+      return {
+        id: section.id,
+        title: section.title,
+        items
+      };
+    })
+    .filter((section) => section.items.length);
+});
+
 const selectItem = (item) => {
   emit("select", item);
 };
@@ -108,7 +151,7 @@ watch(
   () => props.open,
   async (isOpen) => {
     if (!isOpen) return;
-    query.value = props.initialQuery || "";
+    query.value = "";
     await nextTick();
     searchInput.value?.focus();
   }
@@ -129,7 +172,7 @@ watch(
 .icon-picker-card {
   background: #ffffff;
   border-radius: 18px;
-  width: min(760px, 90vw);
+  width: min(980px, 96vw);
   max-height: 82vh;
   padding: 20px 24px;
   display: flex;
@@ -175,12 +218,6 @@ watch(
   background: #e2e8f0;
 }
 
-.icon-picker-sub {
-  margin: 4px 0 0;
-  color: #64748b;
-  font-size: 13px;
-}
-
 .icon-picker-search {
   display: flex;
   align-items: center;
@@ -191,22 +228,54 @@ watch(
   flex: 1;
 }
 
-.icon-picker-meta {
-  font-size: 12px;
-  color: #64748b;
-}
-
 .icon-empty {
   color: #64748b;
   font-size: 13px;
 }
 
-.filter-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 10px;
+.picker-sections {
   overflow: auto;
   padding-right: 6px;
+}
+
+.picker-section + .picker-section {
+  margin-top: 14px;
+}
+
+.picker-section-title {
+  margin: 0 0 8px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #334155;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 1100px) {
+  .filter-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 820px) {
+  .icon-picker-card {
+    width: min(96vw, 760px);
+  }
+
+  .filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .filter-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .filter-card {
@@ -214,7 +283,7 @@ watch(
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border-radius: 4px;
   border: 1px solid #6e93c4;
   background: #6190d6;
@@ -227,6 +296,6 @@ watch(
 }
 
 .filter-title {
-  font-size: 13px;
+  font-size: 14px;
 }
 </style>

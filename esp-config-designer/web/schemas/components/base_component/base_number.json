@@ -1,0 +1,93 @@
+{
+  "id": "base.number",
+  "domain": "number",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "icon",
+      "type": "icon",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "internal",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "disabled_by_default",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "entity_category",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "unit_of_measurement",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "auto",
+      "options": [
+        "auto",
+        "box",
+        "slider"
+      ]
+    },
+    {
+      "key": "device_class",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "on_value",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_value_range",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

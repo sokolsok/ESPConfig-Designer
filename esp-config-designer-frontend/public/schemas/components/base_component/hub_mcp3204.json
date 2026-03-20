@@ -1,0 +1,39 @@
+{
+  "id": "hub.mcp3204",
+  "domain": "mcp3204",
+  "platform": "",
+  "requires": [
+    "spi"
+  ],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "mcp3204_hub",
+      "idDomain": "mcp3204"
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "reference_voltage",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "3.3"
+    },
+    {
+      "key": "spi_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "spi"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "sensor.max6675",
+  "domain": "sensor",
+  "platform": "max6675",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/max6675/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "spi_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor"
+    }
+  ]
+}

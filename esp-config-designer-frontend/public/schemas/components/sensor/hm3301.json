@@ -1,0 +1,54 @@
+{
+  "id": "sensor.hm3301",
+  "domain": "sensor",
+  "platform": "hm3301",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/hm3301/",
+  "fields": [
+    {
+      "key": "pm_1_0",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "pm_2_5",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "pm_10_0",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "name",
+          "placeholder": "Sensor Name",
+          "type": "text",
+          "required": false,
+          "lvl": "simple"
+        },
+        {
+          "key": "calculation_type",
+          "type": "select",
+          "required": true,
+          "lvl": "simple",
+		  "default": "AQI",
+          "options": [
+            "AQI",
+            "CAQI"
+          ]
+        }
+      ],
+      "extends": "base_sensor.json"
+    }
+  ]
+}

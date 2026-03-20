@@ -1,0 +1,109 @@
+{
+  "id": "display.waveshare_epaper",
+  "domain": "display",
+  "platform": "waveshare_epaper",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/display/waveshare_epaper/",
+  "extends": "base_display.json",
+  "display_builder": true,
+  "displayType": "monochrome",
+  "model_meta": {
+    "1.54in": {
+      "w": 200,
+      "h": 200
+    },
+    "2.13in": {
+      "w": 250,
+      "h": 122
+    },
+    "2.90in": {
+      "w": 296,
+      "h": 128
+    },
+    "4.20in": {
+      "w": 400,
+      "h": 300
+    }
+  },
+  "fields": [
+    {
+      "key": "model",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "2.90in"
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "dc_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "busy_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "reset_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "rotation",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "0",
+      "options": [
+        "0",
+        "90",
+        "180",
+        "270"
+      ]
+    },
+    {
+      "key": "full_update_every",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "reset_duration",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "default": "200ms"
+    },
+    {
+      "key": "pages",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "spi_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "advanced",
+      "domain": "spi"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "1s"
+    }
+  ]
+}

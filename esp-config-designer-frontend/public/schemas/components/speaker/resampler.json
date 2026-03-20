@@ -1,0 +1,57 @@
+{
+  "id": "speaker.resampler",
+  "domain": "speaker",
+  "platform": "resampler",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/speaker/resampler/",
+  "extends": "base_speaker.json",
+  "fields": [
+    {
+      "key": "output_speaker",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "speaker"
+    },
+    {
+      "key": "buffer_duration",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "500ms"
+    },
+    {
+      "key": "bits_per_sample",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "sample_rate",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "filters",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "default": 16
+    },
+    {
+      "key": "taps",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "default": 16
+    },
+    {
+      "key": "task_stack_in_psram",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    }
+  ]
+}

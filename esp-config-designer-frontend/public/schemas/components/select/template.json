@@ -1,0 +1,59 @@
+{
+  "id": "select.template",
+  "domain": "select",
+  "platform": "template",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/select/template/",
+  "extends": "base_select.json",
+  "fields": [
+    {
+      "key": "options",
+      "type": "list",
+      "required": true,
+      "lvl": "simple",
+      "item": {
+        "type": "text"
+      }
+    },
+    {
+      "key": "lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "set_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "- logger.log:\n    format: \"Chosen option: %s\"\n    args: [\"x.c_str()\"]"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    },
+    {
+      "key": "optimistic",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "restore_value",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "initial_option",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

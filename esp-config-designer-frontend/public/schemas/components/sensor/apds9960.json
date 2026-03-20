@@ -1,0 +1,75 @@
+{
+  "id": "sensor.apds9960",
+  "domain": "sensor",
+  "platform": "apds9960",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/apds9960/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x39"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "led_drive",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "100mA"
+    },
+    {
+      "key": "proximity_gain",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "4x"
+    },
+    {
+      "key": "ambient_light_gain",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "4x"
+    },
+    {
+      "key": "gesture_led_drive",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "100mA"
+    },
+    {
+      "key": "gesture_gain",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "4x"
+    },
+    {
+      "key": "gesture_wait_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "2.8ms"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "lvgl.widget.focus",
+  "fields": [
+    {
+      "key": "id",
+      "label": "LVGL widget",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "lvgl_widget_id",
+      "domain": "",
+      "lvl": "normal"
+    },
+    {
+      "key": "group",
+      "label": "Group",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "default_group"
+    },
+    {
+      "key": "freeze",
+      "label": "Freeze",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "editing",
+      "label": "Editing",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

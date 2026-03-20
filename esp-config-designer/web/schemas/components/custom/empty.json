@@ -1,0 +1,27 @@
+{
+  "id": "custom.empty",
+  "domain": "custom",
+  "platform": "empty",
+  "helpUrl": "",
+  "uiLabelField": "name",
+  "defaultLabel": "Empty Component",
+  "renderStrategy": "verbatim_root",
+  "verbatimField": "custom_config",
+  "fields": [
+    {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Custom component name",
+      "emitYAML": "never"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "# Enter raw YAML that should be emitted as-is"
+    }
+  ]
+}

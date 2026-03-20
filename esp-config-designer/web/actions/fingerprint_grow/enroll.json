@@ -1,0 +1,34 @@
+{
+  "id": "fingerprint_grow.enroll",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Fingerprint sensor",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "fingerprint_grow_id",
+      "domain": "fingerprint_grow",
+      "lvl": "normal"
+    },
+    {
+      "key": "finger_id",
+      "label": "Finger ID",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "1",
+      "lambdaPlaceholder": "return 1;"
+    },
+    {
+      "key": "num_scans",
+      "label": "Scan count",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "2",
+      "lambdaPlaceholder": "return 2;"
+    }
+  ]
+}

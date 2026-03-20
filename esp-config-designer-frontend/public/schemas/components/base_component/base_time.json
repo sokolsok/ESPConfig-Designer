@@ -1,0 +1,58 @@
+{
+  "id": "base.time",
+  "domain": "time",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "time_id",
+      "idDomain": "time"
+    },
+    {
+      "key": "timezone",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "suppressQuotes": true,
+      "placeholder": "Europe/Warsaw",
+      "optionsFrom": "general/automation/timezones.json",
+      "searchable": true
+    },
+    {
+      "key": "on_time",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_time_sync",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "15min"
+    }
+  ]
+}

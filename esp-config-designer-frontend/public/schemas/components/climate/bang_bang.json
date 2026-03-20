@@ -1,0 +1,83 @@
+{
+  "id": "climate.bang_bang",
+  "domain": "climate",
+  "platform": "bang_bang",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/climate/bang_bang/",
+  "extends": "base_climate.json",
+  "fields": [
+    {
+      "key": "sensor",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "sensor"
+    },
+    {
+      "key": "humidity_sensor",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor"
+    },
+    {
+      "key": "default_target_temperature_low",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "default_target_temperature_high",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "idle_action",
+      "type": "yaml",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "then:\n  - switch.turn_off: heater\n  - switch.turn_off: cooler"
+    },
+    {
+      "key": "heat_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "then:\n  - switch.turn_on: heater"
+    },
+    {
+      "key": "cool_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "then:\n  - switch.turn_on: cooler"
+    },
+    {
+      "key": "away_config",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "default_target_temperature_low",
+          "type": "number",
+          "required": true,
+          "lvl": "normal"
+        },
+        {
+          "key": "default_target_temperature_high",
+          "type": "number",
+          "required": true,
+          "lvl": "normal"
+        }
+      ]
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

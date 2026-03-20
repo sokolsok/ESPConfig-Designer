@@ -9,7 +9,7 @@
       "key": "board",
       "type": "select",
       "required": true,
-      "lvl": "normal",
+      "lvl": "simple",
       "default": "esp01_1m",
       "options": [
         "agruminolemon",
@@ -63,7 +63,7 @@
       "key": "restore_from_flash",
       "type": "boolean",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "normal"
     },
     {
       "key": "board_flash_mode",

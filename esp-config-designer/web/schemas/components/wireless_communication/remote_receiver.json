@@ -1,0 +1,156 @@
+{
+  "id": "remote_receiver",
+  "domain": "remote_receiver",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/remote_receiver/",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal",
+      "idDomain": "remote_receiver"
+    },
+    {
+      "key": "pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "dump",
+      "type": "yaml",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "all"
+    },
+    {
+      "key": "tolerance",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "25%"
+    },
+    {
+      "key": "buffer_size",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "10kB"
+    },
+    {
+      "key": "filter",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "50us"
+    },
+    {
+      "key": "idle",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "10ms"
+    },
+    {
+      "key": "rmt_symbols",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "receive_symbols",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "filter_symbols",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "clock_resolution",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "default": 1000000
+    },
+    {
+      "key": "use_dma",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "carrier_duty_percent",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "default": 100
+    },
+    {
+      "key": "carrier_frequency",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "default": "0Hz"
+    },
+    {
+      "key": "on_raw",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_nec",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_rc_switch",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_pronto",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "# Additional on_<protocol> triggers"
+    }
+  ]
+}

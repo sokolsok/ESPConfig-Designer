@@ -1,0 +1,23 @@
+{
+  "id": "lock.template.publish",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Lock",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "lock_id",
+      "domain": "lock",
+      "lvl": "normal"
+    },
+    {
+      "key": "state",
+      "label": "State",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "hello"
+    }
+  ]
+}

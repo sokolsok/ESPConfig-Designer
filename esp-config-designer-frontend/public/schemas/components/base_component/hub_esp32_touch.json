@@ -1,0 +1,139 @@
+{
+  "id": "hub.esp32_touch",
+  "domain": "esp32_touch",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "esp32_touch_hub",
+      "idDomain": "esp32_touch"
+    },
+    {
+      "key": "setup_mode",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "sleep_duration",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "27ms"
+    },
+    {
+      "key": "measurement_duration",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "8ms"
+    },
+    {
+      "key": "low_voltage_reference",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "0.5V",
+      "options": [
+        "0.5V",
+        "0.6V",
+        "0.7V",
+        "0.8V"
+      ]
+    },
+    {
+      "key": "high_voltage_reference",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "2.7V",
+      "options": [
+        "2.4V",
+        "2.5V",
+        "2.6V",
+        "2.7V"
+      ]
+    },
+    {
+      "key": "voltage_attenuation",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "0V",
+      "options": [
+        "1.5V",
+        "1V",
+        "0.5V",
+        "0V"
+      ]
+    },
+    {
+      "key": "iir_filter",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "filter_mode",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "debounce_count",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "0-7"
+    },
+    {
+      "key": "noise_threshold",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "0-3"
+    },
+    {
+      "key": "jitter_step",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "0-15"
+    },
+    {
+      "key": "smooth_mode",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "denoise_grade",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "denoise_cap_level",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "waterproof_guard_ring",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "waterproof_shield_driver",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

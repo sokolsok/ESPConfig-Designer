@@ -1,0 +1,227 @@
+{
+  "id": "sensor.sen5x",
+  "domain": "sensor",
+  "platform": "sen5x",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/sen5x/",
+  "fields": [
+    {
+      "key": "address",
+      "type": "number",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x69"
+    },
+    {
+      "key": "store_baseline",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "temperature_compensation",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "offset",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0"
+        },
+        {
+          "key": "normalized_offset_slope",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0"
+        },
+        {
+          "key": "time_constant",
+          "type": "duration",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0"
+        }
+      ]
+    },
+    {
+      "key": "acceleration_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+	  "default": "low",
+      "options": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "pm_1_0",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "pm_2_5",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "pm_4_0",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "pm_10_0",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "auto_cleaning_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "temperature",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "humidity",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "voc",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "algorithm_tuning",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "index_offset",
+          "type": "number",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "learning_time_offset_hours",
+          "type": "duration",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "learning_time_gain_hours",
+          "type": "duration",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "gating_max_duration_minutes",
+          "type": "duration",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "std_initial",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "gain_factor",
+          "type": "number",
+          "required": false,
+          "lvl": "normal"
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "nox",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "algorithm_tuning",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "index_offset",
+          "type": "number",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "learning_time_offset_hours",
+          "type": "duration",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "learning_time_gain_hours",
+          "type": "duration",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "gating_max_duration_minutes",
+          "type": "duration",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "std_initial",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "gain_factor",
+          "type": "number",
+          "required": false,
+          "lvl": "normal"
+        }
+      ],
+      "extends": "base_sensor.json"
+    }
+  ]
+}

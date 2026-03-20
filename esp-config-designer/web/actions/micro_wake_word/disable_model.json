@@ -1,0 +1,14 @@
+{
+  "id": "micro_wake_word.disable_model",
+  "fields": [
+    {
+      "key": "model_id",
+      "label": "Model ID",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "okay_nabu"
+    }
+  ]
+}

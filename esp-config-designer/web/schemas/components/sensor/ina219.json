@@ -9,31 +9,35 @@
   "fields": [
     {
       "key": "address",
-      "type": "text",
+      "type": "address",
       "required": false,
-      "lvl": "normal",
-      "default": "0x40"
+      "lvl": "simple",
+      "default": "0x40",
+      "placeholder": "0x40"
     },
     {
       "key": "shunt_resistance",
       "type": "text",
       "required": false,
       "lvl": "normal",
-      "default": "0.1 ohm"
+      "default": "0.1 ohm",
+      "placeholder": "0.1 ohm"
     },
     {
       "key": "max_voltage",
       "type": "text",
       "required": false,
       "lvl": "normal",
-      "default": "32V"
+      "default": "32V",
+      "placeholder": "32V"
     },
     {
       "key": "max_current",
       "type": "text",
       "required": false,
       "lvl": "normal",
-      "default": "3.2A"
+      "default": "3.2A",
+      "placeholder": "3.2A"
     },
     {
       "key": "current",
@@ -71,8 +75,9 @@
       "key": "update_interval",
       "type": "duration",
       "required": false,
-      "lvl": "normal",
-      "default": "60s"
+      "lvl": "simple",
+      "default": "60s",
+      "placeholder": "60s"
     }
   ]
 }

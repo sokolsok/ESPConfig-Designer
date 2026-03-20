@@ -1,0 +1,42 @@
+{
+  "id": "display.tm1621",
+  "domain": "display",
+  "platform": "tm1621",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/display/tm1621/",
+  "extends": "base_display.json",
+  "display_builder": false,
+  "fields": [
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "data_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "read_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "write_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "1s"
+    }
+  ]
+}

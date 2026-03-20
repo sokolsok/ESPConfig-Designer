@@ -1,0 +1,47 @@
+{
+  "id": "fan.speed",
+  "domain": "fan",
+  "platform": "speed",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/fan/speed/",
+  "extends": "base_fan.json",
+  "fields": [
+    {
+      "key": "output",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "oscillation_output",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "output"
+    },
+    {
+      "key": "direction_output",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "output"
+    },
+    {
+      "key": "speed_count",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 100
+    },
+    {
+      "key": "preset_modes",
+      "type": "list",
+      "required": false,
+      "lvl": "normal",
+      "item": {
+        "type": "text"
+      }
+    }
+  ]
+}

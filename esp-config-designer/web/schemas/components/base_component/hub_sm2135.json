@@ -1,0 +1,73 @@
+{
+  "id": "hub.sm2135",
+  "domain": "sm2135",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "sm2135_hub",
+      "idDomain": "sm2135"
+    },
+    {
+      "key": "data_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "clock_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "cw_current",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "10mA",
+      "options": [
+        "10mA",
+        "15mA",
+        "20mA",
+        "25mA",
+        "30mA",
+        "35mA",
+        "40mA",
+        "45mA",
+        "50mA",
+        "55mA",
+        "60mA"
+      ]
+    },
+    {
+      "key": "rgb_current",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "20mA",
+      "options": [
+        "10mA",
+        "15mA",
+        "20mA",
+        "25mA",
+        "30mA",
+        "35mA",
+        "40mA",
+        "45mA"
+      ]
+    },
+    {
+      "key": "separate_modes",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    }
+  ]
+}

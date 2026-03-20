@@ -1,0 +1,14 @@
+{
+  "id": "switch.is_off",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Switch",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "relay_1",
+      "domain": "switch",
+      "lvl": "normal"
+    }
+  ]
+}

@@ -1,0 +1,171 @@
+{
+  "id": "sensor.sgp4x",
+  "domain": "sensor",
+  "platform": "sgp4x",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/sgp4x/",
+  "fields": [
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "store_baseline",
+      "type": "boolean",
+      "default": true,
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "compensation",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "temperature_source",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "25"
+        },
+        {
+          "key": "humidity_source",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "50"
+        }
+      ]
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "voc",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "algorithm_tuning",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "fields": [
+            {
+              "key": "index_offset",
+              "type": "number",
+              "required": false,
+              "lvl": "normal",
+              "placeholder": "100"
+            },
+            {
+              "key": "learning_time_offset_hours",
+              "type": "duration",
+              "required": false,
+              "lvl": "normal",
+              "placeholder": "12h"
+            },
+            {
+              "key": "learning_time_gain_hours",
+              "type": "duration",
+              "required": false,
+              "lvl": "normal",
+              "placeholder": "12h"
+            },
+            {
+              "key": "gating_max_duration_minutes",
+              "type": "duration",
+              "required": false,
+              "lvl": "normal",
+              "placeholder": "720min"
+            },
+            {
+              "key": "std_initial",
+              "type": "text",
+              "required": false,
+              "lvl": "normal",
+              "placeholder": "50"
+            },
+            {
+              "key": "gain_factor",
+              "type": "number",
+              "required": false,
+              "lvl": "normal",
+              "placeholder": "230"
+            }
+          ]
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "nox",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "algorithm_tuning",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "fields": [
+            {
+              "key": "index_offset",
+              "type": "number",
+              "required": false,
+              "lvl": "normal",
+              "placeholder": "100"
+            },
+            {
+              "key": "learning_time_offset_hours",
+              "type": "duration",
+              "required": false,
+              "lvl": "normal",
+              "placeholder": "12h"
+            },
+            {
+              "key": "learning_time_gain_hours",
+              "type": "duration",
+              "required": false,
+              "lvl": "normal",
+              "placeholder": "12h"
+            },
+            {
+              "key": "gating_max_duration_minutes",
+              "type": "duration",
+              "required": false,
+              "lvl": "normal",
+              "placeholder": "720min"
+            },
+            {
+              "key": "std_initial",
+              "type": "text",
+              "required": false,
+              "lvl": "normal",
+              "placeholder": "50"
+            },
+            {
+              "key": "gain_factor",
+              "type": "number",
+              "required": false,
+              "lvl": "normal",
+              "placeholder": "230"
+            }
+          ]
+        }
+      ],
+      "extends": "base_sensor.json"
+    }
+  ]
+}

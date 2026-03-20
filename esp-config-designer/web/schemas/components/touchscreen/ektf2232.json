@@ -1,0 +1,24 @@
+{
+  "id": "touchscreen.ektf2232",
+  "domain": "touchscreen",
+  "platform": "ektf2232",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/touchscreen/ektf2232/",
+  "extends": "base_touchscreen.json",
+  "fields": [
+    {
+      "key": "reset_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "interrupt_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "switch.uart",
+  "domain": "switch",
+  "platform": "uart",
+  "requires": [
+    "uart"
+  ],
+  "helpUrl": "https://esphome.io/components/switch/uart/",
+  "extends": "base_switch.json",
+  "fields": [
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "uart",
+      "placeholder": "uart_bus"
+    },
+    {
+      "key": "data",
+      "type": "yaml",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "'DataToSend'\n# or:\n- 0xDE\n- 0xAD\n- 0xBE\n- 0xEF\n# or:\nturn_on: \"TurnOn\\r\\n\"\nturn_off: \"TurnOff\\r\\n\""
+    },
+    {
+      "key": "send_every",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

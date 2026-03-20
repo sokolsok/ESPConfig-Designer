@@ -1,0 +1,14 @@
+{
+  "id": "deep_sleep.prevent",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Deep Sleep",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "deep_sleep_id",
+      "domain": "deep_sleep",
+      "lvl": "normal"
+    }
+  ]
+}

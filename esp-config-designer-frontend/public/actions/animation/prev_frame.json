@@ -1,0 +1,33 @@
+{
+  "id": "animation.prev_frame",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Animation",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "animation_id",
+      "domain": "animation",
+      "lvl": "normal"
+    },
+    {
+      "key": "step",
+      "label": "Step",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1",
+      "lambdaPlaceholder": "return 1;"
+    },
+    {
+      "key": "wrap",
+      "label": "Wrap",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    }
+  ]
+}

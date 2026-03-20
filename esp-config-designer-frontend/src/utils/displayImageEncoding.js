@@ -101,32 +101,3 @@ export const normalizeAnimationElementEncoding = (element) => {
     animationByteOrder: normalized.byteOrder
   };
 };
-
-export const validateDisplayEncoding = (type, transparency, invertAlpha, dither, byteOrder) => {
-  const normalized = normalizeEncoding({ type, transparency, invertAlpha, dither, byteOrder });
-  const errors = [];
-  const rawType = String(type || "").trim().toUpperCase();
-  const rawTransparency = String(transparency || "opaque").trim().toLowerCase();
-  const rawDither = String(dither || "NONE").trim().toUpperCase();
-  const rawByteOrder = String(byteOrder || "big_endian").trim().toLowerCase();
-
-  if (rawType === LEGACY_TRANSPARENT_BINARY) {
-    errors.push("Image type TRANSPARENT_BINARY is no longer supported");
-  }
-  if (rawType && rawType !== LEGACY_TRANSPARENT_BINARY && rawType !== normalized.type) {
-    errors.push("Unsupported image type");
-  }
-  if (rawTransparency !== normalized.transparency) {
-    errors.push("Unsupported transparency for selected image type");
-  }
-  if (!supportsInvertAlpha(normalized.type) && Boolean(invertAlpha)) {
-    errors.push("invert_alpha is only supported for BINARY and GRAYSCALE");
-  }
-  if (!supportsDither(normalized.type) && rawDither !== "NONE") {
-    errors.push("dither is only supported for BINARY and GRAYSCALE");
-  }
-  if (!supportsByteOrder(normalized.type) && rawByteOrder !== "big_endian") {
-    errors.push("byte_order is only supported for RGB565");
-  }
-  return errors;
-};

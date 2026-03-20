@@ -1,0 +1,14 @@
+{
+  "id": "tag.polling_on",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Tag",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "tag_id",
+      "domain": "tag",
+      "lvl": "normal"
+    }
+  ]
+}

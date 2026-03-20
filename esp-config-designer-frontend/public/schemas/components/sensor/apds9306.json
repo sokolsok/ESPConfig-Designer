@@ -1,0 +1,69 @@
+{
+  "id": "sensor.apds9306",
+  "domain": "sensor",
+  "platform": "apds9306",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/apds9306/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "gain",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "1"
+    },
+    {
+      "key": "bit_width",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "20",
+        "19",
+        "18",
+        "default",
+        "17",
+        "16",
+        "13"
+      ]
+    },
+    {
+      "key": "measurement_rate",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "25",
+        "50",
+        "100",
+        "default",
+        "200",
+        "500",
+        "1000"
+      ]
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

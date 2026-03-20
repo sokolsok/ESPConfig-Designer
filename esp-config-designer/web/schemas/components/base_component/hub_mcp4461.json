@@ -1,0 +1,62 @@
+{
+  "id": "hub.mcp4461",
+  "domain": "mcp4461",
+  "platform": "",
+  "requires": [
+    "i2c"
+  ],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "mcp4461_hub",
+      "idDomain": "mcp4461"
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x2C",
+      "suppressQuotes": true
+    },
+    {
+      "key": "disable_wiper_0",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "disable_wiper_1",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "disable_wiper_2",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "disable_wiper_3",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "advanced",
+      "domain": "i2c"
+    }
+  ]
+}

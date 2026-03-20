@@ -1,0 +1,22 @@
+{
+  "id": "tag.set_emulation_message",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Tag",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "tag_id",
+      "domain": "tag",
+      "lvl": "normal"
+    },
+    {
+      "key": "emulation_message",
+      "label": "Emulation Message",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "stepper.set_acceleration",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Stepper",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "stepper_id",
+      "domain": "stepper",
+      "lvl": "normal"
+    },
+    {
+      "key": "acceleration",
+      "label": "Acceleration",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "100",
+      "lambdaPlaceholder": "return 100;"
+    }
+  ]
+}

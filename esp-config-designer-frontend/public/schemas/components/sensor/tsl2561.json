@@ -9,11 +9,19 @@
   "extends": "base_sensor.json",
   "fields": [
     {
-      "key": "address",
+      "key": "name",
+      "placeholder": "Sensor Name",
       "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "address",
+      "type": "address",
       "required": false,
-      "lvl": "normal",
-      "default": "0x39"
+      "lvl": "simple",
+      "default": "0x39",
+      "placeholder": "0x39"
     },
     {
       "key": "integration_time",
@@ -49,8 +57,9 @@
       "key": "update_interval",
       "type": "duration",
       "required": false,
-      "lvl": "normal",
-      "default": "60s"
+      "lvl": "simple",
+      "default": "60s",
+      "placeholder": "60s"
     }
   ]
 }

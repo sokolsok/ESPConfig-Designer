@@ -1,0 +1,44 @@
+{
+  "id": "sensor.sound_level",
+  "domain": "sensor",
+  "platform": "sound_level",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/sound_level/",
+  "fields": [
+    {
+      "key": "microphone",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "measurement_duration",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1000ms"
+    },
+    {
+      "key": "passive",
+      "type": "boolean",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "peak",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "rms",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    }
+  ]
+}

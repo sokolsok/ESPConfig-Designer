@@ -4,20 +4,39 @@
   "platform": "gpio",
   "requires": [],
   "helpUrl": "https://esphome.io/components/binary_sensor/gpio/",
+  "extends": "base_binary_sensor.json",
   "fields": [
     {
-      "key": "name",
-      "type": "text",
-      "required": true
+      "key": "pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "helpUrl": "https://esphome.io/guides/configuration-types#pin-schema"
     },
     {
-      "key": "pin",
-      "type": "gpio"
-    },	
+      "key": "name",
+      "placeholder": "Binary Sensor Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
     {
-      "key": "lambda",
-      "type": "lambda",
-      "required": false
+      "key": "use_interrupt",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "interrupt_type",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "ANY",
+      "options": [
+        "ANY",
+        "RISING",
+        "FALLING"
+      ]
     }
   ]
 }

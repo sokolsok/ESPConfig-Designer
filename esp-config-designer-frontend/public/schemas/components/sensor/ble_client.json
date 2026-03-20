@@ -1,0 +1,147 @@
+{
+  "id": "sensor.ble_client",
+  "domain": "sensor",
+  "platform": "ble_client",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/ble_client/",
+  "extends": "base_sensor.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "ble_client",
+      "dedupeBy": "id"
+    },
+    {
+      "key": "ble_tracker",
+      "domain": "esp32_ble_tracker",
+      "emitAs": "map",
+      "singleton": true,
+      "alwaysEmit": true,
+      "defaultPayload": {},
+      "merge": "first"
+    }
+  ],
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_ble_client.json"
+    },
+    {
+      "key": "ble_tracker",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "uiHidden": true,
+      "emitYAML": "never",
+      "extends": "hub_esp32_ble_tracker.json"
+    },
+    {
+      "key": "type",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "characteristic",
+      "options": [
+        "rssi",
+        "characteristic"
+      ]
+    },
+    {
+      "key": "ble_client_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "ble_client",
+      "allowSelfReference": true,
+      "default": "ble_client_hub"
+    },
+    {
+      "key": "service_uuid",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "180f",
+      "dependsOn": {
+        "key": "type",
+        "value": "characteristic"
+      }
+    },
+    {
+      "key": "characteristic_uuid",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "2a19",
+      "dependsOn": {
+        "key": "type",
+        "value": "characteristic"
+      }
+    },
+    {
+      "key": "descriptor_uuid",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "2902",
+      "dependsOn": {
+        "key": "type",
+        "value": "characteristic"
+      }
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "type",
+        "value": "characteristic"
+      }
+    },
+    {
+      "key": "notify",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "type",
+        "value": "characteristic"
+      }
+    },
+    {
+      "key": "on_notify",
+      "type": "list",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "notify",
+        "value": true
+      },
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

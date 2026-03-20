@@ -1,0 +1,38 @@
+{
+  "id": "light.color_temperature",
+  "domain": "light",
+  "platform": "color_temperature",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/light/color_temperature/",
+  "extends": "base_light.json",
+  "fields": [
+    {
+      "key": "color_temperature",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "brightness",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "cold_white_color_temperature",
+      "type": "text",
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "6536 K"
+    },
+    {
+      "key": "warm_white_color_temperature",
+      "type": "text",
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "2000 K"
+    }
+  ]
+}

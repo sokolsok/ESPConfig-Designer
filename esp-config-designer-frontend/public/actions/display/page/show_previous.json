@@ -1,0 +1,14 @@
+{
+  "id": "display.page.show_previous",
+  "fields": [
+    {
+      "key": "display_id",
+      "label": "Display ID",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "main_display"
+    }
+  ]
+}

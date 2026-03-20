@@ -1,0 +1,23 @@
+{
+  "id": "speaker.play",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Speaker",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "speaker_id",
+      "domain": "speaker",
+      "lvl": "normal"
+    },
+    {
+      "key": "data",
+      "label": "Data",
+      "type": "yaml",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "- 0\n- 255\n- 127"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "id": "display_menu.show",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Display menu",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "display_menu_id",
+      "domain": "display_menu",
+      "lvl": "normal"
+    },
+    {
+      "key": "root_item_id",
+      "label": "Root item ID",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "main_root"
+    },
+    {
+      "key": "item_id",
+      "label": "Item ID",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "settings_item"
+    }
+  ]
+}

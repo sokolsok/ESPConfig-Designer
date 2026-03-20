@@ -9,7 +9,7 @@
       "key": "board",
       "type": "select",
       "required": true,
-      "lvl": "normal",
+      "lvl": "simple",
       "default": "adafruit_feather_nrf52840",
       "options": [
         "adafruit_feather_nrf52840",

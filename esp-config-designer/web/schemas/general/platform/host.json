@@ -9,7 +9,7 @@
       "key": "mac_address",
       "type": "text",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "default": "06:35:69:ab:f6:79",
       "placeholder": "06:35:69:ab:f6:79"
     }

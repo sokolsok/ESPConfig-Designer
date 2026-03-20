@@ -1,0 +1,23 @@
+{
+  "id": "sensor.tuya",
+  "domain": "sensor",
+  "platform": "tuya",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/tuya/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "sensor_datapoint",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    }
+  ]
+}

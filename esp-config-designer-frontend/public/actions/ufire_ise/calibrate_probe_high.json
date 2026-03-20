@@ -1,0 +1,24 @@
+{
+  "id": "ufire_ise.calibrate_probe_high",
+  "fields": [
+    {
+      "key": "id",
+      "label": "uFire ISE",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "ufire_ise_id",
+      "domain": "ufire_ise",
+      "lvl": "normal"
+    },
+    {
+      "key": "solution",
+      "label": "High calibration",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "7",
+      "lambdaPlaceholder": "return 7;"
+    }
+  ]
+}

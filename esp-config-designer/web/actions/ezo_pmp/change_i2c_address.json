@@ -1,0 +1,23 @@
+{
+  "id": "ezo_pmp.change_i2c_address",
+  "fields": [
+    {
+      "key": "id",
+      "label": "EZO PMP",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "ezo_pmp_id",
+      "domain": "ezo_pmp",
+      "lvl": "normal"
+    },
+    {
+      "key": "address",
+      "label": "Address",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "0x67"
+    }
+  ]
+}

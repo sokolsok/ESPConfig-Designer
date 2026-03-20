@@ -1,0 +1,23 @@
+{
+  "id": "microphone.unmute",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Microphone",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "microphone_id",
+      "domain": "microphone",
+      "lvl": "normal"
+    },
+    {
+      "key": "resume_capture",
+      "label": "Resume capture",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

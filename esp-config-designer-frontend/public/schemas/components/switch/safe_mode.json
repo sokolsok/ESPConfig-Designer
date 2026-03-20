@@ -1,0 +1,9 @@
+{
+  "id": "switch.safe_mode",
+  "domain": "switch",
+  "platform": "safe_mode",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/switch/safe_mode/",
+  "extends": "base_switch.json",
+  "fields": []
+}

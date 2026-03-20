@@ -104,7 +104,7 @@
                   aria-label="Restore view"
                 >
                   <img
-                    src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/restore.svg"
+                    src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/arrow-collapse-all.svg"
                     alt=""
                   />
                 </button>
@@ -195,6 +195,7 @@ import {
   normalizeAnimationElementEncoding,
   normalizeImageElementEncoding
 } from "../../utils/displayImageEncoding";
+import { resolveDisplayViewport } from "../../utils/displayViewport";
 
 const props = defineProps({
   schema: {
@@ -263,7 +264,7 @@ const canvasElements = computed(() => [...elements.value].reverse());
 const modelMeta = computed(() => props.schema?.model_meta || {});
 const modelKeys = computed(() => Object.keys(modelMeta.value || {}));
 const selectedModelKey = computed(() => props.componentConfig?.model || modelKeys.value[0] || "");
-const screen = computed(() => modelMeta.value[selectedModelKey.value] || null);
+const screen = computed(() => resolveDisplayViewport(props.componentConfig, modelMeta.value));
 const selectedModelLabel = computed(() => selectedModelKey.value || "n/a");
 const displayModelName = computed(() => selectedModelLabel.value.split(" ")[0] || "n/a");
 const isMonochrome = computed(() => (props.schema?.displayType || "monochrome") === "monochrome");
@@ -272,7 +273,7 @@ const fitZoom = computed(() => {
   if (!screen.value) return 1;
   const { w, h } = containerSize.value;
   if (!w || !h) return 1;
-  return w / screen.value.w;
+  return Math.min(w / screen.value.w, h / screen.value.h);
 });
 
 const isScreenOverflowing = computed(() => {
@@ -1146,8 +1147,8 @@ onBeforeUnmount(() => {
 }
 
 .display-zoom__btn img {
-  width: 14px;
-  height: 14px;
+  width: 24px;
+  height: 24px;
   display: block;
   filter: brightness(0) invert(1);
   margin: auto;

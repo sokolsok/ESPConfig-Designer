@@ -1,0 +1,76 @@
+{
+  "id": "sensor.qmp6988",
+  "domain": "sensor",
+  "platform": "qmp6988",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/qmp6988/",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "oversampling",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "pressure",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "oversampling",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x70"
+    },
+    {
+      "key": "iir_filter",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "OFF",
+        "2x",
+        "4x",
+        "8x",
+        "16x",
+        "32x"
+      ]
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

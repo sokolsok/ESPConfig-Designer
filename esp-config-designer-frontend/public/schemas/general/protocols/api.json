@@ -56,6 +56,17 @@
       ]
     },
     {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "placeholder": "my_api_id",
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    },
+    {
       "key": "actions",
       "type": "yaml",
       "required": false,
@@ -66,17 +77,6 @@
       },
       "placeholder": "- logger.log: \"Hello\"",
       "helpUrl": "https://esphome.io/components/api/#actions"
-    },
-    {
-      "key": "id",
-      "type": "id",
-      "required": false,
-      "placeholder": "my_api_id",
-      "lvl": "advanced",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      }
     },
     {
       "key": "port",

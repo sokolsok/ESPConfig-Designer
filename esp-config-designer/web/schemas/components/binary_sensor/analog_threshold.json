@@ -1,0 +1,25 @@
+{
+  "id": "binary_sensor.analog_threshold",
+  "domain": "binary_sensor",
+  "platform": "analog_threshold",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/binary_sensor/analog_threshold/",
+  "extends": "base_binary_sensor.json",
+  "fields": [
+    {
+      "key": "sensor_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "sensor",
+      "placeholder": "source_sensor_id"
+    },
+    {
+      "key": "threshold",
+      "type": "yaml",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "0.5\n# or:\nupper: 0.6\nlower: 0.4"
+    }
+  ]
+}

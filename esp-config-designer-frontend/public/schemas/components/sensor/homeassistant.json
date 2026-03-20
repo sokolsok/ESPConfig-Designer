@@ -7,9 +7,17 @@
   "extends": "base_sensor.json",
   "fields": [
     {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
       "key": "entity_id",
       "type": "text",
       "required": true,
+      "suppressQuotes": true,
       "lvl": "simple",
       "placeholder": "sensor.example_entity"
     },

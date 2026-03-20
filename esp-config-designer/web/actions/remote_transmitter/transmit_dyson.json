@@ -1,0 +1,62 @@
+{
+  "id": "remote_transmitter.transmit_dyson",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Remote transmitter",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "remote_transmitter_id",
+      "domain": "remote_transmitter",
+      "lvl": "normal"
+    },
+    {
+      "key": "code",
+      "label": "Code",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "0x123456789ABC"
+    },
+    {
+      "key": "index",
+      "label": "Index",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0",
+      "lambdaPlaceholder": "return 0;"
+    },
+    {
+      "key": "repeat",
+      "label": "Repeat",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "times",
+          "label": "Times",
+          "type": "number",
+          "templatable": true,
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "2",
+          "lambdaPlaceholder": "return 2;"
+        },
+        {
+          "key": "wait_time",
+          "label": "Wait time",
+          "type": "duration",
+          "templatable": true,
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "25ms",
+          "lambdaPlaceholder": "return 25;"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "senseair.abc_enable",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Senseair",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "senseair_id",
+      "domain": "senseair",
+      "lvl": "normal"
+    }
+  ]
+}

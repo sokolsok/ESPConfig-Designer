@@ -1,0 +1,124 @@
+{
+  "id": "light.esp32_rmt_led_strip",
+  "domain": "light",
+  "platform": "esp32_rmt_led_strip",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/light/esp32_rmt_led_strip/",
+  "extends": "base_light.json",
+  "fields": [
+    {
+      "key": "pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "num_leds",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "chipset",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "options": [
+        "WS2811",
+        "WS2812",
+        "SK6812",
+        "APA106",
+        "SM16703"
+      ]
+    },
+    {
+      "key": "rgb_order",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "options": [
+        "RGB",
+        "RBG",
+        "GRB",
+        "GBR",
+        "BGR",
+        "BRG"
+      ]
+    },
+    {
+      "key": "is_rgbw",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "is_wrgb",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "max_refresh_rate",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "use_psram",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    },
+    {
+      "key": "rmt_symbols",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "use_dma",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "bit0_high",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "bit0_low",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "bit1_high",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "bit1_low",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "reset_high",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "default": "0us"
+    },
+    {
+      "key": "reset_low",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "default": "0us"
+    }
+  ]
+}

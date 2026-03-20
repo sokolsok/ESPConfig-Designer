@@ -1,0 +1,80 @@
+{
+  "id": "output.mcp4461",
+  "domain": "output",
+  "platform": "mcp4461",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/output/mcp4461/",
+  "extends": "base_output_float.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "mcp4461",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_mcp4461.json"
+    },
+    {
+      "key": "mcp4461_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "mcp4461",
+      "allowSelfReference": true,
+      "default": "mcp4461_hub"
+    },
+    {
+      "key": "channel",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "options": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H"
+      ]
+    },
+    {
+      "key": "initial_value",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "terminal_a",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": true
+    },
+    {
+      "key": "terminal_b",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": true
+    },
+    {
+      "key": "terminal_w",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": true
+    }
+  ]
+}

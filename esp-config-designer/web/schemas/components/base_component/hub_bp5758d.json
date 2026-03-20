@@ -1,0 +1,29 @@
+{
+  "id": "hub.bp5758d",
+  "domain": "bp5758d",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "bp5758d_hub",
+      "idDomain": "bp5758d"
+    },
+    {
+      "key": "data_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "clock_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    }
+  ]
+}

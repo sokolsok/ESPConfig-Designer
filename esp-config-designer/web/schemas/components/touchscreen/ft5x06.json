@@ -1,0 +1,30 @@
+{
+  "id": "touchscreen.ft5x06",
+  "domain": "touchscreen",
+  "platform": "ft5x06",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/touchscreen/ft5x06/",
+  "extends": "base_touchscreen.json",
+  "fields": [
+    {
+      "key": "rotation",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        0,
+        90,
+        180,
+        270
+      ]
+    },
+    {
+      "key": "interrupt_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple"
+    }
+  ]
+}

@@ -1,0 +1,215 @@
+{
+  "id": "display.hub75",
+  "domain": "display",
+  "platform": "hub75",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/display/hub75/",
+  "extends": "base_display.json",
+  "display_builder": true,
+  "displayType": "color",
+  "model_meta": {
+    "HUB75 64x32": {
+      "w": 64,
+      "h": 32
+    },
+    "HUB75 64x64": {
+      "w": 64,
+      "h": 64
+    },
+    "HUB75 128x64": {
+      "w": 128,
+      "h": 64
+    }
+  },
+  "fields": [
+    {
+      "key": "model",
+      "type": "select",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "default": "HUB75 64x32",
+      "options": [
+        "HUB75 64x32",
+        "HUB75 64x64",
+        "HUB75 128x64"
+      ]
+    },
+    {
+      "key": "board",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "adafruit-matrix-portal-s3"
+    },
+    {
+      "key": "width",
+      "type": "number",
+      "required": true,
+      "lvl": "simple",
+      "default": 64
+    },
+    {
+      "key": "height",
+      "type": "number",
+      "required": true,
+      "lvl": "simple",
+      "default": 32
+    },
+    {
+      "key": "chain_length",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 1
+    },
+    {
+      "key": "parallel_chains",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 1
+    },
+    {
+      "key": "brightness",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 128
+    },
+    {
+      "key": "bit_depth",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 8
+    },
+    {
+      "key": "gamma_correct",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "CIE1931",
+      "options": [
+        "LINEAR",
+        "CIE1931"
+      ]
+    },
+    {
+      "key": "double_buffer",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "min_refresh_rate",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "r1_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "g1_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "b1_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "r2_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "g2_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "b2_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "a_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "b_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "c_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "d_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "e_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "lat_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "oe_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "clk_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "auto_clear_enabled",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "pages",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "16ms"
+    }
+  ]
+}

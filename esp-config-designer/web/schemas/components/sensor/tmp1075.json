@@ -1,0 +1,84 @@
+{
+  "id": "sensor.tmp1075",
+  "domain": "sensor",
+  "platform": "tmp1075",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/tmp1075/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x48"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "conversion_rate",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "27.5ms"
+    },
+    {
+      "key": "alert",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "function",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "comparator"
+        },
+        {
+          "key": "polarity",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "active_high"
+        },
+        {
+          "key": "limit_low",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "-128"
+        },
+        {
+          "key": "limit_high",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "127.9375"
+        },
+        {
+          "key": "fault_count",
+          "type": "number",
+          "required": true,
+          "lvl": "simple",
+          "placeholder": "1"
+        }
+      ],
+      "extends": "base_sensor.json"
+    }
+  ]
+}

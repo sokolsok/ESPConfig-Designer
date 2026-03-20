@@ -1,0 +1,22 @@
+{
+  "id": "sprinkler.set_multiplier",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Sprinkler",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "sprinkler_id",
+      "domain": "sprinkler",
+      "lvl": "normal"
+    },
+    {
+      "key": "multiplier",
+      "label": "Multiplier",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

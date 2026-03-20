@@ -1,0 +1,18 @@
+{
+  "id": "sensor.ld2410",
+  "domain": "sensor",
+  "platform": "ld2410",
+  "requires": [
+    "uart"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/ld2410/",
+  "fields": [
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor"
+    }
+  ]
+}

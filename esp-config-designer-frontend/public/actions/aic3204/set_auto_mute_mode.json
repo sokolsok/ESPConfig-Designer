@@ -1,0 +1,22 @@
+{
+  "id": "aic3204.set_auto_mute_mode",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Aic3204",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "aic3204_id",
+      "domain": "aic3204",
+      "lvl": "normal"
+    },
+    {
+      "key": "auto_mute_mode",
+      "label": "Auto Mute Mode",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

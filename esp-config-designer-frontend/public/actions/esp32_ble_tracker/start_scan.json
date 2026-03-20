@@ -1,0 +1,23 @@
+{
+  "id": "esp32_ble_tracker.start_scan",
+  "fields": [
+    {
+      "key": "id",
+      "label": "ESP32 BLE tracker",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "esp32_ble_tracker_id",
+      "domain": "esp32_ble_tracker",
+      "lvl": "normal"
+    },
+    {
+      "key": "continuous",
+      "label": "Continuous",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

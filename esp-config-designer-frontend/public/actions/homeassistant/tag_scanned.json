@@ -1,0 +1,14 @@
+{
+  "id": "homeassistant.tag_scanned",
+  "fields": [
+    {
+      "key": "tag",
+      "label": "Tag",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "04A224B91C2A80"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "id": "select.tuya",
+  "domain": "select",
+  "platform": "tuya",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/select/tuya/",
+  "extends": "base_select.json",
+  "fields": [
+    {
+      "key": "enum_datapoint",
+      "type": "number",
+      "required": false,
+      "lvl": "simple",
+      "note": "Set enum_datapoint or int_datapoint."
+    },
+    {
+      "key": "int_datapoint",
+      "type": "number",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "options",
+      "type": "list",
+      "required": true,
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "key",
+            "type": "text",
+            "required": true,
+            "lvl": "simple",
+            "placeholder": "0"
+          },
+          {
+            "key": "value",
+            "type": "text",
+            "required": true,
+            "lvl": "simple",
+            "placeholder": "Internal"
+          }
+        ]
+      }
+    },
+    {
+      "key": "optimistic",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

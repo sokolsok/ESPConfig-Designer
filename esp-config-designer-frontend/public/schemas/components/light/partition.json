@@ -1,0 +1,54 @@
+{
+  "id": "light.partition",
+  "domain": "light",
+  "platform": "partition",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/light/partition/",
+  "extends": "base_light.json",
+  "fields": [
+    {
+      "key": "segments",
+      "type": "list",
+      "required": true,
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "id",
+            "type": "id_ref",
+            "required": false,
+            "lvl": "simple",
+            "domain": "light"
+          },
+          {
+            "key": "from",
+            "type": "number",
+            "required": false,
+            "lvl": "simple"
+          },
+          {
+            "key": "to",
+            "type": "number",
+            "required": false,
+            "lvl": "simple"
+          },
+          {
+            "key": "reversed",
+            "type": "boolean",
+            "required": false,
+            "lvl": "normal"
+          },
+          {
+            "key": "single_light_id",
+            "type": "id_ref",
+            "required": false,
+            "lvl": "simple",
+            "domain": "light",
+            "note": "Use either id+from+to for segment, or single_light_id"
+          }
+        ]
+      }
+    }
+  ]
+}

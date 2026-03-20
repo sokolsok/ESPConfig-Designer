@@ -1,0 +1,51 @@
+{
+  "id": "sensor.adc128s102",
+  "domain": "sensor",
+  "platform": "adc128s102",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/adc128s102/",
+  "extends": "base_sensor.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "adc128s102",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_adc128s102.json"
+    },
+    {
+      "key": "adc128s102_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "adc128s102",
+      "allowSelfReference": true,
+      "default": "adc128s102_hub"
+    },
+    {
+      "key": "channel",
+      "type": "number",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "0"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

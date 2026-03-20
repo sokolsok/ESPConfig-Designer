@@ -1,0 +1,191 @@
+{
+  "id": "sensor.ade7953",
+  "domain": "sensor",
+  "platform": "ade7953",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/ade7953/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x38"
+    },
+    {
+      "key": "irq_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "voltage",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "frequency",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "current_a",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "current_b",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "power_factor_a",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "power_factor_b",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "apparent_power_a",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "apparent_power_b",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "active_power_a",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "active_power_b",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "reactive_power_a",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "reactive_power_b",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "voltage_pga_gain",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "1x",
+        "2x",
+        "4x",
+        "8x",
+        "16x",
+        "22x"
+      ]
+    },
+    {
+      "key": "current_pga_gain_a",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "1x",
+        "2x",
+        "4x",
+        "8x",
+        "16x",
+        "22x"
+      ]
+    },
+    {
+      "key": "current_pga_gain_b",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "1x",
+        "2x",
+        "4x",
+        "8x",
+        "16x"
+      ]
+    },
+    {
+      "key": "voltage_gain",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0x400000"
+    },
+    {
+      "key": "current_gain_a",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0x400000"
+    },
+    {
+      "key": "current_gain_b",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0x400000"
+    },
+    {
+      "key": "active_power_gain_a",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0x400000"
+    },
+    {
+      "key": "active_power_gain_b",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0x400000"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "use_accumulated_energy_registers",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

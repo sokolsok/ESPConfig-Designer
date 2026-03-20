@@ -1,0 +1,22 @@
+{
+  "id": "ble_client.numeric_comparison_reply",
+  "fields": [
+    {
+      "key": "id",
+      "label": "BLE client",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "ble_client_id",
+      "domain": "ble_client",
+      "lvl": "normal"
+    },
+    {
+      "key": "accept",
+      "label": "Accept",
+      "type": "boolean",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

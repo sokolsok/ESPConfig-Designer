@@ -1,0 +1,24 @@
+{
+  "id": "hc8.calibrate",
+  "fields": [
+    {
+      "key": "id",
+      "label": "HC8",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "hc8_id",
+      "domain": "hc8",
+      "lvl": "normal"
+    },
+    {
+      "key": "baseline",
+      "label": "Baseline",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "0",
+      "lambdaPlaceholder": "return 0;"
+    }
+  ]
+}

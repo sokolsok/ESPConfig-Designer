@@ -1,0 +1,48 @@
+{
+  "id": "output.bp5758d",
+  "domain": "output",
+  "platform": "bp5758d",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/output/bp5758d/",
+  "extends": "base_output_float.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "bp5758d",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_bp5758d.json"
+    },
+    {
+      "key": "bp5758d_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "bp5758d",
+      "allowSelfReference": true,
+      "default": "bp5758d_hub"
+    },
+    {
+      "key": "channel",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "current",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 10
+    }
+  ]
+}

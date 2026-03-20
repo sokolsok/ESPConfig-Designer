@@ -1,0 +1,63 @@
+{
+  "id": "light.neopixelbus",
+  "domain": "light",
+  "platform": "neopixelbus",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/light/neopixelbus/",
+  "extends": "base_light.json",
+  "fields": [
+    {
+      "key": "num_leds",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "type",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "GRB",
+      "placeholder": "GRB"
+    },
+    {
+      "key": "variant",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "WS2812"
+    },
+    {
+      "key": "method",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "type: esp32_rmt\nchannel: 1"
+    },
+    {
+      "key": "invert",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple",
+      "note": "Use pin for one-wire, or clock_pin + data_pin for two-wire"
+    },
+    {
+      "key": "clock_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "data_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple"
+    }
+  ]
+}

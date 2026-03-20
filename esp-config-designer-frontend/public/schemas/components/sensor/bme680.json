@@ -89,10 +89,11 @@
     },
     {
       "key": "address",
-      "type": "text",
+      "type": "address",
       "required": false,
-      "lvl": "normal",
-      "default": "0x76"
+      "lvl": "simple",
+      "default": "0x76",
+      "placeholder": "0x76"
     },
     {
       "key": "iir_filter",
@@ -115,21 +116,23 @@
       "key": "heater",
       "type": "object",
       "required": false,
-      "lvl": "advanced",
+      "lvl": "simple",
       "fields": [
         {
           "key": "temperature",
           "type": "number",
           "required": false,
           "lvl": "advanced",
-          "default": 320
+          "default": 320,
+          "placeholder": "320"
         },
         {
           "key": "duration",
           "type": "duration",
           "required": false,
           "lvl": "advanced",
-          "default": "150ms"
+          "default": "150ms",
+          "placeholder": "150ms"
         }
       ]
     },
@@ -137,8 +140,9 @@
       "key": "update_interval",
       "type": "duration",
       "required": false,
-      "lvl": "normal",
-      "default": "60s"
+      "lvl": "simple",
+      "default": "60s",
+      "placeholder": "60s"
     }
   ]
 }

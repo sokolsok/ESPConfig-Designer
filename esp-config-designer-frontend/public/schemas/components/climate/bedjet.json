@@ -1,0 +1,45 @@
+{
+  "id": "climate.bedjet",
+  "domain": "climate",
+  "platform": "bedjet",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/climate/bedjet/",
+  "extends": "base_climate.json",
+  "fields": [
+    {
+      "key": "bedjet_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "bedjet"
+    },
+    {
+      "key": "heat_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "heat",
+      "options": [
+        "heat",
+        "extended"
+      ]
+    },
+    {
+      "key": "temperature_source",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "ambient",
+      "options": [
+        "ambient",
+        "outlet"
+      ]
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

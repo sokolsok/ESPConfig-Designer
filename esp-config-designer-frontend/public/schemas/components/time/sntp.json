@@ -1,0 +1,28 @@
+{
+  "id": "time.sntp",
+  "domain": "time",
+  "platform": "sntp",
+  "requires": [
+    "network"
+  ],
+  "helpUrl": "https://esphome.io/components/time/sntp/",
+  "extends": "base_time.json",
+  "fields": [
+    {
+      "key": "servers",
+      "type": "list",
+      "required": false,
+      "lvl": "normal",
+      "item": {
+        "type": "text",
+        "suppressQuotes": true,
+        "placeholder": "0.pool.ntp.org"
+      },
+      "default": [
+        "0.pool.ntp.org",
+        "1.pool.ntp.org",
+        "2.pool.ntp.org"
+      ]
+    }
+  ]
+}

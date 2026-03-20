@@ -50,8 +50,10 @@
       "required": false,
       "item": {
         "type": "object",
-        "fields": []
-      }
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "on_turn_off",
@@ -59,8 +61,10 @@
       "required": false,
       "item": {
         "type": "object",
-        "fields": []
-      }
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "on_state",
@@ -68,8 +72,10 @@
       "required": false,
       "item": {
         "type": "object",
-        "fields": []
-      }
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "disabled_by_default",

@@ -1,0 +1,72 @@
+{
+  "id": "sensor.combination",
+  "domain": "sensor",
+  "platform": "combination",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/combination/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "type",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "options": [
+        "KALMAN",
+        "LINEAR",
+        "MAXIMUM",
+        "MEAN",
+        "MEDIAN",
+        "MINIMUM",
+        "MOST_RECENTLY_UPDATED",
+        "RANGE",
+        "SUM"
+      ]
+    },
+    {
+      "key": "sources",
+      "type": "object",
+      "required": true,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "source",
+          "type": "text",
+          "required": true,
+          "lvl": "simple"
+        },
+        {
+          "key": "error",
+          "type": "yaml",
+          "required": true,
+          "lvl": "simple"
+        },
+        {
+          "key": "coefficient",
+          "type": "yaml",
+          "required": true,
+          "lvl": "simple"
+        }
+      ]
+    },
+    {
+      "key": "process_std_dev",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "std_dev",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

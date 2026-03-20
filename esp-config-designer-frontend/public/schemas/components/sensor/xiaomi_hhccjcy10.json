@@ -1,0 +1,75 @@
+{
+  "id": "sensor.xiaomi_hhccjcy10",
+  "domain": "sensor",
+  "platform": "xiaomi_hhccjcy10",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/xiaomi_hhccjcy10/",
+  "embedded": [
+    {
+      "key": "ble_tracker",
+      "domain": "esp32_ble_tracker",
+      "emitAs": "map",
+      "singleton": true,
+      "alwaysEmit": true,
+      "defaultPayload": {},
+      "merge": "first"
+    }
+  ],
+  "fields": [
+    {
+      "key": "ble_tracker",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "uiHidden": true,
+      "emitYAML": "never",
+      "extends": "hub_esp32_ble_tracker.json"
+    },
+    {
+      "key": "mac_address",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "temperature",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "moisture",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "illuminance",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "conductivity",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "battery_level",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    }
+  ]
+}

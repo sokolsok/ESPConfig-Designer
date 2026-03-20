@@ -1,0 +1,24 @@
+{
+  "id": "binary_sensor.status",
+  "domain": "binary_sensor",
+  "platform": "status",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/binary_sensor/status/",
+  "extends": "base_binary_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Binary Sensor Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "1s"
+    }
+  ]
+}

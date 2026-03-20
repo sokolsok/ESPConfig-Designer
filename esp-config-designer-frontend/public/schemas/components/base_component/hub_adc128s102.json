@@ -1,0 +1,32 @@
+{
+  "id": "hub.adc128s102",
+  "domain": "adc128s102",
+  "platform": "",
+  "requires": [
+    "spi"
+  ],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "adc128s102_hub",
+      "idDomain": "adc128s102"
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "spi_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "spi"
+    }
+  ]
+}

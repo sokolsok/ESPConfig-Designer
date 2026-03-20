@@ -1,0 +1,14 @@
+{
+  "id": "dfrobot_sen0395.reset",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Dfrobot Sen0395",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "dfrobot_sen0395_id",
+      "domain": "dfrobot_sen0395",
+      "lvl": "normal"
+    }
+  ]
+}

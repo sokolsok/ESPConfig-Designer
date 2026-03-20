@@ -1,0 +1,84 @@
+{
+  "id": "output.mcp4728",
+  "domain": "output",
+  "platform": "mcp4728",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/output/mcp4728/",
+  "extends": "base_output_float.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "mcp4728",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_mcp4728.json"
+    },
+    {
+      "key": "mcp4728_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "mcp4728",
+      "allowSelfReference": true,
+      "default": "mcp4728_hub"
+    },
+    {
+      "key": "channel",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "options": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "key": "vref",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "vdd",
+      "options": [
+        "vdd",
+        "internal"
+      ]
+    },
+    {
+      "key": "gain",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "X1",
+      "options": [
+        "X1",
+        "X2"
+      ]
+    },
+    {
+      "key": "power_down",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "normal",
+      "options": [
+        "normal",
+        "gnd_1k",
+        "gnd_100k",
+        "gnd_500k"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "media_player.turn_off",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Media Player",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "media_player_id",
+      "domain": "media_player",
+      "lvl": "normal"
+    },
+    {
+      "key": "announcement",
+      "label": "Announcement",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    }
+  ]
+}

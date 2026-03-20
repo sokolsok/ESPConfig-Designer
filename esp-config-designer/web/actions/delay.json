@@ -1,0 +1,14 @@
+{
+  "id": "delay",
+  "fields": [
+    {
+      "key": "duration",
+      "label": "Duration",
+      "type": "duration",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "1s"
+    }
+  ]
+}

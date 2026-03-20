@@ -1,0 +1,75 @@
+{
+  "id": "sensor.hmc5883l",
+  "domain": "sensor",
+  "platform": "hmc5883l",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/hmc5883l/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x1E"
+    },
+    {
+      "key": "field_strength_x",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "field_strength_y",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "field_strength_z",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "heading",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "oversampling",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "1x",
+        "2x",
+        "4x",
+        "8x"
+      ]
+    },
+    {
+      "key": "range",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

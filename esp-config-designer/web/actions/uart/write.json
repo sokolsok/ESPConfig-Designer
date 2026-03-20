@@ -1,0 +1,23 @@
+{
+  "id": "uart.write",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Uart",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "uart_id",
+      "domain": "uart",
+      "lvl": "normal"
+    },
+    {
+      "key": "data",
+      "label": "Data",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "AT+RST\\r\\n"
+    }
+  ]
+}

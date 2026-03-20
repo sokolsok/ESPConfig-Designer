@@ -1,0 +1,43 @@
+{
+  "id": "hub.sm16716",
+  "domain": "sm16716",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "sm16716_hub",
+      "idDomain": "sm16716"
+    },
+    {
+      "key": "data_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "clock_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "num_channels",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 3
+    },
+    {
+      "key": "num_chips",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 1
+    }
+  ]
+}

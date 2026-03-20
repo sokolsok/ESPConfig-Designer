@@ -1,0 +1,46 @@
+{
+  "id": "hub.ads1115",
+  "domain": "ads1115",
+  "platform": "",
+  "requires": [
+    "i2c"
+  ],
+  "type": "object",
+  "fields": [
+    {
+      "key": "address",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "0x48",
+      "options": [
+        "0x48",
+        "0x49",
+        "0x4A",
+        "0x4B"
+      ]
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "ads1115_hub",
+      "idDomain": "ads1115"
+    },
+    {
+      "key": "continuous_mode",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2c"
+    }
+  ]
+}

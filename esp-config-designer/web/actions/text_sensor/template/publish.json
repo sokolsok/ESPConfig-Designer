@@ -1,0 +1,23 @@
+{
+  "id": "text_sensor.template.publish",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Text Sensor",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "text_sensor_id",
+      "domain": "text_sensor",
+      "lvl": "normal"
+    },
+    {
+      "key": "state",
+      "label": "State",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "hello"
+    }
+  ]
+}

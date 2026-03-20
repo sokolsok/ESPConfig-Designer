@@ -1,0 +1,22 @@
+{
+  "id": "tag.set_clean_mode",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Tag",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "tag_id",
+      "domain": "tag",
+      "lvl": "normal"
+    },
+    {
+      "key": "clean_mode",
+      "label": "Clean Mode",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

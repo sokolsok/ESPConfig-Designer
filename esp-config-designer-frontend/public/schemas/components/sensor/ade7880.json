@@ -1,0 +1,177 @@
+{
+  "id": "sensor.ade7880",
+  "domain": "sensor",
+  "platform": "ade7880",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/ade7880/",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "irq1_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "irq0_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "reset_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "frequency",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "50Hz"
+    },
+    {
+      "key": "phase_a",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "voltage",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "current",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "active_power",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "apparent_power",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "power_factor",
+          "type": "number",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "forward_active_energy",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "reverse_active_energy",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "calibration",
+          "type": "text",
+          "required": true,
+          "lvl": "simple"
+        },
+        {
+          "key": "current_gain",
+          "type": "number",
+          "required": true,
+          "lvl": "simple"
+        },
+        {
+          "key": "voltage_gain",
+          "type": "number",
+          "required": true,
+          "lvl": "simple"
+        },
+        {
+          "key": "power_gain",
+          "type": "number",
+          "required": true,
+          "lvl": "simple"
+        },
+        {
+          "key": "phase_angle",
+          "type": "number",
+          "required": true,
+          "lvl": "simple"
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "phase_b",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "phase_c",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "neutral",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "current",
+          "type": "text",
+          "required": true,
+          "lvl": "simple"
+        },
+        {
+          "key": "calibration",
+          "type": "text",
+          "required": true,
+          "lvl": "simple"
+        },
+        {
+          "key": "current_gain",
+          "type": "number",
+          "required": true,
+          "lvl": "simple"
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "sensor.mcp3221",
+  "domain": "sensor",
+  "platform": "mcp3221",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/mcp3221/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "0x48"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "60s"
+    },
+    {
+      "key": "reference_voltage",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+	  "placeholder": "3.3V"
+    }
+  ]
+}

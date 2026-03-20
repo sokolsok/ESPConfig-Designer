@@ -1,0 +1,24 @@
+{
+  "id": "mhz19.detection_range_set",
+  "fields": [
+    {
+      "key": "id",
+      "label": "MH-Z19",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "mhz19_id",
+      "domain": "mhz19",
+      "lvl": "normal"
+    },
+    {
+      "key": "detection_range",
+      "label": "Detection range",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "5000",
+      "lambdaPlaceholder": "return 5000;"
+    }
+  ]
+}

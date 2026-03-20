@@ -1,0 +1,114 @@
+{
+  "id": "sensor.ens160",
+  "domain": "sensor",
+  "platform": "ens160_i2c",
+  "platformByBus": {
+    "i2c": "ens160_i2c",
+    "spi": "ens160_spi"
+  },
+  "requiresByBus": {
+    "i2c": [
+      "i2c"
+    ],
+    "spi": [
+      "spi"
+    ]
+  },
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/ens160/",
+  "fields": [
+    {
+      "key": "bus",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "i2c",
+      "set_global": "ens160_bus",
+      "options": [
+        "i2c",
+        "spi"
+      ]
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "globalDependsOn": {
+        "key": "ens160_bus",
+        "value": "i2c"
+      },
+      "placeholder": "0x52"
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "globalDependsOn": {
+        "key": "ens160_bus",
+        "value": "spi"
+      },
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "eco2",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "tvoc",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "aqi",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "compensation",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "temperature",
+          "type": "id_ref",
+          "required": false,
+          "lvl": "advanced",
+          "domain": "sensor"
+        },
+        {
+          "key": "humidity",
+          "type": "id_ref",
+          "required": false,
+          "lvl": "advanced",
+          "domain": "sensor"
+        }
+      ]
+    }
+  ]
+}

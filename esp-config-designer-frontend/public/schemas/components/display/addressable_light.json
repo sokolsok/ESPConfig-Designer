@@ -1,0 +1,81 @@
+{
+  "id": "display.addressable_light",
+  "domain": "display",
+  "platform": "addressable_light",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/display/addressable_light/",
+  "extends": "base_display.json",
+  "display_builder": true,
+  "displayType": "color",
+  "model_meta": {
+    "Custom 32x8": {
+      "w": 32,
+      "h": 8
+    },
+    "Custom 16x16": {
+      "w": 16,
+      "h": 16
+    }
+  },
+  "fields": [
+    {
+      "key": "model",
+      "type": "select",
+      "required": false,
+      "lvl": "simple",
+      "default": "Custom 32x8",
+      "emitYAML": "never",
+      "options": [
+        "Custom 32x8",
+        "Custom 16x16"
+      ]
+    },
+    {
+      "key": "addressable_light_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "light"
+    },
+    {
+      "key": "width",
+      "type": "number",
+      "required": true,
+      "lvl": "simple",
+      "default": 32
+    },
+    {
+      "key": "height",
+      "type": "number",
+      "required": true,
+      "lvl": "simple",
+      "default": 8
+    },
+    {
+      "key": "rotation",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "0",
+      "options": [
+        "0",
+        "90",
+        "180",
+        "270"
+      ]
+    },
+    {
+      "key": "pixel_mapper",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "16ms"
+    }
+  ]
+}

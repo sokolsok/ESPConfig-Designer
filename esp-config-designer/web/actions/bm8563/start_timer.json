@@ -1,0 +1,24 @@
+{
+  "id": "bm8563.start_timer",
+  "fields": [
+    {
+      "key": "id",
+      "label": "BM8563",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "bm8563_id",
+      "domain": "bm8563",
+      "lvl": "normal"
+    },
+    {
+      "key": "duration",
+      "label": "Duration",
+      "type": "duration",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "30s",
+      "lambdaPlaceholder": "return 30000;"
+    }
+  ]
+}

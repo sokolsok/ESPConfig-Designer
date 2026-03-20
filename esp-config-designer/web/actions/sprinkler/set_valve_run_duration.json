@@ -1,0 +1,34 @@
+{
+  "id": "sprinkler.set_valve_run_duration",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Sprinkler",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "sprinkler_id",
+      "domain": "sprinkler",
+      "lvl": "normal"
+    },
+    {
+      "key": "valve_number",
+      "label": "Valve number",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1",
+      "lambdaPlaceholder": "return 1;"
+    },
+    {
+      "key": "run_duration",
+      "label": "Run duration",
+      "type": "duration",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "5min",
+      "lambdaPlaceholder": "return 300000;"
+    }
+  ]
+}

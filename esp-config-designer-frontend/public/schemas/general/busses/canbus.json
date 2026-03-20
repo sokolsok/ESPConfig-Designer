@@ -52,6 +52,7 @@
       "type": "id",
       "required": false,
       "lvl": "normal",
+      "default": "canbus_id",
       "dependsOn": {
         "key": "enabled",
         "value": true

@@ -1,0 +1,14 @@
+{
+  "id": "lvgl.resume",
+  "fields": [
+    {
+      "key": "lvgl_id",
+      "label": "LVGL ID",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "main_ui"
+    }
+  ]
+}

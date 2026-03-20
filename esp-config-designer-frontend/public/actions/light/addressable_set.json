@@ -1,0 +1,84 @@
+{
+  "id": "light.addressable_set",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Light",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "light_id",
+      "domain": "light",
+      "lvl": "normal"
+    },
+    {
+      "key": "range_from",
+      "label": "Range from",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0",
+      "lambdaPlaceholder": "return 0;"
+    },
+    {
+      "key": "range_to",
+      "label": "Range to",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "10",
+      "lambdaPlaceholder": "return 10;"
+    },
+    {
+      "key": "color_brightness",
+      "label": "Color brightness",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "100%",
+      "lambdaPlaceholder": "return 1.0;"
+    },
+    {
+      "key": "red",
+      "label": "Red",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "100%",
+      "lambdaPlaceholder": "return 1.0;"
+    },
+    {
+      "key": "green",
+      "label": "Green",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "50%",
+      "lambdaPlaceholder": "return 0.5;"
+    },
+    {
+      "key": "blue",
+      "label": "Blue",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "25%",
+      "lambdaPlaceholder": "return 0.25;"
+    },
+    {
+      "key": "white",
+      "label": "White",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0%",
+      "lambdaPlaceholder": "return 0.0;"
+    }
+  ]
+}

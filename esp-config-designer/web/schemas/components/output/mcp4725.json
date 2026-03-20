@@ -1,0 +1,27 @@
+{
+  "id": "output.mcp4725",
+  "domain": "output",
+  "platform": "mcp4725",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/output/mcp4725/",
+  "extends": "base_output_float.json",
+  "fields": [
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x60",
+      "suppressQuotes": true
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "advanced",
+      "domain": "i2c"
+    }
+  ]
+}

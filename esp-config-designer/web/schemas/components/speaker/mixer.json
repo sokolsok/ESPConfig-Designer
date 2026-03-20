@@ -1,0 +1,74 @@
+{
+  "id": "speaker.mixer",
+  "domain": "speaker",
+  "platform": "mixer",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/speaker/mixer/",
+  "extends": "base_speaker.json",
+  "fields": [
+    {
+      "key": "output_speaker",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "speaker"
+    },
+    {
+      "key": "source_speakers",
+      "type": "list",
+      "required": true,
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "extends": "base_speaker.json",
+        "fields": [
+          {
+            "key": "id",
+            "type": "id",
+            "required": true,
+            "lvl": "simple",
+            "idDomain": "speaker"
+          },
+          {
+            "key": "buffer_duration",
+            "type": "duration",
+            "required": false,
+            "lvl": "normal",
+            "default": "100ms"
+          },
+          {
+            "key": "timeout",
+            "type": "duration",
+            "required": false,
+            "lvl": "normal",
+            "default": "500ms"
+          }
+        ]
+      }
+    },
+    {
+      "key": "num_channels",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        1,
+        2
+      ]
+    },
+    {
+      "key": "queue_mode",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "task_stack_in_psram",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    }
+  ]
+}

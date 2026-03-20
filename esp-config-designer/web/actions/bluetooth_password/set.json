@@ -1,0 +1,23 @@
+{
+  "id": "bluetooth_password.set",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Bluetooth Password",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "bluetooth_password_id",
+      "domain": "bluetooth_password",
+      "lvl": "normal"
+    },
+    {
+      "key": "password",
+      "label": "Password",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "123456"
+    }
+  ]
+}

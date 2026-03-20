@@ -1,0 +1,14 @@
+{
+  "id": "ufire_ise.reset",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Ufire Ise",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "ufire_ise_id",
+      "domain": "ufire_ise",
+      "lvl": "normal"
+    }
+  ]
+}

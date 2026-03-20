@@ -1,0 +1,42 @@
+{
+  "id": "if",
+  "fields": [
+    {
+      "key": "condition",
+      "label": "Condition",
+      "type": "list",
+      "required": true,
+      "lvl": "normal",
+      "note": "Use multiple entries for implicit AND, or add logic conditions like OR / NOT.",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_conditions.json"
+      }
+    },
+    {
+      "key": "then",
+      "label": "Then",
+      "type": "list",
+      "required": true,
+      "lvl": "normal",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      }
+    },
+    {
+      "key": "else",
+      "label": "Else",
+      "type": "list",
+      "required": false,
+      "lvl": "normal",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      }
+    }
+  ]
+}

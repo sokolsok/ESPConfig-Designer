@@ -1,0 +1,56 @@
+{
+  "id": "hub.my9231",
+  "domain": "my9231",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "my9231_hub",
+      "idDomain": "my9231"
+    },
+    {
+      "key": "data_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "clock_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "num_channels",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 6
+    },
+    {
+      "key": "num_chips",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 2
+    },
+    {
+      "key": "bit_depth",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": 16,
+      "options": [
+        8,
+        12,
+        14,
+        16
+      ]
+    }
+  ]
+}

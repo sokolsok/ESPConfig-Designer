@@ -1,0 +1,23 @@
+{
+  "id": "online_image.release",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Online image",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "online_image_id",
+      "domain": "online_image",
+      "lvl": "normal"
+    },
+    {
+      "key": "evict_cache",
+      "label": "Evict cache",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "id": "sensor.bl0942",
+  "domain": "sensor",
+  "platform": "bl0942",
+  "requires": [
+    "uart"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/bl0942/",
+  "fields": [
+    {
+      "key": "voltage",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "current",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "power",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "energy",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "frequency",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor"
+    },
+    {
+      "key": "line_frequency",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "50Hz",
+        "60Hz"
+      ]
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0"
+    },
+    {
+      "key": "reset",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "current_reference",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "251065.6814"
+    },
+    {
+      "key": "voltage_reference",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "15883.34116"
+    },
+    {
+      "key": "power_reference",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "623.0270705"
+    },
+    {
+      "key": "energy_reference",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "5347.484240"
+    }
+  ]
+}

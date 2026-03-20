@@ -1,0 +1,22 @@
+{
+  "id": "switch.control",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Switch",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "switch_id",
+      "domain": "switch",
+      "lvl": "normal"
+    },
+    {
+      "key": "state",
+      "label": "State",
+      "type": "boolean",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

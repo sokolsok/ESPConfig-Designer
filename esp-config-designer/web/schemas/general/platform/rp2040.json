@@ -9,7 +9,7 @@
       "key": "board",
       "type": "text",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "default": "rpipicow",
       "placeholder": "rpipicow"
     },

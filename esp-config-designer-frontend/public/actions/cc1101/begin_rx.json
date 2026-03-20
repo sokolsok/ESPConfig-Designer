@@ -1,0 +1,34 @@
+{
+  "id": "cc1101.begin_rx",
+  "fields": [
+    {
+      "key": "id",
+      "label": "CC1101",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "cc1101_id",
+      "domain": "cc1101",
+      "lvl": "normal"
+    },
+    {
+      "key": "channel",
+      "label": "Channel",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1",
+      "lambdaPlaceholder": "return 1;"
+    },
+    {
+      "key": "frequency",
+      "label": "Frequency",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "433.92",
+      "lambdaPlaceholder": "return 433.92;"
+    }
+  ]
+}

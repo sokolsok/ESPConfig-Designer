@@ -1,0 +1,24 @@
+{
+  "id": "touchscreen.gt911",
+  "domain": "touchscreen",
+  "platform": "gt911",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/touchscreen/gt911/",
+  "extends": "base_touchscreen.json",
+  "fields": [
+    {
+      "key": "interrupt_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "reset_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple"
+    }
+  ]
+}

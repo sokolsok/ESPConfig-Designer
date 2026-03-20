@@ -1,0 +1,23 @@
+{
+  "id": "fan.cycle_speed",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Fan",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "fan_id",
+      "domain": "fan",
+      "lvl": "normal"
+    },
+    {
+      "key": "off_speed_cycle",
+      "label": "Include off",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

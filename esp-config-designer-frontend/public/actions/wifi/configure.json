@@ -1,0 +1,32 @@
+{
+  "id": "wifi.configure",
+  "fields": [
+    {
+      "key": "ssid",
+      "label": "SSID",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "MyWiFi"
+    },
+    {
+      "key": "password",
+      "label": "Password",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "supersecret"
+    },
+    {
+      "key": "save",
+      "label": "Save",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    }
+  ]
+}

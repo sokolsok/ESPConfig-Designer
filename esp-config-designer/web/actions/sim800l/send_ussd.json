@@ -1,0 +1,23 @@
+{
+  "id": "sim800l.send_ussd",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Sim800l",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "sim800l_id",
+      "domain": "sim800l",
+      "lvl": "normal"
+    },
+    {
+      "key": "ussd",
+      "label": "USSD",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "*100#"
+    }
+  ]
+}

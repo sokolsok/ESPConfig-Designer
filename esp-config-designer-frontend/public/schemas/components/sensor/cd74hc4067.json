@@ -1,0 +1,63 @@
+{
+  "id": "sensor.cd74hc4067",
+  "domain": "sensor",
+  "platform": "cd74hc4067",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/cd74hc4067/",
+  "extends": "base_sensor.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "cd74hc4067",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_cd74hc4067.json"
+    },
+    {
+      "key": "sensor",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "sensor",
+      "placeholder": "adc_sensor"
+    },
+    {
+      "key": "cd74hc4067_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "cd74hc4067",
+      "allowSelfReference": true,
+      "default": "cd74hc4067_hub"
+    },
+    {
+      "key": "number",
+      "type": "number",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "0"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "grove_tb6612fng",
+  "domain": "grove_tb6612fng",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/grove_tb6612fng/",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "idDomain": "grove_tb6612fng"
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x14"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "light.status_led",
+  "domain": "light",
+  "platform": "status_led",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/light/status_led/",
+  "extends": "base_light.json",
+  "fields": [
+    {
+      "key": "pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple",
+      "note": "Use pin or output"
+    },
+    {
+      "key": "output",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "output"
+    }
+  ]
+}

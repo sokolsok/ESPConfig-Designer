@@ -1,0 +1,41 @@
+{
+  "id": "fan.tuya",
+  "domain": "fan",
+  "platform": "tuya",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/fan/tuya/",
+  "extends": "base_fan.json",
+  "fields": [
+    {
+      "key": "speed_datapoint",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "switch_datapoint",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "oscillation_datapoint",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "direction_datapoint",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "speed_count",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 3
+    }
+  ]
+}

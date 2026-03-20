@@ -1,0 +1,24 @@
+{
+  "id": "output.libretiny_pwm.set_frequency",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Output",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "output_id",
+      "domain": "output",
+      "lvl": "normal"
+    },
+    {
+      "key": "frequency",
+      "label": "Frequency",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "1000 Hz",
+      "lambdaPlaceholder": "return 1000;"
+    }
+  ]
+}

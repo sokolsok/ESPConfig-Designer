@@ -1,0 +1,14 @@
+{
+  "id": "output.turn_off",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Output",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "output_id",
+      "domain": "output",
+      "lvl": "normal"
+    }
+  ]
+}

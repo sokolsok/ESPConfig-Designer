@@ -1,0 +1,14 @@
+{
+  "id": "cc1101.reset",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Cc1101",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "cc1101_id",
+      "domain": "cc1101",
+      "lvl": "normal"
+    }
+  ]
+}

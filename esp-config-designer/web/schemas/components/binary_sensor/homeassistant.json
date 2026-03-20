@@ -1,0 +1,32 @@
+{
+  "id": "binary_sensor.homeassistant",
+  "domain": "binary_sensor",
+  "platform": "homeassistant",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/binary_sensor/homeassistant/",
+  "extends": "base_binary_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Binary Sensor Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "entity_id",
+      "type": "text",
+      "required": true,
+	  "suppressQuotes": true,
+      "lvl": "simple",
+      "placeholder": "binary_sensor.example_entity"
+    },
+    {
+      "key": "attribute",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "attribute_name"
+    }
+  ]
+}

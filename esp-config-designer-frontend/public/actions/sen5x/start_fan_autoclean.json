@@ -1,0 +1,14 @@
+{
+  "id": "sen5x.start_fan_autoclean",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Sen5x",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "sen5x_id",
+      "domain": "sen5x",
+      "lvl": "normal"
+    }
+  ]
+}

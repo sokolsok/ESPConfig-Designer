@@ -1,0 +1,42 @@
+{
+  "id": "udp.write",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Udp",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "udp_id",
+      "domain": "udp",
+      "lvl": "normal"
+    },
+    {
+      "key": "host",
+      "label": "Host",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "192.168.1.10"
+    },
+    {
+      "key": "port",
+      "label": "Port",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "1234",
+      "lambdaPlaceholder": "return 1234;"
+    },
+    {
+      "key": "data",
+      "label": "Data",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "hello"
+    }
+  ]
+}

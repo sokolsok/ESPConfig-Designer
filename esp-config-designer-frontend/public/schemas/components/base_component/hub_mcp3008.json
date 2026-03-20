@@ -1,0 +1,32 @@
+{
+  "id": "hub.mcp3008",
+  "domain": "mcp3008",
+  "platform": "",
+  "requires": [
+    "spi"
+  ],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "mcp3008_hub",
+      "idDomain": "mcp3008"
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "spi_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "spi"
+    }
+  ]
+}

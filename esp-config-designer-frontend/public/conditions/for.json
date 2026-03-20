@@ -1,0 +1,27 @@
+{
+  "id": "for",
+  "fields": [
+    {
+      "key": "time",
+      "label": "Time",
+      "placeholder": "5s",
+      "type": "duration",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "lambdaPlaceholder": "return 5000;"
+    },
+    {
+      "key": "condition",
+      "label": "Condition",
+      "type": "list",
+      "required": true,
+      "lvl": "normal",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_conditions.json"
+      }
+    }
+  ]
+}

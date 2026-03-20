@@ -1,0 +1,46 @@
+{
+  "id": "sensor.integration",
+  "domain": "sensor",
+  "platform": "integration",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/integration/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "sensor",
+      "type": "duration",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "time_unit",
+      "type": "duration",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "integration_method",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "trapezoid",
+        "left",
+        "right"
+      ]
+    },
+    {
+      "key": "restore",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

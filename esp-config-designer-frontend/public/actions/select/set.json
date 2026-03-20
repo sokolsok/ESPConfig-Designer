@@ -1,0 +1,23 @@
+{
+  "id": "select.set",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Select",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "select_id",
+      "domain": "select",
+      "lvl": "normal"
+    },
+    {
+      "key": "option",
+      "label": "Option",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "eco"
+    }
+  ]
+}

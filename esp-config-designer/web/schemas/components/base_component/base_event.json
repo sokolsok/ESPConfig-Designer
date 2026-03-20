@@ -1,0 +1,74 @@
+{
+  "id": "base.event",
+  "domain": "event",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Template Event"
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "template_event_id",
+      "idDomain": "event"
+    },
+    {
+      "key": "icon",
+      "type": "icon",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "mdi:gesture-tap-button"
+    },
+    {
+      "key": "internal",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "disabled_by_default",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "entity_category",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "diagnostic"
+    },
+    {
+      "key": "device_class",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "button",
+        "doorbell",
+        "motion"
+      ]
+    },
+    {
+      "key": "on_event",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "helpUrl": "https://esphome.io/components/event/",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

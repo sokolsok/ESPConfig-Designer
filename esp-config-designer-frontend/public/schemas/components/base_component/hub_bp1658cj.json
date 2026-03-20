@@ -1,0 +1,43 @@
+{
+  "id": "hub.bp1658cj",
+  "domain": "bp1658cj",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "bp1658cj_hub",
+      "idDomain": "bp1658cj"
+    },
+    {
+      "key": "data_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "clock_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "max_power_color_channels",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 4
+    },
+    {
+      "key": "max_power_white_channels",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 6
+    }
+  ]
+}

@@ -60,15 +60,17 @@
       "key": "update_interval",
       "type": "duration",
       "required": false,
-      "lvl": "normal",
-      "default": "60s"
+      "lvl": "simple",
+      "default": "60s",
+      "placeholder": "60s"
     },
     {
       "key": "address",
       "type": "number",
       "required": false,
-      "lvl": "normal",
-      "default": 1
+      "lvl": "simple",
+      "default": 1,
+      "placeholder": "1"
     },
     {
       "key": "modbus_id",

@@ -1,0 +1,22 @@
+{
+  "id": "tag.set_format_mode",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Tag",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "tag_id",
+      "domain": "tag",
+      "lvl": "normal"
+    },
+    {
+      "key": "format_mode",
+      "label": "Format Mode",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "sx127x.set_mode_standby",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Sx127x",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "sx127x_id",
+      "domain": "sx127x",
+      "lvl": "normal"
+    },
+    {
+      "key": "mode_standby",
+      "label": "Mode Standby",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

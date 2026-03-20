@@ -1,0 +1,35 @@
+{
+  "id": "sensor.absolute_humidity",
+  "domain": "sensor",
+  "platform": "absolute_humidity",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/absolute_humidity/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "temperature",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "humidity",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "equation",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

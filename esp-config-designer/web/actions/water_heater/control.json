@@ -1,0 +1,33 @@
+{
+  "id": "water_heater.control",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Water Heater",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "water_heater_id",
+      "domain": "water_heater",
+      "lvl": "normal"
+    },
+    {
+      "key": "mode",
+      "label": "Mode",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "HEAT"
+    },
+    {
+      "key": "target_temperature",
+      "label": "Target temperature",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "55",
+      "lambdaPlaceholder": "return 55;"
+    }
+  ]
+}

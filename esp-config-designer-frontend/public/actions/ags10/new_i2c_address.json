@@ -1,0 +1,23 @@
+{
+  "id": "ags10.new_i2c_address",
+  "fields": [
+    {
+      "key": "id",
+      "label": "AGS10",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "ags10_id",
+      "domain": "ags10",
+      "lvl": "normal"
+    },
+    {
+      "key": "address",
+      "label": "Address",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "0x1A"
+    }
+  ]
+}

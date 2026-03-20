@@ -1,0 +1,26 @@
+{
+  "id": "text_sensor.mqtt_subscribe",
+  "domain": "text_sensor",
+  "platform": "mqtt_subscribe",
+  "requires": [
+    "mqtt"
+  ],
+  "helpUrl": "https://esphome.io/components/text_sensor/mqtt_subscribe/",
+  "extends": "base_text_sensor.json",
+  "fields": [
+    {
+      "key": "topic",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "the/topic"
+    },
+    {
+      "key": "qos",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 0
+    }
+  ]
+}

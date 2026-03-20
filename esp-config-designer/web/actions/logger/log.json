@@ -1,0 +1,49 @@
+{
+  "id": "logger.log",
+  "fields": [
+    {
+      "key": "format",
+      "label": "Message",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "Hello from ESPHome"
+    },
+    {
+      "key": "args",
+      "label": "Args",
+      "type": "yaml",
+      "templatable": false,
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "- id(sensor).state"
+    },
+    {
+      "key": "level",
+      "label": "Level",
+      "type": "select",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "NONE",
+        "ERROR",
+        "WARN",
+        "INFO",
+        "DEBUG",
+        "VERBOSE",
+        "VERY_VERBOSE"
+      ]
+    },
+    {
+      "key": "tag",
+      "label": "Tag",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "main"
+    }
+  ]
+}

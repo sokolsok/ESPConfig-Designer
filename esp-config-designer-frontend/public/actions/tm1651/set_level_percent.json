@@ -1,0 +1,22 @@
+{
+  "id": "tm1651.set_level_percent",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Tm1651",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "tm1651_id",
+      "domain": "tm1651",
+      "lvl": "normal"
+    },
+    {
+      "key": "level_percent",
+      "label": "Level Percent",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

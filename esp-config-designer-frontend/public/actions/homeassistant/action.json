@@ -1,0 +1,79 @@
+{
+  "id": "homeassistant.action",
+  "fields": [
+    {
+      "key": "action",
+      "label": "Action",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "light.turn_on"
+    },
+    {
+      "key": "data",
+      "label": "Data",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "root[\"entity_id\"] = \"light.kitchen\";"
+    },
+    {
+      "key": "data_template",
+      "label": "Data template",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "root[\"brightness\"] = 200;"
+    },
+    {
+      "key": "variables",
+      "label": "Variables",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "root[\"room\"] = \"kitchen\";"
+    },
+    {
+      "key": "capture_response",
+      "label": "Capture response",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "response_template",
+      "label": "Response template",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "root[\"ok\"] = true;"
+    },
+    {
+      "key": "on_success",
+      "label": "On success",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      }
+    },
+    {
+      "key": "on_error",
+      "label": "On error",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      }
+    }
+  ]
+}

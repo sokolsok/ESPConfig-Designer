@@ -1,0 +1,62 @@
+{
+  "id": "servo",
+  "domain": "servo",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/servo/",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "idDomain": "servo"
+    },
+    {
+      "key": "output",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "min_level",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "3%"
+    },
+    {
+      "key": "idle_level",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "7.5%"
+    },
+    {
+      "key": "max_level",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "12%"
+    },
+    {
+      "key": "restore",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "auto_detach_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "default": "0s"
+    },
+    {
+      "key": "transition_length",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

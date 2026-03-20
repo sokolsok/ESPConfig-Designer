@@ -1,0 +1,24 @@
+{
+  "id": "sim800l.connect",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Sim800l",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "sim800l_id",
+      "domain": "sim800l",
+      "lvl": "normal"
+    },
+    {
+      "key": "timeout",
+      "label": "Timeout",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "30s",
+      "lambdaPlaceholder": "return 30000;"
+    }
+  ]
+}

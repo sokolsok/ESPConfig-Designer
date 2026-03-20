@@ -1,0 +1,137 @@
+{
+  "id": "display.st7789v",
+  "domain": "display",
+  "platform": "st7789v",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/display/st7789v/",
+  "extends": "base_display.json",
+  "display_builder": true,
+  "displayType": "color",
+  "model_meta": {
+    "TTGO TDisplay 135x240": {
+      "w": 135,
+      "h": 240
+    },
+    "Adafruit Funhouse 240x240": {
+      "w": 240,
+      "h": 240
+    },
+    "LILYGO T-Embed 170x320": {
+      "w": 170,
+      "h": 320
+    },
+    "Custom": {
+      "w": 240,
+      "h": 320
+    }
+  },
+  "fields": [
+    {
+      "key": "model",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "Custom",
+      "options": [
+        "TTGO TDisplay 135x240",
+        "Adafruit Funhouse 240x240",
+        "LILYGO T-Embed 170x320",
+        "Custom"
+      ]
+    },
+    {
+      "key": "height",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "width",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "offset_height",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "offset_width",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "dc_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "reset_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "eightbitcolor",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "backlight_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "power_supply",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "power_supply"
+    },
+    {
+      "key": "pages",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "data_rate",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "20MHz"
+    },
+    {
+      "key": "spi_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "MODE0",
+      "options": [
+        "MODE0",
+        "MODE3"
+      ]
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "5s"
+    }
+  ]
+}

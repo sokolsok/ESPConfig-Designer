@@ -1,0 +1,111 @@
+{
+  "id": "switch.modbus_controller",
+  "domain": "switch",
+  "platform": "modbus_controller",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/switch/modbus_controller/",
+  "extends": "base_switch.json",
+  "fields": [
+    {
+      "key": "modbus_controller_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "modbus_controller",
+      "placeholder": "modbus_controller_id"
+    },
+    {
+      "key": "register_type",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "options": [
+        "coil",
+        "discrete_input",
+        "holding",
+        "read"
+      ]
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "0x3200"
+    },
+    {
+      "key": "assumed_state",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "skip_updates",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "register_count",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 1
+    },
+    {
+      "key": "use_write_multiple",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "bitmask",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0x80"
+    },
+    {
+      "key": "lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "write_lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "custom_command",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "- 0x01\n- 0x05\n- 0x00\n- 0x06\n- 0xFF\n- 0x00"
+    },
+    {
+      "key": "offset",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "restore_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "DISABLED",
+      "options": [
+        "RESTORE_DEFAULT_OFF",
+        "RESTORE_DEFAULT_ON",
+        "RESTORE_INVERTED_DEFAULT_OFF",
+        "RESTORE_INVERTED_DEFAULT_ON",
+        "ALWAYS_OFF",
+        "ALWAYS_ON",
+        "DISABLED"
+      ]
+    }
+  ]
+}

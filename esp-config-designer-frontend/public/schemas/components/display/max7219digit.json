@@ -1,0 +1,157 @@
+{
+  "id": "display.max7219digit",
+  "domain": "display",
+  "platform": "max7219digit",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/display/max7219digit/",
+  "extends": "base_display.json",
+  "display_builder": true,
+  "displayType": "monochrome",
+  "model_meta": {
+    "4 chips (32x8)": {
+      "w": 32,
+      "h": 8
+    },
+    "8 chips (64x8)": {
+      "w": 64,
+      "h": 8
+    },
+    "8 chips multiline (32x16)": {
+      "w": 32,
+      "h": 16
+    }
+  },
+  "fields": [
+    {
+      "key": "model",
+      "type": "select",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "default": "4 chips (32x8)",
+      "options": [
+        "4 chips (32x8)",
+        "8 chips (64x8)",
+        "8 chips multiline (32x16)"
+      ]
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "num_chips",
+      "type": "number",
+      "required": false,
+      "lvl": "simple",
+      "default": 4
+    },
+    {
+      "key": "num_chip_lines",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 1
+    },
+    {
+      "key": "chip_lines_style",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "snake",
+      "options": [
+        "snake",
+        "zigzag"
+      ]
+    },
+    {
+      "key": "rotate_chip",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "0",
+      "options": [
+        "0",
+        "90",
+        "180",
+        "270"
+      ]
+    },
+    {
+      "key": "scroll_enable",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    },
+    {
+      "key": "scroll_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "CONTINUOUS",
+      "options": [
+        "CONTINUOUS",
+        "STOP"
+      ]
+    },
+    {
+      "key": "scroll_speed",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "250ms"
+    },
+    {
+      "key": "scroll_delay",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "1s"
+    },
+    {
+      "key": "scroll_dwell",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "1s"
+    },
+    {
+      "key": "reverse_enable",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "intensity",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 15
+    },
+    {
+      "key": "flip_x",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "spi_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "advanced",
+      "domain": "spi"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "1s"
+    }
+  ]
+}

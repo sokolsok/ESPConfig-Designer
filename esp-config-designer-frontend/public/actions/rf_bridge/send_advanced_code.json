@@ -1,0 +1,43 @@
+{
+  "id": "rf_bridge.send_advanced_code",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Rf Bridge",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "rf_bridge_id",
+      "domain": "rf_bridge",
+      "lvl": "normal"
+    },
+    {
+      "key": "length",
+      "label": "Length",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "24",
+      "lambdaPlaceholder": "return 24;"
+    },
+    {
+      "key": "protocol",
+      "label": "Protocol",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "1",
+      "lambdaPlaceholder": "return 1;"
+    },
+    {
+      "key": "code",
+      "label": "Code",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "012345"
+    }
+  ]
+}

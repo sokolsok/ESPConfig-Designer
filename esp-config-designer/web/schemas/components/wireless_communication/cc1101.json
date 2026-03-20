@@ -1,0 +1,369 @@
+{
+  "id": "cc1101",
+  "domain": "cc1101",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/cc1101/",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal",
+      "idDomain": "cc1101"
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "gdo0_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "frequency",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "default": "433.92MHz"
+    },
+    {
+      "key": "output_power",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 10
+    },
+    {
+      "key": "modulation_type",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "ASK/OOK",
+      "options": [
+        "ASK/OOK",
+        "2-FSK",
+        "4-FSK",
+        "GFSK",
+        "MSK"
+      ]
+    },
+    {
+      "key": "symbol_rate",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 5000
+    },
+    {
+      "key": "rx_attenuation",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "0dB",
+      "options": [
+        "0dB",
+        "6dB",
+        "12dB",
+        "18dB"
+      ]
+    },
+    {
+      "key": "dc_blocking_filter",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": true
+    },
+    {
+      "key": "manchester",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "filter_bandwidth",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "203kHz"
+    },
+    {
+      "key": "fsk_deviation",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "msk_deviation",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "channel",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "default": 0
+    },
+    {
+      "key": "channel_spacing",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "default": "200kHz"
+    },
+    {
+      "key": "if_frequency",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "default": "153kHz"
+    },
+    {
+      "key": "packet_mode",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "packet_length",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 0,
+      "dependsOn": {
+        "key": "packet_mode",
+        "value": true
+      }
+    },
+    {
+      "key": "crc_enable",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false,
+      "dependsOn": {
+        "key": "packet_mode",
+        "value": true
+      }
+    },
+    {
+      "key": "whitening",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false,
+      "dependsOn": {
+        "key": "packet_mode",
+        "value": true
+      }
+    },
+    {
+      "key": "sync_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "16/16",
+      "options": [
+        "None",
+        "15/16",
+        "16/16",
+        "30/32"
+      ],
+      "dependsOn": {
+        "key": "packet_mode",
+        "value": true
+      }
+    },
+    {
+      "key": "sync0",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "default": "0x91",
+      "suppressQuotes": true,
+      "dependsOn": {
+        "key": "packet_mode",
+        "value": true
+      }
+    },
+    {
+      "key": "sync1",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "default": "0xD3",
+      "suppressQuotes": true,
+      "dependsOn": {
+        "key": "packet_mode",
+        "value": true
+      }
+    },
+    {
+      "key": "num_preamble",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "default": 2,
+      "dependsOn": {
+        "key": "packet_mode",
+        "value": true
+      }
+    },
+    {
+      "key": "magn_target",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "42dB"
+    },
+    {
+      "key": "max_lna_gain",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "Default",
+      "options": [
+        "Default",
+        "2.6dB",
+        "6.1dB",
+        "7.4dB",
+        "9.2dB",
+        "11.5dB",
+        "14.6dB",
+        "17.1dB"
+      ]
+    },
+    {
+      "key": "max_dvga_gain",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "-3",
+      "options": [
+        "Default",
+        "-1",
+        "-2",
+        "-3"
+      ]
+    },
+    {
+      "key": "lna_priority",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "carrier_sense_above_threshold",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "carrier_sense_abs_thr",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "carrier_sense_rel_thr",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "options": [
+        "Default",
+        "+6dB",
+        "+10dB",
+        "+14dB"
+      ]
+    },
+    {
+      "key": "filter_length_fsk_msk",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "options": [
+        "8",
+        "16",
+        "32",
+        "64"
+      ]
+    },
+    {
+      "key": "filter_length_ask_ook",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "options": [
+        "4dB",
+        "8dB",
+        "12dB",
+        "16dB"
+      ]
+    },
+    {
+      "key": "freeze",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "options": [
+        "Default",
+        "On Sync",
+        "Analog Only",
+        "Analog And Digital"
+      ]
+    },
+    {
+      "key": "wait_time",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "32",
+      "options": [
+        "8",
+        "16",
+        "24",
+        "32"
+      ]
+    },
+    {
+      "key": "hyst_level",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "options": [
+        "None",
+        "Low",
+        "Medium",
+        "High"
+      ]
+    },
+    {
+      "key": "on_packet",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "packet_mode",
+        "value": true
+      },
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "text_sensor.homeassistant",
+  "domain": "text_sensor",
+  "platform": "homeassistant",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/text_sensor/homeassistant/",
+  "extends": "base_text_sensor.json",
+  "fields": [
+    {
+      "key": "entity_id",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "sensor.living_room_status"
+    },
+    {
+      "key": "attribute",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "friendly_name"
+    }
+  ]
+}

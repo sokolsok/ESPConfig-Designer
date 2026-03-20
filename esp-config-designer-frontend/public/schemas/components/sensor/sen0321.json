@@ -1,0 +1,39 @@
+{
+  "id": "sensor.sen0321",
+  "domain": "sensor",
+  "platform": "sen0321",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/sen0321/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "address",
+      "type": "select",
+      "required": false,
+      "lvl": "simple",
+	  "default": "0x73",
+      "options": [
+        "0x73",
+        "0x70",
+        "0x71",
+        "0x72"
+      ]
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

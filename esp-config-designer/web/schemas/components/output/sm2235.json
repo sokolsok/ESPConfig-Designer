@@ -1,0 +1,41 @@
+{
+  "id": "output.sm2235",
+  "domain": "output",
+  "platform": "sm2235",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/output/sm2235/",
+  "extends": "base_output_float.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "sm2235",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_sm2235.json"
+    },
+    {
+      "key": "sm2235_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sm2235",
+      "allowSelfReference": true,
+      "default": "sm2235_hub"
+    },
+    {
+      "key": "channel",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "sx126x.set_mode_rx",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Sx126x",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "sx126x_id",
+      "domain": "sx126x",
+      "lvl": "normal"
+    },
+    {
+      "key": "mode_rx",
+      "label": "Mode Rx",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

@@ -27,6 +27,17 @@
       "suppressQuotes": "true"
     },
     {
+      "key": "port",
+      "type": "number",
+      "required": false,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "1883"
+    },
+    {
       "key": "username",
       "type": "text",
       "required": false,
@@ -47,17 +58,6 @@
         "value": true
       },
       "placeholder": "!secret mqtt_password"
-    },
-    {
-      "key": "port",
-      "type": "number",
-      "required": false,
-      "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
-      "placeholder": "1883"
     },
     {
       "key": "id",

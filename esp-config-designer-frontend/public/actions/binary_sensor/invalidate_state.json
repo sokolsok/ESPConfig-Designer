@@ -1,0 +1,14 @@
+{
+  "id": "binary_sensor.invalidate_state",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Binary Sensor",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "binary_sensor_id",
+      "domain": "binary_sensor",
+      "lvl": "normal"
+    }
+  ]
+}

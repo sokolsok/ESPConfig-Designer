@@ -7,11 +7,19 @@
   "extends": "base_sensor.json",
   "fields": [
     {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
       "key": "update_interval",
       "type": "duration",
       "required": false,
-      "lvl": "normal",
-      "default": "60s"
+      "lvl": "simple",
+      "default": "60s",
+      "placeholder": "60s"
     }
   ]
 }

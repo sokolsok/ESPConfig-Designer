@@ -1,0 +1,75 @@
+{
+  "id": "display.st7920",
+  "domain": "display",
+  "platform": "st7920",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/display/st7920/",
+  "extends": "base_display.json",
+  "display_builder": true,
+  "displayType": "monochrome",
+  "model_meta": {
+    "ST7920 128x64": {
+      "w": 128,
+      "h": 64
+    }
+  },
+  "fields": [
+    {
+      "key": "model",
+      "type": "select",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "default": "ST7920 128x64",
+      "options": [
+        "ST7920 128x64"
+      ]
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "width",
+      "type": "number",
+      "required": true,
+      "lvl": "simple",
+      "default": 128
+    },
+    {
+      "key": "height",
+      "type": "number",
+      "required": true,
+      "lvl": "simple",
+      "default": 64
+    },
+    {
+      "key": "rotation",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "0",
+      "options": [
+        "0",
+        "90",
+        "180",
+        "270"
+      ]
+    },
+    {
+      "key": "pages",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    }
+  ]
+}

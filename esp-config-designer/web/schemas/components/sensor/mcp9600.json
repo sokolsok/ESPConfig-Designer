@@ -1,0 +1,48 @@
+{
+  "id": "sensor.mcp9600",
+  "domain": "sensor",
+  "platform": "mcp9600",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/mcp9600/",
+  "fields": [
+    {
+      "key": "hot_junction",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "cold_junction",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "thermocouple_type",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "K"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x67"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

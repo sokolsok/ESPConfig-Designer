@@ -40,7 +40,8 @@
       "type": "number",
       "required": false,
       "lvl": "advanced",
-      "default": 0.0
+      "default": 0.0,
+      "placeholder": "0.0"
     },
     {
       "key": "heater_power",
@@ -67,17 +68,19 @@
     },
     {
       "key": "address",
-      "type": "text",
+      "type": "address",
       "required": false,
-      "lvl": "normal",
-      "default": "0x44"
+      "lvl": "simple",
+      "default": "0x44",
+      "placeholder": "0x44"
     },
     {
       "key": "update_interval",
       "type": "duration",
       "required": false,
-      "lvl": "normal",
-      "default": "60s"
+      "lvl": "simple",
+      "default": "60s",
+      "placeholder": "60s"
     }
   ]
 }

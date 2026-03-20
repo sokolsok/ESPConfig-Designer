@@ -1,0 +1,23 @@
+{
+  "id": "lvgl.widget.refresh",
+  "fields": [
+    {
+      "key": "id",
+      "label": "LVGL widget",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "lvgl_widget_id",
+      "domain": "",
+      "lvl": "normal"
+    },
+    {
+      "key": "deep",
+      "label": "Deep refresh",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "tm1651.turn_on",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Tm1651",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "tm1651_id",
+      "domain": "tm1651",
+      "lvl": "normal"
+    }
+  ]
+}

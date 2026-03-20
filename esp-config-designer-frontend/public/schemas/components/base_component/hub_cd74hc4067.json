@@ -1,0 +1,48 @@
+{
+  "id": "hub.cd74hc4067",
+  "domain": "cd74hc4067",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "cd74hc4067_hub",
+      "idDomain": "cd74hc4067"
+    },
+    {
+      "key": "pin_s0",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "pin_s1",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "pin_s2",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "pin_s3",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "delay",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "2ms"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "valve.open",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Valve",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "valve_id",
+      "domain": "valve",
+      "lvl": "normal"
+    }
+  ]
+}

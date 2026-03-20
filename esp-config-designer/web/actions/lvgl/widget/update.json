@@ -1,0 +1,75 @@
+{
+  "id": "lvgl.widget.update",
+  "fields": [
+    {
+      "key": "id",
+      "label": "LVGL widget",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "lvgl_widget_id",
+      "domain": "",
+      "lvl": "normal"
+    },
+    {
+      "key": "hidden",
+      "label": "Hidden",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "disabled",
+      "label": "Disabled",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "checked",
+      "label": "Checked",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "text",
+      "label": "Text",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "Updated label"
+    },
+    {
+      "key": "value",
+      "label": "Value",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "42",
+      "lambdaPlaceholder": "return 42;"
+    },
+    {
+      "key": "bg_color",
+      "label": "Background color",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "#336699"
+    },
+    {
+      "key": "text_color",
+      "label": "Text color",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "#ffffff"
+    }
+  ]
+}

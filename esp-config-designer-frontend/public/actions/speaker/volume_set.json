@@ -1,0 +1,24 @@
+{
+  "id": "speaker.volume_set",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Speaker",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "speaker_id",
+      "domain": "speaker",
+      "lvl": "normal"
+    },
+    {
+      "key": "volume",
+      "label": "Volume",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "75%",
+      "lambdaPlaceholder": "return 0.75;"
+    }
+  ]
+}

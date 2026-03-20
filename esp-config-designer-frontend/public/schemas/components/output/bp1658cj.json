@@ -1,0 +1,41 @@
+{
+  "id": "output.bp1658cj",
+  "domain": "output",
+  "platform": "bp1658cj",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/output/bp1658cj/",
+  "extends": "base_output_float.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "bp1658cj",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_bp1658cj.json"
+    },
+    {
+      "key": "bp1658cj_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "bp1658cj",
+      "allowSelfReference": true,
+      "default": "bp1658cj_hub"
+    },
+    {
+      "key": "channel",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    }
+  ]
+}

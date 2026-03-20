@@ -1,0 +1,22 @@
+{
+  "id": "cc1101.set_idle",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Cc1101",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "cc1101_id",
+      "domain": "cc1101",
+      "lvl": "normal"
+    },
+    {
+      "key": "idle",
+      "label": "Idle",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

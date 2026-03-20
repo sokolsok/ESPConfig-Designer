@@ -1,0 +1,38 @@
+{
+  "id": "binary_sensor.nfc",
+  "domain": "binary_sensor",
+  "platform": "nfc",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/binary_sensor/nfc/",
+  "extends": "base_binary_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Binary Sensor Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "uid",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "74-10-37-94"
+    },
+    {
+      "key": "tag_id",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "pulsed"
+    },
+    {
+      "key": "ndef_contains",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "pulse"
+    }
+  ]
+}

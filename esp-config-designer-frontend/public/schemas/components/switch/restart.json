@@ -1,0 +1,9 @@
+{
+  "id": "switch.restart",
+  "domain": "switch",
+  "platform": "restart",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/switch/restart/",
+  "extends": "base_switch.json",
+  "fields": []
+}

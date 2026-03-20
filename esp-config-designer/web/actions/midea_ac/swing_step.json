@@ -1,0 +1,27 @@
+{
+  "id": "midea_ac.swing_step",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Midea AC",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "midea_ac_id",
+      "domain": "midea_ac",
+      "lvl": "normal"
+    },
+    {
+      "key": "direction",
+      "label": "Direction",
+      "type": "select",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "VERTICAL",
+        "HORIZONTAL",
+        "BOTH"
+      ]
+    }
+  ]
+}

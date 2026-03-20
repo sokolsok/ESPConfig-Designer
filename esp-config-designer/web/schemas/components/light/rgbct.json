@@ -1,0 +1,66 @@
+{
+  "id": "light.rgbct",
+  "domain": "light",
+  "platform": "rgbct",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/light/rgbct/",
+  "extends": "base_light.json",
+  "fields": [
+    {
+      "key": "red",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "green",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "blue",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "color_temperature",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "white_brightness",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "cold_white_color_temperature",
+      "type": "text",
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "153 mireds"
+    },
+    {
+      "key": "warm_white_color_temperature",
+      "type": "text",
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "500 mireds"
+    },
+    {
+      "key": "color_interlock",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

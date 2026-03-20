@@ -1,0 +1,90 @@
+{
+  "id": "remote_transmitter.transmit_rc_switch_type_c",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Remote transmitter",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "remote_transmitter_id",
+      "domain": "remote_transmitter",
+      "lvl": "normal"
+    },
+    {
+      "key": "family",
+      "label": "Family",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "a"
+    },
+    {
+      "key": "group",
+      "label": "Group",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "1",
+      "lambdaPlaceholder": "return 1;"
+    },
+    {
+      "key": "device",
+      "label": "Device",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "1",
+      "lambdaPlaceholder": "return 1;"
+    },
+    {
+      "key": "state",
+      "label": "State",
+      "type": "boolean",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    },
+    {
+      "key": "protocol",
+      "label": "Protocol",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1",
+      "lambdaPlaceholder": "return 1;"
+    },
+    {
+      "key": "repeat",
+      "label": "Repeat",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "times",
+          "label": "Times",
+          "type": "number",
+          "templatable": true,
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "2",
+          "lambdaPlaceholder": "return 2;"
+        },
+        {
+          "key": "wait_time",
+          "label": "Wait time",
+          "type": "duration",
+          "templatable": true,
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "25ms",
+          "lambdaPlaceholder": "return 25;"
+        }
+      ]
+    }
+  ]
+}

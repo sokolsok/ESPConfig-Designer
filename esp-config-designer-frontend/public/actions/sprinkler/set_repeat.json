@@ -1,0 +1,22 @@
+{
+  "id": "sprinkler.set_repeat",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Sprinkler",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "sprinkler_id",
+      "domain": "sprinkler",
+      "lvl": "normal"
+    },
+    {
+      "key": "repeat",
+      "label": "Repeat",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

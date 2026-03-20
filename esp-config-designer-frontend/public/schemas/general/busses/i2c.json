@@ -107,6 +107,7 @@
       "type": "id",
       "required": false,
       "lvl": "normal",
+      "default": "i2c_id",
       "dependsOn": {
         "key": "enabled",
         "value": true

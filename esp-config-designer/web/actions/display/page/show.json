@@ -1,0 +1,23 @@
+{
+  "id": "display.page.show",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Display page",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "display_page_id",
+      "domain": "display",
+      "lvl": "normal"
+    },
+    {
+      "key": "display_id",
+      "label": "Display ID",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "main_display"
+    }
+  ]
+}

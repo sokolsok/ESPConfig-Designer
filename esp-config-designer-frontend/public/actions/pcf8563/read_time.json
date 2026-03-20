@@ -1,0 +1,14 @@
+{
+  "id": "pcf8563.read_time",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Pcf8563",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "pcf8563_id",
+      "domain": "pcf8563",
+      "lvl": "normal"
+    }
+  ]
+}

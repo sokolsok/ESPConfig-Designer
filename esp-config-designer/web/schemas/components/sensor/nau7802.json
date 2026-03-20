@@ -1,0 +1,90 @@
+{
+  "id": "sensor.nau7802",
+  "domain": "sensor",
+  "platform": "nau7802",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/nau7802/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "gain",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+	  "default": "128",
+      "options": [
+        "1",
+        "2",
+        "4",
+        "8",
+        "16",
+        "32",
+        "64",
+        "128"
+      ]
+    },
+    {
+      "key": "ldo_voltage",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+	  "default": "3.0V",
+      "options": [
+        "2.4V",
+        "2.7V",
+        "3.0V",
+        "3.3V",
+        "3.6V",
+        "3.9V",
+        "4.2V",
+        "4.5V",
+        "External",
+        "Ext",
+        "AV",
+        "AVDD"
+      ]
+    },
+    {
+      "key": "samples_per_second",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+	  "default": "10",
+      "options": [
+        "10",
+        "20",
+        "40",
+        "80",
+        "320"
+      ]
+    },
+    {
+      "key": "offset_calibration",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+	  "placeholder": "0"
+    },
+    {
+      "key": "gain_calibration",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+	  "placeholder": "0"
+    }
+  ]
+}

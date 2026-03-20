@@ -1,0 +1,28 @@
+{
+  "id": "wait_until",
+  "fields": [
+    {
+      "key": "condition",
+      "label": "Condition",
+      "type": "list",
+      "required": true,
+      "lvl": "normal",
+      "note": "Use one condition for the common case, or multiple entries for implicit AND.",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_conditions.json"
+      }
+    },
+    {
+      "key": "timeout",
+      "label": "Timeout",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "30s",
+      "lambdaPlaceholder": "return 30000;"
+    }
+  ]
+}

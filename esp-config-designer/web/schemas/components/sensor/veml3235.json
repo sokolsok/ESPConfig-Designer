@@ -1,0 +1,64 @@
+{
+  "id": "sensor.veml3235",
+  "domain": "sensor",
+  "platform": "veml3235",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/veml3235/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "gain",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "options": [
+        "1x",
+        "2x",
+        "4x"
+      ]
+    },
+    {
+      "key": "digital_gain",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "1x",
+        "2x"
+      ]
+    },
+    {
+      "key": "integration_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "auto_gain",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "auto_gain_threshold_high",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "auto_gain_threshold_low",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

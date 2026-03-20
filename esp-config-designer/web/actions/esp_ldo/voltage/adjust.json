@@ -1,0 +1,24 @@
+{
+  "id": "esp_ldo.voltage.adjust",
+  "fields": [
+    {
+      "key": "id",
+      "label": "ESP LDO voltage",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "esp_ldo_voltage_id",
+      "domain": "esp_ldo.voltage",
+      "lvl": "normal"
+    },
+    {
+      "key": "voltage",
+      "label": "Voltage",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "3.3",
+      "lambdaPlaceholder": "return 3.3;"
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "id": "sensor.mhz19",
+  "domain": "sensor",
+  "platform": "mhz19",
+  "requires": [
+    "uart"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/mhz19/",
+  "fields": [
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor"
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "automatic_baseline_calibration",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "warmup_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "75s"
+    },
+    {
+      "key": "detection_range",
+      "type": "select",
+      "required": false,
+      "lvl": "simple",
+      "options": [
+        "2000ppm",
+        "5000ppm",
+        "10000ppm"
+      ]
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "co2",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    }
+  ]
+}

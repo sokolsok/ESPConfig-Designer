@@ -1,0 +1,35 @@
+{
+  "id": "binary_sensor.qwiic_pir",
+  "domain": "binary_sensor",
+  "platform": "qwiic_pir",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/binary_sensor/qwiic_pir/",
+  "extends": "base_binary_sensor.json",
+  "fields": [
+    {
+      "key": "debounce_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "HYBRID",
+      "options": [
+        "HYBRID",
+        "NATIVE",
+        "RAW"
+      ]
+    },
+    {
+      "key": "debounce",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "1ms",
+      "dependsOn": {
+        "key": "debounce_mode",
+        "value": "NATIVE"
+      }
+    }
+  ]
+}

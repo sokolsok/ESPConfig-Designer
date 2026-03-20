@@ -1,0 +1,14 @@
+{
+  "id": "binary_sensor.is_on",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Binary sensor",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "door_sensor",
+      "domain": "binary_sensor",
+      "lvl": "normal"
+    }
+  ]
+}

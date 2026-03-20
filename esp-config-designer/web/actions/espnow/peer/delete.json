@@ -1,0 +1,14 @@
+{
+  "id": "espnow.peer.delete",
+  "fields": [
+    {
+      "key": "mac_address",
+      "label": "MAC address",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "AA:BB:CC:DD:EE:FF"
+    }
+  ]
+}

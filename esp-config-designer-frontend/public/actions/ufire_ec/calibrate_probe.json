@@ -1,0 +1,24 @@
+{
+  "id": "ufire_ec.calibrate_probe",
+  "fields": [
+    {
+      "key": "id",
+      "label": "uFire EC",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "ufire_ec_id",
+      "domain": "ufire_ec",
+      "lvl": "normal"
+    },
+    {
+      "key": "solution",
+      "label": "Solution",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "1.413",
+      "lambdaPlaceholder": "return 1.413;"
+    }
+  ]
+}

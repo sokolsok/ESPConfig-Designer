@@ -1,0 +1,14 @@
+{
+  "id": "micro_wake_word.stop",
+  "fields": [
+    {
+      "key": "keep_models_loaded",
+      "label": "Keep models loaded",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

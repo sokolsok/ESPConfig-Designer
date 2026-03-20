@@ -1,0 +1,23 @@
+{
+  "id": "binary_sensor.template.publish",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Binary Sensor",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "binary_sensor_id",
+      "domain": "binary_sensor",
+      "lvl": "normal"
+    },
+    {
+      "key": "state",
+      "label": "State",
+      "type": "boolean",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "lambdaPlaceholder": "return true;"
+    }
+  ]
+}

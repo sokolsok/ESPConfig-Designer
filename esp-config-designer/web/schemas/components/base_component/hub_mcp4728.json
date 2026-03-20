@@ -1,0 +1,41 @@
+{
+  "id": "hub.mcp4728",
+  "domain": "mcp4728",
+  "platform": "",
+  "requires": [
+    "i2c"
+  ],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "mcp4728_hub",
+      "idDomain": "mcp4728"
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x60",
+      "suppressQuotes": true
+    },
+    {
+      "key": "store_in_eeprom",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "advanced",
+      "domain": "i2c"
+    }
+  ]
+}

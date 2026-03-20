@@ -1,0 +1,24 @@
+{
+  "id": "sound_level.start",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Sound level",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "sound_level_id",
+      "domain": "sound_level",
+      "lvl": "normal"
+    },
+    {
+      "key": "window_size",
+      "label": "Window size",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "100ms",
+      "lambdaPlaceholder": "return 100;"
+    }
+  ]
+}

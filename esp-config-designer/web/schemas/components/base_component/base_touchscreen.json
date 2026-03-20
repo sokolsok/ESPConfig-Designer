@@ -1,0 +1,135 @@
+{
+  "id": "base.touchscreen",
+  "domain": "touchscreen",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple",
+      "idDomain": "touchscreen",
+      "placeholder": "touchscreen_id"
+    },
+    {
+      "key": "display",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "display",
+      "placeholder": "display1"
+    },
+    {
+      "key": "transform",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "swap_xy",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal",
+          "default": false
+        },
+        {
+          "key": "mirror_x",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal",
+          "default": false
+        },
+        {
+          "key": "mirror_y",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal",
+          "default": false
+        }
+      ]
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "50ms"
+    },
+    {
+      "key": "touch_timeout",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "calibration",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "x_min",
+          "type": "number",
+          "required": true,
+          "lvl": "normal"
+        },
+        {
+          "key": "x_max",
+          "type": "number",
+          "required": true,
+          "lvl": "normal"
+        },
+        {
+          "key": "y_min",
+          "type": "number",
+          "required": true,
+          "lvl": "normal"
+        },
+        {
+          "key": "y_max",
+          "type": "number",
+          "required": true,
+          "lvl": "normal"
+        }
+      ]
+    },
+    {
+      "key": "on_touch",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_update",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_release",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

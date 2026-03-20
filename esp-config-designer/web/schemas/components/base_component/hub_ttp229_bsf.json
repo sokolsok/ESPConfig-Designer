@@ -1,0 +1,31 @@
+{
+  "id": "hub.ttp229_bsf",
+  "domain": "ttp229_bsf",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "ttp229_component",
+      "idDomain": "ttp229"
+    },
+    {
+      "key": "sdo_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "helpUrl": "https://esphome.io/guides/configuration-types#pin-schema"
+    },
+    {
+      "key": "scl_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "helpUrl": "https://esphome.io/guides/configuration-types#pin-schema"
+    }
+  ]
+}

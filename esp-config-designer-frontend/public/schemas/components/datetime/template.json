@@ -1,0 +1,63 @@
+{
+  "id": "datetime.template",
+  "domain": "datetime",
+  "platform": "template",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/datetime/template/",
+  "extends": "base_datetime.json",
+  "fields": [
+    {
+      "key": "type",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "datetime",
+      "options": [
+        "date",
+        "time",
+        "datetime"
+      ]
+    },
+    {
+      "key": "lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "set_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "then:\n  - logger.log: \"Datetime set request\""
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    },
+    {
+      "key": "optimistic",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "restore_value",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "initial_value",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "\"2024-12-31 12:34:56\"\n# or:\nyear: 2024\nmonth: 12\nday: 31\nhour: 12\nminute: 34\nsecond: 56"
+    }
+  ]
+}

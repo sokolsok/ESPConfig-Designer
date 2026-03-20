@@ -1,0 +1,95 @@
+{
+  "id": "sensor.ads1118",
+  "domain": "sensor",
+  "platform": "ads1118",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/ads1118/",
+  "extends": "base_sensor.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "ads1118",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_ads1118.json"
+    },
+    {
+      "key": "ads1118_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "ads1118",
+      "allowSelfReference": true,
+      "default": "ads1118_hub"
+    },
+    {
+      "key": "type",
+      "type": "select",
+      "required": false,
+      "lvl": "simple",
+      "default": "adc",
+      "options": [
+        "adc",
+        "temperature"
+      ]
+    },
+    {
+      "key": "multiplexer",
+      "type": "select",
+      "required": false,
+      "lvl": "simple",
+      "default": "A0_GND",
+      "options": [
+        "A0_A1",
+        "A0_A3",
+        "A1_A3",
+        "A2_A3",
+        "A0_GND",
+        "A1_GND",
+        "A2_GND",
+        "A3_GND"
+      ],
+      "dependsOn": {
+        "key": "type",
+        "value": "adc"
+      }
+    },
+    {
+      "key": "gain",
+      "type": "select",
+      "required": false,
+      "lvl": "simple",
+      "default": "6.144",
+      "options": [
+        "6.144",
+        "4.096",
+        "2.048",
+        "1.024",
+        "0.512",
+        "0.256"
+      ],
+      "dependsOn": {
+        "key": "type",
+        "value": "adc"
+      }
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

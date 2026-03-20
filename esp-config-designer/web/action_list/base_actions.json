@@ -1,0 +1,4031 @@
+{
+  "id": "base.actions",
+  "type": "action-catalog",
+  "description": "ESPHome action catalog used by automation pickers.",
+  "fields": [],
+  "actions": [
+    {
+      "id": "ags10.new_i2c_address",
+      "label": "Ags10 New I2C Address",
+      "description": "ESPHome action `ags10.new_i2c_address`.",
+      "domain": "ags10",
+      "actionDomain": "ags10",
+      "helpUrl": "https://esphome.io/components/sensor/ags10/",
+      "schemaUrl": "actions/ags10/new_i2c_address.json"
+    },
+    {
+      "id": "ags10.set_zero_point",
+      "label": "Ags10 Set Zero Point",
+      "description": "ESPHome action `ags10.set_zero_point`.",
+      "domain": "ags10",
+      "actionDomain": "ags10",
+      "helpUrl": "https://esphome.io/components/sensor/ags10/",
+      "schemaUrl": "actions/ags10/set_zero_point.json"
+    },
+    {
+      "id": "aic3204.set_auto_mute_mode",
+      "label": "Aic3204 Set Auto Mute Mode",
+      "description": "ESPHome action `aic3204.set_auto_mute_mode`.",
+      "domain": "aic3204",
+      "actionDomain": "aic3204",
+      "helpUrl": "https://esphome.io/components/audio_dac/aic3204/",
+      "schemaUrl": "actions/aic3204/set_auto_mute_mode.json"
+    },
+    {
+      "id": "alarm_control_panel.arm_away",
+      "label": "Alarm Control Panel Arm Away",
+      "description": "ESPHome action `alarm_control_panel.arm_away`.",
+      "domain": "alarm_control_panel",
+      "actionDomain": "alarm_control_panel",
+      "helpUrl": "https://esphome.io/components/alarm_control_panel/",
+      "schemaUrl": "actions/alarm_control_panel/arm_away.json"
+    },
+    {
+      "id": "alarm_control_panel.arm_home",
+      "label": "Alarm Control Panel Arm Home",
+      "description": "ESPHome action `alarm_control_panel.arm_home`.",
+      "domain": "alarm_control_panel",
+      "actionDomain": "alarm_control_panel",
+      "helpUrl": "https://esphome.io/components/alarm_control_panel/",
+      "schemaUrl": "actions/alarm_control_panel/arm_home.json"
+    },
+    {
+      "id": "alarm_control_panel.arm_night",
+      "label": "Alarm Control Panel Arm Night",
+      "description": "ESPHome action `alarm_control_panel.arm_night`.",
+      "domain": "alarm_control_panel",
+      "actionDomain": "alarm_control_panel",
+      "helpUrl": "https://esphome.io/components/alarm_control_panel/",
+      "schemaUrl": "actions/alarm_control_panel/arm_night.json"
+    },
+    {
+      "id": "alarm_control_panel.disarm",
+      "label": "Alarm Control Panel Disarm",
+      "description": "ESPHome action `alarm_control_panel.disarm`.",
+      "domain": "alarm_control_panel",
+      "actionDomain": "alarm_control_panel",
+      "helpUrl": "https://esphome.io/components/alarm_control_panel/",
+      "schemaUrl": "actions/alarm_control_panel/disarm.json"
+    },
+    {
+      "id": "alarm_control_panel.pending",
+      "label": "Alarm Control Panel Pending",
+      "description": "ESPHome action `alarm_control_panel.pending`.",
+      "domain": "alarm_control_panel",
+      "actionDomain": "alarm_control_panel",
+      "helpUrl": "https://esphome.io/components/alarm_control_panel/",
+      "schemaUrl": "actions/alarm_control_panel/pending.json"
+    },
+    {
+      "id": "alarm_control_panel.triggered",
+      "label": "Alarm Control Panel Triggered",
+      "description": "ESPHome action `alarm_control_panel.triggered`.",
+      "domain": "alarm_control_panel",
+      "actionDomain": "alarm_control_panel",
+      "helpUrl": "https://esphome.io/components/alarm_control_panel/",
+      "schemaUrl": "actions/alarm_control_panel/triggered.json"
+    },
+    {
+      "id": "animation.next_frame",
+      "label": "Animation Next Frame",
+      "description": "ESPHome action `animation.next_frame`.",
+      "domain": "animation",
+      "actionDomain": "animation",
+      "helpUrl": "https://esphome.io/components/animation/",
+      "schemaUrl": "actions/animation/next_frame.json"
+    },
+    {
+      "id": "animation.prev_frame",
+      "label": "Animation Prev Frame",
+      "description": "ESPHome action `animation.prev_frame`.",
+      "domain": "animation",
+      "actionDomain": "animation",
+      "helpUrl": "https://esphome.io/components/animation/",
+      "schemaUrl": "actions/animation/prev_frame.json"
+    },
+    {
+      "id": "animation.set_frame",
+      "label": "Animation Set Frame",
+      "description": "ESPHome action `animation.set_frame`.",
+      "domain": "animation",
+      "actionDomain": "animation",
+      "helpUrl": "https://esphome.io/components/animation/",
+      "schemaUrl": "actions/animation/set_frame.json"
+    },
+    {
+      "id": "api.respond",
+      "label": "Api Respond",
+      "description": "ESPHome action `api.respond`.",
+      "domain": "api",
+      "actionDomain": "api",
+      "helpUrl": "https://esphome.io/components/api/",
+      "schemaUrl": "actions/api/respond.json"
+    },
+    {
+      "id": "at581x.reset",
+      "label": "At581X Reset",
+      "description": "ESPHome action `at581x.reset`.",
+      "domain": "at581x",
+      "actionDomain": "at581x",
+      "helpUrl": "https://esphome.io/components/at581x/",
+      "schemaUrl": "actions/at581x/reset.json"
+    },
+    {
+      "id": "at581x.settings",
+      "label": "At581X Settings",
+      "description": "ESPHome action `at581x.settings`.",
+      "domain": "at581x",
+      "actionDomain": "at581x",
+      "helpUrl": "https://esphome.io/components/at581x/",
+      "schemaUrl": "actions/at581x/settings.json"
+    },
+    {
+      "id": "audio_adc.set_mic_gain",
+      "label": "Audio Adc Set Mic Gain",
+      "description": "ESPHome action `audio_adc.set_mic_gain`.",
+      "domain": "audio_adc",
+      "actionDomain": "audio_adc",
+      "helpUrl": "https://esphome.io/components/audio_adc/",
+      "schemaUrl": "actions/audio_adc/set_mic_gain.json"
+    },
+    {
+      "id": "audio_dac.mute_off",
+      "label": "Audio Dac Mute Off",
+      "description": "ESPHome action `audio_dac.mute_off`.",
+      "domain": "audio_dac",
+      "actionDomain": "audio_dac",
+      "helpUrl": "https://esphome.io/components/audio_dac/",
+      "schemaUrl": "actions/audio_dac/mute_off.json"
+    },
+    {
+      "id": "audio_dac.mute_on",
+      "label": "Audio Dac Mute On",
+      "description": "ESPHome action `audio_dac.mute_on`.",
+      "domain": "audio_dac",
+      "actionDomain": "audio_dac",
+      "helpUrl": "https://esphome.io/components/audio_dac/",
+      "schemaUrl": "actions/audio_dac/mute_on.json"
+    },
+    {
+      "id": "audio_dac.set_volume",
+      "label": "Audio Dac Set Volume",
+      "description": "ESPHome action `audio_dac.set_volume`.",
+      "domain": "audio_dac",
+      "actionDomain": "audio_dac",
+      "helpUrl": "https://esphome.io/components/audio_dac/",
+      "schemaUrl": "actions/audio_dac/set_volume.json"
+    },
+    {
+      "id": "binary_sensor.invalidate_state",
+      "label": "Binary Sensor Invalidate State",
+      "description": "ESPHome action `binary_sensor.invalidate_state`.",
+      "domain": "binary_sensor",
+      "actionDomain": "binary_sensor",
+      "helpUrl": "https://esphome.io/components/binary_sensor/",
+      "schemaUrl": "actions/binary_sensor/invalidate_state.json"
+    },
+    {
+      "id": "binary_sensor.nextion.publish",
+      "label": "Binary Sensor Nextion Publish",
+      "description": "ESPHome action `binary_sensor.nextion.publish`.",
+      "domain": "binary_sensor",
+      "actionDomain": "binary_sensor.nextion",
+      "helpUrl": "https://esphome.io/components/binary_sensor/nextion/",
+      "schemaUrl": "actions/binary_sensor/nextion/publish.json"
+    },
+    {
+      "id": "binary_sensor.template.publish",
+      "label": "Binary Sensor Template Publish",
+      "description": "ESPHome action `binary_sensor.template.publish`.",
+      "domain": "binary_sensor",
+      "actionDomain": "binary_sensor.template",
+      "helpUrl": "https://esphome.io/components/binary_sensor/template/",
+      "schemaUrl": "actions/binary_sensor/template/publish.json"
+    },
+    {
+      "id": "ble.disable",
+      "label": "Ble Disable",
+      "description": "ESPHome action `ble.disable`.",
+      "domain": "ble",
+      "actionDomain": "ble",
+      "helpUrl": "https://esphome.io/components/esp32_ble/",
+      "schemaUrl": "actions/ble/disable.json"
+    },
+    {
+      "id": "ble.enable",
+      "label": "Ble Enable",
+      "description": "ESPHome action `ble.enable`.",
+      "domain": "ble",
+      "actionDomain": "ble",
+      "helpUrl": "https://esphome.io/components/esp32_ble/",
+      "schemaUrl": "actions/ble/enable.json"
+    },
+    {
+      "id": "ble_client.ble_write",
+      "label": "Ble Client Ble Write",
+      "description": "ESPHome action `ble_client.ble_write`.",
+      "domain": "ble_client",
+      "actionDomain": "ble_client",
+      "helpUrl": "https://esphome.io/components/ble_client/",
+      "schemaUrl": "actions/ble_client/ble_write.json"
+    },
+    {
+      "id": "ble_client.connect",
+      "label": "Ble Client Connect",
+      "description": "ESPHome action `ble_client.connect`.",
+      "domain": "ble_client",
+      "actionDomain": "ble_client",
+      "helpUrl": "https://esphome.io/components/ble_client/",
+      "schemaUrl": "actions/ble_client/connect.json"
+    },
+    {
+      "id": "ble_client.disconnect",
+      "label": "Ble Client Disconnect",
+      "description": "ESPHome action `ble_client.disconnect`.",
+      "domain": "ble_client",
+      "actionDomain": "ble_client",
+      "helpUrl": "https://esphome.io/components/ble_client/",
+      "schemaUrl": "actions/ble_client/disconnect.json"
+    },
+    {
+      "id": "ble_client.numeric_comparison_reply",
+      "label": "Ble Client Numeric Comparison Reply",
+      "description": "ESPHome action `ble_client.numeric_comparison_reply`.",
+      "domain": "ble_client",
+      "actionDomain": "ble_client",
+      "helpUrl": "https://esphome.io/components/ble_client/",
+      "schemaUrl": "actions/ble_client/numeric_comparison_reply.json"
+    },
+    {
+      "id": "ble_client.passkey_reply",
+      "label": "Ble Client Passkey Reply",
+      "description": "ESPHome action `ble_client.passkey_reply`.",
+      "domain": "ble_client",
+      "actionDomain": "ble_client",
+      "helpUrl": "https://esphome.io/components/ble_client/",
+      "schemaUrl": "actions/ble_client/passkey_reply.json"
+    },
+    {
+      "id": "ble_client.remove_bond",
+      "label": "Ble Client Remove Bond",
+      "description": "ESPHome action `ble_client.remove_bond`.",
+      "domain": "ble_client",
+      "actionDomain": "ble_client",
+      "helpUrl": "https://esphome.io/components/ble_client/",
+      "schemaUrl": "actions/ble_client/remove_bond.json"
+    },
+    {
+      "id": "ble_server.characteristic.notify",
+      "label": "Ble Server Characteristic Notify",
+      "description": "ESPHome action `ble_server.characteristic.notify`.",
+      "domain": "ble_server",
+      "actionDomain": "ble_server.characteristic",
+      "helpUrl": "https://esphome.io/components/esp32_ble_server/",
+      "schemaUrl": "actions/ble_server/characteristic/notify.json"
+    },
+    {
+      "id": "ble_server.characteristic.set_value",
+      "label": "Ble Server Characteristic Set Value",
+      "description": "ESPHome action `ble_server.characteristic.set_value`.",
+      "domain": "ble_server",
+      "actionDomain": "ble_server.characteristic",
+      "helpUrl": "https://esphome.io/components/esp32_ble_server/",
+      "schemaUrl": "actions/ble_server/characteristic/set_value.json"
+    },
+    {
+      "id": "ble_server.descriptor.set_value",
+      "label": "Ble Server Descriptor Set Value",
+      "description": "ESPHome action `ble_server.descriptor.set_value`.",
+      "domain": "ble_server",
+      "actionDomain": "ble_server.descriptor",
+      "helpUrl": "https://esphome.io/components/esp32_ble_server/",
+      "schemaUrl": "actions/ble_server/descriptor/set_value.json"
+    },
+    {
+      "id": "bluetooth_password.set",
+      "label": "Bluetooth Password Set",
+      "description": "ESPHome action `bluetooth_password.set`.",
+      "domain": "bluetooth_password",
+      "actionDomain": "bluetooth_password",
+      "helpUrl": "https://esphome.io/components/sensor/ld2410/",
+      "schemaUrl": "actions/bluetooth_password/set.json"
+    },
+    {
+      "id": "bm8563.read_time",
+      "label": "Bm8563 Read Time",
+      "description": "ESPHome action `bm8563.read_time`.",
+      "domain": "bm8563",
+      "actionDomain": "bm8563",
+      "helpUrl": "https://esphome.io/components/time/bm8563/",
+      "schemaUrl": "actions/bm8563/read_time.json"
+    },
+    {
+      "id": "bm8563.start_timer",
+      "label": "Bm8563 Start Timer",
+      "description": "ESPHome action `bm8563.start_timer`.",
+      "domain": "bm8563",
+      "actionDomain": "bm8563",
+      "helpUrl": "https://esphome.io/components/time/bm8563/",
+      "schemaUrl": "actions/bm8563/start_timer.json"
+    },
+    {
+      "id": "bm8563.write_time",
+      "label": "Bm8563 Write Time",
+      "description": "ESPHome action `bm8563.write_time`.",
+      "domain": "bm8563",
+      "actionDomain": "bm8563",
+      "helpUrl": "https://esphome.io/components/time/bm8563/",
+      "schemaUrl": "actions/bm8563/write_time.json"
+    },
+    {
+      "id": "button.press",
+      "label": "Button Press",
+      "description": "ESPHome action `button.press`.",
+      "domain": "button",
+      "actionDomain": "button",
+      "helpUrl": "https://esphome.io/components/button/",
+      "schemaUrl": "actions/button/press.json"
+    },
+    {
+      "id": "canbus.send",
+      "label": "Canbus Send",
+      "description": "ESPHome action `canbus.send`.",
+      "domain": "canbus",
+      "actionDomain": "canbus",
+      "helpUrl": "https://esphome.io/components/canbus/",
+      "schemaUrl": "actions/canbus/send.json"
+    },
+    {
+      "id": "cc1101.begin_rx",
+      "label": "Cc1101 Begin Rx",
+      "description": "ESPHome action `cc1101.begin_rx`.",
+      "domain": "cc1101",
+      "actionDomain": "cc1101",
+      "helpUrl": "https://esphome.io/components/cc1101/",
+      "schemaUrl": "actions/cc1101/begin_rx.json"
+    },
+    {
+      "id": "cc1101.begin_tx",
+      "label": "Cc1101 Begin Tx",
+      "description": "ESPHome action `cc1101.begin_tx`.",
+      "domain": "cc1101",
+      "actionDomain": "cc1101",
+      "helpUrl": "https://esphome.io/components/cc1101/",
+      "schemaUrl": "actions/cc1101/begin_tx.json"
+    },
+    {
+      "id": "cc1101.reset",
+      "label": "Cc1101 Reset",
+      "description": "ESPHome action `cc1101.reset`.",
+      "domain": "cc1101",
+      "actionDomain": "cc1101",
+      "helpUrl": "https://esphome.io/components/cc1101/",
+      "schemaUrl": "actions/cc1101/reset.json"
+    },
+    {
+      "id": "cc1101.send_packet",
+      "label": "Cc1101 Send Packet",
+      "description": "ESPHome action `cc1101.send_packet`.",
+      "domain": "cc1101",
+      "actionDomain": "cc1101",
+      "helpUrl": "https://esphome.io/components/cc1101/",
+      "schemaUrl": "actions/cc1101/send_packet.json"
+    },
+    {
+      "id": "cc1101.set_idle",
+      "label": "Cc1101 Set Idle",
+      "description": "ESPHome action `cc1101.set_idle`.",
+      "domain": "cc1101",
+      "actionDomain": "cc1101",
+      "helpUrl": "https://esphome.io/components/cc1101/",
+      "schemaUrl": "actions/cc1101/set_idle.json"
+    },
+    {
+      "id": "climate.control",
+      "label": "Climate Control",
+      "description": "ESPHome action `climate.control`.",
+      "domain": "climate",
+      "actionDomain": "climate",
+      "helpUrl": "https://esphome.io/components/climate/",
+      "schemaUrl": "actions/climate/control.json"
+    },
+    {
+      "id": "climate.haier.beeper_off",
+      "label": "Climate Haier Beeper Off",
+      "description": "ESPHome action `climate.haier.beeper_off`.",
+      "domain": "climate",
+      "actionDomain": "climate.haier",
+      "helpUrl": "https://esphome.io/components/climate/haier/",
+      "schemaUrl": "actions/climate/haier/beeper_off.json"
+    },
+    {
+      "id": "climate.haier.beeper_on",
+      "label": "Climate Haier Beeper On",
+      "description": "ESPHome action `climate.haier.beeper_on`.",
+      "domain": "climate",
+      "actionDomain": "climate.haier",
+      "helpUrl": "https://esphome.io/components/climate/haier/",
+      "schemaUrl": "actions/climate/haier/beeper_on.json"
+    },
+    {
+      "id": "climate.haier.display_off",
+      "label": "Climate Haier Display Off",
+      "description": "ESPHome action `climate.haier.display_off`.",
+      "domain": "climate",
+      "actionDomain": "climate.haier",
+      "helpUrl": "https://esphome.io/components/climate/haier/",
+      "schemaUrl": "actions/climate/haier/display_off.json"
+    },
+    {
+      "id": "climate.haier.display_on",
+      "label": "Climate Haier Display On",
+      "description": "ESPHome action `climate.haier.display_on`.",
+      "domain": "climate",
+      "actionDomain": "climate.haier",
+      "helpUrl": "https://esphome.io/components/climate/haier/",
+      "schemaUrl": "actions/climate/haier/display_on.json"
+    },
+    {
+      "id": "climate.haier.health_off",
+      "label": "Climate Haier Health Off",
+      "description": "ESPHome action `climate.haier.health_off`.",
+      "domain": "climate",
+      "actionDomain": "climate.haier",
+      "helpUrl": "https://esphome.io/components/climate/haier/",
+      "schemaUrl": "actions/climate/haier/health_off.json"
+    },
+    {
+      "id": "climate.haier.health_on",
+      "label": "Climate Haier Health On",
+      "description": "ESPHome action `climate.haier.health_on`.",
+      "domain": "climate",
+      "actionDomain": "climate.haier",
+      "helpUrl": "https://esphome.io/components/climate/haier/",
+      "schemaUrl": "actions/climate/haier/health_on.json"
+    },
+    {
+      "id": "climate.haier.power_off",
+      "label": "Climate Haier Power Off",
+      "description": "ESPHome action `climate.haier.power_off`.",
+      "domain": "climate",
+      "actionDomain": "climate.haier",
+      "helpUrl": "https://esphome.io/components/climate/haier/",
+      "schemaUrl": "actions/climate/haier/power_off.json"
+    },
+    {
+      "id": "climate.haier.power_on",
+      "label": "Climate Haier Power On",
+      "description": "ESPHome action `climate.haier.power_on`.",
+      "domain": "climate",
+      "actionDomain": "climate.haier",
+      "helpUrl": "https://esphome.io/components/climate/haier/",
+      "schemaUrl": "actions/climate/haier/power_on.json"
+    },
+    {
+      "id": "climate.haier.power_toggle",
+      "label": "Climate Haier Power Toggle",
+      "description": "ESPHome action `climate.haier.power_toggle`.",
+      "domain": "climate",
+      "actionDomain": "climate.haier",
+      "helpUrl": "https://esphome.io/components/climate/haier/",
+      "schemaUrl": "actions/climate/haier/power_toggle.json"
+    },
+    {
+      "id": "climate.haier.set_horizontal_airflow",
+      "label": "Climate Haier Set Horizontal Airflow",
+      "description": "ESPHome action `climate.haier.set_horizontal_airflow`.",
+      "domain": "climate",
+      "actionDomain": "climate.haier",
+      "helpUrl": "https://esphome.io/components/climate/haier/",
+      "schemaUrl": "actions/climate/haier/set_horizontal_airflow.json"
+    },
+    {
+      "id": "climate.haier.set_vertical_airflow",
+      "label": "Climate Haier Set Vertical Airflow",
+      "description": "ESPHome action `climate.haier.set_vertical_airflow`.",
+      "domain": "climate",
+      "actionDomain": "climate.haier",
+      "helpUrl": "https://esphome.io/components/climate/haier/",
+      "schemaUrl": "actions/climate/haier/set_vertical_airflow.json"
+    },
+    {
+      "id": "climate.haier.start_self_cleaning",
+      "label": "Climate Haier Start Self Cleaning",
+      "description": "ESPHome action `climate.haier.start_self_cleaning`.",
+      "domain": "climate",
+      "actionDomain": "climate.haier",
+      "helpUrl": "https://esphome.io/components/climate/haier/",
+      "schemaUrl": "actions/climate/haier/start_self_cleaning.json"
+    },
+    {
+      "id": "climate.haier.start_steri_cleaning",
+      "label": "Climate Haier Start Steri Cleaning",
+      "description": "ESPHome action `climate.haier.start_steri_cleaning`.",
+      "domain": "climate",
+      "actionDomain": "climate.haier",
+      "helpUrl": "https://esphome.io/components/climate/haier/",
+      "schemaUrl": "actions/climate/haier/start_steri_cleaning.json"
+    },
+    {
+      "id": "climate.pid.autotune",
+      "label": "Climate Pid Autotune",
+      "description": "ESPHome action `climate.pid.autotune`.",
+      "domain": "climate",
+      "actionDomain": "climate.pid",
+      "helpUrl": "https://esphome.io/components/climate/pid/",
+      "schemaUrl": "actions/climate/pid/autotune.json"
+    },
+    {
+      "id": "climate.pid.reset_integral_term",
+      "label": "Climate Pid Reset Integral Term",
+      "description": "ESPHome action `climate.pid.reset_integral_term`.",
+      "domain": "climate",
+      "actionDomain": "climate.pid",
+      "helpUrl": "https://esphome.io/components/climate/pid/",
+      "schemaUrl": "actions/climate/pid/reset_integral_term.json"
+    },
+    {
+      "id": "climate.pid.set_control_parameters",
+      "label": "Climate Pid Set Control Parameters",
+      "description": "ESPHome action `climate.pid.set_control_parameters`.",
+      "domain": "climate",
+      "actionDomain": "climate.pid",
+      "helpUrl": "https://esphome.io/components/climate/pid/",
+      "schemaUrl": "actions/climate/pid/set_control_parameters.json"
+    },
+    {
+      "id": "cm1106.calibrate_zero",
+      "label": "Cm1106 Calibrate Zero",
+      "description": "ESPHome action `cm1106.calibrate_zero`.",
+      "domain": "cm1106",
+      "actionDomain": "cm1106",
+      "helpUrl": "https://esphome.io/components/sensor/cm1106/",
+      "schemaUrl": "actions/cm1106/calibrate_zero.json"
+    },
+    {
+      "id": "component.resume",
+      "label": "Component Resume",
+      "description": "ESPHome action `component.resume`.",
+      "domain": "component",
+      "actionDomain": "component",
+      "helpUrl": "https://esphome.io/automations/actions/",
+      "schemaUrl": "actions/component/resume.json"
+    },
+    {
+      "id": "component.suspend",
+      "label": "Component Suspend",
+      "description": "ESPHome action `component.suspend`.",
+      "domain": "component",
+      "actionDomain": "component",
+      "helpUrl": "https://esphome.io/automations/actions/",
+      "schemaUrl": "actions/component/suspend.json"
+    },
+    {
+      "id": "component.update",
+      "label": "Component Update",
+      "description": "ESPHome action `component.update`.",
+      "domain": "component",
+      "actionDomain": "component",
+      "helpUrl": "https://esphome.io/automations/actions/",
+      "schemaUrl": "actions/component/update.json"
+    },
+    {
+      "id": "cover.close",
+      "label": "Cover Close",
+      "description": "ESPHome action `cover.close`.",
+      "domain": "cover",
+      "actionDomain": "cover",
+      "helpUrl": "https://esphome.io/components/cover/",
+      "schemaUrl": "actions/cover/close.json"
+    },
+    {
+      "id": "cover.control",
+      "label": "Cover Control",
+      "description": "ESPHome action `cover.control`.",
+      "domain": "cover",
+      "actionDomain": "cover",
+      "helpUrl": "https://esphome.io/components/cover/",
+      "schemaUrl": "actions/cover/control.json"
+    },
+    {
+      "id": "cover.open",
+      "label": "Cover Open",
+      "description": "ESPHome action `cover.open`.",
+      "domain": "cover",
+      "actionDomain": "cover",
+      "helpUrl": "https://esphome.io/components/cover/",
+      "schemaUrl": "actions/cover/open.json"
+    },
+    {
+      "id": "cover.stop",
+      "label": "Cover Stop",
+      "description": "ESPHome action `cover.stop`.",
+      "domain": "cover",
+      "actionDomain": "cover",
+      "helpUrl": "https://esphome.io/components/cover/",
+      "schemaUrl": "actions/cover/stop.json"
+    },
+    {
+      "id": "cover.template.publish",
+      "label": "Cover Template Publish",
+      "description": "ESPHome action `cover.template.publish`.",
+      "domain": "cover",
+      "actionDomain": "cover.template",
+      "helpUrl": "https://esphome.io/components/cover/template/",
+      "schemaUrl": "actions/cover/template/publish.json"
+    },
+    {
+      "id": "cover.toggle",
+      "label": "Cover Toggle",
+      "description": "ESPHome action `cover.toggle`.",
+      "domain": "cover",
+      "actionDomain": "cover",
+      "helpUrl": "https://esphome.io/components/cover/",
+      "schemaUrl": "actions/cover/toggle.json"
+    },
+    {
+      "id": "cs5460a.restart",
+      "label": "Cs5460A Restart",
+      "description": "ESPHome action `cs5460a.restart`.",
+      "domain": "cs5460a",
+      "actionDomain": "cs5460a",
+      "helpUrl": "https://esphome.io/components/sensor/cs5460a/",
+      "schemaUrl": "actions/cs5460a/restart.json"
+    },
+    {
+      "id": "datetime.date.set",
+      "label": "Datetime Date Set",
+      "description": "ESPHome action `datetime.date.set`.",
+      "domain": "datetime",
+      "actionDomain": "datetime.date",
+      "helpUrl": "https://esphome.io/components/datetime/",
+      "schemaUrl": "actions/datetime/date/set.json"
+    },
+    {
+      "id": "datetime.datetime.set",
+      "label": "Datetime Datetime Set",
+      "description": "ESPHome action `datetime.datetime.set`.",
+      "domain": "datetime",
+      "actionDomain": "datetime.datetime",
+      "helpUrl": "https://esphome.io/components/datetime/",
+      "schemaUrl": "actions/datetime/datetime/set.json"
+    },
+    {
+      "id": "datetime.time.set",
+      "label": "Datetime Time Set",
+      "description": "ESPHome action `datetime.time.set`.",
+      "domain": "datetime",
+      "actionDomain": "datetime.time",
+      "helpUrl": "https://esphome.io/components/datetime/",
+      "schemaUrl": "actions/datetime/time/set.json"
+    },
+    {
+      "id": "deep_sleep.allow",
+      "label": "Deep Sleep Allow",
+      "description": "Allow the device to enter deep sleep again.",
+      "domain": "deep_sleep",
+      "helpUrl": "https://esphome.io/components/deep_sleep/",
+      "actionDomain": "deep_sleep",
+      "schemaUrl": "actions/deep_sleep/allow.json"
+    },
+    {
+      "id": "deep_sleep.enter",
+      "label": "Deep Sleep Enter",
+      "description": "Put the device into deep sleep.",
+      "domain": "deep_sleep",
+      "helpUrl": "https://esphome.io/components/deep_sleep/",
+      "actionDomain": "deep_sleep",
+      "schemaUrl": "actions/deep_sleep/enter.json"
+    },
+    {
+      "id": "deep_sleep.prevent",
+      "label": "Deep Sleep Prevent",
+      "description": "Prevent the device from entering deep sleep.",
+      "domain": "deep_sleep",
+      "helpUrl": "https://esphome.io/components/deep_sleep/",
+      "actionDomain": "deep_sleep",
+      "schemaUrl": "actions/deep_sleep/prevent.json"
+    },
+    {
+      "id": "delay",
+      "label": "Delay",
+      "description": "Wait for a duration before continuing.",
+      "domain": "core",
+      "helpUrl": "https://esphome.io/automations/actions/#delay-action",
+      "actionDomain": "core",
+      "schemaUrl": "actions/delay.json"
+    },
+    {
+      "id": "dfplayer.pause",
+      "label": "Dfplayer Pause",
+      "description": "ESPHome action `dfplayer.pause`.",
+      "domain": "dfplayer",
+      "actionDomain": "dfplayer",
+      "helpUrl": "https://esphome.io/components/dfplayer/",
+      "schemaUrl": "actions/dfplayer/pause.json"
+    },
+    {
+      "id": "dfplayer.play",
+      "label": "Dfplayer Play",
+      "description": "ESPHome action `dfplayer.play`.",
+      "domain": "dfplayer",
+      "actionDomain": "dfplayer",
+      "helpUrl": "https://esphome.io/components/dfplayer/",
+      "schemaUrl": "actions/dfplayer/play.json"
+    },
+    {
+      "id": "dfplayer.play_folder",
+      "label": "Dfplayer Play Folder",
+      "description": "ESPHome action `dfplayer.play_folder`.",
+      "domain": "dfplayer",
+      "actionDomain": "dfplayer",
+      "helpUrl": "https://esphome.io/components/dfplayer/",
+      "schemaUrl": "actions/dfplayer/play_folder.json"
+    },
+    {
+      "id": "dfplayer.play_mp3",
+      "label": "Dfplayer Play Mp3",
+      "description": "ESPHome action `dfplayer.play_mp3`.",
+      "domain": "dfplayer",
+      "actionDomain": "dfplayer",
+      "helpUrl": "https://esphome.io/components/dfplayer/",
+      "schemaUrl": "actions/dfplayer/play_mp3.json"
+    },
+    {
+      "id": "dfplayer.play_next",
+      "label": "Dfplayer Play Next",
+      "description": "ESPHome action `dfplayer.play_next`.",
+      "domain": "dfplayer",
+      "actionDomain": "dfplayer",
+      "helpUrl": "https://esphome.io/components/dfplayer/",
+      "schemaUrl": "actions/dfplayer/play_next.json"
+    },
+    {
+      "id": "dfplayer.play_previous",
+      "label": "Dfplayer Play Previous",
+      "description": "ESPHome action `dfplayer.play_previous`.",
+      "domain": "dfplayer",
+      "actionDomain": "dfplayer",
+      "helpUrl": "https://esphome.io/components/dfplayer/",
+      "schemaUrl": "actions/dfplayer/play_previous.json"
+    },
+    {
+      "id": "dfplayer.random",
+      "label": "Dfplayer Random",
+      "description": "ESPHome action `dfplayer.random`.",
+      "domain": "dfplayer",
+      "actionDomain": "dfplayer",
+      "helpUrl": "https://esphome.io/components/dfplayer/",
+      "schemaUrl": "actions/dfplayer/random.json"
+    },
+    {
+      "id": "dfplayer.reset",
+      "label": "Dfplayer Reset",
+      "description": "ESPHome action `dfplayer.reset`.",
+      "domain": "dfplayer",
+      "actionDomain": "dfplayer",
+      "helpUrl": "https://esphome.io/components/dfplayer/",
+      "schemaUrl": "actions/dfplayer/reset.json"
+    },
+    {
+      "id": "dfplayer.set_device",
+      "label": "Dfplayer Set Device",
+      "description": "ESPHome action `dfplayer.set_device`.",
+      "domain": "dfplayer",
+      "actionDomain": "dfplayer",
+      "helpUrl": "https://esphome.io/components/dfplayer/",
+      "schemaUrl": "actions/dfplayer/set_device.json"
+    },
+    {
+      "id": "dfplayer.set_eq",
+      "label": "Dfplayer Set Eq",
+      "description": "ESPHome action `dfplayer.set_eq`.",
+      "domain": "dfplayer",
+      "actionDomain": "dfplayer",
+      "helpUrl": "https://esphome.io/components/dfplayer/",
+      "schemaUrl": "actions/dfplayer/set_eq.json"
+    },
+    {
+      "id": "dfplayer.set_volume",
+      "label": "Dfplayer Set Volume",
+      "description": "ESPHome action `dfplayer.set_volume`.",
+      "domain": "dfplayer",
+      "actionDomain": "dfplayer",
+      "helpUrl": "https://esphome.io/components/dfplayer/",
+      "schemaUrl": "actions/dfplayer/set_volume.json"
+    },
+    {
+      "id": "dfplayer.sleep",
+      "label": "Dfplayer Sleep",
+      "description": "ESPHome action `dfplayer.sleep`.",
+      "domain": "dfplayer",
+      "actionDomain": "dfplayer",
+      "helpUrl": "https://esphome.io/components/dfplayer/",
+      "schemaUrl": "actions/dfplayer/sleep.json"
+    },
+    {
+      "id": "dfplayer.start",
+      "label": "Dfplayer Start",
+      "description": "ESPHome action `dfplayer.start`.",
+      "domain": "dfplayer",
+      "actionDomain": "dfplayer",
+      "helpUrl": "https://esphome.io/components/dfplayer/",
+      "schemaUrl": "actions/dfplayer/start.json"
+    },
+    {
+      "id": "dfplayer.stop",
+      "label": "Dfplayer Stop",
+      "description": "ESPHome action `dfplayer.stop`.",
+      "domain": "dfplayer",
+      "actionDomain": "dfplayer",
+      "helpUrl": "https://esphome.io/components/dfplayer/",
+      "schemaUrl": "actions/dfplayer/stop.json"
+    },
+    {
+      "id": "dfplayer.volume_down",
+      "label": "Dfplayer Volume Down",
+      "description": "ESPHome action `dfplayer.volume_down`.",
+      "domain": "dfplayer",
+      "actionDomain": "dfplayer",
+      "helpUrl": "https://esphome.io/components/dfplayer/",
+      "schemaUrl": "actions/dfplayer/volume_down.json"
+    },
+    {
+      "id": "dfplayer.volume_up",
+      "label": "Dfplayer Volume Up",
+      "description": "ESPHome action `dfplayer.volume_up`.",
+      "domain": "dfplayer",
+      "actionDomain": "dfplayer",
+      "helpUrl": "https://esphome.io/components/dfplayer/",
+      "schemaUrl": "actions/dfplayer/volume_up.json"
+    },
+    {
+      "id": "dfrobot_sen0395.reset",
+      "label": "Dfrobot Sen0395 Reset",
+      "description": "ESPHome action `dfrobot_sen0395.reset`.",
+      "domain": "dfrobot_sen0395",
+      "actionDomain": "dfrobot_sen0395",
+      "helpUrl": "https://esphome.io/components/dfrobot_sen0395/",
+      "schemaUrl": "actions/dfrobot_sen0395/reset.json"
+    },
+    {
+      "id": "dfrobot_sen0395.settings",
+      "label": "Dfrobot Sen0395 Settings",
+      "description": "ESPHome action `dfrobot_sen0395.settings`.",
+      "domain": "dfrobot_sen0395",
+      "actionDomain": "dfrobot_sen0395",
+      "helpUrl": "https://esphome.io/components/dfrobot_sen0395/",
+      "schemaUrl": "actions/dfrobot_sen0395/settings.json"
+    },
+    {
+      "id": "display.nextion.set_brightness",
+      "label": "Display Nextion Set Brightness",
+      "description": "ESPHome action `display.nextion.set_brightness`.",
+      "domain": "display",
+      "actionDomain": "display.nextion",
+      "helpUrl": "https://esphome.io/components/display/nextion/",
+      "schemaUrl": "actions/display/nextion/set_brightness.json"
+    },
+    {
+      "id": "display.page.show",
+      "label": "Display Page Show",
+      "description": "ESPHome action `display.page.show`.",
+      "domain": "display",
+      "actionDomain": "display.page",
+      "helpUrl": "https://esphome.io/components/display/",
+      "schemaUrl": "actions/display/page/show.json"
+    },
+    {
+      "id": "display.page.show_next",
+      "label": "Display Page Show Next",
+      "description": "ESPHome action `display.page.show_next`.",
+      "domain": "display",
+      "actionDomain": "display.page",
+      "helpUrl": "https://esphome.io/components/display/",
+      "schemaUrl": "actions/display/page/show_next.json"
+    },
+    {
+      "id": "display.page.show_previous",
+      "label": "Display Page Show Previous",
+      "description": "ESPHome action `display.page.show_previous`.",
+      "domain": "display",
+      "actionDomain": "display.page",
+      "helpUrl": "https://esphome.io/components/display/",
+      "schemaUrl": "actions/display/page/show_previous.json"
+    },
+    {
+      "id": "display_menu.down",
+      "label": "Display Menu Down",
+      "description": "ESPHome action `display_menu.down`.",
+      "domain": "display_menu",
+      "actionDomain": "display_menu",
+      "helpUrl": "https://esphome.io/components/display_menu/",
+      "schemaUrl": "actions/display_menu/down.json"
+    },
+    {
+      "id": "display_menu.enter",
+      "label": "Display Menu Enter",
+      "description": "ESPHome action `display_menu.enter`.",
+      "domain": "display_menu",
+      "actionDomain": "display_menu",
+      "helpUrl": "https://esphome.io/components/display_menu/",
+      "schemaUrl": "actions/display_menu/enter.json"
+    },
+    {
+      "id": "display_menu.hide",
+      "label": "Display Menu Hide",
+      "description": "ESPHome action `display_menu.hide`.",
+      "domain": "display_menu",
+      "actionDomain": "display_menu",
+      "helpUrl": "https://esphome.io/components/display_menu/",
+      "schemaUrl": "actions/display_menu/hide.json"
+    },
+    {
+      "id": "display_menu.left",
+      "label": "Display Menu Left",
+      "description": "ESPHome action `display_menu.left`.",
+      "domain": "display_menu",
+      "actionDomain": "display_menu",
+      "helpUrl": "https://esphome.io/components/display_menu/",
+      "schemaUrl": "actions/display_menu/left.json"
+    },
+    {
+      "id": "display_menu.right",
+      "label": "Display Menu Right",
+      "description": "ESPHome action `display_menu.right`.",
+      "domain": "display_menu",
+      "actionDomain": "display_menu",
+      "helpUrl": "https://esphome.io/components/display_menu/",
+      "schemaUrl": "actions/display_menu/right.json"
+    },
+    {
+      "id": "display_menu.show",
+      "label": "Display Menu Show",
+      "description": "ESPHome action `display_menu.show`.",
+      "domain": "display_menu",
+      "actionDomain": "display_menu",
+      "helpUrl": "https://esphome.io/components/display_menu/",
+      "schemaUrl": "actions/display_menu/show.json"
+    },
+    {
+      "id": "display_menu.show_main",
+      "label": "Display Menu Show Main",
+      "description": "ESPHome action `display_menu.show_main`.",
+      "domain": "display_menu",
+      "actionDomain": "display_menu",
+      "helpUrl": "https://esphome.io/components/display_menu/",
+      "schemaUrl": "actions/display_menu/show_main.json"
+    },
+    {
+      "id": "display_menu.up",
+      "label": "Display Menu Up",
+      "description": "ESPHome action `display_menu.up`.",
+      "domain": "display_menu",
+      "actionDomain": "display_menu",
+      "helpUrl": "https://esphome.io/components/display_menu/",
+      "schemaUrl": "actions/display_menu/up.json"
+    },
+    {
+      "id": "ds1307.read_time",
+      "label": "Ds1307 Read Time",
+      "description": "ESPHome action `ds1307.read_time`.",
+      "domain": "ds1307",
+      "actionDomain": "ds1307",
+      "helpUrl": "https://esphome.io/components/time/ds1307/",
+      "schemaUrl": "actions/ds1307/read_time.json"
+    },
+    {
+      "id": "ds1307.write_time",
+      "label": "Ds1307 Write Time",
+      "description": "ESPHome action `ds1307.write_time`.",
+      "domain": "ds1307",
+      "actionDomain": "ds1307",
+      "helpUrl": "https://esphome.io/components/time/ds1307/",
+      "schemaUrl": "actions/ds1307/write_time.json"
+    },
+    {
+      "id": "esp32_ble_tracker.start_scan",
+      "label": "Esp32 Ble Tracker Start Scan",
+      "description": "ESPHome action `esp32_ble_tracker.start_scan`.",
+      "domain": "esp32_ble_tracker",
+      "actionDomain": "esp32_ble_tracker",
+      "helpUrl": "https://esphome.io/components/esp32_ble_tracker/",
+      "schemaUrl": "actions/esp32_ble_tracker/start_scan.json"
+    },
+    {
+      "id": "esp32_ble_tracker.stop_scan",
+      "label": "Esp32 Ble Tracker Stop Scan",
+      "description": "ESPHome action `esp32_ble_tracker.stop_scan`.",
+      "domain": "esp32_ble_tracker",
+      "actionDomain": "esp32_ble_tracker",
+      "helpUrl": "https://esphome.io/components/esp32_ble_tracker/",
+      "schemaUrl": "actions/esp32_ble_tracker/stop_scan.json"
+    },
+    {
+      "id": "esp_ldo.voltage.adjust",
+      "label": "Esp Ldo Voltage Adjust",
+      "description": "ESPHome action `esp_ldo.voltage.adjust`.",
+      "domain": "esp_ldo",
+      "actionDomain": "esp_ldo.voltage",
+      "helpUrl": "https://esphome.io/components/esp_ldo/",
+      "schemaUrl": "actions/esp_ldo/voltage/adjust.json"
+    },
+    {
+      "id": "espnow.broadcast",
+      "label": "Espnow Broadcast",
+      "description": "ESPHome action `espnow.broadcast`.",
+      "domain": "espnow",
+      "actionDomain": "espnow",
+      "helpUrl": "https://esphome.io/components/espnow/",
+      "schemaUrl": "actions/espnow/broadcast.json"
+    },
+    {
+      "id": "espnow.peer.add",
+      "label": "Espnow Peer Add",
+      "description": "ESPHome action `espnow.peer.add`.",
+      "domain": "espnow",
+      "actionDomain": "espnow.peer",
+      "helpUrl": "https://esphome.io/components/espnow/",
+      "schemaUrl": "actions/espnow/peer/add.json"
+    },
+    {
+      "id": "espnow.peer.delete",
+      "label": "Espnow Peer Delete",
+      "description": "ESPHome action `espnow.peer.delete`.",
+      "domain": "espnow",
+      "actionDomain": "espnow.peer",
+      "helpUrl": "https://esphome.io/components/espnow/",
+      "schemaUrl": "actions/espnow/peer/delete.json"
+    },
+    {
+      "id": "espnow.send",
+      "label": "Espnow Send",
+      "description": "ESPHome action `espnow.send`.",
+      "domain": "espnow",
+      "actionDomain": "espnow",
+      "helpUrl": "https://esphome.io/components/espnow/",
+      "schemaUrl": "actions/espnow/send.json"
+    },
+    {
+      "id": "espnow.set_channel",
+      "label": "Espnow Set Channel",
+      "description": "ESPHome action `espnow.set_channel`.",
+      "domain": "espnow",
+      "actionDomain": "espnow",
+      "helpUrl": "https://esphome.io/components/espnow/",
+      "schemaUrl": "actions/espnow/set_channel.json"
+    },
+    {
+      "id": "event.trigger",
+      "label": "Event Trigger",
+      "description": "ESPHome action `event.trigger`.",
+      "domain": "event",
+      "actionDomain": "event",
+      "helpUrl": "https://esphome.io/components/event/",
+      "schemaUrl": "actions/event/trigger.json"
+    },
+    {
+      "id": "ezo_pmp.change_i2c_address",
+      "label": "Ezo Pmp Change I2C Address",
+      "description": "ESPHome action `ezo_pmp.change_i2c_address`.",
+      "domain": "ezo_pmp",
+      "actionDomain": "ezo_pmp",
+      "helpUrl": "https://esphome.io/components/ezo_pmp/",
+      "schemaUrl": "actions/ezo_pmp/change_i2c_address.json"
+    },
+    {
+      "id": "ezo_pmp.clear_calibration",
+      "label": "Ezo Pmp Clear Calibration",
+      "description": "ESPHome action `ezo_pmp.clear_calibration`.",
+      "domain": "ezo_pmp",
+      "actionDomain": "ezo_pmp",
+      "helpUrl": "https://esphome.io/components/ezo_pmp/",
+      "schemaUrl": "actions/ezo_pmp/clear_calibration.json"
+    },
+    {
+      "id": "ezo_pmp.clear_total_volume_dosed",
+      "label": "Ezo Pmp Clear Total Volume Dosed",
+      "description": "ESPHome action `ezo_pmp.clear_total_volume_dosed`.",
+      "domain": "ezo_pmp",
+      "actionDomain": "ezo_pmp",
+      "helpUrl": "https://esphome.io/components/ezo_pmp/",
+      "schemaUrl": "actions/ezo_pmp/clear_total_volume_dosed.json"
+    },
+    {
+      "id": "ezo_pmp.dose_continuously",
+      "label": "Ezo Pmp Dose Continuously",
+      "description": "ESPHome action `ezo_pmp.dose_continuously`.",
+      "domain": "ezo_pmp",
+      "actionDomain": "ezo_pmp",
+      "helpUrl": "https://esphome.io/components/ezo_pmp/",
+      "schemaUrl": "actions/ezo_pmp/dose_continuously.json"
+    },
+    {
+      "id": "ezo_pmp.dose_volume",
+      "label": "Ezo Pmp Dose Volume",
+      "description": "ESPHome action `ezo_pmp.dose_volume`.",
+      "domain": "ezo_pmp",
+      "actionDomain": "ezo_pmp",
+      "helpUrl": "https://esphome.io/components/ezo_pmp/",
+      "schemaUrl": "actions/ezo_pmp/dose_volume.json"
+    },
+    {
+      "id": "ezo_pmp.dose_volume_over_time",
+      "label": "Ezo Pmp Dose Volume Over Time",
+      "description": "ESPHome action `ezo_pmp.dose_volume_over_time`.",
+      "domain": "ezo_pmp",
+      "actionDomain": "ezo_pmp",
+      "helpUrl": "https://esphome.io/components/ezo_pmp/",
+      "schemaUrl": "actions/ezo_pmp/dose_volume_over_time.json"
+    },
+    {
+      "id": "ezo_pmp.dose_with_constant_flow_rate",
+      "label": "Ezo Pmp Dose With Constant Flow Rate",
+      "description": "ESPHome action `ezo_pmp.dose_with_constant_flow_rate`.",
+      "domain": "ezo_pmp",
+      "actionDomain": "ezo_pmp",
+      "helpUrl": "https://esphome.io/components/ezo_pmp/",
+      "schemaUrl": "actions/ezo_pmp/dose_with_constant_flow_rate.json"
+    },
+    {
+      "id": "ezo_pmp.find",
+      "label": "Ezo Pmp Find",
+      "description": "ESPHome action `ezo_pmp.find`.",
+      "domain": "ezo_pmp",
+      "actionDomain": "ezo_pmp",
+      "helpUrl": "https://esphome.io/components/ezo_pmp/",
+      "schemaUrl": "actions/ezo_pmp/find.json"
+    },
+    {
+      "id": "ezo_pmp.pause_dosing",
+      "label": "Ezo Pmp Pause Dosing",
+      "description": "ESPHome action `ezo_pmp.pause_dosing`.",
+      "domain": "ezo_pmp",
+      "actionDomain": "ezo_pmp",
+      "helpUrl": "https://esphome.io/components/ezo_pmp/",
+      "schemaUrl": "actions/ezo_pmp/pause_dosing.json"
+    },
+    {
+      "id": "ezo_pmp.set_calibration_volume",
+      "label": "Ezo Pmp Set Calibration Volume",
+      "description": "ESPHome action `ezo_pmp.set_calibration_volume`.",
+      "domain": "ezo_pmp",
+      "actionDomain": "ezo_pmp",
+      "helpUrl": "https://esphome.io/components/ezo_pmp/",
+      "schemaUrl": "actions/ezo_pmp/set_calibration_volume.json"
+    },
+    {
+      "id": "ezo_pmp.stop_dosing",
+      "label": "Ezo Pmp Stop Dosing",
+      "description": "ESPHome action `ezo_pmp.stop_dosing`.",
+      "domain": "ezo_pmp",
+      "actionDomain": "ezo_pmp",
+      "helpUrl": "https://esphome.io/components/ezo_pmp/",
+      "schemaUrl": "actions/ezo_pmp/stop_dosing.json"
+    },
+    {
+      "id": "fan.cycle_speed",
+      "label": "Fan Cycle Speed",
+      "description": "ESPHome action `fan.cycle_speed`.",
+      "domain": "fan",
+      "actionDomain": "fan",
+      "helpUrl": "https://esphome.io/components/fan/",
+      "schemaUrl": "actions/fan/cycle_speed.json"
+    },
+    {
+      "id": "fan.hbridge.brake",
+      "label": "Fan Hbridge Brake",
+      "description": "ESPHome action `fan.hbridge.brake`.",
+      "domain": "fan",
+      "actionDomain": "fan.hbridge",
+      "helpUrl": "https://esphome.io/components/fan/hbridge/",
+      "schemaUrl": "actions/fan/hbridge/brake.json"
+    },
+    {
+      "id": "fan.toggle",
+      "label": "Fan Toggle",
+      "description": "ESPHome action `fan.toggle`.",
+      "domain": "fan",
+      "actionDomain": "fan",
+      "helpUrl": "https://esphome.io/components/fan/",
+      "schemaUrl": "actions/fan/toggle.json"
+    },
+    {
+      "id": "fan.turn_off",
+      "label": "Fan Turn Off",
+      "description": "ESPHome action `fan.turn_off`.",
+      "domain": "fan",
+      "actionDomain": "fan",
+      "helpUrl": "https://esphome.io/components/fan/",
+      "schemaUrl": "actions/fan/turn_off.json"
+    },
+    {
+      "id": "fan.turn_on",
+      "label": "Fan Turn On",
+      "description": "ESPHome action `fan.turn_on`.",
+      "domain": "fan",
+      "actionDomain": "fan",
+      "helpUrl": "https://esphome.io/components/fan/",
+      "schemaUrl": "actions/fan/turn_on.json"
+    },
+    {
+      "id": "fingerprint_grow.aura_led_control",
+      "label": "Fingerprint Grow Aura Led Control",
+      "description": "ESPHome action `fingerprint_grow.aura_led_control`.",
+      "domain": "fingerprint_grow",
+      "actionDomain": "fingerprint_grow",
+      "helpUrl": "https://esphome.io/components/fingerprint_grow/",
+      "schemaUrl": "actions/fingerprint_grow/aura_led_control.json"
+    },
+    {
+      "id": "fingerprint_grow.cancel_enroll",
+      "label": "Fingerprint Grow Cancel Enroll",
+      "description": "ESPHome action `fingerprint_grow.cancel_enroll`.",
+      "domain": "fingerprint_grow",
+      "actionDomain": "fingerprint_grow",
+      "helpUrl": "https://esphome.io/components/fingerprint_grow/",
+      "schemaUrl": "actions/fingerprint_grow/cancel_enroll.json"
+    },
+    {
+      "id": "fingerprint_grow.delete",
+      "label": "Fingerprint Grow Delete",
+      "description": "ESPHome action `fingerprint_grow.delete`.",
+      "domain": "fingerprint_grow",
+      "actionDomain": "fingerprint_grow",
+      "helpUrl": "https://esphome.io/components/fingerprint_grow/",
+      "schemaUrl": "actions/fingerprint_grow/delete.json"
+    },
+    {
+      "id": "fingerprint_grow.delete_all",
+      "label": "Fingerprint Grow Delete All",
+      "description": "ESPHome action `fingerprint_grow.delete_all`.",
+      "domain": "fingerprint_grow",
+      "actionDomain": "fingerprint_grow",
+      "helpUrl": "https://esphome.io/components/fingerprint_grow/",
+      "schemaUrl": "actions/fingerprint_grow/delete_all.json"
+    },
+    {
+      "id": "fingerprint_grow.enroll",
+      "label": "Fingerprint Grow Enroll",
+      "description": "ESPHome action `fingerprint_grow.enroll`.",
+      "domain": "fingerprint_grow",
+      "actionDomain": "fingerprint_grow",
+      "helpUrl": "https://esphome.io/components/fingerprint_grow/",
+      "schemaUrl": "actions/fingerprint_grow/enroll.json"
+    },
+    {
+      "id": "fingerprint_grow.led_control",
+      "label": "Fingerprint Grow Led Control",
+      "description": "ESPHome action `fingerprint_grow.led_control`.",
+      "domain": "fingerprint_grow",
+      "actionDomain": "fingerprint_grow",
+      "helpUrl": "https://esphome.io/components/fingerprint_grow/",
+      "schemaUrl": "actions/fingerprint_grow/led_control.json"
+    },
+    {
+      "id": "globals.set",
+      "label": "Globals Set",
+      "description": "ESPHome action `globals.set`.",
+      "domain": "globals",
+      "actionDomain": "globals",
+      "helpUrl": "https://esphome.io/components/globals/",
+      "schemaUrl": "actions/globals/set.json"
+    },
+    {
+      "id": "grove_tb6612fng.break",
+      "label": "Grove Tb6612Fng Break",
+      "description": "ESPHome action `grove_tb6612fng.break`.",
+      "domain": "grove_tb6612fng",
+      "actionDomain": "grove_tb6612fng",
+      "helpUrl": "https://esphome.io/components/grove_tb6612fng/",
+      "schemaUrl": "actions/grove_tb6612fng/break.json"
+    },
+    {
+      "id": "grove_tb6612fng.change_address",
+      "label": "Grove Tb6612Fng Change Address",
+      "description": "ESPHome action `grove_tb6612fng.change_address`.",
+      "domain": "grove_tb6612fng",
+      "actionDomain": "grove_tb6612fng",
+      "helpUrl": "https://esphome.io/components/grove_tb6612fng/",
+      "schemaUrl": "actions/grove_tb6612fng/change_address.json"
+    },
+    {
+      "id": "grove_tb6612fng.no_standby",
+      "label": "Grove Tb6612Fng No Standby",
+      "description": "ESPHome action `grove_tb6612fng.no_standby`.",
+      "domain": "grove_tb6612fng",
+      "actionDomain": "grove_tb6612fng",
+      "helpUrl": "https://esphome.io/components/grove_tb6612fng/",
+      "schemaUrl": "actions/grove_tb6612fng/no_standby.json"
+    },
+    {
+      "id": "grove_tb6612fng.run",
+      "label": "Grove Tb6612Fng Run",
+      "description": "ESPHome action `grove_tb6612fng.run`.",
+      "domain": "grove_tb6612fng",
+      "actionDomain": "grove_tb6612fng",
+      "helpUrl": "https://esphome.io/components/grove_tb6612fng/",
+      "schemaUrl": "actions/grove_tb6612fng/run.json"
+    },
+    {
+      "id": "grove_tb6612fng.standby",
+      "label": "Grove Tb6612Fng Standby",
+      "description": "ESPHome action `grove_tb6612fng.standby`.",
+      "domain": "grove_tb6612fng",
+      "actionDomain": "grove_tb6612fng",
+      "helpUrl": "https://esphome.io/components/grove_tb6612fng/",
+      "schemaUrl": "actions/grove_tb6612fng/standby.json"
+    },
+    {
+      "id": "grove_tb6612fng.stop",
+      "label": "Grove Tb6612Fng Stop",
+      "description": "ESPHome action `grove_tb6612fng.stop`.",
+      "domain": "grove_tb6612fng",
+      "actionDomain": "grove_tb6612fng",
+      "helpUrl": "https://esphome.io/components/grove_tb6612fng/",
+      "schemaUrl": "actions/grove_tb6612fng/stop.json"
+    },
+    {
+      "id": "hc8.calibrate",
+      "label": "Hc8 Calibrate",
+      "description": "ESPHome action `hc8.calibrate`.",
+      "domain": "hc8",
+      "actionDomain": "hc8",
+      "helpUrl": "https://esphome.io/components/sensor/hc8/",
+      "schemaUrl": "actions/hc8/calibrate.json"
+    },
+    {
+      "id": "hlk_fm22x.delete",
+      "label": "Hlk Fm22X Delete",
+      "description": "ESPHome action `hlk_fm22x.delete`.",
+      "domain": "hlk_fm22x",
+      "actionDomain": "hlk_fm22x",
+      "helpUrl": "https://esphome.io/components/hlk_fm22x/",
+      "schemaUrl": "actions/hlk_fm22x/delete.json"
+    },
+    {
+      "id": "hlk_fm22x.delete_all",
+      "label": "Hlk Fm22X Delete All",
+      "description": "ESPHome action `hlk_fm22x.delete_all`.",
+      "domain": "hlk_fm22x",
+      "actionDomain": "hlk_fm22x",
+      "helpUrl": "https://esphome.io/components/hlk_fm22x/",
+      "schemaUrl": "actions/hlk_fm22x/delete_all.json"
+    },
+    {
+      "id": "hlk_fm22x.enroll",
+      "label": "Hlk Fm22X Enroll",
+      "description": "ESPHome action `hlk_fm22x.enroll`.",
+      "domain": "hlk_fm22x",
+      "actionDomain": "hlk_fm22x",
+      "helpUrl": "https://esphome.io/components/hlk_fm22x/",
+      "schemaUrl": "actions/hlk_fm22x/enroll.json"
+    },
+    {
+      "id": "hlk_fm22x.reset",
+      "label": "Hlk Fm22X Reset",
+      "description": "ESPHome action `hlk_fm22x.reset`.",
+      "domain": "hlk_fm22x",
+      "actionDomain": "hlk_fm22x",
+      "helpUrl": "https://esphome.io/components/hlk_fm22x/",
+      "schemaUrl": "actions/hlk_fm22x/reset.json"
+    },
+    {
+      "id": "hlk_fm22x.scan",
+      "label": "Hlk Fm22X Scan",
+      "description": "ESPHome action `hlk_fm22x.scan`.",
+      "domain": "hlk_fm22x",
+      "actionDomain": "hlk_fm22x",
+      "helpUrl": "https://esphome.io/components/hlk_fm22x/",
+      "schemaUrl": "actions/hlk_fm22x/scan.json"
+    },
+    {
+      "id": "homeassistant.action",
+      "label": "Homeassistant Action",
+      "description": "ESPHome action `homeassistant.action`.",
+      "domain": "homeassistant",
+      "actionDomain": "homeassistant",
+      "helpUrl": "https://esphome.io/components/api/",
+      "schemaUrl": "actions/homeassistant/action.json"
+    },
+    {
+      "id": "homeassistant.event",
+      "label": "Homeassistant Event",
+      "description": "ESPHome action `homeassistant.event`.",
+      "domain": "homeassistant",
+      "actionDomain": "homeassistant",
+      "helpUrl": "https://esphome.io/components/api/",
+      "schemaUrl": "actions/homeassistant/event.json"
+    },
+    {
+      "id": "homeassistant.tag_scanned",
+      "label": "Homeassistant Tag Scanned",
+      "description": "ESPHome action `homeassistant.tag_scanned`.",
+      "domain": "homeassistant",
+      "actionDomain": "homeassistant",
+      "helpUrl": "https://esphome.io/components/api/",
+      "schemaUrl": "actions/homeassistant/tag_scanned.json"
+    },
+    {
+      "id": "http_request.get",
+      "label": "Http Request Get",
+      "description": "ESPHome action `http_request.get`.",
+      "domain": "http_request",
+      "actionDomain": "http_request",
+      "helpUrl": "https://esphome.io/components/http_request/",
+      "schemaUrl": "actions/http_request/get.json"
+    },
+    {
+      "id": "http_request.post",
+      "label": "Http Request Post",
+      "description": "ESPHome action `http_request.post`.",
+      "domain": "http_request",
+      "actionDomain": "http_request",
+      "helpUrl": "https://esphome.io/components/http_request/",
+      "schemaUrl": "actions/http_request/post.json"
+    },
+    {
+      "id": "http_request.send",
+      "label": "Http Request Send",
+      "description": "ESPHome action `http_request.send`.",
+      "domain": "http_request",
+      "actionDomain": "http_request",
+      "helpUrl": "https://esphome.io/components/http_request/",
+      "schemaUrl": "actions/http_request/send.json"
+    },
+    {
+      "id": "hub75.set_brightness",
+      "label": "Hub75 Set Brightness",
+      "description": "ESPHome action `hub75.set_brightness`.",
+      "domain": "hub75",
+      "actionDomain": "hub75",
+      "helpUrl": "https://esphome.io/components/display/hub75/",
+      "schemaUrl": "actions/hub75/set_brightness.json"
+    },
+    {
+      "id": "if",
+      "label": "If",
+      "description": "Conditional branching action with shared condition and nested action editors.",
+      "domain": "core",
+      "actionDomain": "core",
+      "helpUrl": "https://esphome.io/automations/actions/#if-action",
+      "schemaUrl": "actions/if.json"
+    },
+    {
+      "id": "key_collector.disable",
+      "label": "Key Collector Disable",
+      "description": "ESPHome action `key_collector.disable`.",
+      "domain": "key_collector",
+      "actionDomain": "key_collector",
+      "helpUrl": "https://esphome.io/components/key_collector/",
+      "schemaUrl": "actions/key_collector/disable.json"
+    },
+    {
+      "id": "key_collector.enable",
+      "label": "Key Collector Enable",
+      "description": "ESPHome action `key_collector.enable`.",
+      "domain": "key_collector",
+      "actionDomain": "key_collector",
+      "helpUrl": "https://esphome.io/components/key_collector/",
+      "schemaUrl": "actions/key_collector/enable.json"
+    },
+    {
+      "id": "lambda",
+      "label": "Lambda",
+      "description": "Run a custom lambda action.",
+      "domain": "core",
+      "helpUrl": "https://esphome.io/automations/actions/#lambda-action",
+      "actionDomain": "core",
+      "schemaUrl": "actions/lambda.json"
+    },
+    {
+      "id": "light.addressable_set",
+      "label": "Light Addressable Set",
+      "description": "ESPHome action `light.addressable_set`.",
+      "domain": "light",
+      "actionDomain": "light",
+      "helpUrl": "https://esphome.io/components/light/",
+      "schemaUrl": "actions/light/addressable_set.json"
+    },
+    {
+      "id": "light.control",
+      "label": "Light Control",
+      "description": "ESPHome action `light.control`.",
+      "domain": "light",
+      "actionDomain": "light",
+      "helpUrl": "https://esphome.io/components/light/",
+      "schemaUrl": "actions/light/control.json"
+    },
+    {
+      "id": "light.dim_relative",
+      "label": "Light Dim Relative",
+      "description": "ESPHome action `light.dim_relative`.",
+      "domain": "light",
+      "actionDomain": "light",
+      "helpUrl": "https://esphome.io/components/light/",
+      "schemaUrl": "actions/light/dim_relative.json"
+    },
+    {
+      "id": "light.toggle",
+      "label": "Light Toggle",
+      "description": "ESPHome action `light.toggle`.",
+      "domain": "light",
+      "actionDomain": "light",
+      "helpUrl": "https://esphome.io/components/light/",
+      "schemaUrl": "actions/light/toggle.json"
+    },
+    {
+      "id": "light.turn_off",
+      "label": "Light Turn Off",
+      "description": "Turn a light off by ID.",
+      "domain": "light",
+      "helpUrl": "https://esphome.io/components/light/",
+      "actionDomain": "light",
+      "schemaUrl": "actions/light/turn_off.json"
+    },
+    {
+      "id": "light.turn_on",
+      "label": "Light Turn On",
+      "description": "Turn a light on by ID.",
+      "domain": "light",
+      "helpUrl": "https://esphome.io/components/light/",
+      "actionDomain": "light",
+      "schemaUrl": "actions/light/turn_on.json"
+    },
+    {
+      "id": "lightwaverf.send_raw",
+      "label": "Lightwaverf Send Raw",
+      "description": "ESPHome action `lightwaverf.send_raw`.",
+      "domain": "lightwaverf",
+      "actionDomain": "lightwaverf",
+      "helpUrl": "https://esphome.io/components/lightwaverf/",
+      "schemaUrl": "actions/lightwaverf/send_raw.json"
+    },
+    {
+      "id": "lock.lock",
+      "label": "Lock Lock",
+      "description": "ESPHome action `lock.lock`.",
+      "domain": "lock",
+      "actionDomain": "lock",
+      "helpUrl": "https://esphome.io/components/lock/",
+      "schemaUrl": "actions/lock/lock.json"
+    },
+    {
+      "id": "lock.open",
+      "label": "Lock Open",
+      "description": "ESPHome action `lock.open`.",
+      "domain": "lock",
+      "actionDomain": "lock",
+      "helpUrl": "https://esphome.io/components/lock/",
+      "schemaUrl": "actions/lock/open.json"
+    },
+    {
+      "id": "lock.template.publish",
+      "label": "Lock Template Publish",
+      "description": "ESPHome action `lock.template.publish`.",
+      "domain": "lock",
+      "actionDomain": "lock.template",
+      "helpUrl": "https://esphome.io/components/lock/template/",
+      "schemaUrl": "actions/lock/template/publish.json"
+    },
+    {
+      "id": "lock.unlock",
+      "label": "Lock Unlock",
+      "description": "ESPHome action `lock.unlock`.",
+      "domain": "lock",
+      "actionDomain": "lock",
+      "helpUrl": "https://esphome.io/components/lock/",
+      "schemaUrl": "actions/lock/unlock.json"
+    },
+    {
+      "id": "logger.log",
+      "label": "Logger Log",
+      "description": "Write a message to the ESPHome logger.",
+      "domain": "logger",
+      "helpUrl": "https://esphome.io/components/logger/",
+      "actionDomain": "logger",
+      "schemaUrl": "actions/logger/log.json"
+    },
+    {
+      "id": "logger.set_level",
+      "label": "Logger Set Level",
+      "description": "ESPHome action `logger.set_level`.",
+      "domain": "logger",
+      "actionDomain": "logger",
+      "helpUrl": "https://esphome.io/components/logger/",
+      "schemaUrl": "actions/logger/set_level.json"
+    },
+    {
+      "id": "lvgl.page.next",
+      "label": "Lvgl Page Next",
+      "description": "ESPHome action `lvgl.page.next`.",
+      "domain": "lvgl",
+      "actionDomain": "lvgl.page",
+      "helpUrl": "https://esphome.io/components/lvgl/",
+      "schemaUrl": "actions/lvgl/page/next.json"
+    },
+    {
+      "id": "lvgl.page.previous",
+      "label": "Lvgl Page Previous",
+      "description": "ESPHome action `lvgl.page.previous`.",
+      "domain": "lvgl",
+      "actionDomain": "lvgl.page",
+      "helpUrl": "https://esphome.io/components/lvgl/",
+      "schemaUrl": "actions/lvgl/page/previous.json"
+    },
+    {
+      "id": "lvgl.page.show",
+      "label": "Lvgl Page Show",
+      "description": "ESPHome action `lvgl.page.show`.",
+      "domain": "lvgl",
+      "actionDomain": "lvgl.page",
+      "helpUrl": "https://esphome.io/components/lvgl/",
+      "schemaUrl": "actions/lvgl/page/show.json"
+    },
+    {
+      "id": "lvgl.pause",
+      "label": "Lvgl Pause",
+      "description": "ESPHome action `lvgl.pause`.",
+      "domain": "lvgl",
+      "actionDomain": "lvgl",
+      "helpUrl": "https://esphome.io/components/lvgl/",
+      "schemaUrl": "actions/lvgl/pause.json"
+    },
+    {
+      "id": "lvgl.resume",
+      "label": "Lvgl Resume",
+      "description": "ESPHome action `lvgl.resume`.",
+      "domain": "lvgl",
+      "actionDomain": "lvgl",
+      "helpUrl": "https://esphome.io/components/lvgl/",
+      "schemaUrl": "actions/lvgl/resume.json"
+    },
+    {
+      "id": "lvgl.style.update",
+      "label": "Lvgl Style Update",
+      "description": "ESPHome action `lvgl.style.update`.",
+      "domain": "lvgl",
+      "actionDomain": "lvgl.style",
+      "helpUrl": "https://esphome.io/components/lvgl/",
+      "schemaUrl": "actions/lvgl/style/update.json"
+    },
+    {
+      "id": "lvgl.update",
+      "label": "Lvgl Update",
+      "description": "ESPHome action `lvgl.update`.",
+      "domain": "lvgl",
+      "actionDomain": "lvgl",
+      "helpUrl": "https://esphome.io/components/lvgl/",
+      "schemaUrl": "actions/lvgl/update.json"
+    },
+    {
+      "id": "lvgl.widget.disable",
+      "label": "Lvgl Widget Disable",
+      "description": "ESPHome action `lvgl.widget.disable`.",
+      "domain": "lvgl",
+      "actionDomain": "lvgl.widget",
+      "helpUrl": "https://esphome.io/components/lvgl/",
+      "schemaUrl": "actions/lvgl/widget/disable.json"
+    },
+    {
+      "id": "lvgl.widget.enable",
+      "label": "Lvgl Widget Enable",
+      "description": "ESPHome action `lvgl.widget.enable`.",
+      "domain": "lvgl",
+      "actionDomain": "lvgl.widget",
+      "helpUrl": "https://esphome.io/components/lvgl/",
+      "schemaUrl": "actions/lvgl/widget/enable.json"
+    },
+    {
+      "id": "lvgl.widget.focus",
+      "label": "Lvgl Widget Focus",
+      "description": "ESPHome action `lvgl.widget.focus`.",
+      "domain": "lvgl",
+      "actionDomain": "lvgl.widget",
+      "helpUrl": "https://esphome.io/components/lvgl/",
+      "schemaUrl": "actions/lvgl/widget/focus.json"
+    },
+    {
+      "id": "lvgl.widget.hide",
+      "label": "Lvgl Widget Hide",
+      "description": "ESPHome action `lvgl.widget.hide`.",
+      "domain": "lvgl",
+      "actionDomain": "lvgl.widget",
+      "helpUrl": "https://esphome.io/components/lvgl/",
+      "schemaUrl": "actions/lvgl/widget/hide.json"
+    },
+    {
+      "id": "lvgl.widget.redraw",
+      "label": "Lvgl Widget Redraw",
+      "description": "ESPHome action `lvgl.widget.redraw`.",
+      "domain": "lvgl",
+      "actionDomain": "lvgl.widget",
+      "helpUrl": "https://esphome.io/components/lvgl/",
+      "schemaUrl": "actions/lvgl/widget/redraw.json"
+    },
+    {
+      "id": "lvgl.widget.refresh",
+      "label": "Lvgl Widget Refresh",
+      "description": "ESPHome action `lvgl.widget.refresh`.",
+      "domain": "lvgl",
+      "actionDomain": "lvgl.widget",
+      "helpUrl": "https://esphome.io/components/lvgl/",
+      "schemaUrl": "actions/lvgl/widget/refresh.json"
+    },
+    {
+      "id": "lvgl.widget.show",
+      "label": "Lvgl Widget Show",
+      "description": "ESPHome action `lvgl.widget.show`.",
+      "domain": "lvgl",
+      "actionDomain": "lvgl.widget",
+      "helpUrl": "https://esphome.io/components/lvgl/",
+      "schemaUrl": "actions/lvgl/widget/show.json"
+    },
+    {
+      "id": "lvgl.widget.update",
+      "label": "Lvgl Widget Update",
+      "description": "ESPHome action `lvgl.widget.update`.",
+      "domain": "lvgl",
+      "actionDomain": "lvgl.widget",
+      "helpUrl": "https://esphome.io/components/lvgl/",
+      "schemaUrl": "actions/lvgl/widget/update.json"
+    },
+    {
+      "id": "max7219digit.intensity",
+      "label": "Max7219Digit Intensity",
+      "description": "ESPHome action `max7219digit.intensity`.",
+      "domain": "max7219digit",
+      "actionDomain": "max7219digit",
+      "helpUrl": "https://esphome.io/components/display/max7219digit/",
+      "schemaUrl": "actions/max7219digit/intensity.json"
+    },
+    {
+      "id": "max7219digit.invert_off",
+      "label": "Max7219Digit Invert Off",
+      "description": "ESPHome action `max7219digit.invert_off`.",
+      "domain": "max7219digit",
+      "actionDomain": "max7219digit",
+      "helpUrl": "https://esphome.io/components/display/max7219digit/",
+      "schemaUrl": "actions/max7219digit/invert_off.json"
+    },
+    {
+      "id": "max7219digit.invert_on",
+      "label": "Max7219Digit Invert On",
+      "description": "ESPHome action `max7219digit.invert_on`.",
+      "domain": "max7219digit",
+      "actionDomain": "max7219digit",
+      "helpUrl": "https://esphome.io/components/display/max7219digit/",
+      "schemaUrl": "actions/max7219digit/invert_on.json"
+    },
+    {
+      "id": "max7219digit.reverse_off",
+      "label": "Max7219Digit Reverse Off",
+      "description": "ESPHome action `max7219digit.reverse_off`.",
+      "domain": "max7219digit",
+      "actionDomain": "max7219digit",
+      "helpUrl": "https://esphome.io/components/display/max7219digit/",
+      "schemaUrl": "actions/max7219digit/reverse_off.json"
+    },
+    {
+      "id": "max7219digit.reverse_on",
+      "label": "Max7219Digit Reverse On",
+      "description": "ESPHome action `max7219digit.reverse_on`.",
+      "domain": "max7219digit",
+      "actionDomain": "max7219digit",
+      "helpUrl": "https://esphome.io/components/display/max7219digit/",
+      "schemaUrl": "actions/max7219digit/reverse_on.json"
+    },
+    {
+      "id": "max7219digit.turn_off",
+      "label": "Max7219Digit Turn Off",
+      "description": "ESPHome action `max7219digit.turn_off`.",
+      "domain": "max7219digit",
+      "actionDomain": "max7219digit",
+      "helpUrl": "https://esphome.io/components/display/max7219digit/",
+      "schemaUrl": "actions/max7219digit/turn_off.json"
+    },
+    {
+      "id": "max7219digit.turn_on",
+      "label": "Max7219Digit Turn On",
+      "description": "ESPHome action `max7219digit.turn_on`.",
+      "domain": "max7219digit",
+      "actionDomain": "max7219digit",
+      "helpUrl": "https://esphome.io/components/display/max7219digit/",
+      "schemaUrl": "actions/max7219digit/turn_on.json"
+    },
+    {
+      "id": "media_player.pause",
+      "label": "Media Player Pause",
+      "description": "ESPHome action `media_player.pause`.",
+      "domain": "media_player",
+      "actionDomain": "media_player",
+      "helpUrl": "https://esphome.io/components/media_player/",
+      "schemaUrl": "actions/media_player/pause.json"
+    },
+    {
+      "id": "media_player.play",
+      "label": "Media Player Play",
+      "description": "ESPHome action `media_player.play`.",
+      "domain": "media_player",
+      "actionDomain": "media_player",
+      "helpUrl": "https://esphome.io/components/media_player/",
+      "schemaUrl": "actions/media_player/play.json"
+    },
+    {
+      "id": "media_player.play_media",
+      "label": "Media Player Play Media",
+      "description": "ESPHome action `media_player.play_media`.",
+      "domain": "media_player",
+      "actionDomain": "media_player",
+      "helpUrl": "https://esphome.io/components/media_player/",
+      "schemaUrl": "actions/media_player/play_media.json"
+    },
+    {
+      "id": "media_player.speaker.play_on_device_media_file",
+      "label": "Media Player Speaker Play On Device Media File",
+      "description": "ESPHome action `media_player.speaker.play_on_device_media_file`.",
+      "domain": "media_player",
+      "actionDomain": "media_player.speaker",
+      "helpUrl": "https://esphome.io/components/media_player/speaker/",
+      "schemaUrl": "actions/media_player/speaker/play_on_device_media_file.json"
+    },
+    {
+      "id": "media_player.stop",
+      "label": "Media Player Stop",
+      "description": "ESPHome action `media_player.stop`.",
+      "domain": "media_player",
+      "actionDomain": "media_player",
+      "helpUrl": "https://esphome.io/components/media_player/",
+      "schemaUrl": "actions/media_player/stop.json"
+    },
+    {
+      "id": "media_player.toggle",
+      "label": "Media Player Toggle",
+      "description": "ESPHome action `media_player.toggle`.",
+      "domain": "media_player",
+      "actionDomain": "media_player",
+      "helpUrl": "https://esphome.io/components/media_player/",
+      "schemaUrl": "actions/media_player/toggle.json"
+    },
+    {
+      "id": "media_player.turn_off",
+      "label": "Media Player Turn Off",
+      "description": "ESPHome action `media_player.turn_off`.",
+      "domain": "media_player",
+      "actionDomain": "media_player",
+      "helpUrl": "https://esphome.io/components/media_player/",
+      "schemaUrl": "actions/media_player/turn_off.json"
+    },
+    {
+      "id": "media_player.turn_on",
+      "label": "Media Player Turn On",
+      "description": "ESPHome action `media_player.turn_on`.",
+      "domain": "media_player",
+      "actionDomain": "media_player",
+      "helpUrl": "https://esphome.io/components/media_player/",
+      "schemaUrl": "actions/media_player/turn_on.json"
+    },
+    {
+      "id": "media_player.volume_down",
+      "label": "Media Player Volume Down",
+      "description": "ESPHome action `media_player.volume_down`.",
+      "domain": "media_player",
+      "actionDomain": "media_player",
+      "helpUrl": "https://esphome.io/components/media_player/",
+      "schemaUrl": "actions/media_player/volume_down.json"
+    },
+    {
+      "id": "media_player.volume_set",
+      "label": "Media Player Volume Set",
+      "description": "ESPHome action `media_player.volume_set`.",
+      "domain": "media_player",
+      "actionDomain": "media_player",
+      "helpUrl": "https://esphome.io/components/media_player/",
+      "schemaUrl": "actions/media_player/volume_set.json"
+    },
+    {
+      "id": "media_player.volume_up",
+      "label": "Media Player Volume Up",
+      "description": "ESPHome action `media_player.volume_up`.",
+      "domain": "media_player",
+      "actionDomain": "media_player",
+      "helpUrl": "https://esphome.io/components/media_player/",
+      "schemaUrl": "actions/media_player/volume_up.json"
+    },
+    {
+      "id": "mhz19.abc_disable",
+      "label": "Mhz19 Abc Disable",
+      "description": "ESPHome action `mhz19.abc_disable`.",
+      "domain": "mhz19",
+      "actionDomain": "mhz19",
+      "helpUrl": "https://esphome.io/components/sensor/mhz19/",
+      "schemaUrl": "actions/mhz19/abc_disable.json"
+    },
+    {
+      "id": "mhz19.abc_enable",
+      "label": "Mhz19 Abc Enable",
+      "description": "ESPHome action `mhz19.abc_enable`.",
+      "domain": "mhz19",
+      "actionDomain": "mhz19",
+      "helpUrl": "https://esphome.io/components/sensor/mhz19/",
+      "schemaUrl": "actions/mhz19/abc_enable.json"
+    },
+    {
+      "id": "mhz19.calibrate_zero",
+      "label": "Mhz19 Calibrate Zero",
+      "description": "ESPHome action `mhz19.calibrate_zero`.",
+      "domain": "mhz19",
+      "actionDomain": "mhz19",
+      "helpUrl": "https://esphome.io/components/sensor/mhz19/",
+      "schemaUrl": "actions/mhz19/calibrate_zero.json"
+    },
+    {
+      "id": "mhz19.detection_range_set",
+      "label": "Mhz19 Detection Range Set",
+      "description": "ESPHome action `mhz19.detection_range_set`.",
+      "domain": "mhz19",
+      "actionDomain": "mhz19",
+      "helpUrl": "https://esphome.io/components/sensor/mhz19/",
+      "schemaUrl": "actions/mhz19/detection_range_set.json"
+    },
+    {
+      "id": "micro_wake_word.disable_model",
+      "label": "Micro Wake Word Disable Model",
+      "description": "ESPHome action `micro_wake_word.disable_model`.",
+      "domain": "micro_wake_word",
+      "actionDomain": "micro_wake_word",
+      "helpUrl": "https://esphome.io/components/micro_wake_word/",
+      "schemaUrl": "actions/micro_wake_word/disable_model.json"
+    },
+    {
+      "id": "micro_wake_word.enable_model",
+      "label": "Micro Wake Word Enable Model",
+      "description": "ESPHome action `micro_wake_word.enable_model`.",
+      "domain": "micro_wake_word",
+      "actionDomain": "micro_wake_word",
+      "helpUrl": "https://esphome.io/components/micro_wake_word/",
+      "schemaUrl": "actions/micro_wake_word/enable_model.json"
+    },
+    {
+      "id": "micro_wake_word.start",
+      "label": "Micro Wake Word Start",
+      "description": "ESPHome action `micro_wake_word.start`.",
+      "domain": "micro_wake_word",
+      "actionDomain": "micro_wake_word",
+      "helpUrl": "https://esphome.io/components/micro_wake_word/",
+      "schemaUrl": "actions/micro_wake_word/start.json"
+    },
+    {
+      "id": "micro_wake_word.stop",
+      "label": "Micro Wake Word Stop",
+      "description": "ESPHome action `micro_wake_word.stop`.",
+      "domain": "micro_wake_word",
+      "actionDomain": "micro_wake_word",
+      "helpUrl": "https://esphome.io/components/micro_wake_word/",
+      "schemaUrl": "actions/micro_wake_word/stop.json"
+    },
+    {
+      "id": "microphone.capture",
+      "label": "Microphone Capture",
+      "description": "ESPHome action `microphone.capture`.",
+      "domain": "microphone",
+      "actionDomain": "microphone",
+      "helpUrl": "https://esphome.io/components/microphone/",
+      "schemaUrl": "actions/microphone/capture.json"
+    },
+    {
+      "id": "microphone.mute",
+      "label": "Microphone Mute",
+      "description": "ESPHome action `microphone.mute`.",
+      "domain": "microphone",
+      "actionDomain": "microphone",
+      "helpUrl": "https://esphome.io/components/microphone/",
+      "schemaUrl": "actions/microphone/mute.json"
+    },
+    {
+      "id": "microphone.stop_capture",
+      "label": "Microphone Stop Capture",
+      "description": "ESPHome action `microphone.stop_capture`.",
+      "domain": "microphone",
+      "actionDomain": "microphone",
+      "helpUrl": "https://esphome.io/components/microphone/",
+      "schemaUrl": "actions/microphone/stop_capture.json"
+    },
+    {
+      "id": "microphone.unmute",
+      "label": "Microphone Unmute",
+      "description": "ESPHome action `microphone.unmute`.",
+      "domain": "microphone",
+      "actionDomain": "microphone",
+      "helpUrl": "https://esphome.io/components/microphone/",
+      "schemaUrl": "actions/microphone/unmute.json"
+    },
+    {
+      "id": "midea_ac.beeper_off",
+      "label": "Midea Ac Beeper Off",
+      "description": "ESPHome action `midea_ac.beeper_off`.",
+      "domain": "midea_ac",
+      "actionDomain": "midea_ac",
+      "helpUrl": "https://esphome.io/components/climate/midea/",
+      "schemaUrl": "actions/midea_ac/beeper_off.json"
+    },
+    {
+      "id": "midea_ac.beeper_on",
+      "label": "Midea Ac Beeper On",
+      "description": "ESPHome action `midea_ac.beeper_on`.",
+      "domain": "midea_ac",
+      "actionDomain": "midea_ac",
+      "helpUrl": "https://esphome.io/components/climate/midea/",
+      "schemaUrl": "actions/midea_ac/beeper_on.json"
+    },
+    {
+      "id": "midea_ac.display_toggle",
+      "label": "Midea Ac Display Toggle",
+      "description": "ESPHome action `midea_ac.display_toggle`.",
+      "domain": "midea_ac",
+      "actionDomain": "midea_ac",
+      "helpUrl": "https://esphome.io/components/climate/midea/",
+      "schemaUrl": "actions/midea_ac/display_toggle.json"
+    },
+    {
+      "id": "midea_ac.follow_me",
+      "label": "Midea Ac Follow Me",
+      "description": "ESPHome action `midea_ac.follow_me`.",
+      "domain": "midea_ac",
+      "actionDomain": "midea_ac",
+      "helpUrl": "https://esphome.io/components/climate/midea/",
+      "schemaUrl": "actions/midea_ac/follow_me.json"
+    },
+    {
+      "id": "midea_ac.power_off",
+      "label": "Midea Ac Power Off",
+      "description": "ESPHome action `midea_ac.power_off`.",
+      "domain": "midea_ac",
+      "actionDomain": "midea_ac",
+      "helpUrl": "https://esphome.io/components/climate/midea/",
+      "schemaUrl": "actions/midea_ac/power_off.json"
+    },
+    {
+      "id": "midea_ac.power_on",
+      "label": "Midea Ac Power On",
+      "description": "ESPHome action `midea_ac.power_on`.",
+      "domain": "midea_ac",
+      "actionDomain": "midea_ac",
+      "helpUrl": "https://esphome.io/components/climate/midea/",
+      "schemaUrl": "actions/midea_ac/power_on.json"
+    },
+    {
+      "id": "midea_ac.power_toggle",
+      "label": "Midea Ac Power Toggle",
+      "description": "ESPHome action `midea_ac.power_toggle`.",
+      "domain": "midea_ac",
+      "actionDomain": "midea_ac",
+      "helpUrl": "https://esphome.io/components/climate/midea/",
+      "schemaUrl": "actions/midea_ac/power_toggle.json"
+    },
+    {
+      "id": "midea_ac.swing_step",
+      "label": "Midea Ac Swing Step",
+      "description": "ESPHome action `midea_ac.swing_step`.",
+      "domain": "midea_ac",
+      "actionDomain": "midea_ac",
+      "helpUrl": "https://esphome.io/components/climate/midea/",
+      "schemaUrl": "actions/midea_ac/swing_step.json"
+    },
+    {
+      "id": "mixer_speaker.apply_ducking",
+      "label": "Mixer Speaker Apply Ducking",
+      "description": "ESPHome action `mixer_speaker.apply_ducking`.",
+      "domain": "mixer_speaker",
+      "actionDomain": "mixer_speaker",
+      "helpUrl": "https://esphome.io/components/speaker/mixer/",
+      "schemaUrl": "actions/mixer_speaker/apply_ducking.json"
+    },
+    {
+      "id": "mqtt.disable",
+      "label": "Mqtt Disable",
+      "description": "ESPHome action `mqtt.disable`.",
+      "domain": "mqtt",
+      "actionDomain": "mqtt",
+      "helpUrl": "https://esphome.io/components/mqtt/",
+      "schemaUrl": "actions/mqtt/disable.json"
+    },
+    {
+      "id": "mqtt.enable",
+      "label": "Mqtt Enable",
+      "description": "ESPHome action `mqtt.enable`.",
+      "domain": "mqtt",
+      "actionDomain": "mqtt",
+      "helpUrl": "https://esphome.io/components/mqtt/",
+      "schemaUrl": "actions/mqtt/enable.json"
+    },
+    {
+      "id": "mqtt.publish",
+      "label": "Mqtt Publish",
+      "description": "ESPHome action `mqtt.publish`.",
+      "domain": "mqtt",
+      "actionDomain": "mqtt",
+      "helpUrl": "https://esphome.io/components/mqtt/",
+      "schemaUrl": "actions/mqtt/publish.json"
+    },
+    {
+      "id": "mqtt.publish_json",
+      "label": "Mqtt Publish Json",
+      "description": "ESPHome action `mqtt.publish_json`.",
+      "domain": "mqtt",
+      "actionDomain": "mqtt",
+      "helpUrl": "https://esphome.io/components/mqtt/",
+      "schemaUrl": "actions/mqtt/publish_json.json"
+    },
+    {
+      "id": "number.decrement",
+      "label": "Number Decrement",
+      "description": "ESPHome action `number.decrement`.",
+      "domain": "number",
+      "actionDomain": "number",
+      "helpUrl": "https://esphome.io/components/number/homeassistant/",
+      "schemaUrl": "actions/number/decrement.json"
+    },
+    {
+      "id": "number.increment",
+      "label": "Number Increment",
+      "description": "ESPHome action `number.increment`.",
+      "domain": "number",
+      "actionDomain": "number",
+      "helpUrl": "https://esphome.io/components/number/homeassistant/",
+      "schemaUrl": "actions/number/increment.json"
+    },
+    {
+      "id": "number.operation",
+      "label": "Number Operation",
+      "description": "ESPHome action `number.operation`.",
+      "domain": "number",
+      "actionDomain": "number",
+      "helpUrl": "https://esphome.io/components/number/homeassistant/",
+      "schemaUrl": "actions/number/operation.json"
+    },
+    {
+      "id": "number.set",
+      "label": "Number Set",
+      "description": "ESPHome action `number.set`.",
+      "domain": "number",
+      "actionDomain": "number",
+      "helpUrl": "https://esphome.io/components/number/homeassistant/",
+      "schemaUrl": "actions/number/set.json"
+    },
+    {
+      "id": "number.to_max",
+      "label": "Number To Max",
+      "description": "ESPHome action `number.to_max`.",
+      "domain": "number",
+      "actionDomain": "number",
+      "helpUrl": "https://esphome.io/components/number/homeassistant/",
+      "schemaUrl": "actions/number/to_max.json"
+    },
+    {
+      "id": "number.to_min",
+      "label": "Number To Min",
+      "description": "ESPHome action `number.to_min`.",
+      "domain": "number",
+      "actionDomain": "number",
+      "helpUrl": "https://esphome.io/components/number/homeassistant/",
+      "schemaUrl": "actions/number/to_min.json"
+    },
+    {
+      "id": "online_image.release",
+      "label": "Online Image Release",
+      "description": "ESPHome action `online_image.release`.",
+      "domain": "online_image",
+      "actionDomain": "online_image",
+      "helpUrl": "https://esphome.io/components/online_image/",
+      "schemaUrl": "actions/online_image/release.json"
+    },
+    {
+      "id": "online_image.set_url",
+      "label": "Online Image Set Url",
+      "description": "ESPHome action `online_image.set_url`.",
+      "domain": "online_image",
+      "actionDomain": "online_image",
+      "helpUrl": "https://esphome.io/components/online_image/",
+      "schemaUrl": "actions/online_image/set_url.json"
+    },
+    {
+      "id": "ota.http_request.flash",
+      "label": "Ota Http Request Flash",
+      "description": "ESPHome action `ota.http_request.flash`.",
+      "domain": "ota",
+      "actionDomain": "ota.http_request",
+      "helpUrl": "https://esphome.io/components/ota/http_request/",
+      "schemaUrl": "actions/ota/http_request/flash.json"
+    },
+    {
+      "id": "output.esp8266_pwm.set_frequency",
+      "label": "Output Esp8266 Pwm Set Frequency",
+      "description": "ESPHome action `output.esp8266_pwm.set_frequency`.",
+      "domain": "output",
+      "actionDomain": "output.esp8266_pwm",
+      "helpUrl": "https://esphome.io/components/output/esp8266_pwm/",
+      "schemaUrl": "actions/output/esp8266_pwm/set_frequency.json"
+    },
+    {
+      "id": "output.ledc.set_frequency",
+      "label": "Output Ledc Set Frequency",
+      "description": "ESPHome action `output.ledc.set_frequency`.",
+      "domain": "output",
+      "actionDomain": "output.ledc",
+      "helpUrl": "https://esphome.io/components/output/ledc/",
+      "schemaUrl": "actions/output/ledc/set_frequency.json"
+    },
+    {
+      "id": "output.libretiny_pwm.set_frequency",
+      "label": "Output Libretiny Pwm Set Frequency",
+      "description": "ESPHome action `output.libretiny_pwm.set_frequency`.",
+      "domain": "output",
+      "actionDomain": "output.libretiny_pwm",
+      "helpUrl": "https://esphome.io/components/output/libretiny_pwm/",
+      "schemaUrl": "actions/output/libretiny_pwm/set_frequency.json"
+    },
+    {
+      "id": "output.pipsolar.set_level",
+      "label": "Output Pipsolar Set Level",
+      "description": "ESPHome action `output.pipsolar.set_level`.",
+      "domain": "output",
+      "actionDomain": "output.pipsolar",
+      "helpUrl": "https://esphome.io/components/pipsolar/",
+      "schemaUrl": "actions/output/pipsolar/set_level.json"
+    },
+    {
+      "id": "output.set_level",
+      "label": "Output Set Level",
+      "description": "ESPHome action `output.set_level`.",
+      "domain": "output",
+      "actionDomain": "output",
+      "helpUrl": "https://esphome.io/components/output/",
+      "schemaUrl": "actions/output/set_level.json"
+    },
+    {
+      "id": "output.set_max_power",
+      "label": "Output Set Max Power",
+      "description": "ESPHome action `output.set_max_power`.",
+      "domain": "output",
+      "actionDomain": "output",
+      "helpUrl": "https://esphome.io/components/output/",
+      "schemaUrl": "actions/output/set_max_power.json"
+    },
+    {
+      "id": "output.set_min_power",
+      "label": "Output Set Min Power",
+      "description": "ESPHome action `output.set_min_power`.",
+      "domain": "output",
+      "actionDomain": "output",
+      "helpUrl": "https://esphome.io/components/output/",
+      "schemaUrl": "actions/output/set_min_power.json"
+    },
+    {
+      "id": "output.turn_off",
+      "label": "Output Turn Off",
+      "description": "ESPHome action `output.turn_off`.",
+      "domain": "output",
+      "actionDomain": "output",
+      "helpUrl": "https://esphome.io/components/output/",
+      "schemaUrl": "actions/output/turn_off.json"
+    },
+    {
+      "id": "output.turn_on",
+      "label": "Output Turn On",
+      "description": "ESPHome action `output.turn_on`.",
+      "domain": "output",
+      "actionDomain": "output",
+      "helpUrl": "https://esphome.io/components/output/",
+      "schemaUrl": "actions/output/turn_on.json"
+    },
+    {
+      "id": "pcf85063.read_time",
+      "label": "Pcf85063 Read Time",
+      "description": "ESPHome action `pcf85063.read_time`.",
+      "domain": "pcf85063",
+      "actionDomain": "pcf85063",
+      "helpUrl": "https://esphome.io/components/time/pcf85063/",
+      "schemaUrl": "actions/pcf85063/read_time.json"
+    },
+    {
+      "id": "pcf85063.write_time",
+      "label": "Pcf85063 Write Time",
+      "description": "ESPHome action `pcf85063.write_time`.",
+      "domain": "pcf85063",
+      "actionDomain": "pcf85063",
+      "helpUrl": "https://esphome.io/components/time/pcf85063/",
+      "schemaUrl": "actions/pcf85063/write_time.json"
+    },
+    {
+      "id": "pcf8563.read_time",
+      "label": "Pcf8563 Read Time",
+      "description": "ESPHome action `pcf8563.read_time`.",
+      "domain": "pcf8563",
+      "actionDomain": "pcf8563",
+      "helpUrl": "https://esphome.io/components/time/pcf8563/",
+      "schemaUrl": "actions/pcf8563/read_time.json"
+    },
+    {
+      "id": "pcf8563.write_time",
+      "label": "Pcf8563 Write Time",
+      "description": "ESPHome action `pcf8563.write_time`.",
+      "domain": "pcf8563",
+      "actionDomain": "pcf8563",
+      "helpUrl": "https://esphome.io/components/time/pcf8563/",
+      "schemaUrl": "actions/pcf8563/write_time.json"
+    },
+    {
+      "id": "pmwcs3.air_calibration",
+      "label": "Pmwcs3 Air Calibration",
+      "description": "ESPHome action `pmwcs3.air_calibration`.",
+      "domain": "pmwcs3",
+      "actionDomain": "pmwcs3",
+      "helpUrl": "https://esphome.io/components/sensor/pmwcs3/",
+      "schemaUrl": "actions/pmwcs3/air_calibration.json"
+    },
+    {
+      "id": "pmwcs3.new_i2c_address",
+      "label": "Pmwcs3 New I2C Address",
+      "description": "ESPHome action `pmwcs3.new_i2c_address`.",
+      "domain": "pmwcs3",
+      "actionDomain": "pmwcs3",
+      "helpUrl": "https://esphome.io/components/sensor/pmwcs3/",
+      "schemaUrl": "actions/pmwcs3/new_i2c_address.json"
+    },
+    {
+      "id": "pmwcs3.water_calibration",
+      "label": "Pmwcs3 Water Calibration",
+      "description": "ESPHome action `pmwcs3.water_calibration`.",
+      "domain": "pmwcs3",
+      "actionDomain": "pmwcs3",
+      "helpUrl": "https://esphome.io/components/sensor/pmwcs3/",
+      "schemaUrl": "actions/pmwcs3/water_calibration.json"
+    },
+    {
+      "id": "pulse_counter.set_total_pulses",
+      "label": "Pulse Counter Set Total Pulses",
+      "description": "ESPHome action `pulse_counter.set_total_pulses`.",
+      "domain": "pulse_counter",
+      "actionDomain": "pulse_counter",
+      "helpUrl": "https://esphome.io/components/sensor/pulse_counter/",
+      "schemaUrl": "actions/pulse_counter/set_total_pulses.json"
+    },
+    {
+      "id": "pulse_meter.set_total_pulses",
+      "label": "Pulse Meter Set Total Pulses",
+      "description": "ESPHome action `pulse_meter.set_total_pulses`.",
+      "domain": "pulse_meter",
+      "actionDomain": "pulse_meter",
+      "helpUrl": "https://esphome.io/components/sensor/pulse_meter/",
+      "schemaUrl": "actions/pulse_meter/set_total_pulses.json"
+    },
+    {
+      "id": "pzemac.reset_energy",
+      "label": "Pzemac Reset Energy",
+      "description": "ESPHome action `pzemac.reset_energy`.",
+      "domain": "pzemac",
+      "actionDomain": "pzemac",
+      "helpUrl": "https://esphome.io/components/sensor/pzemac/",
+      "schemaUrl": "actions/pzemac/reset_energy.json"
+    },
+    {
+      "id": "pzemdc.reset_energy",
+      "label": "Pzemdc Reset Energy",
+      "description": "ESPHome action `pzemdc.reset_energy`.",
+      "domain": "pzemdc",
+      "actionDomain": "pzemdc",
+      "helpUrl": "https://esphome.io/components/sensor/pzemdc/",
+      "schemaUrl": "actions/pzemdc/reset_energy.json"
+    },
+    {
+      "id": "remote_transmitter.digital_write",
+      "label": "Remote Transmitter Digital Write",
+      "description": "ESPHome action `remote_transmitter.digital_write`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/digital_write.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_abbwelcome",
+      "label": "Remote Transmitter Transmit Abbwelcome",
+      "description": "ESPHome action `remote_transmitter.transmit_abbwelcome`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_abbwelcome.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_aeha",
+      "label": "Remote Transmitter Transmit Aeha",
+      "description": "ESPHome action `remote_transmitter.transmit_aeha`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_aeha.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_beo4",
+      "label": "Remote Transmitter Transmit Beo4",
+      "description": "ESPHome action `remote_transmitter.transmit_beo4`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_beo4.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_byronsx",
+      "label": "Remote Transmitter Transmit Byronsx",
+      "description": "ESPHome action `remote_transmitter.transmit_byronsx`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_byronsx.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_canalsat",
+      "label": "Remote Transmitter Transmit Canalsat",
+      "description": "ESPHome action `remote_transmitter.transmit_canalsat`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_canalsat.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_canalsatld",
+      "label": "Remote Transmitter Transmit Canalsatld",
+      "description": "ESPHome action `remote_transmitter.transmit_canalsatld`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_canalsatld.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_coolix",
+      "label": "Remote Transmitter Transmit Coolix",
+      "description": "ESPHome action `remote_transmitter.transmit_coolix`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_coolix.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_dish",
+      "label": "Remote Transmitter Transmit Dish",
+      "description": "ESPHome action `remote_transmitter.transmit_dish`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_dish.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_dooya",
+      "label": "Remote Transmitter Transmit Dooya",
+      "description": "ESPHome action `remote_transmitter.transmit_dooya`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_dooya.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_drayton",
+      "label": "Remote Transmitter Transmit Drayton",
+      "description": "ESPHome action `remote_transmitter.transmit_drayton`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_drayton.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_dyson",
+      "label": "Remote Transmitter Transmit Dyson",
+      "description": "ESPHome action `remote_transmitter.transmit_dyson`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_dyson.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_gobox",
+      "label": "Remote Transmitter Transmit Gobox",
+      "description": "ESPHome action `remote_transmitter.transmit_gobox`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_gobox.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_haier",
+      "label": "Remote Transmitter Transmit Haier",
+      "description": "ESPHome action `remote_transmitter.transmit_haier`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_haier.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_jvc",
+      "label": "Remote Transmitter Transmit Jvc",
+      "description": "ESPHome action `remote_transmitter.transmit_jvc`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_jvc.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_keeloq",
+      "label": "Remote Transmitter Transmit Keeloq",
+      "description": "ESPHome action `remote_transmitter.transmit_keeloq`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_keeloq.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_lg",
+      "label": "Remote Transmitter Transmit Lg",
+      "description": "ESPHome action `remote_transmitter.transmit_lg`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_lg.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_magiquest",
+      "label": "Remote Transmitter Transmit Magiquest",
+      "description": "ESPHome action `remote_transmitter.transmit_magiquest`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_magiquest.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_midea",
+      "label": "Remote Transmitter Transmit Midea",
+      "description": "ESPHome action `remote_transmitter.transmit_midea`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_midea.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_mirage",
+      "label": "Remote Transmitter Transmit Mirage",
+      "description": "ESPHome action `remote_transmitter.transmit_mirage`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_mirage.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_nec",
+      "label": "Remote Transmitter Transmit Nec",
+      "description": "ESPHome action `remote_transmitter.transmit_nec`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_nec.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_nexa",
+      "label": "Remote Transmitter Transmit Nexa",
+      "description": "ESPHome action `remote_transmitter.transmit_nexa`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_nexa.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_panasonic",
+      "label": "Remote Transmitter Transmit Panasonic",
+      "description": "ESPHome action `remote_transmitter.transmit_panasonic`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_panasonic.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_pioneer",
+      "label": "Remote Transmitter Transmit Pioneer",
+      "description": "ESPHome action `remote_transmitter.transmit_pioneer`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_pioneer.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_pronto",
+      "label": "Remote Transmitter Transmit Pronto",
+      "description": "ESPHome action `remote_transmitter.transmit_pronto`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_pronto.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_raw",
+      "label": "Remote Transmitter Transmit Raw",
+      "description": "ESPHome action `remote_transmitter.transmit_raw`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_raw.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_rc5",
+      "label": "Remote Transmitter Transmit Rc5",
+      "description": "ESPHome action `remote_transmitter.transmit_rc5`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_rc5.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_rc6",
+      "label": "Remote Transmitter Transmit Rc6",
+      "description": "ESPHome action `remote_transmitter.transmit_rc6`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_rc6.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_rc_switch_raw",
+      "label": "Remote Transmitter Transmit Rc Switch Raw",
+      "description": "ESPHome action `remote_transmitter.transmit_rc_switch_raw`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_rc_switch_raw.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_rc_switch_type_a",
+      "label": "Remote Transmitter Transmit Rc Switch Type A",
+      "description": "ESPHome action `remote_transmitter.transmit_rc_switch_type_a`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_rc_switch_type_a.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_rc_switch_type_b",
+      "label": "Remote Transmitter Transmit Rc Switch Type B",
+      "description": "ESPHome action `remote_transmitter.transmit_rc_switch_type_b`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_rc_switch_type_b.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_rc_switch_type_c",
+      "label": "Remote Transmitter Transmit Rc Switch Type C",
+      "description": "ESPHome action `remote_transmitter.transmit_rc_switch_type_c`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_rc_switch_type_c.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_rc_switch_type_d",
+      "label": "Remote Transmitter Transmit Rc Switch Type D",
+      "description": "ESPHome action `remote_transmitter.transmit_rc_switch_type_d`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_rc_switch_type_d.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_roomba",
+      "label": "Remote Transmitter Transmit Roomba",
+      "description": "ESPHome action `remote_transmitter.transmit_roomba`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_roomba.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_samsung",
+      "label": "Remote Transmitter Transmit Samsung",
+      "description": "ESPHome action `remote_transmitter.transmit_samsung`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_samsung.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_samsung36",
+      "label": "Remote Transmitter Transmit Samsung36",
+      "description": "ESPHome action `remote_transmitter.transmit_samsung36`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_samsung36.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_sony",
+      "label": "Remote Transmitter Transmit Sony",
+      "description": "ESPHome action `remote_transmitter.transmit_sony`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_sony.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_symphony",
+      "label": "Remote Transmitter Transmit Symphony",
+      "description": "ESPHome action `remote_transmitter.transmit_symphony`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_symphony.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_toshiba_ac",
+      "label": "Remote Transmitter Transmit Toshiba Ac",
+      "description": "ESPHome action `remote_transmitter.transmit_toshiba_ac`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_toshiba_ac.json"
+    },
+    {
+      "id": "remote_transmitter.transmit_toto",
+      "label": "Remote Transmitter Transmit Toto",
+      "description": "ESPHome action `remote_transmitter.transmit_toto`.",
+      "domain": "remote_transmitter",
+      "actionDomain": "remote_transmitter",
+      "helpUrl": "https://esphome.io/components/remote_transmitter/",
+      "schemaUrl": "actions/remote_transmitter/transmit_toto.json"
+    },
+    {
+      "id": "repeat",
+      "label": "Repeat",
+      "description": "Repeat nested actions a fixed or templated number of times.",
+      "domain": "core",
+      "actionDomain": "core",
+      "helpUrl": "https://esphome.io/automations/actions/#repeat-action",
+      "schemaUrl": "actions/repeat.json"
+    },
+    {
+      "id": "rf_bridge.beep",
+      "label": "Rf Bridge Beep",
+      "description": "ESPHome action `rf_bridge.beep`.",
+      "domain": "rf_bridge",
+      "actionDomain": "rf_bridge",
+      "helpUrl": "https://esphome.io/components/rf_bridge/",
+      "schemaUrl": "actions/rf_bridge/beep.json"
+    },
+    {
+      "id": "rf_bridge.learn",
+      "label": "Rf Bridge Learn",
+      "description": "ESPHome action `rf_bridge.learn`.",
+      "domain": "rf_bridge",
+      "actionDomain": "rf_bridge",
+      "helpUrl": "https://esphome.io/components/rf_bridge/",
+      "schemaUrl": "actions/rf_bridge/learn.json"
+    },
+    {
+      "id": "rf_bridge.send_advanced_code",
+      "label": "Rf Bridge Send Advanced Code",
+      "description": "ESPHome action `rf_bridge.send_advanced_code`.",
+      "domain": "rf_bridge",
+      "actionDomain": "rf_bridge",
+      "helpUrl": "https://esphome.io/components/rf_bridge/",
+      "schemaUrl": "actions/rf_bridge/send_advanced_code.json"
+    },
+    {
+      "id": "rf_bridge.send_code",
+      "label": "Rf Bridge Send Code",
+      "description": "ESPHome action `rf_bridge.send_code`.",
+      "domain": "rf_bridge",
+      "actionDomain": "rf_bridge",
+      "helpUrl": "https://esphome.io/components/rf_bridge/",
+      "schemaUrl": "actions/rf_bridge/send_code.json"
+    },
+    {
+      "id": "rf_bridge.send_raw",
+      "label": "Rf Bridge Send Raw",
+      "description": "ESPHome action `rf_bridge.send_raw`.",
+      "domain": "rf_bridge",
+      "actionDomain": "rf_bridge",
+      "helpUrl": "https://esphome.io/components/rf_bridge/",
+      "schemaUrl": "actions/rf_bridge/send_raw.json"
+    },
+    {
+      "id": "rf_bridge.start_advanced_sniffing",
+      "label": "Rf Bridge Start Advanced Sniffing",
+      "description": "ESPHome action `rf_bridge.start_advanced_sniffing`.",
+      "domain": "rf_bridge",
+      "actionDomain": "rf_bridge",
+      "helpUrl": "https://esphome.io/components/rf_bridge/",
+      "schemaUrl": "actions/rf_bridge/start_advanced_sniffing.json"
+    },
+    {
+      "id": "rf_bridge.start_bucket_sniffing",
+      "label": "Rf Bridge Start Bucket Sniffing",
+      "description": "ESPHome action `rf_bridge.start_bucket_sniffing`.",
+      "domain": "rf_bridge",
+      "actionDomain": "rf_bridge",
+      "helpUrl": "https://esphome.io/components/rf_bridge/",
+      "schemaUrl": "actions/rf_bridge/start_bucket_sniffing.json"
+    },
+    {
+      "id": "rf_bridge.stop_advanced_sniffing",
+      "label": "Rf Bridge Stop Advanced Sniffing",
+      "description": "ESPHome action `rf_bridge.stop_advanced_sniffing`.",
+      "domain": "rf_bridge",
+      "actionDomain": "rf_bridge",
+      "helpUrl": "https://esphome.io/components/rf_bridge/",
+      "schemaUrl": "actions/rf_bridge/stop_advanced_sniffing.json"
+    },
+    {
+      "id": "rtttl.play",
+      "label": "Rtttl Play",
+      "description": "ESPHome action `rtttl.play`.",
+      "domain": "rtttl",
+      "actionDomain": "rtttl",
+      "helpUrl": "https://esphome.io/components/rtttl/",
+      "schemaUrl": "actions/rtttl/play.json"
+    },
+    {
+      "id": "rtttl.stop",
+      "label": "Rtttl Stop",
+      "description": "ESPHome action `rtttl.stop`.",
+      "domain": "rtttl",
+      "actionDomain": "rtttl",
+      "helpUrl": "https://esphome.io/components/rtttl/",
+      "schemaUrl": "actions/rtttl/stop.json"
+    },
+    {
+      "id": "rx8130.read_time",
+      "label": "Rx8130 Read Time",
+      "description": "ESPHome action `rx8130.read_time`.",
+      "domain": "rx8130",
+      "actionDomain": "rx8130",
+      "helpUrl": "https://esphome.io/components/time/rx8130/",
+      "schemaUrl": "actions/rx8130/read_time.json"
+    },
+    {
+      "id": "rx8130.write_time",
+      "label": "Rx8130 Write Time",
+      "description": "ESPHome action `rx8130.write_time`.",
+      "domain": "rx8130",
+      "actionDomain": "rx8130",
+      "helpUrl": "https://esphome.io/components/time/rx8130/",
+      "schemaUrl": "actions/rx8130/write_time.json"
+    },
+    {
+      "id": "scd30.force_recalibration_with_reference",
+      "label": "Scd30 Force Recalibration With Reference",
+      "description": "ESPHome action `scd30.force_recalibration_with_reference`.",
+      "domain": "scd30",
+      "actionDomain": "scd30",
+      "helpUrl": "https://esphome.io/components/sensor/scd30/",
+      "schemaUrl": "actions/scd30/force_recalibration_with_reference.json"
+    },
+    {
+      "id": "scd4x.factory_reset",
+      "label": "Scd4X Factory Reset",
+      "description": "ESPHome action `scd4x.factory_reset`.",
+      "domain": "scd4x",
+      "actionDomain": "scd4x",
+      "helpUrl": "https://esphome.io/components/sensor/scd4x/",
+      "schemaUrl": "actions/scd4x/factory_reset.json"
+    },
+    {
+      "id": "scd4x.perform_forced_calibration",
+      "label": "Scd4X Perform Forced Calibration",
+      "description": "ESPHome action `scd4x.perform_forced_calibration`.",
+      "domain": "scd4x",
+      "actionDomain": "scd4x",
+      "helpUrl": "https://esphome.io/components/sensor/scd4x/",
+      "schemaUrl": "actions/scd4x/perform_forced_calibration.json"
+    },
+    {
+      "id": "script.execute",
+      "label": "Script Execute",
+      "description": "Run a script by ID.",
+      "domain": "script",
+      "helpUrl": "https://esphome.io/components/script/",
+      "actionDomain": "script",
+      "schemaUrl": "actions/script/execute.json"
+    },
+    {
+      "id": "script.stop",
+      "label": "Script Stop",
+      "description": "Stop a running script by ID.",
+      "domain": "script",
+      "helpUrl": "https://esphome.io/components/script/",
+      "actionDomain": "script",
+      "schemaUrl": "actions/script/stop.json"
+    },
+    {
+      "id": "script.wait",
+      "label": "Script Wait",
+      "description": "Wait until a script finishes.",
+      "domain": "script",
+      "helpUrl": "https://esphome.io/components/script/",
+      "actionDomain": "script",
+      "schemaUrl": "actions/script/wait.json"
+    },
+    {
+      "id": "select.first",
+      "label": "Select First",
+      "description": "ESPHome action `select.first`.",
+      "domain": "select",
+      "actionDomain": "select",
+      "helpUrl": "https://esphome.io/components/select/",
+      "schemaUrl": "actions/select/first.json"
+    },
+    {
+      "id": "select.last",
+      "label": "Select Last",
+      "description": "ESPHome action `select.last`.",
+      "domain": "select",
+      "actionDomain": "select",
+      "helpUrl": "https://esphome.io/components/select/",
+      "schemaUrl": "actions/select/last.json"
+    },
+    {
+      "id": "select.next",
+      "label": "Select Next",
+      "description": "ESPHome action `select.next`.",
+      "domain": "select",
+      "actionDomain": "select",
+      "helpUrl": "https://esphome.io/components/select/",
+      "schemaUrl": "actions/select/next.json"
+    },
+    {
+      "id": "select.operation",
+      "label": "Select Operation",
+      "description": "ESPHome action `select.operation`.",
+      "domain": "select",
+      "actionDomain": "select",
+      "helpUrl": "https://esphome.io/components/select/",
+      "schemaUrl": "actions/select/operation.json"
+    },
+    {
+      "id": "select.previous",
+      "label": "Select Previous",
+      "description": "ESPHome action `select.previous`.",
+      "domain": "select",
+      "actionDomain": "select",
+      "helpUrl": "https://esphome.io/components/select/",
+      "schemaUrl": "actions/select/previous.json"
+    },
+    {
+      "id": "select.set",
+      "label": "Select Set",
+      "description": "ESPHome action `select.set`.",
+      "domain": "select",
+      "actionDomain": "select",
+      "helpUrl": "https://esphome.io/components/select/",
+      "schemaUrl": "actions/select/set.json"
+    },
+    {
+      "id": "select.set_index",
+      "label": "Select Set Index",
+      "description": "ESPHome action `select.set_index`.",
+      "domain": "select",
+      "actionDomain": "select",
+      "helpUrl": "https://esphome.io/components/select/",
+      "schemaUrl": "actions/select/set_index.json"
+    },
+    {
+      "id": "sen5x.start_fan_autoclean",
+      "label": "Sen5X Start Fan Autoclean",
+      "description": "ESPHome action `sen5x.start_fan_autoclean`.",
+      "domain": "sen5x",
+      "actionDomain": "sen5x",
+      "helpUrl": "https://esphome.io/components/sensor/sen5x/",
+      "schemaUrl": "actions/sen5x/start_fan_autoclean.json"
+    },
+    {
+      "id": "senseair.abc_disable",
+      "label": "Senseair Abc Disable",
+      "description": "ESPHome action `senseair.abc_disable`.",
+      "domain": "senseair",
+      "actionDomain": "senseair",
+      "helpUrl": "https://esphome.io/components/sensor/senseair/",
+      "schemaUrl": "actions/senseair/abc_disable.json"
+    },
+    {
+      "id": "senseair.abc_enable",
+      "label": "Senseair Abc Enable",
+      "description": "ESPHome action `senseair.abc_enable`.",
+      "domain": "senseair",
+      "actionDomain": "senseair",
+      "helpUrl": "https://esphome.io/components/sensor/senseair/",
+      "schemaUrl": "actions/senseair/abc_enable.json"
+    },
+    {
+      "id": "senseair.abc_get_period",
+      "label": "Senseair Abc Get Period",
+      "description": "ESPHome action `senseair.abc_get_period`.",
+      "domain": "senseair",
+      "actionDomain": "senseair",
+      "helpUrl": "https://esphome.io/components/sensor/senseair/",
+      "schemaUrl": "actions/senseair/abc_get_period.json"
+    },
+    {
+      "id": "senseair.background_calibration",
+      "label": "Senseair Background Calibration",
+      "description": "ESPHome action `senseair.background_calibration`.",
+      "domain": "senseair",
+      "actionDomain": "senseair",
+      "helpUrl": "https://esphome.io/components/sensor/senseair/",
+      "schemaUrl": "actions/senseair/background_calibration.json"
+    },
+    {
+      "id": "senseair.background_calibration_result",
+      "label": "Senseair Background Calibration Result",
+      "description": "ESPHome action `senseair.background_calibration_result`.",
+      "domain": "senseair",
+      "actionDomain": "senseair",
+      "helpUrl": "https://esphome.io/components/sensor/senseair/",
+      "schemaUrl": "actions/senseair/background_calibration_result.json"
+    },
+    {
+      "id": "sensor.duty_time.reset",
+      "label": "Sensor Duty Time Reset",
+      "description": "ESPHome action `sensor.duty_time.reset`.",
+      "domain": "sensor",
+      "actionDomain": "sensor.duty_time",
+      "helpUrl": "https://esphome.io/components/sensor/duty_time/",
+      "schemaUrl": "actions/sensor/duty_time/reset.json"
+    },
+    {
+      "id": "sensor.duty_time.start",
+      "label": "Sensor Duty Time Start",
+      "description": "ESPHome action `sensor.duty_time.start`.",
+      "domain": "sensor",
+      "actionDomain": "sensor.duty_time",
+      "helpUrl": "https://esphome.io/components/sensor/duty_time/",
+      "schemaUrl": "actions/sensor/duty_time/start.json"
+    },
+    {
+      "id": "sensor.duty_time.stop",
+      "label": "Sensor Duty Time Stop",
+      "description": "ESPHome action `sensor.duty_time.stop`.",
+      "domain": "sensor",
+      "actionDomain": "sensor.duty_time",
+      "helpUrl": "https://esphome.io/components/sensor/duty_time/",
+      "schemaUrl": "actions/sensor/duty_time/stop.json"
+    },
+    {
+      "id": "sensor.integration.reset",
+      "label": "Sensor Integration Reset",
+      "description": "ESPHome action `sensor.integration.reset`.",
+      "domain": "sensor",
+      "actionDomain": "sensor.integration",
+      "helpUrl": "https://esphome.io/components/sensor/integration/",
+      "schemaUrl": "actions/sensor/integration/reset.json"
+    },
+    {
+      "id": "sensor.nextion.publish",
+      "label": "Sensor Nextion Publish",
+      "description": "ESPHome action `sensor.nextion.publish`.",
+      "domain": "sensor",
+      "actionDomain": "sensor.nextion",
+      "helpUrl": "https://esphome.io/components/sensor/nextion/",
+      "schemaUrl": "actions/sensor/nextion/publish.json"
+    },
+    {
+      "id": "sensor.rotary_encoder.set_value",
+      "label": "Sensor Rotary Encoder Set Value",
+      "description": "ESPHome action `sensor.rotary_encoder.set_value`.",
+      "domain": "sensor",
+      "actionDomain": "sensor.rotary_encoder",
+      "helpUrl": "https://esphome.io/components/sensor/rotary_encoder/",
+      "schemaUrl": "actions/sensor/rotary_encoder/set_value.json"
+    },
+    {
+      "id": "sensor.template.publish",
+      "label": "Sensor Template Publish",
+      "description": "ESPHome action `sensor.template.publish`.",
+      "domain": "sensor",
+      "actionDomain": "sensor.template",
+      "helpUrl": "https://esphome.io/components/sensor/template/",
+      "schemaUrl": "actions/sensor/template/publish.json"
+    },
+    {
+      "id": "servo.detach",
+      "label": "Servo Detach",
+      "description": "ESPHome action `servo.detach`.",
+      "domain": "servo",
+      "actionDomain": "servo",
+      "helpUrl": "https://esphome.io/components/servo/",
+      "schemaUrl": "actions/servo/detach.json"
+    },
+    {
+      "id": "servo.write",
+      "label": "Servo Write",
+      "description": "ESPHome action `servo.write`.",
+      "domain": "servo",
+      "actionDomain": "servo",
+      "helpUrl": "https://esphome.io/components/servo/",
+      "schemaUrl": "actions/servo/write.json"
+    },
+    {
+      "id": "sim800l.connect",
+      "label": "Sim800L Connect",
+      "description": "ESPHome action `sim800l.connect`.",
+      "domain": "sim800l",
+      "actionDomain": "sim800l",
+      "helpUrl": "https://esphome.io/components/sim800l/",
+      "schemaUrl": "actions/sim800l/connect.json"
+    },
+    {
+      "id": "sim800l.dial",
+      "label": "Sim800L Dial",
+      "description": "ESPHome action `sim800l.dial`.",
+      "domain": "sim800l",
+      "actionDomain": "sim800l",
+      "helpUrl": "https://esphome.io/components/sim800l/",
+      "schemaUrl": "actions/sim800l/dial.json"
+    },
+    {
+      "id": "sim800l.disconnect",
+      "label": "Sim800L Disconnect",
+      "description": "ESPHome action `sim800l.disconnect`.",
+      "domain": "sim800l",
+      "actionDomain": "sim800l",
+      "helpUrl": "https://esphome.io/components/sim800l/",
+      "schemaUrl": "actions/sim800l/disconnect.json"
+    },
+    {
+      "id": "sim800l.send_sms",
+      "label": "Sim800L Send Sms",
+      "description": "ESPHome action `sim800l.send_sms`.",
+      "domain": "sim800l",
+      "actionDomain": "sim800l",
+      "helpUrl": "https://esphome.io/components/sim800l/",
+      "schemaUrl": "actions/sim800l/send_sms.json"
+    },
+    {
+      "id": "sim800l.send_ussd",
+      "label": "Sim800L Send Ussd",
+      "description": "ESPHome action `sim800l.send_ussd`.",
+      "domain": "sim800l",
+      "actionDomain": "sim800l",
+      "helpUrl": "https://esphome.io/components/sim800l/",
+      "schemaUrl": "actions/sim800l/send_ussd.json"
+    },
+    {
+      "id": "sound_level.start",
+      "label": "Sound Level Start",
+      "description": "ESPHome action `sound_level.start`.",
+      "domain": "sound_level",
+      "actionDomain": "sound_level",
+      "helpUrl": "https://esphome.io/components/sensor/sound_level/",
+      "schemaUrl": "actions/sound_level/start.json"
+    },
+    {
+      "id": "sound_level.stop",
+      "label": "Sound Level Stop",
+      "description": "ESPHome action `sound_level.stop`.",
+      "domain": "sound_level",
+      "actionDomain": "sound_level",
+      "helpUrl": "https://esphome.io/components/sensor/sound_level/",
+      "schemaUrl": "actions/sound_level/stop.json"
+    },
+    {
+      "id": "speaker.finish",
+      "label": "Speaker Finish",
+      "description": "ESPHome action `speaker.finish`.",
+      "domain": "speaker",
+      "actionDomain": "speaker",
+      "helpUrl": "https://esphome.io/components/speaker/",
+      "schemaUrl": "actions/speaker/finish.json"
+    },
+    {
+      "id": "speaker.mute_off",
+      "label": "Speaker Mute Off",
+      "description": "ESPHome action `speaker.mute_off`.",
+      "domain": "speaker",
+      "actionDomain": "speaker",
+      "helpUrl": "https://esphome.io/components/speaker/",
+      "schemaUrl": "actions/speaker/mute_off.json"
+    },
+    {
+      "id": "speaker.mute_on",
+      "label": "Speaker Mute On",
+      "description": "ESPHome action `speaker.mute_on`.",
+      "domain": "speaker",
+      "actionDomain": "speaker",
+      "helpUrl": "https://esphome.io/components/speaker/",
+      "schemaUrl": "actions/speaker/mute_on.json"
+    },
+    {
+      "id": "speaker.play",
+      "label": "Speaker Play",
+      "description": "ESPHome action `speaker.play`.",
+      "domain": "speaker",
+      "actionDomain": "speaker",
+      "helpUrl": "https://esphome.io/components/speaker/",
+      "schemaUrl": "actions/speaker/play.json"
+    },
+    {
+      "id": "speaker.stop",
+      "label": "Speaker Stop",
+      "description": "ESPHome action `speaker.stop`.",
+      "domain": "speaker",
+      "actionDomain": "speaker",
+      "helpUrl": "https://esphome.io/components/speaker/",
+      "schemaUrl": "actions/speaker/stop.json"
+    },
+    {
+      "id": "speaker.volume_set",
+      "label": "Speaker Volume Set",
+      "description": "ESPHome action `speaker.volume_set`.",
+      "domain": "speaker",
+      "actionDomain": "speaker",
+      "helpUrl": "https://esphome.io/components/speaker/",
+      "schemaUrl": "actions/speaker/volume_set.json"
+    },
+    {
+      "id": "sprinkler.clear_queued_valves",
+      "label": "Sprinkler Clear Queued Valves",
+      "description": "ESPHome action `sprinkler.clear_queued_valves`.",
+      "domain": "sprinkler",
+      "actionDomain": "sprinkler",
+      "helpUrl": "https://esphome.io/components/sprinkler/",
+      "schemaUrl": "actions/sprinkler/clear_queued_valves.json"
+    },
+    {
+      "id": "sprinkler.next_valve",
+      "label": "Sprinkler Next Valve",
+      "description": "ESPHome action `sprinkler.next_valve`.",
+      "domain": "sprinkler",
+      "actionDomain": "sprinkler",
+      "helpUrl": "https://esphome.io/components/sprinkler/",
+      "schemaUrl": "actions/sprinkler/next_valve.json"
+    },
+    {
+      "id": "sprinkler.pause",
+      "label": "Sprinkler Pause",
+      "description": "ESPHome action `sprinkler.pause`.",
+      "domain": "sprinkler",
+      "actionDomain": "sprinkler",
+      "helpUrl": "https://esphome.io/components/sprinkler/",
+      "schemaUrl": "actions/sprinkler/pause.json"
+    },
+    {
+      "id": "sprinkler.previous_valve",
+      "label": "Sprinkler Previous Valve",
+      "description": "ESPHome action `sprinkler.previous_valve`.",
+      "domain": "sprinkler",
+      "actionDomain": "sprinkler",
+      "helpUrl": "https://esphome.io/components/sprinkler/",
+      "schemaUrl": "actions/sprinkler/previous_valve.json"
+    },
+    {
+      "id": "sprinkler.queue_valve",
+      "label": "Sprinkler Queue Valve",
+      "description": "ESPHome action `sprinkler.queue_valve`.",
+      "domain": "sprinkler",
+      "actionDomain": "sprinkler",
+      "helpUrl": "https://esphome.io/components/sprinkler/",
+      "schemaUrl": "actions/sprinkler/queue_valve.json"
+    },
+    {
+      "id": "sprinkler.resume",
+      "label": "Sprinkler Resume",
+      "description": "ESPHome action `sprinkler.resume`.",
+      "domain": "sprinkler",
+      "actionDomain": "sprinkler",
+      "helpUrl": "https://esphome.io/components/sprinkler/",
+      "schemaUrl": "actions/sprinkler/resume.json"
+    },
+    {
+      "id": "sprinkler.resume_or_start_full_cycle",
+      "label": "Sprinkler Resume Or Start Full Cycle",
+      "description": "ESPHome action `sprinkler.resume_or_start_full_cycle`.",
+      "domain": "sprinkler",
+      "actionDomain": "sprinkler",
+      "helpUrl": "https://esphome.io/components/sprinkler/",
+      "schemaUrl": "actions/sprinkler/resume_or_start_full_cycle.json"
+    },
+    {
+      "id": "sprinkler.set_divider",
+      "label": "Sprinkler Set Divider",
+      "description": "ESPHome action `sprinkler.set_divider`.",
+      "domain": "sprinkler",
+      "actionDomain": "sprinkler",
+      "helpUrl": "https://esphome.io/components/sprinkler/",
+      "schemaUrl": "actions/sprinkler/set_divider.json"
+    },
+    {
+      "id": "sprinkler.set_multiplier",
+      "label": "Sprinkler Set Multiplier",
+      "description": "ESPHome action `sprinkler.set_multiplier`.",
+      "domain": "sprinkler",
+      "actionDomain": "sprinkler",
+      "helpUrl": "https://esphome.io/components/sprinkler/",
+      "schemaUrl": "actions/sprinkler/set_multiplier.json"
+    },
+    {
+      "id": "sprinkler.set_repeat",
+      "label": "Sprinkler Set Repeat",
+      "description": "ESPHome action `sprinkler.set_repeat`.",
+      "domain": "sprinkler",
+      "actionDomain": "sprinkler",
+      "helpUrl": "https://esphome.io/components/sprinkler/",
+      "schemaUrl": "actions/sprinkler/set_repeat.json"
+    },
+    {
+      "id": "sprinkler.set_valve_run_duration",
+      "label": "Sprinkler Set Valve Run Duration",
+      "description": "ESPHome action `sprinkler.set_valve_run_duration`.",
+      "domain": "sprinkler",
+      "actionDomain": "sprinkler",
+      "helpUrl": "https://esphome.io/components/sprinkler/",
+      "schemaUrl": "actions/sprinkler/set_valve_run_duration.json"
+    },
+    {
+      "id": "sprinkler.shutdown",
+      "label": "Sprinkler Shutdown",
+      "description": "ESPHome action `sprinkler.shutdown`.",
+      "domain": "sprinkler",
+      "actionDomain": "sprinkler",
+      "helpUrl": "https://esphome.io/components/sprinkler/",
+      "schemaUrl": "actions/sprinkler/shutdown.json"
+    },
+    {
+      "id": "sprinkler.start_from_queue",
+      "label": "Sprinkler Start From Queue",
+      "description": "ESPHome action `sprinkler.start_from_queue`.",
+      "domain": "sprinkler",
+      "actionDomain": "sprinkler",
+      "helpUrl": "https://esphome.io/components/sprinkler/",
+      "schemaUrl": "actions/sprinkler/start_from_queue.json"
+    },
+    {
+      "id": "sprinkler.start_full_cycle",
+      "label": "Sprinkler Start Full Cycle",
+      "description": "ESPHome action `sprinkler.start_full_cycle`.",
+      "domain": "sprinkler",
+      "actionDomain": "sprinkler",
+      "helpUrl": "https://esphome.io/components/sprinkler/",
+      "schemaUrl": "actions/sprinkler/start_full_cycle.json"
+    },
+    {
+      "id": "sprinkler.start_single_valve",
+      "label": "Sprinkler Start Single Valve",
+      "description": "ESPHome action `sprinkler.start_single_valve`.",
+      "domain": "sprinkler",
+      "actionDomain": "sprinkler",
+      "helpUrl": "https://esphome.io/components/sprinkler/",
+      "schemaUrl": "actions/sprinkler/start_single_valve.json"
+    },
+    {
+      "id": "sps30.start_fan_autoclean",
+      "label": "Sps30 Start Fan Autoclean",
+      "description": "ESPHome action `sps30.start_fan_autoclean`.",
+      "domain": "sps30",
+      "actionDomain": "sps30",
+      "helpUrl": "https://esphome.io/components/sensor/sps30/",
+      "schemaUrl": "actions/sps30/start_fan_autoclean.json"
+    },
+    {
+      "id": "sps30.start_measurement",
+      "label": "Sps30 Start Measurement",
+      "description": "ESPHome action `sps30.start_measurement`.",
+      "domain": "sps30",
+      "actionDomain": "sps30",
+      "helpUrl": "https://esphome.io/components/sensor/sps30/",
+      "schemaUrl": "actions/sps30/start_measurement.json"
+    },
+    {
+      "id": "sps30.stop_measurement",
+      "label": "Sps30 Stop Measurement",
+      "description": "ESPHome action `sps30.stop_measurement`.",
+      "domain": "sps30",
+      "actionDomain": "sps30",
+      "helpUrl": "https://esphome.io/components/sensor/sps30/",
+      "schemaUrl": "actions/sps30/stop_measurement.json"
+    },
+    {
+      "id": "stepper.report_position",
+      "label": "Stepper Report Position",
+      "description": "ESPHome action `stepper.report_position`.",
+      "domain": "stepper",
+      "actionDomain": "stepper",
+      "helpUrl": "https://esphome.io/components/stepper/",
+      "schemaUrl": "actions/stepper/report_position.json"
+    },
+    {
+      "id": "stepper.set_acceleration",
+      "label": "Stepper Set Acceleration",
+      "description": "ESPHome action `stepper.set_acceleration`.",
+      "domain": "stepper",
+      "actionDomain": "stepper",
+      "helpUrl": "https://esphome.io/components/stepper/",
+      "schemaUrl": "actions/stepper/set_acceleration.json"
+    },
+    {
+      "id": "stepper.set_deceleration",
+      "label": "Stepper Set Deceleration",
+      "description": "ESPHome action `stepper.set_deceleration`.",
+      "domain": "stepper",
+      "actionDomain": "stepper",
+      "helpUrl": "https://esphome.io/components/stepper/",
+      "schemaUrl": "actions/stepper/set_deceleration.json"
+    },
+    {
+      "id": "stepper.set_speed",
+      "label": "Stepper Set Speed",
+      "description": "ESPHome action `stepper.set_speed`.",
+      "domain": "stepper",
+      "actionDomain": "stepper",
+      "helpUrl": "https://esphome.io/components/stepper/",
+      "schemaUrl": "actions/stepper/set_speed.json"
+    },
+    {
+      "id": "stepper.set_target",
+      "label": "Stepper Set Target",
+      "description": "ESPHome action `stepper.set_target`.",
+      "domain": "stepper",
+      "actionDomain": "stepper",
+      "helpUrl": "https://esphome.io/components/stepper/",
+      "schemaUrl": "actions/stepper/set_target.json"
+    },
+    {
+      "id": "switch.control",
+      "label": "Switch Control",
+      "description": "ESPHome action `switch.control`.",
+      "domain": "switch",
+      "actionDomain": "switch",
+      "helpUrl": "https://esphome.io/components/switch/",
+      "schemaUrl": "actions/switch/control.json"
+    },
+    {
+      "id": "switch.nextion.publish",
+      "label": "Switch Nextion Publish",
+      "description": "ESPHome action `switch.nextion.publish`.",
+      "domain": "switch",
+      "actionDomain": "switch.nextion",
+      "helpUrl": "https://esphome.io/components/switch/nextion/",
+      "schemaUrl": "actions/switch/nextion/publish.json"
+    },
+    {
+      "id": "switch.template.publish",
+      "label": "Switch Template Publish",
+      "description": "ESPHome action `switch.template.publish`.",
+      "domain": "switch",
+      "actionDomain": "switch.template",
+      "helpUrl": "https://esphome.io/components/switch/template/",
+      "schemaUrl": "actions/switch/template/publish.json"
+    },
+    {
+      "id": "switch.toggle",
+      "label": "Switch Toggle",
+      "description": "Toggle a switch by ID.",
+      "domain": "switch",
+      "helpUrl": "https://esphome.io/components/switch/",
+      "actionDomain": "switch",
+      "schemaUrl": "actions/switch/toggle.json"
+    },
+    {
+      "id": "switch.turn_off",
+      "label": "Switch Turn Off",
+      "description": "Turn a switch off by ID.",
+      "domain": "switch",
+      "helpUrl": "https://esphome.io/components/switch/",
+      "actionDomain": "switch",
+      "schemaUrl": "actions/switch/turn_off.json"
+    },
+    {
+      "id": "switch.turn_on",
+      "label": "Switch Turn On",
+      "description": "Turn a switch on by ID.",
+      "domain": "switch",
+      "helpUrl": "https://esphome.io/components/switch/",
+      "actionDomain": "switch",
+      "schemaUrl": "actions/switch/turn_on.json"
+    },
+    {
+      "id": "sx126x.run_image_cal",
+      "label": "Sx126X Run Image Cal",
+      "description": "ESPHome action `sx126x.run_image_cal`.",
+      "domain": "sx126x",
+      "actionDomain": "sx126x",
+      "helpUrl": "https://esphome.io/components/sx126x/",
+      "schemaUrl": "actions/sx126x/run_image_cal.json"
+    },
+    {
+      "id": "sx126x.send_packet",
+      "label": "Sx126X Send Packet",
+      "description": "ESPHome action `sx126x.send_packet`.",
+      "domain": "sx126x",
+      "actionDomain": "sx126x",
+      "helpUrl": "https://esphome.io/components/sx126x/",
+      "schemaUrl": "actions/sx126x/send_packet.json"
+    },
+    {
+      "id": "sx126x.set_mode_rx",
+      "label": "Sx126X Set Mode Rx",
+      "description": "ESPHome action `sx126x.set_mode_rx`.",
+      "domain": "sx126x",
+      "actionDomain": "sx126x",
+      "helpUrl": "https://esphome.io/components/sx126x/",
+      "schemaUrl": "actions/sx126x/set_mode_rx.json"
+    },
+    {
+      "id": "sx126x.set_mode_sleep",
+      "label": "Sx126X Set Mode Sleep",
+      "description": "ESPHome action `sx126x.set_mode_sleep`.",
+      "domain": "sx126x",
+      "actionDomain": "sx126x",
+      "helpUrl": "https://esphome.io/components/sx126x/",
+      "schemaUrl": "actions/sx126x/set_mode_sleep.json"
+    },
+    {
+      "id": "sx126x.set_mode_standby",
+      "label": "Sx126X Set Mode Standby",
+      "description": "ESPHome action `sx126x.set_mode_standby`.",
+      "domain": "sx126x",
+      "actionDomain": "sx126x",
+      "helpUrl": "https://esphome.io/components/sx126x/",
+      "schemaUrl": "actions/sx126x/set_mode_standby.json"
+    },
+    {
+      "id": "sx126x.set_mode_tx",
+      "label": "Sx126X Set Mode Tx",
+      "description": "ESPHome action `sx126x.set_mode_tx`.",
+      "domain": "sx126x",
+      "actionDomain": "sx126x",
+      "helpUrl": "https://esphome.io/components/sx126x/",
+      "schemaUrl": "actions/sx126x/set_mode_tx.json"
+    },
+    {
+      "id": "sx127x.run_image_cal",
+      "label": "Sx127X Run Image Cal",
+      "description": "ESPHome action `sx127x.run_image_cal`.",
+      "domain": "sx127x",
+      "actionDomain": "sx127x",
+      "helpUrl": "https://esphome.io/components/sx127x/",
+      "schemaUrl": "actions/sx127x/run_image_cal.json"
+    },
+    {
+      "id": "sx127x.send_packet",
+      "label": "Sx127X Send Packet",
+      "description": "ESPHome action `sx127x.send_packet`.",
+      "domain": "sx127x",
+      "actionDomain": "sx127x",
+      "helpUrl": "https://esphome.io/components/sx127x/",
+      "schemaUrl": "actions/sx127x/send_packet.json"
+    },
+    {
+      "id": "sx127x.set_mode_rx",
+      "label": "Sx127X Set Mode Rx",
+      "description": "ESPHome action `sx127x.set_mode_rx`.",
+      "domain": "sx127x",
+      "actionDomain": "sx127x",
+      "helpUrl": "https://esphome.io/components/sx127x/",
+      "schemaUrl": "actions/sx127x/set_mode_rx.json"
+    },
+    {
+      "id": "sx127x.set_mode_sleep",
+      "label": "Sx127X Set Mode Sleep",
+      "description": "ESPHome action `sx127x.set_mode_sleep`.",
+      "domain": "sx127x",
+      "actionDomain": "sx127x",
+      "helpUrl": "https://esphome.io/components/sx127x/",
+      "schemaUrl": "actions/sx127x/set_mode_sleep.json"
+    },
+    {
+      "id": "sx127x.set_mode_standby",
+      "label": "Sx127X Set Mode Standby",
+      "description": "ESPHome action `sx127x.set_mode_standby`.",
+      "domain": "sx127x",
+      "actionDomain": "sx127x",
+      "helpUrl": "https://esphome.io/components/sx127x/",
+      "schemaUrl": "actions/sx127x/set_mode_standby.json"
+    },
+    {
+      "id": "sx127x.set_mode_tx",
+      "label": "Sx127X Set Mode Tx",
+      "description": "ESPHome action `sx127x.set_mode_tx`.",
+      "domain": "sx127x",
+      "actionDomain": "sx127x",
+      "helpUrl": "https://esphome.io/components/sx127x/",
+      "schemaUrl": "actions/sx127x/set_mode_tx.json"
+    },
+    {
+      "id": "tag.emulation_off",
+      "label": "Tag Emulation Off",
+      "description": "ESPHome action `tag.emulation_off`.",
+      "domain": "tag",
+      "actionDomain": "tag",
+      "helpUrl": "https://esphome.io/components/pn7150/",
+      "schemaUrl": "actions/tag/emulation_off.json"
+    },
+    {
+      "id": "tag.emulation_on",
+      "label": "Tag Emulation On",
+      "description": "ESPHome action `tag.emulation_on`.",
+      "domain": "tag",
+      "actionDomain": "tag",
+      "helpUrl": "https://esphome.io/components/pn7150/",
+      "schemaUrl": "actions/tag/emulation_on.json"
+    },
+    {
+      "id": "tag.polling_off",
+      "label": "Tag Polling Off",
+      "description": "ESPHome action `tag.polling_off`.",
+      "domain": "tag",
+      "actionDomain": "tag",
+      "helpUrl": "https://esphome.io/components/pn7150/",
+      "schemaUrl": "actions/tag/polling_off.json"
+    },
+    {
+      "id": "tag.polling_on",
+      "label": "Tag Polling On",
+      "description": "ESPHome action `tag.polling_on`.",
+      "domain": "tag",
+      "actionDomain": "tag",
+      "helpUrl": "https://esphome.io/components/pn7150/",
+      "schemaUrl": "actions/tag/polling_on.json"
+    },
+    {
+      "id": "tag.set_clean_mode",
+      "label": "Tag Set Clean Mode",
+      "description": "ESPHome action `tag.set_clean_mode`.",
+      "domain": "tag",
+      "actionDomain": "tag",
+      "helpUrl": "https://esphome.io/components/pn7150/",
+      "schemaUrl": "actions/tag/set_clean_mode.json"
+    },
+    {
+      "id": "tag.set_emulation_message",
+      "label": "Tag Set Emulation Message",
+      "description": "ESPHome action `tag.set_emulation_message`.",
+      "domain": "tag",
+      "actionDomain": "tag",
+      "helpUrl": "https://esphome.io/components/pn7150/",
+      "schemaUrl": "actions/tag/set_emulation_message.json"
+    },
+    {
+      "id": "tag.set_format_mode",
+      "label": "Tag Set Format Mode",
+      "description": "ESPHome action `tag.set_format_mode`.",
+      "domain": "tag",
+      "actionDomain": "tag",
+      "helpUrl": "https://esphome.io/components/pn7150/",
+      "schemaUrl": "actions/tag/set_format_mode.json"
+    },
+    {
+      "id": "tag.set_read_mode",
+      "label": "Tag Set Read Mode",
+      "description": "ESPHome action `tag.set_read_mode`.",
+      "domain": "tag",
+      "actionDomain": "tag",
+      "helpUrl": "https://esphome.io/components/pn7150/",
+      "schemaUrl": "actions/tag/set_read_mode.json"
+    },
+    {
+      "id": "tag.set_write_message",
+      "label": "Tag Set Write Message",
+      "description": "ESPHome action `tag.set_write_message`.",
+      "domain": "tag",
+      "actionDomain": "tag",
+      "helpUrl": "https://esphome.io/components/pn7150/",
+      "schemaUrl": "actions/tag/set_write_message.json"
+    },
+    {
+      "id": "tag.set_write_mode",
+      "label": "Tag Set Write Mode",
+      "description": "ESPHome action `tag.set_write_mode`.",
+      "domain": "tag",
+      "actionDomain": "tag",
+      "helpUrl": "https://esphome.io/components/pn7150/",
+      "schemaUrl": "actions/tag/set_write_mode.json"
+    },
+    {
+      "id": "text.set",
+      "label": "Text Set",
+      "description": "ESPHome action `text.set`.",
+      "domain": "text",
+      "actionDomain": "text",
+      "helpUrl": "https://esphome.io/components/text/",
+      "schemaUrl": "actions/text/set.json"
+    },
+    {
+      "id": "text_sensor.nextion.publish",
+      "label": "Text Sensor Nextion Publish",
+      "description": "ESPHome action `text_sensor.nextion.publish`.",
+      "domain": "text_sensor",
+      "actionDomain": "text_sensor.nextion",
+      "helpUrl": "https://esphome.io/components/text_sensor/nextion/",
+      "schemaUrl": "actions/text_sensor/nextion/publish.json"
+    },
+    {
+      "id": "text_sensor.template.publish",
+      "label": "Text Sensor Template Publish",
+      "description": "ESPHome action `text_sensor.template.publish`.",
+      "domain": "text_sensor",
+      "actionDomain": "text_sensor.template",
+      "helpUrl": "https://esphome.io/components/text_sensor/template/",
+      "schemaUrl": "actions/text_sensor/template/publish.json"
+    },
+    {
+      "id": "tm1651.set_brightness",
+      "label": "Tm1651 Set Brightness",
+      "description": "ESPHome action `tm1651.set_brightness`.",
+      "domain": "tm1651",
+      "actionDomain": "tm1651",
+      "helpUrl": "https://esphome.io/components/tm1651/",
+      "schemaUrl": "actions/tm1651/set_brightness.json"
+    },
+    {
+      "id": "tm1651.set_level",
+      "label": "Tm1651 Set Level",
+      "description": "ESPHome action `tm1651.set_level`.",
+      "domain": "tm1651",
+      "actionDomain": "tm1651",
+      "helpUrl": "https://esphome.io/components/tm1651/",
+      "schemaUrl": "actions/tm1651/set_level.json"
+    },
+    {
+      "id": "tm1651.set_level_percent",
+      "label": "Tm1651 Set Level Percent",
+      "description": "ESPHome action `tm1651.set_level_percent`.",
+      "domain": "tm1651",
+      "actionDomain": "tm1651",
+      "helpUrl": "https://esphome.io/components/tm1651/",
+      "schemaUrl": "actions/tm1651/set_level_percent.json"
+    },
+    {
+      "id": "tm1651.turn_off",
+      "label": "Tm1651 Turn Off",
+      "description": "ESPHome action `tm1651.turn_off`.",
+      "domain": "tm1651",
+      "actionDomain": "tm1651",
+      "helpUrl": "https://esphome.io/components/tm1651/",
+      "schemaUrl": "actions/tm1651/turn_off.json"
+    },
+    {
+      "id": "tm1651.turn_on",
+      "label": "Tm1651 Turn On",
+      "description": "ESPHome action `tm1651.turn_on`.",
+      "domain": "tm1651",
+      "actionDomain": "tm1651",
+      "helpUrl": "https://esphome.io/components/tm1651/",
+      "schemaUrl": "actions/tm1651/turn_on.json"
+    },
+    {
+      "id": "uart.write",
+      "label": "Uart Write",
+      "description": "ESPHome action `uart.write`.",
+      "domain": "uart",
+      "actionDomain": "uart",
+      "helpUrl": "https://esphome.io/components/uart/",
+      "schemaUrl": "actions/uart/write.json"
+    },
+    {
+      "id": "udp.write",
+      "label": "Udp Write",
+      "description": "ESPHome action `udp.write`.",
+      "domain": "udp",
+      "actionDomain": "udp",
+      "helpUrl": "https://esphome.io/components/udp/",
+      "schemaUrl": "actions/udp/write.json"
+    },
+    {
+      "id": "ufire_ec.calibrate_probe",
+      "label": "Ufire Ec Calibrate Probe",
+      "description": "ESPHome action `ufire_ec.calibrate_probe`.",
+      "domain": "ufire_ec",
+      "actionDomain": "ufire_ec",
+      "helpUrl": "https://esphome.io/components/sensor/ufire_ec/",
+      "schemaUrl": "actions/ufire_ec/calibrate_probe.json"
+    },
+    {
+      "id": "ufire_ec.reset",
+      "label": "Ufire Ec Reset",
+      "description": "ESPHome action `ufire_ec.reset`.",
+      "domain": "ufire_ec",
+      "actionDomain": "ufire_ec",
+      "helpUrl": "https://esphome.io/components/sensor/ufire_ec/",
+      "schemaUrl": "actions/ufire_ec/reset.json"
+    },
+    {
+      "id": "ufire_ise.calibrate_probe_high",
+      "label": "Ufire Ise Calibrate Probe High",
+      "description": "ESPHome action `ufire_ise.calibrate_probe_high`.",
+      "domain": "ufire_ise",
+      "actionDomain": "ufire_ise",
+      "helpUrl": "https://esphome.io/components/sensor/ufire_ise/",
+      "schemaUrl": "actions/ufire_ise/calibrate_probe_high.json"
+    },
+    {
+      "id": "ufire_ise.calibrate_probe_low",
+      "label": "Ufire Ise Calibrate Probe Low",
+      "description": "ESPHome action `ufire_ise.calibrate_probe_low`.",
+      "domain": "ufire_ise",
+      "actionDomain": "ufire_ise",
+      "helpUrl": "https://esphome.io/components/sensor/ufire_ise/",
+      "schemaUrl": "actions/ufire_ise/calibrate_probe_low.json"
+    },
+    {
+      "id": "ufire_ise.reset",
+      "label": "Ufire Ise Reset",
+      "description": "ESPHome action `ufire_ise.reset`.",
+      "domain": "ufire_ise",
+      "actionDomain": "ufire_ise",
+      "helpUrl": "https://esphome.io/components/sensor/ufire_ise/",
+      "schemaUrl": "actions/ufire_ise/reset.json"
+    },
+    {
+      "id": "update.check",
+      "label": "Update Check",
+      "description": "ESPHome action `update.check`.",
+      "domain": "update",
+      "actionDomain": "update",
+      "helpUrl": "https://esphome.io/components/update/",
+      "schemaUrl": "actions/update/check.json"
+    },
+    {
+      "id": "update.perform",
+      "label": "Update Perform",
+      "description": "ESPHome action `update.perform`.",
+      "domain": "update",
+      "actionDomain": "update",
+      "helpUrl": "https://esphome.io/components/update/",
+      "schemaUrl": "actions/update/perform.json"
+    },
+    {
+      "id": "valve.close",
+      "label": "Valve Close",
+      "description": "ESPHome action `valve.close`.",
+      "domain": "valve",
+      "actionDomain": "valve",
+      "helpUrl": "https://esphome.io/components/valve/",
+      "schemaUrl": "actions/valve/close.json"
+    },
+    {
+      "id": "valve.control",
+      "label": "Valve Control",
+      "description": "ESPHome action `valve.control`.",
+      "domain": "valve",
+      "actionDomain": "valve",
+      "helpUrl": "https://esphome.io/components/valve/",
+      "schemaUrl": "actions/valve/control.json"
+    },
+    {
+      "id": "valve.open",
+      "label": "Valve Open",
+      "description": "ESPHome action `valve.open`.",
+      "domain": "valve",
+      "actionDomain": "valve",
+      "helpUrl": "https://esphome.io/components/valve/",
+      "schemaUrl": "actions/valve/open.json"
+    },
+    {
+      "id": "valve.stop",
+      "label": "Valve Stop",
+      "description": "ESPHome action `valve.stop`.",
+      "domain": "valve",
+      "actionDomain": "valve",
+      "helpUrl": "https://esphome.io/components/valve/",
+      "schemaUrl": "actions/valve/stop.json"
+    },
+    {
+      "id": "valve.template.publish",
+      "label": "Valve Template Publish",
+      "description": "ESPHome action `valve.template.publish`.",
+      "domain": "valve",
+      "actionDomain": "valve.template",
+      "helpUrl": "https://esphome.io/components/valve/template/",
+      "schemaUrl": "actions/valve/template/publish.json"
+    },
+    {
+      "id": "valve.toggle",
+      "label": "Valve Toggle",
+      "description": "ESPHome action `valve.toggle`.",
+      "domain": "valve",
+      "actionDomain": "valve",
+      "helpUrl": "https://esphome.io/components/valve/",
+      "schemaUrl": "actions/valve/toggle.json"
+    },
+    {
+      "id": "voice_assistant.start",
+      "label": "Voice Assistant Start",
+      "description": "ESPHome action `voice_assistant.start`.",
+      "domain": "voice_assistant",
+      "actionDomain": "voice_assistant",
+      "helpUrl": "https://esphome.io/components/voice_assistant/",
+      "schemaUrl": "actions/voice_assistant/start.json"
+    },
+    {
+      "id": "voice_assistant.start_continuous",
+      "label": "Voice Assistant Start Continuous",
+      "description": "ESPHome action `voice_assistant.start_continuous`.",
+      "domain": "voice_assistant",
+      "actionDomain": "voice_assistant",
+      "helpUrl": "https://esphome.io/components/voice_assistant/",
+      "schemaUrl": "actions/voice_assistant/start_continuous.json"
+    },
+    {
+      "id": "voice_assistant.stop",
+      "label": "Voice Assistant Stop",
+      "description": "ESPHome action `voice_assistant.stop`.",
+      "domain": "voice_assistant",
+      "actionDomain": "voice_assistant",
+      "helpUrl": "https://esphome.io/components/voice_assistant/",
+      "schemaUrl": "actions/voice_assistant/stop.json"
+    },
+    {
+      "id": "wait_until",
+      "label": "Wait Until",
+      "description": "Wait until one or more conditions become true, with optional timeout.",
+      "domain": "core",
+      "actionDomain": "core",
+      "helpUrl": "https://esphome.io/automations/actions/#wait_until-action",
+      "schemaUrl": "actions/wait_until.json"
+    },
+    {
+      "id": "water_heater.control",
+      "label": "Water Heater Control",
+      "description": "ESPHome action `water_heater.control`.",
+      "domain": "water_heater",
+      "actionDomain": "water_heater",
+      "helpUrl": "https://esphome.io/components/water_heater/",
+      "schemaUrl": "actions/water_heater/control.json"
+    },
+    {
+      "id": "water_heater.template.publish",
+      "label": "Water Heater Template Publish",
+      "description": "ESPHome action `water_heater.template.publish`.",
+      "domain": "water_heater",
+      "actionDomain": "water_heater.template",
+      "helpUrl": "https://esphome.io/components/water_heater/template/",
+      "schemaUrl": "actions/water_heater/template/publish.json"
+    },
+    {
+      "id": "while",
+      "label": "While",
+      "description": "Loop nested actions while one or more conditions remain true.",
+      "domain": "core",
+      "actionDomain": "core",
+      "helpUrl": "https://esphome.io/automations/actions/#while-action",
+      "schemaUrl": "actions/while.json"
+    },
+    {
+      "id": "wifi.configure",
+      "label": "Wifi Configure",
+      "description": "ESPHome action `wifi.configure`.",
+      "domain": "wifi",
+      "actionDomain": "wifi",
+      "helpUrl": "https://esphome.io/components/wifi/",
+      "schemaUrl": "actions/wifi/configure.json"
+    },
+    {
+      "id": "wifi.disable",
+      "label": "Wifi Disable",
+      "description": "ESPHome action `wifi.disable`.",
+      "domain": "wifi",
+      "actionDomain": "wifi",
+      "helpUrl": "https://esphome.io/components/wifi/",
+      "schemaUrl": "actions/wifi/disable.json"
+    },
+    {
+      "id": "wifi.enable",
+      "label": "Wifi Enable",
+      "description": "ESPHome action `wifi.enable`.",
+      "domain": "wifi",
+      "actionDomain": "wifi",
+      "helpUrl": "https://esphome.io/components/wifi/",
+      "schemaUrl": "actions/wifi/enable.json"
+    },
+    {
+      "id": "wireguard.disable",
+      "label": "Wireguard Disable",
+      "description": "ESPHome action `wireguard.disable`.",
+      "domain": "wireguard",
+      "actionDomain": "wireguard",
+      "helpUrl": "https://esphome.io/components/wireguard/",
+      "schemaUrl": "actions/wireguard/disable.json"
+    },
+    {
+      "id": "wireguard.enable",
+      "label": "Wireguard Enable",
+      "description": "ESPHome action `wireguard.enable`.",
+      "domain": "wireguard",
+      "actionDomain": "wireguard",
+      "helpUrl": "https://esphome.io/components/wireguard/",
+      "schemaUrl": "actions/wireguard/enable.json"
+    },
+    {
+      "id": "zigbee.factory_reset",
+      "label": "Zigbee Factory Reset",
+      "description": "ESPHome action `zigbee.factory_reset`.",
+      "domain": "zigbee",
+      "actionDomain": "zigbee",
+      "helpUrl": "https://esphome.io/components/zigbee/",
+      "schemaUrl": "actions/zigbee/factory_reset.json"
+    }
+  ]
+}

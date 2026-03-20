@@ -1,0 +1,25 @@
+{
+  "id": "binary_sensor.switch",
+  "domain": "binary_sensor",
+  "platform": "switch",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/binary_sensor/switch/",
+  "extends": "base_binary_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Binary Sensor Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "source_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "switch",
+      "placeholder": "switch_id"
+    }
+  ]
+}

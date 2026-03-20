@@ -1,0 +1,252 @@
+{
+  "id": "sensor.pmsx003",
+  "domain": "sensor",
+  "platform": "pmsx003",
+  "requires": [
+    "uart"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/pmsx003/",
+  "fields": [
+    {
+      "key": "type",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "PMSX003",
+      "options": [
+        "PMS1003",
+        "PMS3003",
+        "PMSX003",
+        "PMS5003S",
+        "PMS5003T",
+        "PMS5003ST",
+        "PMS9003M"
+      ]
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "placeholder": "60s",
+      "lvl": "simple"
+    },
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "uart"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "pm_1_0_std",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "pm_2_5_std",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "pm_10_0_std",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "pm_1_0",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "pm_2_5",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "pm_10_0",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "pm_0_3um",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "PMS1003",
+          "PMSX003",
+          "PMS5003S",
+          "PMS5003T",
+          "PMS5003ST",
+          "PMS9003M"
+        ]
+      }
+    },
+    {
+      "key": "pm_0_5um",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "PMS1003",
+          "PMSX003",
+          "PMS5003S",
+          "PMS5003T",
+          "PMS5003ST",
+          "PMS9003M"
+        ]
+      }
+    },
+    {
+      "key": "pm_1_0um",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "PMS1003",
+          "PMSX003",
+          "PMS5003S",
+          "PMS5003T",
+          "PMS5003ST",
+          "PMS9003M"
+        ]
+      }
+    },
+    {
+      "key": "pm_2_5um",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "PMS1003",
+          "PMSX003",
+          "PMS5003S",
+          "PMS5003T",
+          "PMS5003ST",
+          "PMS9003M"
+        ]
+      }
+    },
+    {
+      "key": "pm_5_0um",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "PMS1003",
+          "PMSX003",
+          "PMS5003S",
+          "PMS5003ST",
+          "PMS9003M"
+        ]
+      }
+    },
+    {
+      "key": "pm_10_0um",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "PMS1003",
+          "PMSX003",
+          "PMS5003S",
+          "PMS5003ST",
+          "PMS9003M"
+        ]
+      }
+    },
+    {
+      "key": "formaldehyde",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "PMS5003S",
+          "PMS5003ST"
+        ]
+      }
+    },
+    {
+      "key": "temperature",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "PMS5003T",
+          "PMS5003ST"
+        ]
+      }
+    },
+    {
+      "key": "humidity",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "PMS5003T",
+          "PMS5003ST"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "climate.haier.power_off",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Climate",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "climate_id",
+      "domain": "climate",
+      "lvl": "normal"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "rf_bridge.learn",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Rf Bridge",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "rf_bridge_id",
+      "domain": "rf_bridge",
+      "lvl": "normal"
+    },
+    {
+      "key": "timeout",
+      "label": "Timeout",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "10s",
+      "lambdaPlaceholder": "return 10000;"
+    }
+  ]
+}

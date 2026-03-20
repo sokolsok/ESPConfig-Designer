@@ -1,0 +1,23 @@
+{
+  "id": "sensor.daly_bms",
+  "domain": "sensor",
+  "platform": "daly_bms",
+  "requires": [
+    "uart"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/daly_bms/",
+  "fields": [
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple"
+    }
+  ]
+}

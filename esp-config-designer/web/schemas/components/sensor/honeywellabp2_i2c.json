@@ -1,0 +1,53 @@
+{
+  "id": "sensor.honeywellabp2_i2c",
+  "domain": "sensor",
+  "platform": "honeywellabp2_i2c",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/honeywellabp2_i2c/",
+  "fields": [
+    {
+      "key": "pressure",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "min_pressure",
+          "type": "number",
+          "required": true,
+          "lvl": "simple"
+        },
+        {
+          "key": "max_pressure",
+          "type": "number",
+          "required": true,
+          "lvl": "simple"
+        },
+        {
+          "key": "transfer_function",
+          "type": "text",
+          "required": true,
+          "lvl": "simple"
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

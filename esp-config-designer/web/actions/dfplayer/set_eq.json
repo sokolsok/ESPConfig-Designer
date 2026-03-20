@@ -1,0 +1,22 @@
+{
+  "id": "dfplayer.set_eq",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Dfplayer",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "dfplayer_id",
+      "domain": "dfplayer",
+      "lvl": "normal"
+    },
+    {
+      "key": "eq",
+      "label": "Eq",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

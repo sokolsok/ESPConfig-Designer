@@ -1,0 +1,36 @@
+{
+  "id": "hub.tlc5971",
+  "domain": "tlc5971",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "tlc5971_hub",
+      "idDomain": "tlc5971"
+    },
+    {
+      "key": "data_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "clock_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "num_chips",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 1
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "id": "sensor.honeywellabp",
+  "domain": "sensor",
+  "platform": "honeywellabp",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/honeywellabp/",
+  "fields": [
+    {
+      "key": "pressure",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "min_pressure",
+          "type": "number",
+          "required": true,
+          "lvl": "simple"
+        },
+        {
+          "key": "max_pressure",
+          "type": "number",
+          "required": true,
+          "lvl": "simple"
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

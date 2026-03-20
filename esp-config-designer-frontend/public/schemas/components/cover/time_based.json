@@ -1,0 +1,67 @@
+{
+  "id": "cover.time_based",
+  "domain": "cover",
+  "platform": "time_based",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/cover/time_based/",
+  "extends": "base_cover.json",
+  "fields": [
+    {
+      "key": "open_action",
+      "type": "yaml",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "open_duration",
+      "type": "duration",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "close_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "close_duration",
+      "type": "duration",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "stop_action",
+      "type": "yaml",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "has_built_in_endstop",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "manual_control",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "assumed_state",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "servo.detach",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Servo",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "servo_id",
+      "domain": "servo",
+      "lvl": "normal"
+    }
+  ]
+}

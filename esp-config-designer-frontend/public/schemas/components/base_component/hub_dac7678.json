@@ -1,0 +1,41 @@
+{
+  "id": "hub.dac7678",
+  "domain": "dac7678",
+  "platform": "",
+  "requires": [
+    "i2c"
+  ],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "dac7678_hub",
+      "idDomain": "dac7678"
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x48",
+      "suppressQuotes": true
+    },
+    {
+      "key": "internal_reference",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "advanced",
+      "domain": "i2c"
+    }
+  ]
+}

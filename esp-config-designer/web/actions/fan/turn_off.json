@@ -1,0 +1,14 @@
+{
+  "id": "fan.turn_off",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Fan",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "fan_id",
+      "domain": "fan",
+      "lvl": "normal"
+    }
+  ]
+}

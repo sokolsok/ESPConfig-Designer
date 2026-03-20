@@ -1,0 +1,23 @@
+{
+  "id": "lvgl.widget.redraw",
+  "fields": [
+    {
+      "key": "id",
+      "label": "LVGL widget",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "lvgl_widget_id",
+      "domain": "",
+      "lvl": "normal"
+    },
+    {
+      "key": "lvgl_id",
+      "label": "LVGL ID",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "main_ui"
+    }
+  ]
+}

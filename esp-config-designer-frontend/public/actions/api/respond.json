@@ -1,0 +1,36 @@
+{
+  "id": "api.respond",
+  "fields": [
+    {
+      "key": "success",
+      "label": "Success",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    },
+    {
+      "key": "error_message",
+      "label": "Error message",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "Device is busy",
+      "dependsOn": {
+        "key": "success",
+        "value": false
+      }
+    },
+    {
+      "key": "data",
+      "label": "Data builder",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "root[\"status\"] = \"ok\";",
+      "note": "Build the JSON response body using the ESPHome `root[...]` API."
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "id": "alarm_control_panel.template",
+  "domain": "alarm_control_panel",
+  "platform": "template",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/alarm_control_panel/template/",
+  "extends": "base_alarm_control_panel.json",
+  "fields": [
+    {
+      "key": "codes",
+      "type": "list",
+      "required": false,
+      "lvl": "normal",
+      "item": {
+        "type": "text"
+      }
+    },
+    {
+      "key": "requires_code_to_arm",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "arming_away_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "0s"
+    },
+    {
+      "key": "arming_home_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "arming_night_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "pending_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "0s"
+    },
+    {
+      "key": "trigger_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "0s"
+    },
+    {
+      "key": "binary_sensors",
+      "type": "list",
+      "required": false,
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "input",
+            "type": "id_ref",
+            "required": true,
+            "lvl": "simple",
+            "domain": "binary_sensor"
+          },
+          {
+            "key": "bypass_armed_home",
+            "type": "boolean",
+            "required": false,
+            "lvl": "normal"
+          },
+          {
+            "key": "bypass_armed_night",
+            "type": "boolean",
+            "required": false,
+            "lvl": "normal"
+          },
+          {
+            "key": "bypass_auto",
+            "type": "boolean",
+            "required": false,
+            "lvl": "normal"
+          },
+          {
+            "key": "trigger_mode",
+            "type": "select",
+            "required": false,
+            "lvl": "normal",
+            "default": "delayed",
+            "options": [
+              "delayed",
+              "instant",
+              "instant_always",
+              "delayed_follower"
+            ]
+          },
+          {
+            "key": "chime",
+            "type": "boolean",
+            "required": false,
+            "lvl": "normal",
+            "default": false
+          }
+        ]
+      }
+    },
+    {
+      "key": "restore_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "ALWAYS_DISARMED",
+      "options": [
+        "ALWAYS_DISARMED",
+        "RESTORE_DEFAULT_DISARMED"
+      ]
+    }
+  ]
+}

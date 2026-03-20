@@ -1,0 +1,14 @@
+{
+  "id": "bm8563.write_time",
+  "fields": [
+    {
+      "key": "id",
+      "label": "BM8563",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "bm8563_id",
+      "domain": "bm8563",
+      "lvl": "normal"
+    }
+  ]
+}

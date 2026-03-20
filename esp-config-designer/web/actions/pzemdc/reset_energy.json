@@ -1,0 +1,14 @@
+{
+  "id": "pzemdc.reset_energy",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Pzemdc",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "pzemdc_id",
+      "domain": "pzemdc",
+      "lvl": "normal"
+    }
+  ]
+}

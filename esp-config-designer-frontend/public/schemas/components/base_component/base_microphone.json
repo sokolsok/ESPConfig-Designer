@@ -1,0 +1,29 @@
+{
+  "id": "base.microphone",
+  "domain": "microphone",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "mic_input"
+    },
+    {
+      "key": "on_data",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "helpUrl": "https://esphome.io/components/microphone/",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

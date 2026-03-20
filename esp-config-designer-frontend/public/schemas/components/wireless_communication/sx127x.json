@@ -1,0 +1,312 @@
+{
+  "id": "sx127x",
+  "domain": "sx127x",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/sx127x/",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal",
+      "idDomain": "sx127x"
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "rst_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "dio0_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "auto_cal",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": true
+    },
+    {
+      "key": "frequency",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "433.92MHz"
+    },
+    {
+      "key": "modulation",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "LORA",
+      "options": [
+        "OOK",
+        "FSK",
+        "LORA"
+      ]
+    },
+    {
+      "key": "pa_pin",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "BOOST",
+        "RFO"
+      ]
+    },
+    {
+      "key": "pa_power",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "pa_ramp",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "options": [
+        "10us",
+        "12us",
+        "15us",
+        "20us",
+        "25us",
+        "31us",
+        "40us",
+        "50us",
+        "62us",
+        "100us",
+        "125us",
+        "250us",
+        "500us",
+        "1000us",
+        "2000us",
+        "3400us"
+      ]
+    },
+    {
+      "key": "rx_start",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "bandwidth",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "payload_length",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "crc_enable",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "preamble_size",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "sync_value",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "spreading_factor",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 7,
+      "dependsOn": {
+        "key": "modulation",
+        "value": "LORA"
+      }
+    },
+    {
+      "key": "coding_rate",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "CR_4_5",
+      "options": [
+        "CR_4_5",
+        "CR_4_6",
+        "CR_4_7",
+        "CR_4_8"
+      ],
+      "dependsOn": {
+        "key": "modulation",
+        "value": "LORA"
+      }
+    },
+    {
+      "key": "packet_mode",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false,
+      "dependsOn": {
+        "key": "modulation",
+        "values": [
+          "OOK",
+          "FSK"
+        ]
+      }
+    },
+    {
+      "key": "bitrate",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "modulation",
+        "values": [
+          "OOK",
+          "FSK"
+        ]
+      }
+    },
+    {
+      "key": "bitsync",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": true,
+      "dependsOn": {
+        "key": "modulation",
+        "values": [
+          "OOK",
+          "FSK"
+        ]
+      }
+    },
+    {
+      "key": "preamble_polarity",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "0x55",
+      "dependsOn": {
+        "key": "modulation",
+        "values": [
+          "OOK",
+          "FSK"
+        ]
+      }
+    },
+    {
+      "key": "preamble_detect",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "modulation",
+        "values": [
+          "OOK",
+          "FSK"
+        ]
+      }
+    },
+    {
+      "key": "preamble_errors",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "modulation",
+        "values": [
+          "OOK",
+          "FSK"
+        ]
+      }
+    },
+    {
+      "key": "rx_floor",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "modulation",
+        "values": [
+          "OOK",
+          "FSK"
+        ]
+      }
+    },
+    {
+      "key": "deviation",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "default": "5kHz",
+      "dependsOn": {
+        "key": "modulation",
+        "values": [
+          "OOK",
+          "FSK"
+        ]
+      }
+    },
+    {
+      "key": "shaping",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "options": [
+        "CUTOFF_BR_X_2",
+        "CUTOFF_BR_X_1",
+        "GAUSSIAN_BT_0_3",
+        "GAUSSIAN_BT_0_5",
+        "GAUSSIAN_BT_1_0",
+        "NONE"
+      ],
+      "dependsOn": {
+        "key": "modulation",
+        "values": [
+          "OOK",
+          "FSK"
+        ]
+      }
+    },
+    {
+      "key": "on_packet",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

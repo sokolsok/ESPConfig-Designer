@@ -1,0 +1,24 @@
+{
+  "id": "base.speaker",
+  "domain": "speaker",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "speaker_id",
+      "idDomain": "speaker"
+    },
+    {
+      "key": "audio_dac",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "audio_dac"
+    }
+  ]
+}

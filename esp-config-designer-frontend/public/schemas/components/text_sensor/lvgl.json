@@ -1,0 +1,17 @@
+{
+  "id": "text_sensor.lvgl",
+  "domain": "text_sensor",
+  "platform": "lvgl",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/text_sensor/lvgl/",
+  "extends": "base_text_sensor.json",
+  "fields": [
+    {
+      "key": "widget",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "textarea_id"
+    }
+  ]
+}

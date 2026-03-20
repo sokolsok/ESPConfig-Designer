@@ -1,0 +1,24 @@
+{
+  "id": "logger.set_level",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Logger",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "logger_id",
+      "domain": "logger",
+      "lvl": "normal"
+    },
+    {
+      "key": "level",
+      "label": "Level",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "75%",
+      "lambdaPlaceholder": "return 0.75;"
+    }
+  ]
+}

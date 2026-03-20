@@ -1,0 +1,14 @@
+{
+  "id": "button.press",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Button",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "button_id",
+      "domain": "button",
+      "lvl": "normal"
+    }
+  ]
+}

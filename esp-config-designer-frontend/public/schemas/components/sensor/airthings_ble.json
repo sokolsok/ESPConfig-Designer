@@ -1,0 +1,213 @@
+{
+  "id": "sensor.airthings_ble",
+  "domain": "sensor",
+  "platform": "airthings_wave_plus",
+  "platformByBus": {
+    "airthings_wave_plus": "airthings_wave_plus",
+    "airthings_wave_mini": "airthings_wave_mini"
+  },
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/airthings_ble/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "ble_client",
+      "dedupeBy": "id"
+    },
+    {
+      "key": "ble_tracker",
+      "domain": "esp32_ble_tracker",
+      "emitAs": "map",
+      "singleton": true,
+      "alwaysEmit": true,
+      "defaultPayload": {},
+      "merge": "first"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_ble_client.json"
+    },
+    {
+      "key": "ble_tracker",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "uiHidden": true,
+      "emitYAML": "never",
+      "extends": "hub_esp32_ble_tracker.json"
+    },
+    {
+      "key": "ble_client_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "ble_client",
+      "allowSelfReference": true,
+      "default": "ble_client_hub"
+    },
+    {
+      "key": "bus",
+      "label": "Airthings Variant",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "airthings_wave_plus",
+      "set_global": "airthings_ble_variant",
+      "options": [
+        "airthings_wave_plus",
+        "airthings_wave_mini"
+      ]
+    },
+    {
+      "key": "device_type",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "WAVE_PLUS",
+      "options": [
+        "WAVE_PLUS",
+        "WAVE_GEN2"
+      ],
+      "dependsOn": {
+        "key": "bus",
+        "value": "airthings_wave_plus"
+      },
+      "warning": "WAVE_GEN2 does not support CO2 or TVOC sensors.",
+      "globalDependsOn": {
+        "key": "airthings_ble_variant",
+        "value": "airthings_wave_plus"
+      }
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "default": "5min",
+      "placeholder": "5min"
+    },
+    {
+      "key": "battery_update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "24h",
+      "placeholder": "24h"
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "humidity",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "pressure",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "tvoc",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "device_type",
+        "notValue": "WAVE_GEN2"
+      }
+    },
+    {
+      "key": "battery_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "radon",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "airthings_ble_variant",
+        "value": "airthings_wave_plus"
+      }
+    },
+    {
+      "key": "radon_long_term",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "airthings_ble_variant",
+        "value": "airthings_wave_plus"
+      }
+    },
+    {
+      "key": "co2",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "device_type",
+        "value": "WAVE_PLUS"
+      },
+      "globalDependsOn": {
+        "key": "airthings_ble_variant",
+        "value": "airthings_wave_plus"
+      }
+    },
+    {
+      "key": "illuminance",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "airthings_ble_variant",
+        "value": "airthings_wave_plus"
+      }
+    }
+  ]
+}

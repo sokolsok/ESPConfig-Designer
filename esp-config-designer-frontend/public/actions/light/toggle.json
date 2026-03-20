@@ -1,0 +1,24 @@
+{
+  "id": "light.toggle",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Light",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "light_id",
+      "domain": "light",
+      "lvl": "normal"
+    },
+    {
+      "key": "transition_length",
+      "label": "Transition length",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "500ms",
+      "lambdaPlaceholder": "return 500;"
+    }
+  ]
+}

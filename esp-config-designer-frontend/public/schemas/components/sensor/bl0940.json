@@ -1,0 +1,154 @@
+{
+  "id": "sensor.bl0940",
+  "domain": "sensor",
+  "platform": "bl0940",
+  "requires": [
+    "uart"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/bl0940/",
+  "fields": [
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor"
+    },
+    {
+      "key": "legacy_mode",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "read_command",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "write_command",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "voltage",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "current",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "power",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "energy",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "internal_temperature",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "external_temperature",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "reference_voltage",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1.218"
+    },
+    {
+      "key": "resistor_shunt",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1"
+    },
+    {
+      "key": "resistor_one",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0.51"
+    },
+    {
+      "key": "resistor_two",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1950"
+    },
+    {
+      "key": "voltage_reference",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "266013.136288998"
+    },
+    {
+      "key": "current_reference",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "17158.9201389365"
+    },
+    {
+      "key": "power_reference",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "713.104696500825"
+    },
+    {
+      "key": "energy_reference",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "6120.6267056536",
+        "voltage_reference",
+        "current_reference",
+        "If",
+        "power_reference",
+        "energy_reference"
+      ]
+    }
+  ]
+}

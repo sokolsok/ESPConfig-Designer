@@ -1,0 +1,14 @@
+{
+  "id": "rf_bridge.stop_advanced_sniffing",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Rf Bridge",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "rf_bridge_id",
+      "domain": "rf_bridge",
+      "lvl": "normal"
+    }
+  ]
+}

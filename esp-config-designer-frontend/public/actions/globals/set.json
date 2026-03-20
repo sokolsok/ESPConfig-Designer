@@ -1,0 +1,23 @@
+{
+  "id": "globals.set",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Globals",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "globals_id",
+      "domain": "globals",
+      "lvl": "normal"
+    },
+    {
+      "key": "value",
+      "label": "Value",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "42"
+    }
+  ]
+}

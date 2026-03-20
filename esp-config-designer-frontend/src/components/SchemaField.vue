@@ -19,14 +19,22 @@
         :gpio-usage="gpioUsage"
         :gpio-title="gpioTitle"
         :context-component-id="contextComponentId"
+        :context-scope-id="contextScopeId"
         :global-store="globalStore"
         @update="emitUpdate"
         @open-secrets="emitOpenSecrets"
       />
     </div>
   </div>
-  <div v-else class="schema-field" :class="{ 'schema-field--stacked': hasInlineNote }">
-      <label v-if="!isListField" :for="inputId">
+  <div
+    v-else
+    class="schema-field"
+    :class="{
+      'schema-field--stacked': hasInlineNote,
+      'schema-field--custom-config': field.key === 'custom_config'
+    }"
+  >
+      <label v-if="!isListField && !field.hideLabel" :for="inputId">
       {{ fieldLabel }}<span v-if="field.required" class="schema-required">*</span>
       <a
         v-if="field.helpUrl"
@@ -51,54 +59,76 @@
       <option value="__opt_false">{{ booleanFalseOptionLabel }}</option>
     </select>
 
-    <CatalogListField
-      v-else-if="isCatalogListField"
-      :variant="catalogVariant"
-      :field="field"
-      :path="fieldPath"
-      :value="listValue"
-      :mode-level="modeLevel"
-      :id-registry="idRegistry"
-      :name-registry="nameRegistry"
-      :id-index="idIndex"
-      :gpio-options="gpioOptions"
-      :gpio-usage="gpioUsage"
-      :gpio-title="gpioTitle"
-      :context-component-id="contextComponentId"
-      :global-store="globalStore"
-      @update="emitUpdate"
-    />
-
       <div
         v-else-if="isListField"
         class="schema-list"
-        :class="[listLevelClass, { 'is-empty': listValue.length === 0 }]"
+        :class="[listLevelClass, { 'is-empty': listValue.length === 0 }, { 'schema-list--compact': isCompactListField }]"
       >
       <div class="schema-list-header">
         <div class="schema-list-title">
           <span>{{ fieldLabel }}</span>
-          <a
-            v-if="field.helpUrl"
-            class="filter-help"
-            :href="field.helpUrl"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Field help"
-          >
-            ?
-          </a>
+          <button type="button" class="secondary compact btn-add schema-list-add" @click="handleAddListItem">
+            Add
+          </button>
           <span v-if="field.required" class="schema-required">*</span>
         </div>
-        <button type="button" class="secondary compact btn-add schema-list-add" @click="addListItem">
-          Add
-        </button>
       </div>
       <div v-if="listValue.length === 0" class="note">No items yet</div>
       <div v-for="(item, index) in listValue" :key="index" class="schema-list-item">
-        <template v-if="isObjectListItem">
+        <template v-if="isCatalogListField">
+          <div class="components-header">
+            <div class="filter-title-row">
+              <h3 class="filter-title">{{ entryLabel(item) }}</h3>
+              <a
+                v-if="entryDocLink(item)"
+                class="filter-help"
+                :href="entryDocLink(item)"
+                target="_blank"
+                rel="noopener noreferrer"
+                :aria-label="catalogDocLabel"
+              >
+                ?
+              </a>
+            </div>
+          </div>
+          <div class="schema-grid" v-if="entryFields(item).length">
+            <SchemaField
+              v-for="child in entryFields(item)"
+              :key="child.key"
+              :field="child"
+              :path="[]"
+              :value="item.config || {}"
+              :root-value="rootValue || value"
+              :mode-level="modeLevel"
+              :id-registry="idRegistry"
+              :name-registry="nameRegistry"
+              :id-index="idIndex"
+              :gpio-options="gpioOptions"
+              :gpio-usage="gpioUsage"
+              :gpio-title="gpioTitle"
+              :context-component-id="contextComponentId"
+              :context-scope-id="contextScopeId"
+              :global-store="globalStore"
+              @update="(payload) => updateCatalogEntryConfig(index, payload)"
+            />
+          </div>
+          <div v-else class="note">Brak pol konfiguracyjnych.</div>
+          <div v-if="item?.definitionError" class="field-error">
+            {{ item.definitionError }}
+            <button
+              type="button"
+              class="secondary compact btn-standard"
+              :disabled="retryActionIndex === index"
+              @click="retryCatalogEntryDefinition(index)"
+            >
+              {{ retryActionIndex === index ? "Retrying..." : "Retry" }}
+            </button>
+          </div>
+        </template>
+        <template v-else-if="isObjectListItem">
           <div class="schema-levels">
             <SchemaField
-              v-for="child in visibleListItemFields"
+              v-for="child in visibleListItemFields(item)"
               :key="`${index}-${child.key}`"
               :field="child"
               :path="[]"
@@ -112,6 +142,7 @@
               :gpio-usage="gpioUsage"
               :gpio-title="gpioTitle"
               :context-component-id="contextComponentId"
+              :context-scope-id="contextScopeId"
               :global-store="globalStore"
               @update="(payload) => updateListObjectItem(index, payload)"
               @open-secrets="emitOpenSecrets"
@@ -152,11 +183,18 @@
           <input
             :id="listInputId(index)"
             type="text"
-            readonly
+            :placeholder="field.item?.placeholder || field.placeholder"
             :value="item ?? ''"
-            :class="gpioStatusClassForValue(item ?? '')"
-            @click="openListGpioPicker(index)"
+            @input="(event) => updateListPrimitive(index, event.target.value)"
           />
+          <button
+            type="button"
+            class="secondary compact schema-icon-btn"
+            aria-label="Open GPIO picker"
+            @click="openListGpioPicker(index)"
+          >
+            <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/chip.svg" alt="" />
+          </button>
         </div>
         <input
           v-else
@@ -165,12 +203,29 @@
           :value="item ?? ''"
           @input="(event) => updateListPrimitive(index, event.target.value)"
         />
-        <div class="schema-list-actions">
+        <div
+          class="schema-list-actions"
+          :class="{ 'schema-list-actions--catalog': isCatalogListField }"
+        >
           <button type="button" class="secondary compact btn-standard" @click="removeListItem(index)">
-            Remove
+            {{ listRemoveLabel }}
           </button>
         </div>
       </div>
+      <PickerModal
+        v-if="isCatalogListField"
+        :open="catalogPickerOpen"
+        :items="catalogItems"
+        :sections="catalogSections"
+        :use-sections="useCatalogSections"
+        :title="catalogPickerTitle"
+        :help-url="catalogHelpUrl"
+        :help-label="catalogDocLabel"
+        :search-placeholder="catalogSearchPlaceholder"
+        :empty-label="catalogEmptyLabel"
+        @close="catalogPickerOpen = false"
+        @select="addCatalogEntry"
+      />
       <GpioPickerModal
         :open="gpioListPickerOpen"
         :options="gpioOptions"
@@ -202,6 +257,45 @@
         :initial-query="iconName"
         @close="handleIconClose"
         @select="handleIconSelect"
+      />
+    </div>
+
+    <div v-else-if="isTemplatableField" class="schema-templatable">
+      <div class="schema-templatable-toolbar">
+        <button
+          type="button"
+          class="secondary compact btn-standard"
+          :class="{ 'is-active': templatableMode === 'literal' }"
+          @click="setTemplatableMode('literal')"
+        >
+          Value
+        </button>
+        <button
+          type="button"
+          class="secondary compact btn-standard"
+          :class="{ 'is-active': templatableMode === 'lambda' }"
+          @click="setTemplatableMode('lambda')"
+        >
+          Lambda
+        </button>
+      </div>
+      <SchemaField
+        :field="templatableEditorField"
+        :path="[]"
+        :value="templatableEditorValue"
+        :root-value="rootValue || value"
+        :mode-level="modeLevel"
+        :id-registry="idRegistry"
+        :name-registry="nameRegistry"
+        :id-index="idIndex"
+        :gpio-options="gpioOptions"
+        :gpio-usage="gpioUsage"
+        :gpio-title="gpioTitle"
+        :context-component-id="contextComponentId"
+        :context-scope-id="contextScopeId"
+        :global-store="globalStore"
+        @update="handleTemplatableEditorUpdate"
+        @open-secrets="emitOpenSecrets"
       />
     </div>
 
@@ -308,7 +402,6 @@
           type="text"
           :value="resolvedValue"
           :placeholder="field.placeholder"
-          :class="gpioStatusClass"
           @input="onInput"
         />
         <button
@@ -319,17 +412,6 @@
         >
           <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/chip.svg" alt="" />
         </button>
-      </div>
-      <div
-        v-if="gpioNotice"
-        :class="[
-          'field-note',
-          'notice',
-          gpioNotice.variant === 'warning' ? 'notice--warning' : '',
-          gpioNotice.variant === 'error' ? 'notice--error' : ''
-        ]"
-      >
-        {{ gpioNotice.text }}
       </div>
       <GpioPickerModal
         :open="gpioPickerOpen"
@@ -359,7 +441,7 @@
         @click="showSecretAction ? handleSecretClick() : handleGenerate()"
       >
         <img
-          :src="showSecretAction ? 'https://cdn.jsdelivr.net/npm/@mdi/svg/svg/lock.svg' : 'https://cdn.jsdelivr.net/npm/@mdi/svg/svg/lock-reset.svg'"
+          :src="showSecretAction ? 'https://cdn.jsdelivr.net/npm/@mdi/svg/svg/file-key-outline.svg' : 'https://cdn.jsdelivr.net/npm/@mdi/svg/svg/lock-reset.svg'"
           alt=""
           class="icon-button-img"
         />
@@ -394,15 +476,33 @@
 <script setup>
 import { computed, ref, watch } from "vue";
 import IconPicker from "./IconPicker.vue";
-import CatalogListField from "./CatalogListField.vue";
+import PickerModal from "./PickerModal.vue";
 import GpioPickerModal from "./GpioPickerModal.vue";
 import { isFieldVisible } from "../utils/schemaVisibility";
+import {
+  actionIdToSchemaUrl,
+  loadActionCatalog,
+  loadActionDefinition,
+  conditionIdToSchemaUrl,
+  loadConditionCatalog,
+  loadConditionDefinition,
+  loadFilterCatalog
+} from "../utils/schemaLoader";
+import { buildActionSections } from "../utils/actionCatalogSections";
+import { buildConditionSections } from "../utils/conditionCatalogSections";
 import {
   generateFieldValue,
   normalizeSlugValue,
   resolveAutoValue,
   resolveGenerationSpec
 } from "../utils/schemaAuto";
+import {
+  createTemplatableValue,
+  getTemplatableInnerValue,
+  getTemplatableMode,
+  isTemplatableField as isTemplatableFieldUtil,
+  wrapTemplatableValueForField
+} from "../utils/schemaTemplatable";
 
 defineOptions({ name: "SchemaField" });
 
@@ -455,9 +555,17 @@ const props = defineProps({
     type: String,
     default: ""
   },
+  contextScopeId: {
+    type: String,
+    default: ""
+  },
   globalStore: {
     type: Object,
     default: () => ({})
+  },
+  externalError: {
+    type: String,
+    default: ""
   }
 });
 
@@ -476,7 +584,7 @@ const fieldNotice = computed(() => {
   return null;
 });
 
-const hasInlineNote = computed(() => Boolean(fieldNotice.value || gpioNotice.value));
+const hasInlineNote = computed(() => Boolean(fieldNotice.value));
 
 // Full path for nested fields (used to update config values).
 const fieldPath = computed(() => [...props.path, props.field.key]);
@@ -517,6 +625,7 @@ const isIconField = computed(() => props.field.type === "icon");
 const isYamlField = computed(() =>
   props.field.type === "yaml" || props.field.type === "raw_yaml"
 );
+const isTemplatableField = computed(() => isTemplatableFieldUtil(props.field));
 const isLambdaField = computed(() => props.field.type === "lambda");
 const textAreaRows = computed(() => {
   const value = resolvedValue.value;
@@ -546,11 +655,16 @@ const isFilterListField = computed(
 const isActionListField = computed(
   () => props.field.type === "list" && props.field.item?.extends === "base_actions.json"
 );
-// Catalog-backed list (filters/actions) rendered by CatalogListField.
-const isCatalogListField = computed(
-  () => isFilterListField.value || isActionListField.value
+const isConditionListField = computed(
+  () => props.field.type === "list" && props.field.item?.extends === "base_conditions.json"
 );
-const catalogVariant = computed(() => (isFilterListField.value ? "filters" : "actions"));
+// Catalog-backed list (filters/actions).
+const isCatalogListField = computed(
+  () => isFilterListField.value || isActionListField.value || isConditionListField.value
+);
+const isCompactListField = computed(() =>
+  props.field?.listStyle === "compact" || props.field?.compact === true || props.field?.key === "then"
+);
 
 // Normalize list values to an array for list renderers.
 const listValue = computed(() => {
@@ -568,6 +682,369 @@ const isGpioListItem = computed(() => listItemType.value === "gpio");
 const listInputType = computed(() =>
   listItemType.value === "number" ? "number" : "text"
 );
+
+const listRemoveLabel = computed(() => {
+  if (typeof props.field?.removeLabel === "string" && props.field.removeLabel.trim()) {
+    return props.field.removeLabel.trim();
+  }
+  if (isActionListField.value) return "Remove action";
+  if (isFilterListField.value) return "Remove filter";
+  if (props.field?.key === "on_value_range") return "Remove whole range";
+  return "Remove";
+});
+
+const catalogPickerOpen = ref(false);
+const catalogData = ref([]);
+const catalogLoading = ref(false);
+
+const allowedActionDomains = computed(() => {
+  if (!isActionListField.value) return null;
+  const allowed = Array.isArray(props.field.actions) ? props.field.actions : null;
+  return allowed && allowed.length ? allowed : null;
+});
+
+const catalogItems = computed(() => {
+  if (!isCatalogListField.value) return [];
+  if (isConditionListField.value) return catalogData.value;
+  if (!isActionListField.value || !allowedActionDomains.value) return catalogData.value;
+  return catalogData.value.filter((action) => allowedActionDomains.value.includes(action.domain));
+});
+
+const catalogSections = computed(() => {
+  if (isConditionListField.value) return buildConditionSections(catalogItems.value);
+  if (!isActionListField.value) return [];
+  return buildActionSections(catalogItems.value);
+});
+
+const useCatalogSections = computed(() => isActionListField.value || isConditionListField.value);
+
+const catalogPickerTitle = computed(() => {
+  if (isFilterListField.value) return "Choose filter";
+  if (isConditionListField.value) return "Choose condition";
+  return "Choose action";
+});
+const catalogHelpUrl = computed(() =>
+  isFilterListField.value
+    ? "https://esphome.io/components/sensor/#sensor-filters"
+    : isConditionListField.value
+      ? "https://esphome.io/automations/actions/#conditions"
+      : "https://esphome.io/automations/actions/"
+);
+const catalogDocLabel = computed(() =>
+  isFilterListField.value
+    ? "Filter documentation"
+    : isConditionListField.value
+      ? "Condition documentation"
+      : "Action documentation"
+);
+const catalogSearchPlaceholder = computed(() =>
+  isFilterListField.value
+    ? "Search filters"
+    : isConditionListField.value
+      ? "Search conditions"
+      : "Search actions"
+);
+const catalogEmptyLabel = computed(() =>
+  isFilterListField.value
+    ? "No filters to show."
+    : isConditionListField.value
+      ? "No conditions to show."
+      : "No actions to show."
+);
+
+const ensureCatalogLoaded = async () => {
+  if (!isCatalogListField.value) return;
+  if (catalogData.value.length || catalogLoading.value) return;
+  catalogLoading.value = true;
+  try {
+    catalogData.value = isFilterListField.value
+      ? await loadFilterCatalog()
+      : isConditionListField.value
+        ? await loadConditionCatalog()
+        : await loadActionCatalog();
+  } finally {
+    catalogLoading.value = false;
+  }
+};
+
+const handleAddListItem = async () => {
+  if (!isCatalogListField.value) {
+    addListItem();
+    return;
+  }
+  await ensureCatalogLoaded();
+  catalogPickerOpen.value = true;
+};
+
+const addCatalogEntry = async (item) => {
+  const next = listValue.value.slice();
+  if (isFilterListField.value) {
+    next.push({
+      type: item.id,
+      style: item.style,
+      valueKey: item.valueKey || item.fields?.[0]?.key || "value",
+      valueType: item.valueType || "text",
+      config: {}
+    });
+  } else if (isConditionListField.value) {
+    const schemaUrl = item.schemaUrl || conditionIdToSchemaUrl(item.id);
+    let definition = { fields: [] };
+    let definitionError = "";
+    if (schemaUrl) {
+      try {
+        definition = await loadConditionDefinition(schemaUrl, item.id);
+      } catch (error) {
+        definitionError = conditionDefinitionErrorMessage(item.id);
+        definition = { fields: CONDITION_FALLBACK_FIELDS };
+        if (import.meta.env.DEV) {
+          console.warn(`[SchemaField] Failed to load condition definition for ${item.id}`, error);
+        }
+      }
+    }
+    next.push({
+      type: item.id,
+      schemaUrl,
+      fields: Array.isArray(definition?.fields) ? definition.fields : [],
+      definitionError,
+      config: {}
+    });
+  } else {
+    const schemaUrl = item.schemaUrl || actionIdToSchemaUrl(item.id);
+    let definition = { fields: [] };
+    let definitionError = "";
+    if (schemaUrl) {
+      try {
+        definition = await loadActionDefinition(schemaUrl, item.id);
+      } catch (error) {
+        definitionError = actionDefinitionErrorMessage(item.id);
+        definition = { fields: ACTION_FALLBACK_FIELDS };
+        if (import.meta.env.DEV) {
+          console.warn(`[SchemaField] Failed to load action definition for ${item.id}`, error);
+        }
+      }
+    }
+    next.push({
+      type: item.id,
+      schemaUrl,
+      fields: Array.isArray(definition?.fields) ? definition.fields : [],
+      definitionError,
+      config: {}
+    });
+  }
+  emit("update", { path: fieldPath.value, value: next });
+  catalogPickerOpen.value = false;
+};
+
+const retryActionIndex = ref(null);
+let actionHydrationToken = 0;
+
+const retryCatalogEntryDefinition = async (index) => {
+  const entry = listValue.value[index];
+  if (!entry?.type) return;
+  const schemaUrl = isConditionListField.value
+    ? entry.schemaUrl || conditionIdToSchemaUrl(entry.type)
+    : entry.schemaUrl || actionIdToSchemaUrl(entry.type);
+  if (!schemaUrl) return;
+
+  retryActionIndex.value = index;
+  try {
+    const definition = isConditionListField.value
+      ? await loadConditionDefinition(schemaUrl, entry.type)
+      : await loadActionDefinition(schemaUrl, entry.type);
+    const next = listValue.value.map((item, itemIndex) => {
+      if (itemIndex !== index) return item;
+      return {
+        ...item,
+        schemaUrl,
+        fields: Array.isArray(definition?.fields) ? definition.fields : [],
+        definitionError: ""
+      };
+    });
+    emit("update", { path: fieldPath.value, value: next });
+  } catch (error) {
+    const next = listValue.value.map((item, itemIndex) => {
+      if (itemIndex !== index) return item;
+      return {
+        ...item,
+        fields: isConditionListField.value ? CONDITION_FALLBACK_FIELDS : ACTION_FALLBACK_FIELDS,
+        definitionError: isConditionListField.value
+          ? conditionDefinitionErrorMessage(entry.type)
+          : actionDefinitionErrorMessage(entry.type)
+      };
+    });
+    emit("update", { path: fieldPath.value, value: next });
+    if (import.meta.env.DEV) {
+      console.warn(
+        `[SchemaField] Retry failed for ${isConditionListField.value ? "condition" : "action"} definition ${entry.type}`,
+        error
+      );
+    }
+  } finally {
+    retryActionIndex.value = null;
+  }
+};
+
+const hydrateCatalogEntryFields = async () => {
+  if (!isActionListField.value && !isConditionListField.value) return;
+  if (!Array.isArray(listValue.value) || !listValue.value.length) return;
+
+  const localToken = ++actionHydrationToken;
+
+  let changed = false;
+  const source = listValue.value;
+  const next = await Promise.all(
+    source.map(async (entry) => {
+      if (!entry?.type) return entry;
+      const hasFields = Array.isArray(entry.fields) && entry.fields.length > 0;
+      if (hasFields) return entry;
+
+      const schemaUrl = isConditionListField.value
+        ? entry.schemaUrl || conditionIdToSchemaUrl(entry.type)
+        : entry.schemaUrl || actionIdToSchemaUrl(entry.type);
+      if (!schemaUrl) return entry;
+
+      try {
+        const definition = isConditionListField.value
+          ? await loadConditionDefinition(schemaUrl, entry.type)
+          : await loadActionDefinition(schemaUrl, entry.type);
+        const resolvedFields = Array.isArray(definition?.fields) ? definition.fields : [];
+        const currentFields = Array.isArray(entry.fields) ? entry.fields : [];
+        const schemaUrlChanged = entry.schemaUrl !== schemaUrl;
+        const fieldsChanged = JSON.stringify(currentFields) !== JSON.stringify(resolvedFields);
+        if (!schemaUrlChanged && !fieldsChanged) {
+          return entry;
+        }
+        changed = true;
+        return {
+          ...entry,
+          schemaUrl,
+          fields: resolvedFields,
+          definitionError: ""
+        };
+      } catch (error) {
+        if (entry.definitionError) {
+          return entry;
+        }
+        changed = true;
+        const fallback = {
+          ...entry,
+          schemaUrl,
+          fields: isConditionListField.value ? CONDITION_FALLBACK_FIELDS : ACTION_FALLBACK_FIELDS,
+          definitionError: isConditionListField.value
+            ? conditionDefinitionErrorMessage(entry.type)
+            : actionDefinitionErrorMessage(entry.type)
+        };
+        if (import.meta.env.DEV) {
+          console.warn(
+            `[SchemaField] Failed to hydrate ${isConditionListField.value ? "condition" : "action"} definition for ${entry.type}`,
+            error
+          );
+        }
+        return fallback;
+      }
+    })
+  );
+
+  if (localToken !== actionHydrationToken) {
+    return;
+  }
+
+  if (source !== listValue.value) {
+    return;
+  }
+
+  if (changed) {
+    emit("update", { path: fieldPath.value, value: next });
+  }
+};
+
+const updateCatalogEntryConfig = (index, { path, value }) => {
+  const next = listValue.value.map((entry, itemIndex) => {
+    if (itemIndex !== index) return entry;
+    const config = { ...(entry.config || {}) };
+    let cursor = config;
+    path.slice(0, -1).forEach((key) => {
+      if (!cursor[key] || typeof cursor[key] !== "object") {
+        cursor[key] = {};
+      }
+      cursor = cursor[key];
+    });
+    cursor[path[path.length - 1]] = value;
+    return { ...entry, config };
+  });
+  emit("update", { path: fieldPath.value, value: next });
+};
+
+const entryDefinition = (entry) =>
+  catalogData.value.find((catalogItem) => catalogItem.id === entry?.type);
+
+const ACTION_FALLBACK_FIELDS = Object.freeze([
+  {
+    key: "custom_config",
+    label: "custom_config",
+    type: "raw_yaml",
+    required: false,
+    lvl: "advanced",
+    placeholder: "key: value"
+  }
+]);
+
+const CONDITION_FALLBACK_FIELDS = Object.freeze([
+  {
+    key: "custom_config",
+    label: "custom_config",
+    type: "raw_yaml",
+    required: false,
+    lvl: "advanced",
+    placeholder: "condition_key: value"
+  }
+]);
+
+const actionDefinitionErrorMessage = (actionId) =>
+  `Definition missing for ${actionId || "this action"}. Using custom_config fallback.`;
+
+const conditionDefinitionErrorMessage = (conditionId) =>
+  `Definition missing for ${conditionId || "this condition"}. Using custom_config fallback.`;
+
+const entryLabel = (entry) => {
+  const def = entryDefinition(entry);
+  const fallback = isFilterListField.value ? "Filter" : isConditionListField.value ? "Condition" : "Action";
+  return def?.label || entry?.type || fallback;
+};
+
+const entryFields = (entry) => {
+  const def = entryDefinition(entry);
+  if (isFilterListField.value) {
+    if (!def) return [];
+    if (def.style === "scalar") {
+      return [
+        {
+          key: "value",
+          type: def.valueType || "text",
+          required: true
+        }
+      ];
+    }
+    if (def.style === "scalar_or_object") {
+      return def.fields || [];
+    }
+    return def.fields || [];
+  }
+  const entryDefinedFields = Array.isArray(entry?.fields) ? entry.fields : null;
+  const definitionFields = Array.isArray(def?.fields) ? def.fields : null;
+  const fields = entryDefinedFields ?? definitionFields ?? [];
+  return fields;
+};
+
+const entryDocLink = (entry) => {
+  if (!entry?.type) return "";
+  if (isFilterListField.value) {
+    return `https://esphome.io/components/sensor/#${entry.type}`;
+  }
+  if (entry?.helpUrl) return entry.helpUrl;
+  const def = entryDefinition(entry);
+  return def?.helpUrl || "";
+};
 
 const modeOrder = {
   simple: 1,
@@ -596,9 +1073,8 @@ const filterVisibleFields = (fields = [], contextValue = null) =>
 const visibleObjectFields = computed(() =>
   filterVisibleFields(props.field.fields || [], fieldValue.value || {})
 );
-const visibleListItemFields = computed(() =>
-  filterVisibleFields(props.field.item?.fields || [])
-);
+const visibleListItemFields = (itemValue = {}) =>
+  filterVisibleFields(props.field.item?.fields || [], itemValue || {});
 
 const listLevelClass = computed(() => {
   const lvl = props.field?.lvl?.toLowerCase() || "simple";
@@ -629,10 +1105,60 @@ const inputType = computed(() => {
 
 // Apply schema default when no explicit value exists.
 const resolvedValue = computed(() => {
-  if (fieldValue.value !== undefined) return fieldValue.value;
+  if (fieldValue.value !== undefined) {
+    return isTemplatableField.value
+      ? getTemplatableInnerValue(fieldValue.value, props.field)
+      : fieldValue.value;
+  }
   if (props.field.default !== undefined) return props.field.default;
   return "";
 });
+
+const templatableMode = computed(() => getTemplatableMode(fieldValue.value, props.field));
+
+const templatableLiteralField = computed(() => ({
+  ...props.field,
+  key: "value",
+  hideLabel: true,
+  templatable: false
+}));
+
+const templatableLambdaField = computed(() => ({
+  key: "value",
+  type: "lambda",
+  hideLabel: true,
+  required: props.field.required,
+  lvl: props.field.lvl,
+  placeholder: props.field.lambdaPlaceholder || "return ...;"
+}));
+
+const templatableEditorField = computed(() =>
+  templatableMode.value === "lambda" ? templatableLambdaField.value : templatableLiteralField.value
+);
+
+const templatableEditorValue = computed(() => ({ value: resolvedValue.value }));
+
+const setTemplatableMode = (nextMode) => {
+  emit("update", {
+    path: fieldPath.value,
+    value: wrapTemplatableValueForField(
+      props.field,
+      createTemplatableValue(nextMode, resolvedValue.value),
+      nextMode
+    )
+  });
+};
+
+const handleTemplatableEditorUpdate = ({ value }) => {
+  emit("update", {
+    path: fieldPath.value,
+    value: wrapTemplatableValueForField(
+      props.field,
+      createTemplatableValue(templatableMode.value, value),
+      templatableMode.value
+    )
+  });
+};
 
 
 const booleanDisplayValue = computed(() => {
@@ -711,12 +1237,17 @@ const selectListOptionDropdownLabel = (option) => {
 // Build id_ref options filtered by domain and excluding current component.
 const idOptions = computed(() => {
   const allowedDomain = props.field?.domain || "";
-  const currentId = props.contextComponentId;
+  const currentScopeId = props.contextScopeId;
+  const currentComponentId = props.contextComponentId;
+  const allowSelfReference = Boolean(props.field?.allowSelfReference);
   const seen = new Set();
   const options = [];
 
   (props.idIndex || []).forEach((entry) => {
-    if (currentId && entry.componentId === currentId) return;
+    if (!allowSelfReference) {
+      if (currentScopeId && entry.scopeId === currentScopeId) return;
+      if (!currentScopeId && currentComponentId && entry.componentId === currentComponentId) return;
+    }
     if (allowedDomain && entry.domain !== allowedDomain) return;
     if (seen.has(entry.idLower)) return;
     seen.add(entry.idLower);
@@ -752,6 +1283,8 @@ const passwordFormat = computed(() => {
 
 // Inline validation for base64 keys and duplicate IDs/names.
 const fieldError = computed(() => {
+  if (isTemplatableField.value) return "";
+  if (props.externalError) return props.externalError;
   if (hasSecretReference.value) return "";
   const rawValue = resolvedValue.value;
   if (passwordFormat.value === "base64_44") {
@@ -774,6 +1307,7 @@ const fieldError = computed(() => {
 // Inline validation for id_ref fields.
 const idRefError = computed(() => {
   if (!isIdRefField.value) return "";
+  if (props.field?.required !== true) return "";
   if (!idOptions.value.length) return "No matching identifiers available";
   const value = resolvedValue.value;
   if (!value || typeof value !== "string") return "";
@@ -782,69 +1316,6 @@ const idRefError = computed(() => {
 });
 
 const gpioPickerOpen = ref(false);
-
-const normalizeGpioKey = (value) =>
-  String(value || "")
-    .toLowerCase()
-    .replace(/\s+/g, "")
-    .replace(/^gpio/, "");
-
-const gpioEntry = computed(() => {
-  const key = normalizeGpioKey(resolvedValue.value || "");
-  return (
-    props.gpioOptions.find((option) => {
-      const baseValue = option.value || option.id;
-      const normalized = `GPIO${baseValue}`;
-      return normalizeGpioKey(normalized) === key;
-    }) || null
-  );
-});
-
-// Usage count excludes the current field's value.
-const gpioUsageCount = computed(() => {
-  const key = normalizeGpioKey(resolvedValue.value || "");
-  if (!key) return 0;
-  const count = props.gpioUsage?.[key] || 0;
-  return resolvedValue.value ? Math.max(0, count - 1) : count;
-});
-
-const gpioStatus = computed(() => {
-  if (gpioUsageCount.value > 0) return "used";
-  return gpioEntry.value?.status || "";
-});
-
-const gpioStatusClass = computed(() =>
-  gpioStatus.value ? `gpio-${gpioStatus.value}` : ""
-);
-
-const gpioStatusClassForValue = (value) => {
-  const key = normalizeGpioKey(value || "");
-  if (!key) return "";
-  const entry = props.gpioOptions.find((option) => {
-    const baseValue = option.value || option.id;
-    const normalized = `GPIO${baseValue}`;
-    return normalizeGpioKey(normalized) === key;
-  });
-  const usageCount = props.gpioUsage?.[key] || 0;
-  const isUsed = value ? usageCount > 1 : usageCount > 0;
-  const status = isUsed ? "used" : entry?.status;
-  return status ? `gpio-${status}` : "";
-};
-
-const gpioNotice = computed(() => {
-  if (gpioStatus.value === "used") {
-    return { text: "This GPIO is already used elsewhere.", variant: "error" };
-  }
-  const entry = gpioEntry.value || {};
-  if (entry.error) return { text: entry.error, variant: "error" };
-  if (entry.warning) return { text: entry.warning, variant: "warning" };
-  if (entry.note) {
-    if (gpioStatus.value === "avoid") return { text: entry.note, variant: "error" };
-    if (gpioStatus.value === "caution") return { text: entry.note, variant: "warning" };
-    return { text: entry.note, variant: "note" };
-  }
-  return null;
-});
 
 const hasAppliedDefault = ref(false);
 const autoOverride = ref(false);
@@ -858,6 +1329,22 @@ const autoValue = computed(() =>
 // Generate values for password/base64 fields.
 const generateValue = () => generateFieldValue(props.field);
 
+const wrapInputValue = (value) =>
+  isTemplatableField.value
+    ? wrapTemplatableValueForField(props.field, value, templatableMode.value)
+    : value;
+
+watch(
+  () => [isCatalogListField.value, listValue.value.length],
+  async ([isCatalog, listLength]) => {
+    if (!isCatalog) return;
+    if (listLength <= 0) return;
+    await ensureCatalogLoaded();
+    await hydrateCatalogEntryFields();
+  },
+  { immediate: true }
+);
+
 watch(
   () => [fieldValue.value, props.field.default, props.field.required],
   ([currentValue, defaultValue, isRequired]) => {
@@ -867,7 +1354,12 @@ watch(
     if (props.field.type === "object") return;
     if (props.field.type === "list" && !Array.isArray(defaultValue)) return;
     if (props.field.type === "boolean") return;
-    emit("update", { path: fieldPath.value, value: defaultValue });
+    emit("update", {
+      path: fieldPath.value,
+      value: isTemplatableField.value
+        ? wrapTemplatableValueForField(props.field, defaultValue, templatableMode.value)
+        : defaultValue
+    });
     hasAppliedDefault.value = true;
   },
   { immediate: true }
@@ -879,10 +1371,27 @@ watch(
     if (!isAutoField.value) return;
     const computedAutoValue = (nextAutoValue ?? "").toString();
     const current = (currentValue || "").toString();
-    const shouldUpdate = !autoOverride.value || current === lastAutoValue.value || !current;
-    if (!shouldUpdate) return;
-    if (!computedAutoValue && !current) return;
-    emit("update", { path: fieldPath.value, value: computedAutoValue });
+    const previousAutoValue = (lastAutoValue.value || "").toString();
+
+    // Keep auto-sync only while the field is empty or still follows auto output.
+    // If user typed a different non-empty value, treat it as explicit override and preserve it.
+    const isManualOverride = Boolean(
+      current && current !== previousAutoValue && current !== computedAutoValue
+    );
+    if (isManualOverride) {
+      autoOverride.value = true;
+      lastAutoValue.value = computedAutoValue;
+      return;
+    }
+
+    autoOverride.value = false;
+    if (!computedAutoValue && !current) {
+      lastAutoValue.value = computedAutoValue;
+      return;
+    }
+    if (current !== computedAutoValue) {
+      emit("update", { path: fieldPath.value, value: wrapInputValue(computedAutoValue) });
+    }
     lastAutoValue.value = computedAutoValue;
   },
   { immediate: true }
@@ -899,7 +1408,7 @@ watch(
     }
     const generated = generateValue();
     if (!generated) return;
-    emit("update", { path: fieldPath.value, value: generated });
+    emit("update", { path: fieldPath.value, value: wrapInputValue(generated) });
   },
   { immediate: true }
 );
@@ -938,7 +1447,7 @@ const onInput = (event) => {
       lastAutoValue.value = computedAutoValue;
     }
   }
-  emit("update", { path: fieldPath.value, value });
+  emit("update", { path: fieldPath.value, value: wrapInputValue(value) });
 };
 
 const onSearchInput = (event) => {
@@ -957,7 +1466,7 @@ const closeSearch = () => {
 };
 
 const chooseSearchOption = (option) => {
-  emit("update", { path: fieldPath.value, value: option });
+  emit("update", { path: fieldPath.value, value: wrapInputValue(option) });
   searchOpen.value = false;
 };
 
@@ -965,7 +1474,7 @@ const handleGenerate = () => {
   const generated = generateValue();
   if (!generated) return;
   generateTouched.value = true;
-  emit("update", { path: fieldPath.value, value: generated });
+  emit("update", { path: fieldPath.value, value: wrapInputValue(generated) });
 };
 
 const handleSecretClick = () => {
@@ -975,7 +1484,7 @@ const handleSecretClick = () => {
 const onIdRefInput = (event) => {
   const value = event.target.value;
   idRefQuery.value = value;
-  emit("update", { path: fieldPath.value, value });
+  emit("update", { path: fieldPath.value, value: wrapInputValue(value) });
 };
 
 const openIdRef = () => {
@@ -990,7 +1499,7 @@ const scheduleCloseIdRef = () => {
 };
 
 const selectIdRef = (value) => {
-  emit("update", { path: fieldPath.value, value });
+  emit("update", { path: fieldPath.value, value: wrapInputValue(value) });
   idRefQuery.value = value;
   idRefOpen.value = false;
 };
@@ -1020,14 +1529,14 @@ const selectListOptionToken = (index) => `${OPTION_TOKEN_PREFIX}${index}`;
 
 const onSelect = (event) => {
   const value = parseOptionToken(event.target.value, selectOptions.value);
-  emit("update", { path: fieldPath.value, value });
+  emit("update", { path: fieldPath.value, value: wrapInputValue(value) });
   syncHiddenSelectedOption(event.target, value);
 };
 
 const onBooleanSelect = (event) => {
   const value = event.target.value;
   const booleanValue = value === "__opt_true";
-  emit("update", { path: fieldPath.value, value: booleanValue });
+  emit("update", { path: fieldPath.value, value: wrapInputValue(booleanValue) });
   syncHiddenSelectedOption(event.target, booleanValue ? "true" : "false");
 };
 
@@ -1037,25 +1546,25 @@ const openIconPicker = () => {
 
 const onIconInput = (event) => {
   const value = event.target.value;
-  emit("update", { path: fieldPath.value, value });
+  emit("update", { path: fieldPath.value, value: wrapInputValue(value) });
 };
 
 const handleIconSelect = (name) => {
   const value = name ? `mdi:${name}` : "";
-  emit("update", { path: fieldPath.value, value });
+  emit("update", { path: fieldPath.value, value: wrapInputValue(value) });
   iconPickerOpen.value = false;
 };
 
 const handleIconClose = ({ query }) => {
   iconPickerOpen.value = false;
   if (!query) {
-    emit("update", { path: fieldPath.value, value: "" });
+    emit("update", { path: fieldPath.value, value: wrapInputValue("") });
   }
 };
 
 const handleGpioSelect = (value) => {
-  const normalized = value ? `GPIO${value}` : "";
-  emit("update", { path: fieldPath.value, value: normalized });
+  const normalized = normalizeGpioValue(value);
+  emit("update", { path: fieldPath.value, value: wrapInputValue(normalized) });
   gpioPickerOpen.value = false;
 };
 
@@ -1064,8 +1573,7 @@ const openGpioPicker = () => {
 };
 
 const gpioPickerSelected = computed(() => {
-  const value = resolvedValue.value || "";
-  return value.replace(/^gpio\s*/i, "").trim();
+  return normalizeGpioPickerSelected(resolvedValue.value);
 });
 
 const gpioListPickerOpen = ref(false);
@@ -1073,7 +1581,7 @@ const gpioListPickerIndex = ref(null);
 
 const gpioListSelected = computed(() => {
   if (gpioListPickerIndex.value === null) return "";
-  return listValue.value[gpioListPickerIndex.value] || "";
+  return normalizeGpioPickerSelected(listValue.value[gpioListPickerIndex.value]);
 });
 
 const openListGpioPicker = (index) => {
@@ -1083,10 +1591,21 @@ const openListGpioPicker = (index) => {
 
 const handleListGpioSelect = (value) => {
   if (gpioListPickerIndex.value === null) return;
-  const normalized = value ? `GPIO${value}` : "";
+  const normalized = normalizeGpioValue(value);
   updateListPrimitive(gpioListPickerIndex.value, normalized);
   gpioListPickerOpen.value = false;
 };
+
+const normalizeGpioValue = (rawValue) => {
+  const value = String(rawValue || "").trim();
+  if (!value) return "";
+  return `GPIO${value.replace(/^gpio\s*/i, "").trim()}`;
+};
+
+const normalizeGpioPickerSelected = (rawValue) =>
+  String(rawValue || "")
+    .replace(/^gpio\s*/i, "")
+    .trim();
 
 const listInputId = (index) => `${inputId.value}-${index}`;
 

@@ -1,0 +1,14 @@
+{
+  "id": "ufire_ec.reset",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Ufire Ec",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "ufire_ec_id",
+      "domain": "ufire_ec",
+      "lvl": "normal"
+    }
+  ]
+}

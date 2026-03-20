@@ -1,0 +1,117 @@
+{
+  "id": "light.shelly_dimmer",
+  "domain": "light",
+  "platform": "shelly_dimmer",
+  "requires": [
+    "uart"
+  ],
+  "helpUrl": "https://esphome.io/components/light/shelly_dimmer/",
+  "extends": "base_light.json",
+  "fields": [
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "uart"
+    },
+    {
+      "key": "leading_edge",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "min_brightness",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 0
+    },
+    {
+      "key": "max_brightness",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 1000
+    },
+    {
+      "key": "warmup_brightness",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 0
+    },
+    {
+      "key": "nrst_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "boot0_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "current",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "power",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "firmware",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "version",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "default": "51.6"
+        },
+        {
+          "key": "url",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "sha256",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "update",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal",
+          "default": false
+        }
+      ]
+    }
+  ]
+}

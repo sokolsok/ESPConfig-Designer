@@ -1,0 +1,118 @@
+{
+  "id": "output.modbus_controller",
+  "domain": "output",
+  "platform": "modbus_controller",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/output/modbus_controller/",
+  "extends": "base_output.json",
+  "fields": [
+    {
+      "key": "modbus_controller_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "modbus_controller"
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "0x0800",
+      "suppressQuotes": true
+    },
+    {
+      "key": "value_type",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "U_WORD",
+      "options": [
+        "U_WORD",
+        "S_WORD",
+        "U_DWORD",
+        "S_DWORD",
+        "U_DWORD_R",
+        "S_DWORD_R",
+        "U_QWORD",
+        "S_QWORD",
+        "U_QWORD_R",
+        "S_QWORD_R",
+        "FP32",
+        "FP32_R"
+      ]
+    },
+    {
+      "key": "register_type",
+      "type": "select",
+      "required": false,
+      "lvl": "simple",
+      "default": "holding",
+      "options": [
+        "coil",
+        "holding"
+      ]
+    },
+    {
+      "key": "multiply",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "register_type",
+        "value": "holding"
+      }
+    },
+    {
+      "key": "use_write_multiple",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "write_lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "offset",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "min_power",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 0,
+      "dependsOn": {
+        "key": "register_type",
+        "value": "holding"
+      }
+    },
+    {
+      "key": "max_power",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 1,
+      "dependsOn": {
+        "key": "register_type",
+        "value": "holding"
+      }
+    },
+    {
+      "key": "zero_means_zero",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false,
+      "dependsOn": {
+        "key": "register_type",
+        "value": "holding"
+      }
+    }
+  ]
+}

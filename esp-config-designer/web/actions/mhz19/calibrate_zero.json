@@ -1,0 +1,14 @@
+{
+  "id": "mhz19.calibrate_zero",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Mhz19",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "mhz19_id",
+      "domain": "mhz19",
+      "lvl": "normal"
+    }
+  ]
+}

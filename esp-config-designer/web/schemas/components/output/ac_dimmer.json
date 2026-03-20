@@ -1,0 +1,41 @@
+{
+  "id": "output.ac_dimmer",
+  "domain": "output",
+  "platform": "ac_dimmer",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/output/ac_dimmer/",
+  "extends": "base_output_float.json",
+  "fields": [
+    {
+      "key": "gate_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "zero_cross_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "method",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "leading pulse",
+      "options": [
+        "leading pulse",
+        "leading",
+        "trailing"
+      ]
+    },
+    {
+      "key": "init_with_half_cycle",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

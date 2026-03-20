@@ -1,0 +1,50 @@
+{
+  "id": "sensor.pulse_meter",
+  "domain": "sensor",
+  "platform": "pulse_meter",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/pulse_meter/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "internal_filter",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "13us"
+    },
+    {
+      "key": "internal_filter_mode",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "EDGE"
+    },
+    {
+      "key": "timeout",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "5 min"
+    },
+    {
+      "key": "total",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

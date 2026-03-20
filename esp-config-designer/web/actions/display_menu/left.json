@@ -1,0 +1,33 @@
+{
+  "id": "display_menu.left",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Display menu",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "display_menu_id",
+      "domain": "display_menu",
+      "lvl": "normal"
+    },
+    {
+      "key": "steps",
+      "label": "Steps",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1",
+      "lambdaPlaceholder": "return 1;"
+    },
+    {
+      "key": "edit_mode",
+      "label": "Edit mode",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

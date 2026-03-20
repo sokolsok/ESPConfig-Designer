@@ -1,0 +1,33 @@
+{
+  "id": "ble_client.passkey_reply",
+  "fields": [
+    {
+      "key": "id",
+      "label": "BLE client",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "ble_client_id",
+      "domain": "ble_client",
+      "lvl": "normal"
+    },
+    {
+      "key": "accept",
+      "label": "Accept",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    },
+    {
+      "key": "passkey",
+      "label": "Passkey",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "123456",
+      "lambdaPlaceholder": "return 123456;"
+    }
+  ]
+}

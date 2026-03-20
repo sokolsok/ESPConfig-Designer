@@ -1,0 +1,24 @@
+{
+  "id": "scd30.force_recalibration_with_reference",
+  "fields": [
+    {
+      "key": "id",
+      "label": "SCD30",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "scd30_id",
+      "domain": "scd30",
+      "lvl": "normal"
+    },
+    {
+      "key": "co2_reference",
+      "label": "CO2 reference",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "420",
+      "lambdaPlaceholder": "return 420;"
+    }
+  ]
+}

@@ -4,16 +4,27 @@
   "platform": "gpio",
   "requires": [],
   "helpUrl": "https://esphome.io/components/switch/gpio/",
+  "extends": "base_switch.json",
   "fields": [
     {
-      "key": "name",
-      "type": "text",
-      "required": true
+      "key": "pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "helpUrl": "https://esphome.io/guides/configuration-types#pin-schema"
     },
     {
-      "key": "id",
-      "type": "id",
-      "required": false
+      "key": "interlock",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "[relay2]"
+    },
+    {
+      "key": "interlock_wait_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal"
     }
   ]
 }

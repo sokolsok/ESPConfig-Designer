@@ -1,0 +1,24 @@
+{
+  "id": "microphone.capture",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Microphone",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "microphone_id",
+      "domain": "microphone",
+      "lvl": "normal"
+    },
+    {
+      "key": "duration",
+      "label": "Duration",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "5s",
+      "lambdaPlaceholder": "return 5000;"
+    }
+  ]
+}

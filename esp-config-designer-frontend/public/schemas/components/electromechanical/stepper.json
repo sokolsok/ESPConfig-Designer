@@ -1,0 +1,143 @@
+{
+  "id": "stepper",
+  "domain": "stepper",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/stepper/",
+  "fields": [
+    {
+      "key": "platform",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "a4988",
+      "options": [
+        "a4988",
+        "uln2003"
+      ]
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "idDomain": "stepper"
+    },
+    {
+      "key": "max_speed",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "250 steps/s"
+    },
+    {
+      "key": "acceleration",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "inf"
+    },
+    {
+      "key": "deceleration",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "inf"
+    },
+    {
+      "key": "step_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "platform",
+        "value": "a4988"
+      }
+    },
+    {
+      "key": "dir_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "platform",
+        "value": "a4988"
+      }
+    },
+    {
+      "key": "sleep_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "platform",
+        "value": "a4988"
+      }
+    },
+    {
+      "key": "pin_a",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "platform",
+        "value": "uln2003"
+      }
+    },
+    {
+      "key": "pin_b",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "platform",
+        "value": "uln2003"
+      }
+    },
+    {
+      "key": "pin_c",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "platform",
+        "value": "uln2003"
+      }
+    },
+    {
+      "key": "pin_d",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "platform",
+        "value": "uln2003"
+      }
+    },
+    {
+      "key": "sleep_when_done",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "platform",
+        "value": "uln2003"
+      }
+    },
+    {
+      "key": "step_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "FULL_STEP",
+      "options": [
+        "FULL_STEP",
+        "HALF_STEP",
+        "WAVE_DRIVE"
+      ],
+      "dependsOn": {
+        "key": "platform",
+        "value": "uln2003"
+      }
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "id": "hub.ads1118",
+  "domain": "ads1118",
+  "platform": "",
+  "requires": [
+    "spi"
+  ],
+  "type": "object",
+  "fields": [
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "ads1118_hub",
+      "idDomain": "ads1118"
+    },
+    {
+      "key": "spi_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "spi"
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "id": "media_player.speaker",
+  "domain": "media_player",
+  "platform": "speaker",
+  "requires": [
+    "network"
+  ],
+  "helpUrl": "https://esphome.io/components/media_player/speaker/",
+  "extends": "base_media_player.json",
+  "fields": [
+    {
+      "key": "announcement_pipeline",
+      "type": "yaml",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "speaker: my_speaker\nformat: FLAC\nsample_rate: 48000\nnum_channels: 1"
+    },
+    {
+      "key": "media_pipeline",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "speaker: my_media_speaker\nformat: MP3\nsample_rate: 48000\nnum_channels: 2"
+    },
+    {
+      "key": "buffer_size",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 1000000
+    },
+    {
+      "key": "codec_support_enabled",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "needed",
+      "options": [
+        "all",
+        "needed",
+        "none"
+      ]
+    },
+    {
+      "key": "task_stack_in_psram",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "volume_increment",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "5%"
+    },
+    {
+      "key": "volume_initial",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "50%"
+    },
+    {
+      "key": "volume_min",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0%"
+    },
+    {
+      "key": "volume_max",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "100%"
+    },
+    {
+      "key": "files",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "- id: startup_sound\n  file: /config/sounds/startup.wav"
+    },
+    {
+      "key": "on_mute",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_unmute",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_volume",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

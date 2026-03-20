@@ -1,0 +1,51 @@
+{
+  "id": "sensor.resistance",
+  "domain": "sensor",
+  "platform": "resistance",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/resistance/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "sensor",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "sensor",
+      "placeholder": "source_sensor"
+    },
+    {
+      "key": "configuration",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+	  "default": "DOWNSTREAM",
+      "options": [
+        "DOWNSTREAM",
+        "UPSTREAM"
+      ]
+    },
+    {
+      "key": "resistor",
+      "type": "number",
+      "required": true,
+      "lvl": "simple",
+	  "plaheholder": "4.7kOhm"
+    },
+    {
+      "key": "reference_voltage",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 3.3,
+      "placeholder": "3.3"
+    }
+  ]
+}

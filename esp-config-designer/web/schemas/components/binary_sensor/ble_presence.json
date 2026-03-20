@@ -1,0 +1,65 @@
+{
+  "id": "binary_sensor.ble_presence",
+  "domain": "binary_sensor",
+  "platform": "ble_presence",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/binary_sensor/ble_presence/",
+  "extends": "base_binary_sensor.json",
+  "fields": [
+    {
+      "key": "mac_address",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "AA:BB:CC:DD:EE:FF",
+      "note": "Use exactly one of mac_address, irk, service_uuid or ibeacon_uuid"
+    },
+    {
+      "key": "irk",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1234567890abcdef1234567890abcdef"
+    },
+    {
+      "key": "service_uuid",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "11aa"
+    },
+    {
+      "key": "ibeacon_uuid",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "68586f1e-89c2-11eb-8dcd-0242ac130003"
+    },
+    {
+      "key": "ibeacon_major",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "ibeacon_minor",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "min_rssi",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "-80"
+    },
+    {
+      "key": "timeout",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "5min"
+    }
+  ]
+}

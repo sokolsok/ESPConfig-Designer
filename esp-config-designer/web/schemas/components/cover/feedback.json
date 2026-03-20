@@ -1,0 +1,141 @@
+{
+  "id": "cover.feedback",
+  "domain": "cover",
+  "platform": "feedback",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/cover/feedback/",
+  "extends": "base_cover.json",
+  "fields": [
+    {
+      "key": "stop_action",
+      "type": "yaml",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "open_action",
+      "type": "yaml",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "open_duration",
+      "type": "duration",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "open_endstop",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "binary_sensor"
+    },
+    {
+      "key": "open_sensor",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "binary_sensor"
+    },
+    {
+      "key": "open_obstacle_sensor",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "advanced",
+      "domain": "binary_sensor"
+    },
+    {
+      "key": "close_action",
+      "type": "yaml",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "close_duration",
+      "type": "duration",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "close_endstop",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "binary_sensor"
+    },
+    {
+      "key": "close_sensor",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "binary_sensor"
+    },
+    {
+      "key": "close_obstacle_sensor",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "advanced",
+      "domain": "binary_sensor"
+    },
+    {
+      "key": "has_built_in_endstop",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "infer_endstop_from_movement",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "assumed_state",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "max_duration",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "direction_change_wait_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "acceleration_wait_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "default": "0s"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "1s"
+    },
+    {
+      "key": "obstacle_rollback",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "default": 10
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

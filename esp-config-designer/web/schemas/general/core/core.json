@@ -22,7 +22,7 @@
         "maxLength": 24
       },
       "required": true,
-      "lvl": "normal",
+      "lvl": "simple",
       "placeholder": "living-room-controller"
     },
     {
@@ -50,7 +50,7 @@
       "key": "name_add_mac_suffix",
       "type": "boolean",
       "required": false,
-	  "default": false,
+      "default": false,
       "lvl": "advanced"
     },
     {
@@ -65,14 +65,14 @@
             "key": "key",
             "type": "text",
             "required": true,
-			"lvl": "advanced",
+            "lvl": "advanced",
             "placeholder": "upload_speed"
           },
           {
             "key": "value",
             "type": "text",
             "required": false,
-			"lvl": "advanced",
+            "lvl": "advanced",
             "placeholder": "115200"
           }
         ]
@@ -138,26 +138,27 @@
           "key": "name",
           "type": "text",
           "required": false,
-		  "lvl": "advanced",
+          "lvl": "advanced",
           "placeholder": "author.project"
         },
         {
           "key": "version",
           "type": "text",
           "required": false,
-		  "lvl": "advanced",
+          "lvl": "advanced",
           "placeholder": "1.0.0"
         },
         {
           "key": "on_update",
           "type": "list",
           "required": false,
-		  "lvl": "advanced",
+          "lvl": "advanced",
           "item": {
             "type": "object",
             "fields": [],
             "extends": "base_actions.json"
-          }
+          },
+          "wrapThen": true
         }
       ]
     },
@@ -193,21 +194,21 @@
             "key": "id",
             "type": "id",
             "required": true,
-			"lvl": "advanced",
+            "lvl": "advanced",
             "placeholder": "front_door_device"
           },
           {
             "key": "name",
             "type": "text",
             "required": true,
-			"lvl": "advanced",
+            "lvl": "advanced",
             "placeholder": "Front Door Sensor"
           },
           {
             "key": "area_id",
             "type": "id",
             "required": false,
-			"lvl": "advanced",
+            "lvl": "advanced",
             "placeholder": "entrance_area"
           }
         ]
@@ -225,14 +226,14 @@
             "key": "priority",
             "type": "number",
             "required": false,
-			"lvl": "advanced",
+            "lvl": "advanced",
             "placeholder": "600"
           },
           {
             "key": "then",
             "type": "list",
             "required": false,
-			"lvl": "advanced",
+            "lvl": "advanced",
             "item": {
               "type": "object",
               "fields": [],
@@ -254,14 +255,14 @@
             "key": "priority",
             "type": "number",
             "required": false,
-			"lvl": "advanced",
+            "lvl": "advanced",
             "placeholder": "600"
           },
           {
             "key": "then",
             "type": "list",
             "required": false,
-			"lvl": "advanced",
+            "lvl": "advanced",
             "item": {
               "type": "object",
               "fields": [],
@@ -280,7 +281,8 @@
         "type": "object",
         "fields": [],
         "extends": "base_actions.json"
-      }
+      },
+      "wrapThen": true
     }
   ]
 }

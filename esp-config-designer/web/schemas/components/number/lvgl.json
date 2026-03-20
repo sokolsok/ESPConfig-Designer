@@ -1,0 +1,37 @@
+{
+  "id": "number.lvgl",
+  "domain": "number",
+  "platform": "lvgl",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/number/lvgl/",
+  "extends": "base_number.json",
+  "fields": [
+    {
+      "key": "widget",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "slider_id"
+    },
+    {
+      "key": "animated",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    },
+    {
+      "key": "update_on_release",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "restore_value",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

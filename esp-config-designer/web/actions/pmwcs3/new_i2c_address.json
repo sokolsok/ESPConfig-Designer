@@ -1,0 +1,23 @@
+{
+  "id": "pmwcs3.new_i2c_address",
+  "fields": [
+    {
+      "key": "id",
+      "label": "PMWCS3",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "pmwcs3_id",
+      "domain": "pmwcs3",
+      "lvl": "normal"
+    },
+    {
+      "key": "address",
+      "label": "Address",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "0x28"
+    }
+  ]
+}

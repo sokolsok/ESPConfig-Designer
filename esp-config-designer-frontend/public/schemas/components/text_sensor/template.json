@@ -1,0 +1,23 @@
+{
+  "id": "text_sensor.template",
+  "domain": "text_sensor",
+  "platform": "template",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/text_sensor/template/",
+  "extends": "base_text_sensor.json",
+  "fields": [
+    {
+      "key": "lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    }
+  ]
+}

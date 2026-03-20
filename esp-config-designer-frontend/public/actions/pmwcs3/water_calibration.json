@@ -1,0 +1,14 @@
+{
+  "id": "pmwcs3.water_calibration",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Pmwcs3",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "pmwcs3_id",
+      "domain": "pmwcs3",
+      "lvl": "normal"
+    }
+  ]
+}

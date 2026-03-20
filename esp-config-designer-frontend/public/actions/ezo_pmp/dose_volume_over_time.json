@@ -1,0 +1,34 @@
+{
+  "id": "ezo_pmp.dose_volume_over_time",
+  "fields": [
+    {
+      "key": "id",
+      "label": "EZO PMP",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "ezo_pmp_id",
+      "domain": "ezo_pmp",
+      "lvl": "normal"
+    },
+    {
+      "key": "volume",
+      "label": "Volume",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "10",
+      "lambdaPlaceholder": "return 10;"
+    },
+    {
+      "key": "duration",
+      "label": "Duration",
+      "type": "duration",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "30s",
+      "lambdaPlaceholder": "return 30000;"
+    }
+  ]
+}

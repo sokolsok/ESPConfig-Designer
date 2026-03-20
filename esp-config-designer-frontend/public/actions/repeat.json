@@ -1,0 +1,28 @@
+{
+  "id": "repeat",
+  "fields": [
+    {
+      "key": "count",
+      "label": "Count",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "3",
+      "note": "Inside nested lambdas you can use the ESPHome `iteration` variable.",
+      "lambdaPlaceholder": "return id(loop_count);"
+    },
+    {
+      "key": "then",
+      "label": "Then",
+      "type": "list",
+      "required": true,
+      "lvl": "normal",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      }
+    }
+  ]
+}

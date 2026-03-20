@@ -1,0 +1,45 @@
+{
+  "id": "light.rgbw",
+  "domain": "light",
+  "platform": "rgbw",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/light/rgbw/",
+  "extends": "base_light.json",
+  "fields": [
+    {
+      "key": "red",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "green",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "blue",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "white",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "color_interlock",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

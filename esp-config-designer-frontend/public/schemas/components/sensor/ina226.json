@@ -8,31 +8,41 @@
   "helpUrl": "https://esphome.io/components/sensor/ina226/",
   "fields": [
     {
-      "key": "address",
+      "key": "name",
+      "placeholder": "Sensor Name",
       "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "address",
+      "type": "address",
       "required": false,
-      "lvl": "normal",
-      "default": "0x40"
+      "lvl": "simple",
+      "default": "0x40",
+      "placeholder": "0x40"
     },
     {
       "key": "shunt_resistance",
       "type": "text",
       "required": false,
       "lvl": "normal",
-      "default": "0.1 ohm"
+      "default": "0.1 ohm",
+      "placeholder": "0.1 ohm"
     },
     {
       "key": "max_current",
       "type": "text",
       "required": false,
       "lvl": "normal",
-      "default": "3.2A"
+      "default": "3.2A",
+      "placeholder": "3.2A"
     },
     {
       "key": "adc_time",
       "type": "object",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "fields": [
         {
           "key": "voltage",
@@ -91,8 +101,9 @@
       "key": "update_interval",
       "type": "duration",
       "required": false,
-      "lvl": "normal",
-      "default": "60s"
+      "lvl": "simple",
+      "default": "60s",
+      "placeholder": "60s"
     },
     {
       "key": "current",

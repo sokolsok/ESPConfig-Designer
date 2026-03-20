@@ -1,0 +1,47 @@
+{
+  "id": "output.gp8403",
+  "domain": "output",
+  "platform": "gp8403",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/output/gp8403/",
+  "extends": "base_output_float.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "gp8403",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_gp8403.json"
+    },
+    {
+      "key": "gp8403_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "gp8403",
+      "allowSelfReference": true,
+      "default": "gp8403_hub"
+    },
+    {
+      "key": "channel",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "options": [
+        0,
+        1
+      ]
+    }
+  ]
+}

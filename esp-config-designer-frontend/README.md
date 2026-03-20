@@ -8,7 +8,7 @@ This document describes the application structure and runtime behavior.
 - A schema-driven ESPHome configuration editor.
 - A project dashboard with virtual folders.
 - A display layout editor (Display Configurator) with canvas preview.
-- An Asset Manager for images and fonts (upload, list, rename, delete).
+- An Asset Manager for images, fonts, and audio (upload, list, rename, delete).
 - A shared install/log/export UI working in both Dashboard and Builder views.
 
 ## Views
@@ -21,13 +21,14 @@ This document describes the application structure and runtime behavior.
 
 ### Builder (`#/builder`)
 - Form editor generated from JSON schemas.
-- YAML preview/export.
+- YAML preview/export with split tabs.
 - Display Configurator for text/icon/image/animation/graph/shape layout.
 - Asset Manager available from Builder Project menu and Display Configurator.
 - Save state tracking via top-level `isSaved` flag.
 - Device status badge for current YAML.
 
 ## Shared top-bar actions
+- `Validate`
 - `Install`
 - `Logs`
 - `Export`
@@ -39,7 +40,8 @@ State is propagated by custom events from views to `App.vue`.
 - Runtime flow: `src/composables/useInstallConsoleFlow.js`
 
 Shared flow includes:
-- job start (`compile`, `ota`, `logs`),
+- job start (`validate`),
+- job start (`clean`, `compile`, `ota`, `logs`),
 - live log stream (SSE),
 - tail-wait fallback,
 - cancel support,
@@ -62,6 +64,33 @@ Shared flow includes:
 - Display asset references are validated when opening a project in Builder.
 - Missing display image/animation references fallback to empty selection.
 - Missing local display font references fallback to default Google font.
+
+### Schema runtime model
+- Component schemas are loaded from catalog `schemaPath` and resolved with `extends`.
+- Field visibility uses local and global dependency rules (`dependsOn`, `globalDependsOn`).
+- YAML generation follows `emitYAML` modes and field defaults.
+- `embedded` supports:
+  - list emission (`emitAs: "list"`, default),
+  - singleton/root map emission (`emitAs: "map"`) with `singleton`, `merge`, `defaultPayload`.
+- `id_ref` option lists are driven by runtime ID registry and scoped by domain.
+- Builder runs an extra semantic validation pass (`buildValidationErrors` in `src/views/BuilderView.vue`) for cross-field and strict-format rules (for example BLE identity exclusivity and MAC/UUID/bindkey validation).
+
+### Automatic interface/protocol requirements
+- Busses are auto-enabled/disabled from schema requirements (`requires`, `requiresByBus`, `requiresByType`).
+- Protocols are auto-enabled/disabled for `mqtt` and `espnow` using the same requirement pipeline.
+- `api` protocol remains manual/default-driven (not auto-managed by requirements).
+
+### YAML preview grouping
+- Preview starts from generated top-level YAML blocks.
+- Primary groups:
+  - `Core`
+  - `Automation`
+  - `Busses`
+  - `Hubs` (shared sections emitted by component `embedded` definitions)
+  - `Display` (display + display assets: font/image/animation/graph)
+  - `Custom` (verbatim-root components)
+- Remaining top-level blocks are shown as fallback tabs by domain key.
+- Contextual callouts link related tabs when a section is generated elsewhere (for example Display -> Automation interval, domain tabs -> Hubs).
 
 ### Status polling
 - Dashboard polls all devices while the document is visible.
@@ -108,7 +137,7 @@ Shared flow includes:
 - `GET /api/devices/status?yaml=<node>.yaml&refresh=0|1`
 
 ### Jobs and firmware
-- `POST /api/install`
+- `POST /api/install` (`validate`, `clean`, `compile`, `ota`, `logs`)
 - `GET /api/jobs/<job_id>`
 - `GET /api/jobs/<job_id>/stream`
 - `GET /api/jobs/<job_id>/tail-wait`
@@ -121,6 +150,24 @@ Shared flow includes:
 npm install
 npm run dev
 ```
+
+`npm run serve` is an alias to `vite` and behaves the same as `npm run dev`.
+
+Optional dev-only mode for schema work without add-on backend:
+
+1. Create `esp-config-designer-frontend/.env.local`
+2. Add:
+
+```bash
+VITE_DEV_OFFLINE=1
+```
+
+Behavior in this mode (`npm run dev` / `npm run serve`):
+- component catalog loads from `public/components_list/components_list.json`
+- component schemas load from `public/schemas/...`
+- no calls to add-on component catalog/schema endpoints
+
+Disable by removing the variable or setting `VITE_DEV_OFFLINE=0`.
 
 Build:
 

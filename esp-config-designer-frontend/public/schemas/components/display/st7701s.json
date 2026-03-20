@@ -1,0 +1,211 @@
+{
+  "id": "display.st7701s",
+  "domain": "display",
+  "platform": "st7701s",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/display/st7701s/",
+  "extends": "base_display.json",
+  "display_builder": true,
+  "displayType": "color",
+  "model_meta": {
+    "Custom 480x480": {
+      "w": 480,
+      "h": 480
+    },
+    "Custom 800x480": {
+      "w": 800,
+      "h": 480
+    }
+  },
+  "fields": [
+    {
+      "key": "model",
+      "type": "select",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "default": "Custom 480x480",
+      "options": [
+        "Custom 480x480",
+        "Custom 800x480"
+      ]
+    },
+    {
+      "key": "dimensions",
+      "type": "yaml",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "width: 800\nheight: 480"
+    },
+    {
+      "key": "data_pins",
+      "type": "yaml",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "red:\n  - GPIOXX\ngreen:\n  - GPIOXX\nblue:\n  - GPIOXX"
+    },
+    {
+      "key": "de_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "dc_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "pclk_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "hsync_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "vsync_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "reset_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "hsync_pulse_width",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "hsync_front_porch",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "hsync_back_porch",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "vsync_pulse_width",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "vsync_front_porch",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "vsync_back_porch",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "pclk_frequency",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "8MHz"
+    },
+    {
+      "key": "pclk_inverted",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "color_order",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "bgr",
+      "options": [
+        "bgr",
+        "rgb"
+      ]
+    },
+    {
+      "key": "data_rate",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "spi_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "MODE0",
+      "options": [
+        "MODE0",
+        "MODE3"
+      ]
+    },
+    {
+      "key": "invert_colors",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "rotation",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "0",
+      "options": [
+        "0",
+        "90",
+        "180",
+        "270"
+      ]
+    },
+    {
+      "key": "transform",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "init_sequence",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "auto_clear_enabled",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "pages",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "5s"
+    }
+  ]
+}

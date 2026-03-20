@@ -9,7 +9,7 @@
       "key": "variant",
       "type": "select",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "emitYAML": "always",
       "default": "esp32",
       "options": [
@@ -29,7 +29,7 @@
       "key": "framework",
       "type": "select",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "emitYAML": "always",
       "default": "esp-idf",
       "options": [

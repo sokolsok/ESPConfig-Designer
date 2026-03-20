@@ -1,0 +1,58 @@
+{
+  "id": "fan.hbridge",
+  "domain": "fan",
+  "platform": "hbridge",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/fan/hbridge/",
+  "extends": "base_fan.json",
+  "fields": [
+    {
+      "key": "pin_a",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "pin_b",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "enable_pin",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "output"
+    },
+    {
+      "key": "decay_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "SLOW",
+      "options": [
+        "SLOW",
+        "FAST"
+      ]
+    },
+    {
+      "key": "speed_count",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 100
+    },
+    {
+      "key": "preset_modes",
+      "type": "list",
+      "required": false,
+      "lvl": "normal",
+      "item": {
+        "type": "text"
+      }
+    }
+  ]
+}

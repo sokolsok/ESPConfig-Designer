@@ -1,0 +1,49 @@
+{
+  "id": "sensor.ultrasonic",
+  "domain": "sensor",
+  "platform": "ultrasonic",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/ultrasonic/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "trigger_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "echo_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "timeout",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "pulse_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "10us"
+    }
+  ]
+}

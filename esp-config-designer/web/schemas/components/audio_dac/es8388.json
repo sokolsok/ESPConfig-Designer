@@ -1,0 +1,26 @@
+{
+  "id": "audio_dac.es8388",
+  "domain": "audio_dac",
+  "platform": "es8388",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/audio_dac/es8388/",
+  "extends": "base_audio_dac.json",
+  "fields": [
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x10"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2c"
+    }
+  ]
+}

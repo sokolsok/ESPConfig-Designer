@@ -79,7 +79,6 @@ const props = defineProps({
 const emit = defineEmits(["close", "select"]);
 
 const query = ref("");
-const activePin = ref(null);
 
 const titleText = computed(() => props.title || "Select GPIO");
 
@@ -143,12 +142,7 @@ watch(
   () => props.open,
   (isOpen) => {
     if (isOpen) {
-      query.value = "";
-      const selectedValue = (props.selected || "").toLowerCase();
-      const selected = withUsage.value.find((option) => {
-        const baseValue = (option.value || option.id || "").toLowerCase();
-        return baseValue === selectedValue;
-      });
+      query.value = String(props.initialQuery || "").trim();
       window.addEventListener("keydown", handleKeydown);
     } else {
       window.removeEventListener("keydown", handleKeydown);

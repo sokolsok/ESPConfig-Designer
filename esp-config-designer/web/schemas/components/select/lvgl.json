@@ -1,0 +1,24 @@
+{
+  "id": "select.lvgl",
+  "domain": "select",
+  "platform": "lvgl",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/select/lvgl/",
+  "extends": "base_select.json",
+  "fields": [
+    {
+      "key": "widget",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "dropdown_id"
+    },
+    {
+      "key": "restore_value",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

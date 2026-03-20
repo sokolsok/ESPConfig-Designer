@@ -1,0 +1,63 @@
+{
+  "id": "dfrobot_sen0395.settings",
+  "fields": [
+    {
+      "key": "id",
+      "label": "DFRobot SEN0395",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "dfrobot_sen0395_id",
+      "domain": "dfrobot_sen0395",
+      "lvl": "normal"
+    },
+    {
+      "key": "factory_reset",
+      "label": "Factory reset",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "detection_segments",
+      "label": "Detection segments",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "4",
+      "lambdaPlaceholder": "return 4;"
+    },
+    {
+      "key": "delay_after_detect",
+      "label": "Delay after detect",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "500ms",
+      "lambdaPlaceholder": "return 500;"
+    },
+    {
+      "key": "delay_after_disappear",
+      "label": "Delay after disappear",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "5s",
+      "lambdaPlaceholder": "return 5000;"
+    },
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "5",
+      "lambdaPlaceholder": "return 5;"
+    }
+  ]
+}

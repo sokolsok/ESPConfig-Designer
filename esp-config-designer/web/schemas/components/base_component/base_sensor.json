@@ -21,7 +21,7 @@
     },
     {
       "key": "unit_of_measurement",
-      "placeholder": "C°, mm, kg, V ..",
+      "placeholder": "C\u00b0, mm, kg, V ..",
       "type": "text",
       "required": false,
       "lvl": "normal"
@@ -67,7 +67,7 @@
       "type": "text",
       "required": false,
       "lvl": "advanced"
-    },    
+    },
     {
       "key": "internal",
       "placeholder": "",
@@ -102,27 +102,70 @@
     },
     {
       "key": "on_value",
-      "placeholder": "- logger.log: \"Value changed\"",
-      "type": "yaml",
+      "type": "list",
       "required": false,
       "lvl": "advanced",
-      "helpUrl": "https://esphome.io/components/sensor/#sensor-automation"
+      "helpUrl": "https://esphome.io/components/sensor/#sensor-automation",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "on_value_range",
-      "type": "yaml",
+      "type": "list",
       "required": false,
       "lvl": "advanced",
-      "placeholder": "- logger.log: \"Range matched\"",
-      "helpUrl": "https://esphome.io/components/sensor/#sensor-automation"
+      "helpUrl": "https://esphome.io/components/sensor/#sensor-automation",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "above",
+            "type": "number",
+            "required": false,
+            "placeholder": "25"
+          },
+          {
+            "key": "below",
+            "type": "number",
+            "required": false,
+            "placeholder": "18"
+          },
+          {
+            "key": "then",
+            "type": "list",
+            "required": true,
+            "listStyle": "compact",
+            "item": {
+              "type": "object",
+              "fields": [],
+              "extends": "base_actions.json"
+            }
+          }
+        ]
+      }
     },
     {
       "key": "on_raw_value",
-      "type": "yaml",
+      "type": "list",
       "required": false,
       "lvl": "advanced",
-      "placeholder": "- logger.log: \"Raw value\"",
-      "helpUrl": "https://esphome.io/components/sensor/#sensor-automation"
+      "helpUrl": "https://esphome.io/components/sensor/#sensor-automation",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

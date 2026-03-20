@@ -1,0 +1,15 @@
+{
+  "id": "espnow.set_channel",
+  "fields": [
+    {
+      "key": "channel",
+      "label": "Channel",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "1",
+      "lambdaPlaceholder": "return 1;"
+    }
+  ]
+}

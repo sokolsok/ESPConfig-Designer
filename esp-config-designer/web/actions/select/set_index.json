@@ -1,0 +1,22 @@
+{
+  "id": "select.set_index",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Select",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "select_id",
+      "domain": "select",
+      "lvl": "normal"
+    },
+    {
+      "key": "index",
+      "label": "Index",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

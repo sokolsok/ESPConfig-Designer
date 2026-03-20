@@ -1,0 +1,10 @@
+{
+  "id": "sensor.gdk101",
+  "domain": "sensor",
+  "platform": "gdk101",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/gdk101/",
+  "fields": []
+}

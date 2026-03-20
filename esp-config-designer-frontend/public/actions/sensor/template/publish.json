@@ -1,0 +1,24 @@
+{
+  "id": "sensor.template.publish",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Sensor",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "sensor_id",
+      "domain": "sensor",
+      "lvl": "normal"
+    },
+    {
+      "key": "state",
+      "label": "State",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "42",
+      "lambdaPlaceholder": "return 42;"
+    }
+  ]
+}

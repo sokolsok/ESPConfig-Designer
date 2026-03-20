@@ -1,0 +1,22 @@
+{
+  "id": "audio_adc.set_mic_gain",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Audio Adc",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "audio_adc_id",
+      "domain": "audio_adc",
+      "lvl": "normal"
+    },
+    {
+      "key": "mic_gain",
+      "label": "Mic Gain",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

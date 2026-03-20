@@ -1,0 +1,43 @@
+{
+  "id": "output.pca9685",
+  "domain": "output",
+  "platform": "pca9685",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/output/pca9685/",
+  "extends": "base_output_float.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "pca9685",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_pca9685.json"
+    },
+    {
+      "key": "pca9685_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "pca9685",
+      "allowSelfReference": true,
+      "default": "pca9685_hub"
+    },
+    {
+      "key": "channel",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    }
+  ]
+}

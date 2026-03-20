@@ -1,0 +1,30 @@
+{
+  "id": "cover.am43",
+  "domain": "cover",
+  "platform": "am43",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/cover/am43/",
+  "extends": "base_cover.json",
+  "fields": [
+    {
+      "key": "ble_client_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "ble_client"
+    },
+    {
+      "key": "pin",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 8888
+    },
+    {
+      "key": "invert_position",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

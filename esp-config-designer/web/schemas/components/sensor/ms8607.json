@@ -1,0 +1,71 @@
+{
+  "id": "sensor.ms8607",
+  "domain": "sensor",
+  "platform": "ms8607",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/ms8607/",
+  "fields": [
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "pressure",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "humidity",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "address",
+          "type": "address",
+          "required": false,
+          "lvl": "simple",
+          "placeholder": "0x40"
+        },
+        {
+          "key": "i2c_id",
+          "type": "id_ref",
+          "required": false,
+          "lvl": "normal",
+          "domain": "sensor"
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x40"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

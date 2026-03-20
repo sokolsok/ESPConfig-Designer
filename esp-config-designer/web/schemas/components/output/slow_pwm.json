@@ -1,0 +1,50 @@
+{
+  "id": "output.slow_pwm",
+  "domain": "output",
+  "platform": "slow_pwm",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/output/slow_pwm/",
+  "extends": "base_output_float.json",
+  "fields": [
+    {
+      "key": "period",
+      "type": "duration",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "state_change_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "- logger.log: !lambda 'return state ? \"ON\" : \"OFF\";'"
+    },
+    {
+      "key": "turn_on_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "- output.turn_on: relay_output"
+    },
+    {
+      "key": "turn_off_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "- output.turn_off: relay_output"
+    },
+    {
+      "key": "restart_cycle_on_state_change",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "speaker.mute_on",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Speaker",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "speaker_id",
+      "domain": "speaker",
+      "lvl": "normal"
+    }
+  ]
+}

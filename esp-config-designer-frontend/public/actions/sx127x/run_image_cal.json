@@ -1,0 +1,14 @@
+{
+  "id": "sx127x.run_image_cal",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Sx127x",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "sx127x_id",
+      "domain": "sx127x",
+      "lvl": "normal"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "microphone.stop_capture",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Microphone",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "microphone_id",
+      "domain": "microphone",
+      "lvl": "normal"
+    },
+    {
+      "key": "flush",
+      "label": "Flush",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

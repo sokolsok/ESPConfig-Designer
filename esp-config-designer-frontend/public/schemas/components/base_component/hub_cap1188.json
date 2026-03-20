@@ -1,0 +1,45 @@
+{
+  "id": "hub.cap1188",
+  "domain": "cap1188",
+  "platform": "",
+  "requires": [
+    "i2c"
+  ],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "cap1188_component",
+      "idDomain": "cap1188"
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x29"
+    },
+    {
+      "key": "reset_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal",
+      "helpUrl": "https://esphome.io/guides/configuration-types#pin-schema"
+    },
+    {
+      "key": "touch_threshold",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "allow_multiple_touches",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

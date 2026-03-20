@@ -1,0 +1,44 @@
+{
+  "id": "switch.template",
+  "domain": "switch",
+  "platform": "template",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/switch/template/",
+  "extends": "base_switch.json",
+  "fields": [
+    {
+      "key": "lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "turn_on_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "- switch.turn_on: switch2"
+    },
+    {
+      "key": "turn_off_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "- switch.turn_on: switch1"
+    },
+    {
+      "key": "optimistic",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "assumed_state",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

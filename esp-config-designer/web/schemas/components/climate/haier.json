@@ -1,0 +1,185 @@
+{
+  "id": "climate.haier",
+  "domain": "climate",
+  "platform": "haier",
+  "requires": [
+    "uart"
+  ],
+  "helpUrl": "https://esphome.io/components/climate/haier/",
+  "extends": "base_climate.json",
+  "fields": [
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "uart"
+    },
+    {
+      "key": "protocol",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "smartair2",
+      "options": [
+        "hon",
+        "smartair2"
+      ]
+    },
+    {
+      "key": "wifi_signal",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "answer_timeout",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "200ms"
+    },
+    {
+      "key": "alternative_swing_control",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "status_message_header_size",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "default": 0
+    },
+    {
+      "key": "control_packet_size",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "default": 10
+    },
+    {
+      "key": "sensors_packet_size",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "default": 22
+    },
+    {
+      "key": "control_method",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "select",
+        "options": [
+          "MONITOR_ONLY",
+          "SET_GROUP_PARAMETERS",
+          "SET_SINGLE_PARAMETER"
+        ]
+      }
+    },
+    {
+      "key": "display",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "beeper",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "supported_modes",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "select",
+        "options": [
+          "OFF",
+          "HEAT_COOL",
+          "COOL",
+          "HEAT",
+          "DRY",
+          "FAN_ONLY"
+        ]
+      }
+    },
+    {
+      "key": "supported_swing_modes",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "select",
+        "options": [
+          "OFF",
+          "VERTICAL",
+          "HORIZONTAL",
+          "BOTH"
+        ]
+      }
+    },
+    {
+      "key": "supported_presets",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "select",
+        "options": [
+          "AWAY",
+          "BOOST",
+          "COMFORT",
+          "SLEEP"
+        ]
+      }
+    },
+    {
+      "key": "on_alarm_start",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_alarm_end",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_status_message",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

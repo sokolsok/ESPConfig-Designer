@@ -1,0 +1,22 @@
+{
+  "id": "sensor.rotary_encoder.set_value",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Sensor",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "sensor_id",
+      "domain": "sensor",
+      "lvl": "normal"
+    },
+    {
+      "key": "value",
+      "label": "Value",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

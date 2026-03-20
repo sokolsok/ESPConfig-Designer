@@ -1,0 +1,43 @@
+{
+  "id": "hub.sm2235",
+  "domain": "sm2235",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "sm2235_hub",
+      "idDomain": "sm2235"
+    },
+    {
+      "key": "data_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "clock_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "max_power_color_channels",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 2
+    },
+    {
+      "key": "max_power_white_channels",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 4
+    }
+  ]
+}

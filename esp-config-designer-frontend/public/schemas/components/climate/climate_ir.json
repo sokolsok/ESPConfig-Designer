@@ -1,0 +1,236 @@
+{
+  "id": "climate.climate_ir",
+  "domain": "climate",
+  "platform": "climate_ir_lg",
+  "platformByBus": {
+    "climate_ir_lg": "climate_ir_lg",
+    "daikin_brc": "daikin_brc",
+    "gree": "gree",
+    "midea_ir": "midea_ir",
+    "mitsubishi": "mitsubishi",
+    "toshiba": "toshiba",
+    "whynter": "whynter"
+  },
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/climate/climate_ir/",
+  "extends": "base_climate.json",
+  "fields": [
+    {
+      "key": "bus",
+      "label": "IR Platform",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "climate_ir_lg",
+      "options": [
+        "climate_ir_lg",
+        "daikin_brc",
+        "gree",
+        "midea_ir",
+        "mitsubishi",
+        "toshiba",
+        "whynter"
+      ]
+    },
+    {
+      "key": "sensor",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor"
+    },
+    {
+      "key": "humidity_sensor",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor"
+    },
+    {
+      "key": "supports_cool",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    },
+    {
+      "key": "supports_heat",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    },
+    {
+      "key": "receiver_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "advanced",
+      "domain": "remote_receiver"
+    },
+    {
+      "key": "transmitter_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "advanced",
+      "domain": "remote_transmitter"
+    },
+    {
+      "key": "model",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "bus",
+        "values": [
+          "gree",
+          "toshiba"
+        ]
+      },
+      "placeholder": "gree: generic/yan/yaa/yac/yac1fb9/yx1ff/yag, toshiba: GENERIC/RAC-PT1411HWRU-C/RAC-PT1411HWRU-F/RAS-2819T"
+    },
+    {
+      "key": "use_fahrenheit",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false,
+      "dependsOn": {
+        "key": "bus",
+        "values": [
+          "daikin_brc",
+          "midea_ir",
+          "whynter"
+        ]
+      }
+    },
+    {
+      "key": "set_fan_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "bus",
+        "value": "mitsubishi"
+      },
+      "options": [
+        "3levels",
+        "4levels",
+        "quiet_4levels"
+      ]
+    },
+    {
+      "key": "supports_dry",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false,
+      "dependsOn": {
+        "key": "bus",
+        "value": "mitsubishi"
+      }
+    },
+    {
+      "key": "supports_fan_only",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false,
+      "dependsOn": {
+        "key": "bus",
+        "value": "mitsubishi"
+      }
+    },
+    {
+      "key": "horizontal_default",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "bus",
+        "value": "mitsubishi"
+      },
+      "options": [
+        "left",
+        "middle-left",
+        "middle",
+        "middle-right",
+        "right",
+        "auto"
+      ]
+    },
+    {
+      "key": "vertical_default",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "bus",
+        "value": "mitsubishi"
+      },
+      "options": [
+        "down",
+        "middle-down",
+        "middle",
+        "middle-up",
+        "up",
+        "auto"
+      ]
+    },
+    {
+      "key": "header_high",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "bus",
+        "value": "climate_ir_lg"
+      }
+    },
+    {
+      "key": "header_low",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "bus",
+        "value": "climate_ir_lg"
+      }
+    },
+    {
+      "key": "bit_high",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "bus",
+        "value": "climate_ir_lg"
+      }
+    },
+    {
+      "key": "bit_one_low",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "bus",
+        "value": "climate_ir_lg"
+      }
+    },
+    {
+      "key": "bit_zero_low",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "bus",
+        "value": "climate_ir_lg"
+      }
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

@@ -1,0 +1,182 @@
+{
+  "id": "display.qspi_dbi",
+  "domain": "display",
+  "platform": "qspi_dbi",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/display/qspi_dbi/",
+  "extends": "base_display.json",
+  "display_builder": true,
+  "displayType": "color",
+  "model_meta": {
+    "RM67162": {
+      "w": 536,
+      "h": 240
+    },
+    "RM690B0": {
+      "w": 480,
+      "h": 480
+    },
+    "JC4832W535": {
+      "w": 480,
+      "h": 320
+    },
+    "JC3636W518": {
+      "w": 360,
+      "h": 360
+    },
+    "AXS15231": {
+      "w": 360,
+      "h": 360
+    },
+    "CUSTOM": {
+      "w": 240,
+      "h": 240
+    }
+  },
+  "fields": [
+    {
+      "key": "model",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "RM690B0",
+      "options": [
+        "CUSTOM",
+        "RM67162",
+        "RM690B0",
+        "JC4832W535",
+        "JC3636W518",
+        "AXS15231"
+      ]
+    },
+    {
+      "key": "init_sequence",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "model",
+        "value": "CUSTOM"
+      }
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "reset_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "enable_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "brightness",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "color_order",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "rgb",
+      "options": [
+        "rgb",
+        "bgr"
+      ]
+    },
+    {
+      "key": "dimensions",
+      "type": "yaml",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "width: 240\nheight: 240"
+    },
+    {
+      "key": "rotation",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "0",
+      "options": [
+        "0",
+        "90",
+        "180",
+        "270"
+      ]
+    },
+    {
+      "key": "transform",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "data_rate",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "10MHz"
+    },
+    {
+      "key": "spi_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "MODE0",
+      "options": [
+        "MODE0",
+        "MODE3"
+      ]
+    },
+    {
+      "key": "invert_colors",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "draw_from_origin",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "draw_rounding",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "default": 2
+    },
+    {
+      "key": "auto_clear_enabled",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "pages",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "5s"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "dfplayer.random",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Dfplayer",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "dfplayer_id",
+      "domain": "dfplayer",
+      "lvl": "normal"
+    }
+  ]
+}

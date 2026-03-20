@@ -1,0 +1,41 @@
+{
+  "id": "output.tlc5947",
+  "domain": "output",
+  "platform": "tlc5947",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/output/tlc5947/",
+  "extends": "base_output_float.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "tlc5947",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_tlc5947.json"
+    },
+    {
+      "key": "tlc5947_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "tlc5947",
+      "allowSelfReference": true,
+      "default": "tlc5947_hub"
+    },
+    {
+      "key": "channel",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    }
+  ]
+}

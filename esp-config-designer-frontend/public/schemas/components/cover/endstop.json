@@ -1,0 +1,66 @@
+{
+  "id": "cover.endstop",
+  "domain": "cover",
+  "platform": "endstop",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/cover/endstop/",
+  "extends": "base_cover.json",
+  "fields": [
+    {
+      "key": "open_action",
+      "type": "yaml",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "open_duration",
+      "type": "duration",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "open_endstop",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "binary_sensor"
+    },
+    {
+      "key": "close_action",
+      "type": "yaml",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "close_duration",
+      "type": "duration",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "close_endstop",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "binary_sensor"
+    },
+    {
+      "key": "stop_action",
+      "type": "yaml",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "max_duration",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

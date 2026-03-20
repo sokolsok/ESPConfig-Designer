@@ -1,0 +1,70 @@
+{
+  "id": "remote_transmitter.transmit_toto",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Remote transmitter",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "remote_transmitter_id",
+      "domain": "remote_transmitter",
+      "lvl": "normal"
+    },
+    {
+      "key": "command",
+      "label": "Command",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "FLUSH"
+    },
+    {
+      "key": "rc_code_1",
+      "label": "RC code 1",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "A1B2C3"
+    },
+    {
+      "key": "rc_code_2",
+      "label": "RC code 2",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "D4E5F6"
+    },
+    {
+      "key": "repeat",
+      "label": "Repeat",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "times",
+          "label": "Times",
+          "type": "number",
+          "templatable": true,
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "2",
+          "lambdaPlaceholder": "return 2;"
+        },
+        {
+          "key": "wait_time",
+          "label": "Wait time",
+          "type": "duration",
+          "templatable": true,
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "25ms",
+          "lambdaPlaceholder": "return 25;"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,317 @@
+{
+  "id": "display.ili9xxx",
+  "domain": "display",
+  "platform": "ili9xxx",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/display/ili9xxx/",
+  "extends": "base_display.json",
+  "display_builder": true,
+  "displayType": "color",
+  "model_meta": {
+    "M5STACK": {
+      "w": 320,
+      "h": 240
+    },
+    "TFT 2.4": {
+      "w": 240,
+      "h": 320
+    },
+    "TFT 2.4R": {
+      "w": 240,
+      "h": 320
+    },
+    "S3BOX": {
+      "w": 320,
+      "h": 240
+    },
+    "S3BOX_LITE": {
+      "w": 320,
+      "h": 240
+    },
+    "WSPICOLCD": {
+      "w": 480,
+      "h": 320
+    },
+    "ILI9341": {
+      "w": 240,
+      "h": 320
+    },
+    "ILI9342": {
+      "w": 320,
+      "h": 240
+    },
+    "ILI9486": {
+      "w": 320,
+      "h": 480
+    },
+    "CUSTOM": {
+      "w": 240,
+      "h": 320
+    },
+    "ILI9488": {
+      "w": 320,
+      "h": 480
+    },
+    "ILI9488_A": {
+      "w": 320,
+      "h": 480
+    },
+    "ILI9481": {
+      "w": 320,
+      "h": 480
+    },
+    "ILI9481-18": {
+      "w": 320,
+      "h": 480
+    },
+    "ST7789V": {
+      "w": 240,
+      "h": 320
+    },
+    "ST7796": {
+      "w": 320,
+      "h": 480
+    },
+    "ST7735": {
+      "w": 128,
+      "h": 160
+    },
+    "GC9A01A": {
+      "w": 240,
+      "h": 240
+    },
+    "GC9D01N": {
+      "w": 160,
+      "h": 160
+    }
+  },
+  "fields": [
+    {
+      "key": "model",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "ILI9341",
+      "options": [
+        "M5STACK",
+        "TFT 2.4",
+        "TFT 2.4R",
+        "S3BOX",
+        "S3BOX_LITE",
+        "WSPICOLCD",
+        "ILI9341",
+        "ILI9342",
+        "ILI9486",
+        "ILI9488",
+        "ILI9488_A",
+        "ILI9481",
+        "ILI9481-18",
+        "ST7789V",
+        "ST7796",
+        "ST7735",
+        "GC9A01A",
+        "GC9D01N",
+        "CUSTOM"
+      ]
+    },
+    {
+      "key": "dc_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "reset_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "invert_colors",
+      "type": "boolean",
+      "required": true,
+      "lvl": "simple",
+      "default": false
+    },
+    {
+      "key": "dimensions",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "width",
+          "type": "number",
+          "required": true,
+          "lvl": "simple",
+          "default": 320
+        },
+        {
+          "key": "height",
+          "type": "number",
+          "required": true,
+          "lvl": "simple",
+          "default": 240
+        },
+        {
+          "key": "offset_width",
+          "type": "number",
+          "required": false,
+          "lvl": "normal",
+          "default": 0
+        },
+        {
+          "key": "offset_height",
+          "type": "number",
+          "required": false,
+          "lvl": "normal",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "key": "color_palette",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "NONE",
+      "options": [
+        "NONE",
+        "8BIT",
+        "GRAYSCALE",
+        "IMAGE_ADAPTIVE"
+      ]
+    },
+    {
+      "key": "color_order",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "bgr",
+      "options": [
+        "bgr",
+        "rgb"
+      ]
+    },
+    {
+      "key": "color_palette_images",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "color_palette",
+        "value": "IMAGE_ADAPTIVE"
+      }
+    },
+    {
+      "key": "pixel_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "options": [
+        "16bit",
+        "18bit"
+      ]
+    },
+    {
+      "key": "rotation",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "0",
+      "options": [
+        "0",
+        "90",
+        "180",
+        "270"
+      ]
+    },
+    {
+      "key": "transform",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "swap_xy",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal",
+          "default": false
+        },
+        {
+          "key": "mirror_x",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal",
+          "default": false
+        },
+        {
+          "key": "mirror_y",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal",
+          "default": false
+        }
+      ]
+    },
+    {
+      "key": "init_sequence",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "data_rate",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "40MHz"
+    },
+    {
+      "key": "spi_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "MODE0",
+      "options": [
+        "MODE0",
+        "MODE3"
+      ]
+    },
+    {
+      "key": "show_test_card",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "auto_clear_enabled",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "pages",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "default": "1s"
+    }
+  ]
+}

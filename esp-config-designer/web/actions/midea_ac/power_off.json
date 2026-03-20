@@ -1,0 +1,23 @@
+{
+  "id": "midea_ac.power_off",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Midea AC",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "midea_ac_id",
+      "domain": "midea_ac",
+      "lvl": "normal"
+    },
+    {
+      "key": "beeper",
+      "label": "Beeper",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

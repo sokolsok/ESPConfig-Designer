@@ -1,0 +1,23 @@
+{
+  "id": "display_menu.show_main",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Display menu",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "display_menu_id",
+      "domain": "display_menu",
+      "lvl": "normal"
+    },
+    {
+      "key": "reset_history",
+      "label": "Reset history",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

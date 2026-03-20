@@ -1,0 +1,73 @@
+{
+  "id": "binary_sensor.nextion",
+  "domain": "binary_sensor",
+  "platform": "nextion",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/binary_sensor/nextion/",
+  "extends": "base_binary_sensor.json",
+  "fields": [
+    {
+      "key": "nextion_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "display",
+      "placeholder": "nextion_display_id"
+    },
+    {
+      "key": "component_name",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "page0.r0"
+    },
+    {
+      "key": "variable_name",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "darkmode"
+    },
+    {
+      "key": "page_id",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0"
+    },
+    {
+      "key": "component_id",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "8"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "4s"
+    },
+    {
+      "key": "background_color",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "BLACK"
+    },
+    {
+      "key": "foreground_color",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "WHITE"
+    },
+    {
+      "key": "visible",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

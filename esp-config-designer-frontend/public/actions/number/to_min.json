@@ -1,0 +1,14 @@
+{
+  "id": "number.to_min",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Number",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "number_id",
+      "domain": "number",
+      "lvl": "normal"
+    }
+  ]
+}

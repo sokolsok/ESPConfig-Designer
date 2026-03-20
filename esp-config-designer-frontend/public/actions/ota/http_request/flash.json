@@ -1,0 +1,41 @@
+{
+  "id": "ota.http_request.flash",
+  "fields": [
+    {
+      "key": "url",
+      "label": "URL",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "https://example.com/firmware.bin"
+    },
+    {
+      "key": "md5",
+      "label": "MD5",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "0123456789abcdef0123456789abcdef"
+    },
+    {
+      "key": "username",
+      "label": "Username",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "admin"
+    },
+    {
+      "key": "password",
+      "label": "Password",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "secret"
+    }
+  ]
+}

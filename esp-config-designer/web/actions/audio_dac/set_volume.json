@@ -1,0 +1,24 @@
+{
+  "id": "audio_dac.set_volume",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Audio Dac",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "audio_dac_id",
+      "domain": "audio_dac",
+      "lvl": "normal"
+    },
+    {
+      "key": "volume",
+      "label": "Volume",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "75%",
+      "lambdaPlaceholder": "return 0.75;"
+    }
+  ]
+}

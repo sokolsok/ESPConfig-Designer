@@ -1,0 +1,24 @@
+{
+  "id": "stepper.report_position",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Stepper",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "stepper_id",
+      "domain": "stepper",
+      "lvl": "normal"
+    },
+    {
+      "key": "position",
+      "label": "Position",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "0",
+      "lambdaPlaceholder": "return 0;"
+    }
+  ]
+}

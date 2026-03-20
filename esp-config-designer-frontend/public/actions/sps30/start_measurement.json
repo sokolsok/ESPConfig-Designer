@@ -1,0 +1,14 @@
+{
+  "id": "sps30.start_measurement",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Sps30",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "sps30_id",
+      "domain": "sps30",
+      "lvl": "normal"
+    }
+  ]
+}

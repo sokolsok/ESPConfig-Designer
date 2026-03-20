@@ -3,6 +3,7 @@ import mimetypes
 import os
 import queue
 import re
+import io
 import select
 import subprocess
 import shutil
@@ -12,6 +13,8 @@ import pty
 import time
 import socket
 import shlex
+import posixpath
+import zipfile
 from collections import deque
 from datetime import datetime
 from typing import List, Optional, Tuple
@@ -49,6 +52,15 @@ ASSET_GFONTS_JSON = os.path.join(ASSET_ROOT, "gfonts.json")
 ASSET_GLYPH_SUBS = os.path.join(ASSET_ROOT, "mdi_glyph_substitutions.yaml")
 SECRETS_FILENAME = "secrets.yaml"
 SECRETS_RAW_MAX_BYTES = 256 * 1024
+
+COMPONENTS_RUNTIME_ROOTNAME = "esp_components"
+COMPONENTS_RUNTIME_FILENAME = "components_list.json"
+COMPONENTS_BASE_LIST_PATH = os.path.join(WEB_ROOT, "components_list", "components_list.json")
+COMPONENTS_BASE_SCHEMAS_ROOT = os.path.join(WEB_ROOT, "schemas", "components")
+COMPONENTS_IMPORT_MAX_UPLOAD_BYTES = 10 * 1024 * 1024
+COMPONENTS_IMPORT_MAX_FILES = 500
+COMPONENTS_IMPORT_MAX_UNPACKED_BYTES = 30 * 1024 * 1024
+COMPONENTS_IMPORT_MAX_ITEM_ERRORS = 100
 
 ASSET_ALLOWED_EXTENSIONS = {
     "fonts": {".ttf", ".otf"},
@@ -88,12 +100,14 @@ ASSET_ALLOWED_MIME = {
 }
 
 ASSET_LOCK = threading.Lock()
+COMPONENTS_LOCK = threading.Lock()
 
 SEED_ROOT = os.environ.get("SEED_ROOT", "/seed_esphome").strip()
 
 VALID_NAME = re.compile(r"^[A-Za-z0-9_.-]+$")
 VALID_YAML = re.compile(r"^[A-Za-z0-9_.-]+\.yaml$")
 VALID_DEVICE = re.compile(r"^[A-Za-z0-9._-]+$")
+VALID_COMPONENT_TOKEN = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 ANSI_ESCAPE = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 
 
@@ -453,11 +467,508 @@ def load_mdi_glyph_substitutions() -> dict:
     return result
 
 
+def components_runtime_root() -> str:
+    return os.path.join(TARGET_DIR, COMPONENTS_RUNTIME_ROOTNAME)
+
+
+def components_runtime_list_path() -> str:
+    return os.path.join(components_runtime_root(), COMPONENTS_RUNTIME_FILENAME)
+
+
+def components_runtime_schemas_root() -> str:
+    return os.path.join(components_runtime_root(), "schemas", "components")
+
+
+def default_components_catalog() -> dict:
+    return {
+        "generatedAt": utc_now(),
+        "categories": [
+            {
+                "title": "Custom Components",
+                "slug": "custom-components",
+                "items": [],
+                "subcategories": [],
+            }
+        ],
+    }
+
+
+def load_components_catalog(path: str) -> dict:
+    payload = read_json_file(path)
+    if not isinstance(payload, dict):
+        return default_components_catalog()
+    categories = payload.get("categories")
+    if not isinstance(categories, list):
+        payload["categories"] = []
+    return payload
+
+
+def save_runtime_components_catalog(payload: dict) -> None:
+    data = dict(payload or {})
+    data["generatedAt"] = utc_now()
+    path = components_runtime_list_path()
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as handle:
+        json.dump(data, handle, ensure_ascii=False, indent=2)
+        handle.write("\n")
+
+
+def safe_zip_json_member_path(name: str) -> str:
+    raw = str(name or "").strip().replace("\\", "/")
+    if not raw or raw.startswith("/"):
+        return ""
+    if "\x00" in raw:
+        return ""
+    normalized = posixpath.normpath(raw)
+    if normalized in ("", ".", ".."):
+        return ""
+    if normalized.startswith("../") or "/../" in normalized:
+        return ""
+    if not normalized.endswith(".json"):
+        return ""
+    if normalized == "components_list.json":
+        return normalized
+    if normalized.startswith("schemas/components/"):
+        return normalized
+    return ""
+
+
+def normalize_component_token(value: str) -> str:
+    token = str(value or "").strip().lower()
+    if not token or not VALID_COMPONENT_TOKEN.match(token):
+        return ""
+    return token
+
+
+def normalize_component_id(value: str) -> str:
+    raw = str(value or "").strip().lower().replace("\\", "/")
+    if not raw or raw.startswith("/") or raw.endswith("/"):
+        return ""
+    parts = [part for part in raw.split("/") if part]
+    if len(parts) < 2:
+        return ""
+    if any(not normalize_component_token(part) for part in parts):
+        return ""
+    return "/".join(parts)
+
+
+def normalize_component_path(value: str) -> str:
+    raw = str(value or "").strip().lower().replace("\\", "/")
+    if not raw or raw.startswith("/"):
+        return ""
+    if raw.startswith("components/"):
+        comp_id = normalize_component_id(raw[len("components/") :])
+        if not comp_id:
+            return ""
+        return f"components/{comp_id}"
+    return ""
+
+
+def normalize_component_schema_path(value: str) -> str:
+    raw = str(value or "").strip().lower().replace("\\", "/")
+    if not raw or raw.startswith("/"):
+        return ""
+    if not raw.startswith("components/") or not raw.endswith(".json"):
+        return ""
+    comp_id = normalize_component_id(raw[len("components/") : -5])
+    if not comp_id:
+        return ""
+    return f"components/{comp_id}.json"
+
+
+def normalize_custom_component_lookup_id(value: str) -> str:
+    raw = str(value or "").strip().lower().replace("\\", "/")
+    component_id = normalize_component_id(raw) if "/" in raw else ""
+    if component_id:
+        return component_id if component_id.startswith("custom/") else ""
+    key = normalize_component_token(raw)
+    if not key:
+        return ""
+    return f"custom/{key}"
+
+
+def normalize_component_entry(raw: dict) -> Tuple[Optional[dict], str]:
+    if not isinstance(raw, dict):
+        return None, "Component entry must be an object"
+
+    name = str(raw.get("name") or "").strip()
+    if not name:
+        return None, "Component entry missing name"
+
+    comp_id = normalize_component_id(raw.get("id", ""))
+    path_value = normalize_component_path(raw.get("path", ""))
+    schema_path = normalize_component_schema_path(raw.get("schemaPath", ""))
+    if not comp_id or not path_value or not schema_path:
+        return None, f"Invalid component entry for {name}"
+
+    expected_path = f"components/{comp_id}"
+    expected_schema = f"components/{comp_id}.json"
+    if path_value != expected_path or schema_path != expected_schema:
+        return None, f"Invalid path/schemaPath relation for {comp_id}"
+
+    available = raw.get("available", True)
+    if not isinstance(available, bool):
+        return None, f"Invalid available flag for {comp_id}"
+
+    prefill_config = raw.get("prefillConfig")
+    normalized_prefill = None
+    if prefill_config is not None:
+        if not isinstance(prefill_config, dict):
+            return None, f"Invalid prefillConfig for {comp_id}"
+        normalized_prefill = {}
+        if "name" in prefill_config:
+            if not isinstance(prefill_config.get("name"), str):
+                return None, f"Invalid prefillConfig.name for {comp_id}"
+            normalized_prefill["name"] = prefill_config.get("name")
+        if "custom_config" in prefill_config:
+            if not isinstance(prefill_config.get("custom_config"), str):
+                return None, f"Invalid prefillConfig.custom_config for {comp_id}"
+            normalized_prefill["custom_config"] = prefill_config.get("custom_config")
+
+    normalized_entry = {
+        "name": name,
+        "path": expected_path,
+        "id": comp_id,
+        "available": available,
+        "schemaPath": expected_schema,
+    }
+    if normalized_prefill is not None:
+        normalized_entry["prefillConfig"] = normalized_prefill
+
+    return normalized_entry, ""
+
+
+def iter_catalog_item_refs(categories: list):
+    for category in categories:
+        if not isinstance(category, dict):
+            continue
+        items = category.get("items")
+        if isinstance(items, list):
+            for index, item in enumerate(items):
+                yield items, index, item
+        subcategories = category.get("subcategories")
+        if isinstance(subcategories, list):
+            yield from iter_catalog_item_refs(subcategories)
+
+
+def extract_catalog_items(catalog_payload: dict) -> List[dict]:
+    categories = catalog_payload.get("categories")
+    if not isinstance(categories, list):
+        return []
+    items = []
+    for _, _, item in iter_catalog_item_refs(categories):
+        normalized, _ = normalize_component_entry(item)
+        if normalized:
+            items.append(normalized)
+    return items
+
+
+def ensure_custom_category(catalog_payload: dict) -> list:
+    categories = catalog_payload.get("categories")
+    if not isinstance(categories, list):
+        categories = []
+        catalog_payload["categories"] = categories
+
+    for category in categories:
+        if not isinstance(category, dict):
+            continue
+        title = str(category.get("title") or "").strip().lower()
+        slug = str(category.get("slug") or "").strip().lower()
+        if title == "custom components" or slug == "custom-components":
+            items = category.get("items")
+            if not isinstance(items, list):
+                category["items"] = []
+            if not isinstance(category.get("subcategories"), list):
+                category["subcategories"] = []
+            return category["items"]
+
+    custom_category = {
+        "title": "Custom Components",
+        "slug": "custom-components",
+        "items": [],
+        "subcategories": [],
+    }
+    categories.insert(0, custom_category)
+    return custom_category["items"]
+
+
+def category_match_key(category: dict) -> Tuple[str, str]:
+    if not isinstance(category, dict):
+        return "", ""
+    slug = str(category.get("slug") or "").strip().lower()
+    title = str(category.get("title") or "").strip().lower()
+    return slug, title
+
+
+def ensure_category_shape(category: dict) -> dict:
+    if not isinstance(category.get("items"), list):
+        category["items"] = []
+    if not isinstance(category.get("subcategories"), list):
+        category["subcategories"] = []
+    return category
+
+
+def find_category_by_match(categories: list, slug: str, title: str) -> Optional[dict]:
+    for category in categories:
+        if not isinstance(category, dict):
+            continue
+        c_slug, c_title = category_match_key(category)
+        if slug and c_slug == slug:
+            return ensure_category_shape(category)
+        if not slug and title and c_title == title:
+            return ensure_category_shape(category)
+        if slug and not c_slug and title and c_title == title:
+            return ensure_category_shape(category)
+    return None
+
+
+def ensure_category_path(catalog_payload: dict, category_chain: List[dict]) -> list:
+    categories = catalog_payload.get("categories")
+    if not isinstance(categories, list):
+        categories = []
+        catalog_payload["categories"] = categories
+
+    current_list = categories
+    current_category = None
+    for node in category_chain:
+        slug = str(node.get("slug") or "").strip().lower()
+        title = str(node.get("title") or "").strip()
+        title_lower = title.lower()
+
+        found = find_category_by_match(current_list, slug, title_lower)
+        if not found:
+            found = {
+                "title": title or (slug.replace("-", " ").title() if slug else "Category"),
+                "slug": slug,
+                "items": [],
+                "subcategories": [],
+            }
+            current_list.append(found)
+        current_category = ensure_category_shape(found)
+        current_list = current_category["subcategories"]
+
+    if current_category is None:
+        return ensure_custom_category(catalog_payload)
+    return current_category["items"]
+
+
+def remove_catalog_item(catalog_payload: dict, component_id: str) -> Optional[dict]:
+    categories = catalog_payload.get("categories")
+    if not isinstance(categories, list):
+        return None
+    for items, index, item in iter_catalog_item_refs(categories):
+        if isinstance(item, dict) and str(item.get("id") or "").strip().lower() == component_id:
+            removed = items[index]
+            del items[index]
+            return removed
+    return None
+
+
+def find_catalog_item_ref(catalog_payload: dict, component_id: str):
+    categories = catalog_payload.get("categories")
+    if not isinstance(categories, list):
+        return None
+    target_id = str(component_id or "").strip().lower()
+    if not target_id:
+        return None
+    for items, index, item in iter_catalog_item_refs(categories):
+        if isinstance(item, dict) and str(item.get("id") or "").strip().lower() == target_id:
+            return items, index, item
+    return None
+
+
+def remove_catalog_item_all(catalog_payload: dict, component_id: str) -> int:
+    removed_count = 0
+    while True:
+        removed = remove_catalog_item(catalog_payload, component_id)
+        if not removed:
+            break
+        removed_count += 1
+    return removed_count
+
+
+def iter_category_nodes(categories: list, chain: Optional[List[dict]] = None):
+    current_chain = list(chain or [])
+    for category in categories:
+        if not isinstance(category, dict):
+            continue
+        ensured = ensure_category_shape(category)
+        current = current_chain + [
+            {
+                "slug": str(ensured.get("slug") or "").strip(),
+                "title": str(ensured.get("title") or "").strip(),
+            }
+        ]
+        yield ensured, current
+        subcategories = ensured.get("subcategories")
+        if isinstance(subcategories, list):
+            yield from iter_category_nodes(subcategories, current)
+
+
+def apply_runtime_catalog_into_merged(merged_catalog: dict, runtime_catalog: dict) -> None:
+    runtime_categories = runtime_catalog.get("categories")
+    if not isinstance(runtime_categories, list):
+        return
+
+    for runtime_category, chain in iter_category_nodes(runtime_categories):
+        target_items = ensure_category_path(merged_catalog, chain)
+        source_items = runtime_category.get("items")
+        if not isinstance(source_items, list):
+            continue
+        for source_item in source_items:
+            normalized, _ = normalize_component_entry(source_item)
+            if not normalized:
+                continue
+            remove_catalog_item_all(merged_catalog, normalized["id"])
+            target_items.append(normalized)
+
+
+def merge_component_catalogs(base_catalog: dict, runtime_catalog: Optional[dict]) -> dict:
+    merged = json.loads(json.dumps(base_catalog if isinstance(base_catalog, dict) else default_components_catalog()))
+    runtime_payload = runtime_catalog if isinstance(runtime_catalog, dict) else {}
+    apply_runtime_catalog_into_merged(merged, runtime_payload)
+    merged["generatedAt"] = utc_now()
+    return merged
+
+
+def slugify_component_key(value: str) -> str:
+    lowered = str(value or "").strip().lower()
+    lowered = re.sub(r"[^a-z0-9_-]+", "-", lowered)
+    lowered = re.sub(r"-+", "-", lowered).strip("-_")
+    token = normalize_component_token(lowered)
+    if token:
+        return token
+    return ""
+
+
+def runtime_schema_target_path(schema_path: str) -> str:
+    relative = str(schema_path or "").strip().replace("\\", "/")
+    if not relative.startswith("components/"):
+        return ""
+    full_path = os.path.normpath(os.path.join(components_runtime_root(), "schemas", relative))
+    schemas_root = os.path.normpath(os.path.join(components_runtime_root(), "schemas"))
+    try:
+        common = os.path.commonpath([schemas_root, full_path])
+    except ValueError:
+        return ""
+    if common != schemas_root:
+        return ""
+    return full_path
+
+
+def parse_zip_components_catalog(catalog_payload: dict) -> Tuple[List[dict], List[str]]:
+    errors = []
+    entries = []
+    categories = catalog_payload.get("categories")
+    if not isinstance(categories, list):
+        return [], ["components_list.json must contain categories"]
+
+    for category, chain in iter_category_nodes(categories):
+        items = category.get("items")
+        if not isinstance(items, list):
+            continue
+        for item in items:
+            normalized, error = normalize_component_entry(item)
+            if not normalized:
+                if len(errors) < COMPONENTS_IMPORT_MAX_ITEM_ERRORS:
+                    errors.append(error)
+                continue
+            entries.append({"entry": normalized, "chain": chain})
+
+    if not entries:
+        errors.append("No valid component entries found in components_list.json")
+    return entries, errors
+
+
+def normalize_component_schema_relpath(value: str) -> str:
+    raw = str(value or "").strip().replace("\\", "/")
+    if not raw:
+        return ""
+    if raw.startswith("/"):
+        return ""
+    normalized = posixpath.normpath(raw)
+    if normalized in ("", ".", ".."):
+        return ""
+    if normalized.startswith("../") or "/../" in normalized:
+        return ""
+    if normalized.startswith("schemas/"):
+        normalized = normalized[len("schemas/") :]
+    if not normalized.startswith("components/"):
+        return ""
+    if not normalized.endswith(".json"):
+        return ""
+    return normalized
+
+
+def resolve_component_schema_path(base_root: str, relpath: str) -> str:
+    root = os.path.normpath(base_root)
+    candidate = os.path.normpath(os.path.join(root, relpath.replace("/", os.sep)))
+    try:
+        common = os.path.commonpath([root, candidate])
+    except ValueError:
+        return ""
+    if common != root:
+        return ""
+    return candidate
+
+
+def load_empty_custom_template() -> dict:
+    template_path = os.path.join(COMPONENTS_BASE_SCHEMAS_ROOT, "custom", "empty.json")
+    template = read_json_file(template_path)
+    if isinstance(template, dict):
+        return template
+    return {
+        "id": "custom.empty",
+        "domain": "custom",
+        "platform": "empty",
+        "helpUrl": "",
+        "uiLabelField": "name",
+        "defaultLabel": "Empty Component",
+        "renderStrategy": "verbatim_root",
+        "verbatimField": "custom_config",
+        "fields": [
+            {
+                "key": "name",
+                "type": "text",
+                "required": False,
+                "lvl": "simple",
+                "placeholder": "Custom component name",
+                "emitYAML": "never",
+            },
+            {
+                "key": "custom_config",
+                "type": "raw_yaml",
+                "required": False,
+                "lvl": "simple",
+                "placeholder": "# Enter raw YAML that should be emitted as-is",
+            },
+        ],
+    }
+
+
+def build_custom_component_schema(key: str) -> dict:
+    schema = json.loads(json.dumps(load_empty_custom_template()))
+    schema["id"] = f"custom.{key}"
+    schema["domain"] = "custom"
+    schema["platform"] = key
+    fields = schema.get("fields")
+    if isinstance(fields, list):
+        for field in fields:
+            if not isinstance(field, dict):
+                continue
+            field_key = str(field.get("key") or "").strip()
+            if field_key in ("name", "custom_config") and "default" in field:
+                field.pop("default", None)
+
+    return schema
+
+
 def bootstrap_storage() -> None:
     os.makedirs(TARGET_DIR, exist_ok=True)
     # Seed initial project/asset structure once at startup.
     seed_tree(SEED_ROOT, TARGET_DIR)
     seed_assets()
+    os.makedirs(components_runtime_schemas_root(), exist_ok=True)
     sync_assets("all")
 
 
@@ -547,6 +1058,42 @@ def remove_project_from_index(project_filename: str) -> bool:
     return changed
 
 
+def rename_project_in_index(old_name: str, new_name: str) -> bool:
+    if not old_name or not new_name or old_name == new_name:
+        return False
+    index_payload = load_projects_index()
+    current = index_payload.get("projectPlacement")
+    if not isinstance(current, list):
+        current = []
+
+    changed = False
+    deduped = []
+    seen_names = set()
+    for item in current:
+        if not isinstance(item, dict):
+            deduped.append(item)
+            continue
+        name = str(item.get("name") or "").strip()
+        next_name = new_name if name == old_name else name
+        if next_name != name:
+            item = dict(item)
+            item["name"] = next_name
+            changed = True
+        if not next_name:
+            changed = True
+            continue
+        if next_name in seen_names:
+            changed = True
+            continue
+        seen_names.add(next_name)
+        deduped.append(item)
+
+    if changed:
+        index_payload["projectPlacement"] = deduped
+        save_projects_index(index_payload)
+    return changed
+
+
 def unregister_device_record(
     *,
     yaml_name: str = "",
@@ -578,10 +1125,6 @@ def unregister_device_record(
         save_devices(kept)
         return True, removed
     return False, 0
-
-
-def normalize_device_name_from_yaml(yaml_name: str) -> str:
-    return yaml_name[:-5]
 
 
 def device_key_from_yaml(yaml_name: str) -> str:
@@ -753,7 +1296,35 @@ def find_firmware_path(node_name: str, variant: str = "ota") -> str:
     if variant == "factory":
         target_names = ["firmware.factory.bin"]
 
+    def add_candidate(candidates: List[Tuple[float, str]], path: str) -> None:
+        if not path or not os.path.isfile(path):
+            return
+        try:
+            mtime = os.path.getmtime(path)
+        except OSError:
+            return
+        candidates.append((mtime, path))
+
     candidates = []
+    for build_root in build_roots:
+        build_dir = os.path.join(build_root, node_name)
+        if not os.path.isdir(build_dir):
+            continue
+
+        # Fast path: known ESPHome/PlatformIO output locations.
+        pioenvs_dir = os.path.join(build_dir, ".pioenvs")
+        for filename in target_names:
+            add_candidate(candidates, os.path.join(build_dir, filename))
+            add_candidate(candidates, os.path.join(pioenvs_dir, node_name, filename))
+            if os.path.isdir(pioenvs_dir):
+                for env_name in os.listdir(pioenvs_dir):
+                    add_candidate(candidates, os.path.join(pioenvs_dir, env_name, filename))
+
+    if candidates:
+        candidates.sort(key=lambda item: item[0], reverse=True)
+        return candidates[0][1]
+
+    # Fallback: deep scan for non-standard build layouts.
     for build_root in build_roots:
         build_dir = os.path.join(build_root, node_name)
         if not os.path.isdir(build_dir):
@@ -762,12 +1333,7 @@ def find_firmware_path(node_name: str, variant: str = "ota") -> str:
             for filename in files:
                 if filename not in target_names:
                     continue
-                full_path = os.path.join(root, filename)
-                try:
-                    mtime = os.path.getmtime(full_path)
-                except OSError:
-                    continue
-                candidates.append((mtime, full_path))
+                add_candidate(candidates, os.path.join(root, filename))
 
     if not candidates:
         return ""
@@ -800,7 +1366,6 @@ class Job:
         yaml_name: str,
         action: str,
         device: str,
-        clean: bool,
         state: str = "queued",
         created_at: Optional[str] = None,
         started_at: Optional[str] = None,
@@ -812,7 +1377,6 @@ class Job:
         self.yaml_name = yaml_name
         self.action = action
         self.device = device
-        self.clean = clean
         self.state = state
         self.created_at = created_at or utc_now()
         self.started_at = started_at
@@ -839,7 +1403,6 @@ class Job:
             yaml_name=data.get("yaml", ""),
             action=data.get("action", ""),
             device=data.get("device", ""),
-            clean=bool(data.get("clean", False)),
             state=data.get("state", "queued"),
             created_at=data.get("created_at"),
             started_at=data.get("started_at"),
@@ -860,7 +1423,6 @@ class Job:
             "yaml": self.yaml_name,
             "action": self.action,
             "device": self.device,
-            "clean": self.clean,
         }
 
     def save_status(self) -> None:
@@ -940,9 +1502,9 @@ class JobManager:
             except Exception:
                 continue
 
-    def submit(self, yaml_name: str, action: str, device: str, clean: bool) -> Job:
+    def submit(self, yaml_name: str, action: str, device: str) -> Job:
         job_id = uuid.uuid4().hex
-        job = Job(job_id, yaml_name, action, device, clean)
+        job = Job(job_id, yaml_name, action, device)
         with self.lock:
             self.jobs[job.id] = job
         os.makedirs(JOB_DIR, exist_ok=True)
@@ -991,19 +1553,19 @@ class JobManager:
         yaml_path = os.path.join(TARGET_DIR, job.yaml_name)
         if job.action == "logs":
             exit_code = self._run_esphome(job, ["logs", yaml_path, "--device", job.device])
+        elif job.action == "validate":
+            exit_code = self._run_esphome(job, ["config", yaml_path])
+        elif job.action == "clean":
+            exit_code = self._run_esphome(job, ["clean", yaml_path])
         else:
             exit_code = self._run_esphome(job, ["config", yaml_path])
 
             if exit_code == 0 and not job.cancel_requested:
                 compile_cmd = ["compile", yaml_path]
-                if job.clean:
-                    compile_cmd.append("--clean")
                 exit_code = self._run_esphome(job, compile_cmd)
 
             if exit_code == 0 and job.action == "ota" and not job.cancel_requested:
                 upload_cmd = ["upload", yaml_path, "--device", job.device]
-                if job.clean:
-                    upload_cmd.append("--clean")
                 exit_code = self._run_esphome(job, upload_cmd)
 
 
@@ -1172,6 +1734,447 @@ app = Flask(__name__)
 @app.route("/api/health", methods=["GET"])
 def api_health():
     return jsonify({"status": "ok", "ts": utc_now()})
+
+
+@app.route("/api/component-catalog", methods=["GET", "OPTIONS"])
+def api_component_catalog():
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    access = check_access()
+    if access:
+        return access
+
+    base_catalog = load_components_catalog(COMPONENTS_BASE_LIST_PATH)
+    runtime_path = components_runtime_list_path()
+    runtime_catalog = load_components_catalog(runtime_path) if os.path.isfile(runtime_path) else None
+    merged = merge_component_catalogs(base_catalog, runtime_catalog)
+    return jsonify({"status": "ok", "catalog": merged})
+
+
+@app.route("/api/component-schemas/<path:relpath>", methods=["GET", "OPTIONS"])
+def api_component_schema(relpath):
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    access = check_access()
+    if access:
+        return access
+
+    schema_relpath = normalize_component_schema_relpath(relpath)
+    if not schema_relpath:
+        return json_error("Invalid schema path", "COMPONENTS_SCHEMA_PATH_INVALID", 400)
+
+    runtime_base = os.path.join(components_runtime_root(), "schemas")
+    base_base = os.path.join(WEB_ROOT, "schemas")
+
+    runtime_candidate = resolve_component_schema_path(runtime_base, schema_relpath)
+    if runtime_candidate and os.path.isfile(runtime_candidate):
+        return send_from_directory(runtime_base, schema_relpath.replace("/", os.sep), mimetype="application/json")
+
+    base_candidate = resolve_component_schema_path(base_base, schema_relpath)
+    if base_candidate and os.path.isfile(base_candidate):
+        return send_from_directory(base_base, schema_relpath.replace("/", os.sep), mimetype="application/json")
+
+    return json_error("Schema not found", "COMPONENTS_SCHEMA_NOT_FOUND", 404)
+
+
+@app.route("/api/components/import-zip", methods=["POST", "OPTIONS"])
+def api_components_import_zip():
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    access = check_access()
+    if access:
+        return access
+
+    if "file" not in request.files:
+        return json_error("Missing file", "COMPONENTS_FILE_REQUIRED", 400)
+
+    upload = request.files["file"]
+    filename = str(upload.filename or "").strip().lower()
+    if not filename.endswith(".zip"):
+        return json_error("Only .zip imports are supported", "COMPONENTS_ZIP_REQUIRED", 400)
+
+    raw = upload.stream.read(COMPONENTS_IMPORT_MAX_UPLOAD_BYTES + 1)
+    if len(raw) > COMPONENTS_IMPORT_MAX_UPLOAD_BYTES:
+        return json_error("Zip file too large", "COMPONENTS_ZIP_TOO_LARGE", 413)
+    if not raw:
+        return json_error("Empty zip file", "COMPONENTS_EMPTY_ZIP", 400)
+
+    try:
+        archive = zipfile.ZipFile(io.BytesIO(raw))
+    except Exception:
+        return json_error("Invalid zip archive", "COMPONENTS_INVALID_ZIP", 400)
+
+    try:
+        infos = archive.infolist()
+    except Exception:
+        archive.close()
+        return json_error("Failed to read zip archive", "COMPONENTS_INVALID_ZIP", 400)
+
+    total_unpacked = 0
+    safe_members = {}
+    schema_members = set()
+    for info in infos:
+        raw_member_name = str(info.filename or "")
+        if info.is_dir() or raw_member_name.endswith("/") or raw_member_name.endswith("\\"):
+            continue
+        if len(safe_members) >= COMPONENTS_IMPORT_MAX_FILES:
+            archive.close()
+            return json_error("Too many files in zip", "COMPONENTS_ZIP_TOO_MANY_FILES", 400)
+
+        safe_name = safe_zip_json_member_path(info.filename)
+        if not safe_name:
+            archive.close()
+            return json_error("Invalid file in zip package", "COMPONENTS_ZIP_INVALID_FILE", 400)
+        if safe_name in safe_members:
+            archive.close()
+            return json_error("Duplicate file path in zip package", "COMPONENTS_ZIP_DUPLICATE_PATH", 400)
+
+        total_unpacked += max(0, int(info.file_size or 0))
+        if total_unpacked > COMPONENTS_IMPORT_MAX_UNPACKED_BYTES:
+            archive.close()
+            return json_error("Zip unpacked size is too large", "COMPONENTS_ZIP_UNPACKED_TOO_LARGE", 400)
+
+        safe_members[safe_name] = info
+        if safe_name.startswith("schemas/components/"):
+            schema_members.add(safe_name)
+
+    if "components_list.json" not in safe_members:
+        archive.close()
+        return json_error("Zip must include components_list.json", "COMPONENTS_ZIP_MISSING_CATALOG", 400)
+    if not schema_members:
+        archive.close()
+        return json_error("Zip must include schemas/components/*.json", "COMPONENTS_ZIP_MISSING_SCHEMAS", 400)
+
+    try:
+        catalog_data = json.loads(archive.read("components_list.json").decode("utf-8"))
+    except Exception:
+        archive.close()
+        return json_error("Invalid components_list.json", "COMPONENTS_INVALID_CATALOG", 400)
+
+    zip_entries, entry_errors = parse_zip_components_catalog(catalog_data)
+    if entry_errors and not zip_entries:
+        archive.close()
+        return jsonify(
+            {
+                "status": "error",
+                "code": "COMPONENTS_INVALID_CATALOG",
+                "message": "Invalid components_list.json",
+                "summary": {
+                    "imported": 0,
+                    "updated": 0,
+                    "skipped": 0,
+                    "errors": entry_errors[:COMPONENTS_IMPORT_MAX_ITEM_ERRORS],
+                },
+            }
+        ), 400
+
+    imported = 0
+    updated = 0
+    skipped = 0
+    errors = list(entry_errors[:COMPONENTS_IMPORT_MAX_ITEM_ERRORS])
+
+    base_ids = set(item.get("id") for item in extract_catalog_items(load_components_catalog(COMPONENTS_BASE_LIST_PATH)))
+
+    with COMPONENTS_LOCK:
+        runtime_path = components_runtime_list_path()
+        runtime_catalog = load_components_catalog(runtime_path) if os.path.isfile(runtime_path) else default_components_catalog()
+        runtime_items = extract_catalog_items(runtime_catalog)
+        runtime_by_id = {item.get("id"): item for item in runtime_items}
+
+        for zip_item in zip_entries:
+            entry = zip_item["entry"]
+            chain = zip_item["chain"]
+            comp_id = str(entry["id"])
+            schema_member = f"schemas/{entry['schemaPath']}"
+            member_info = safe_members.get(schema_member)
+            if not member_info:
+                skipped += 1
+                if len(errors) < COMPONENTS_IMPORT_MAX_ITEM_ERRORS:
+                    errors.append(f"Missing schema file for {comp_id}: {schema_member}")
+                continue
+
+            try:
+                schema_raw = archive.read(member_info)
+                schema_obj = json.loads(schema_raw.decode("utf-8"))
+            except Exception:
+                skipped += 1
+                if len(errors) < COMPONENTS_IMPORT_MAX_ITEM_ERRORS:
+                    errors.append(f"Invalid schema JSON for {comp_id}: {schema_member}")
+                continue
+
+            schema_target = runtime_schema_target_path(entry["schemaPath"])
+            if not schema_target:
+                skipped += 1
+                if len(errors) < COMPONENTS_IMPORT_MAX_ITEM_ERRORS:
+                    errors.append(f"Invalid schema path for {comp_id}")
+                continue
+
+            os.makedirs(os.path.dirname(schema_target), exist_ok=True)
+            with open(schema_target, "w", encoding="utf-8") as handle:
+                json.dump(schema_obj, handle, ensure_ascii=False, indent=2)
+                handle.write("\n")
+
+            was_existing = comp_id in runtime_by_id or comp_id in base_ids
+            remove_catalog_item_all(runtime_catalog, comp_id)
+            target_items = ensure_category_path(runtime_catalog, chain)
+            target_items.append(entry)
+            runtime_by_id[comp_id] = entry
+            if was_existing:
+                updated += 1
+            else:
+                imported += 1
+
+        save_runtime_components_catalog(runtime_catalog)
+
+    archive.close()
+    return jsonify(
+        {
+            "status": "ok",
+            "summary": {
+                "imported": imported,
+                "updated": updated,
+                "skipped": skipped,
+                "errors": errors,
+            },
+        }
+    )
+
+
+@app.route("/api/custom-components", methods=["POST", "OPTIONS"])
+def api_custom_components_create():
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    access = check_access()
+    if access:
+        return access
+
+    payload = request.get_json(silent=True) or {}
+    name = str(payload.get("name") or "").strip()
+    if not name:
+        return json_error("Missing name", "COMPONENTS_NAME_REQUIRED", 400)
+
+    custom_config = payload.get("custom_config")
+    if custom_config is None:
+        custom_config = payload.get("customConfig")
+    if custom_config is None:
+        custom_config = ""
+    if not isinstance(custom_config, str):
+        return json_error("custom_config must be a string", "COMPONENTS_CUSTOM_CONFIG_INVALID", 400)
+
+    schema_data = payload.get("schema")
+    if isinstance(schema_data, str):
+        try:
+            schema_data = json.loads(schema_data)
+        except Exception:
+            return json_error("Invalid schema JSON", "COMPONENTS_SCHEMA_INVALID", 400)
+
+    requested_id = normalize_component_id(payload.get("id", ""))
+    if requested_id and not requested_id.startswith("custom/"):
+        return json_error("Custom component id must start with custom/", "COMPONENTS_CUSTOM_ID_INVALID", 400)
+
+    key = ""
+    if requested_id:
+        key = requested_id.split("/")[-1]
+    if not key:
+        key = slugify_component_key(payload.get("key", "")) or slugify_component_key(name)
+    if not key:
+        return json_error("Invalid custom component key", "COMPONENTS_CUSTOM_KEY_INVALID", 400)
+
+    component_id = requested_id or f"custom/{key}"
+    available = payload.get("available", True)
+    if not isinstance(available, bool):
+        return json_error("Invalid available flag", "COMPONENTS_AVAILABLE_INVALID", 400)
+    entry = {
+        "name": name,
+        "path": f"components/{component_id}",
+        "id": component_id,
+        "available": available,
+        "schemaPath": f"components/{component_id}.json",
+        "prefillConfig": {
+            "name": name,
+            "custom_config": custom_config,
+        },
+    }
+
+    if schema_data is None:
+        schema_data = build_custom_component_schema(key)
+    elif not isinstance(schema_data, (dict, list)):
+        return json_error("Invalid schema", "COMPONENTS_SCHEMA_INVALID", 400)
+
+    with COMPONENTS_LOCK:
+        runtime_path = components_runtime_list_path()
+        runtime_catalog = load_components_catalog(runtime_path) if os.path.isfile(runtime_path) else default_components_catalog()
+
+        runtime_items = extract_catalog_items(runtime_catalog)
+        existing_ids = {item.get("id") for item in runtime_items}
+        if component_id in existing_ids:
+            return json_error("Component id already exists", "COMPONENTS_ID_CONFLICT", 409)
+
+        normalized_name = name.lower()
+        for item in runtime_items:
+            item_id = str(item.get("id") or "")
+            item_name = str(item.get("name") or "").strip().lower()
+            if item_id.startswith("custom/") and item_name == normalized_name:
+                return json_error("Component name already exists", "COMPONENTS_NAME_CONFLICT", 409)
+
+        schema_target = runtime_schema_target_path(entry["schemaPath"])
+        if not schema_target:
+            return json_error("Invalid schema path", "COMPONENTS_SCHEMA_PATH_INVALID", 400)
+        os.makedirs(os.path.dirname(schema_target), exist_ok=True)
+        with open(schema_target, "w", encoding="utf-8") as handle:
+            json.dump(schema_data, handle, ensure_ascii=False, indent=2)
+            handle.write("\n")
+
+        custom_items = ensure_custom_category(runtime_catalog)
+        custom_items.append(entry)
+        save_runtime_components_catalog(runtime_catalog)
+
+    return jsonify({"status": "ok", "item": entry})
+
+
+@app.route("/api/custom-components/<path:id_or_key>", methods=["PUT", "OPTIONS"])
+def api_custom_components_update(id_or_key):
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    access = check_access()
+    if access:
+        return access
+
+    component_id = normalize_custom_component_lookup_id(id_or_key)
+    if not component_id:
+        return json_error("Invalid component id", "COMPONENTS_ID_INVALID", 400)
+
+    payload = request.get_json(silent=True) or {}
+    name = str(payload.get("name") or "").strip()
+    if not name:
+        return json_error("Missing name", "COMPONENTS_NAME_REQUIRED", 400)
+
+    custom_config = payload.get("custom_config")
+    if custom_config is None:
+        custom_config = payload.get("customConfig")
+    if custom_config is None:
+        custom_config = ""
+    if not isinstance(custom_config, str):
+        return json_error("custom_config must be a string", "COMPONENTS_CUSTOM_CONFIG_INVALID", 400)
+
+    available = payload.get("available", True)
+    if not isinstance(available, bool):
+        return json_error("Invalid available flag", "COMPONENTS_AVAILABLE_INVALID", 400)
+
+    new_key = slugify_component_key(name)
+    if not new_key:
+        return json_error("Invalid custom component key", "COMPONENTS_CUSTOM_KEY_INVALID", 400)
+    new_id = f"custom/{new_key}"
+
+    with COMPONENTS_LOCK:
+        runtime_path = components_runtime_list_path()
+        if not os.path.isfile(runtime_path):
+            return json_error("Component not found", "COMPONENTS_NOT_FOUND", 404)
+        runtime_catalog = load_components_catalog(runtime_path)
+
+        existing_ref = find_catalog_item_ref(runtime_catalog, component_id)
+        if not existing_ref:
+            return json_error("Component not found", "COMPONENTS_NOT_FOUND", 404)
+        target_items, target_index, existing_item = existing_ref
+
+        runtime_items = extract_catalog_items(runtime_catalog)
+        normalized_name = name.strip().lower()
+        for item in runtime_items:
+            item_id = str(item.get("id") or "")
+            item_name = str(item.get("name") or "").strip().lower()
+            if item_id == component_id:
+                continue
+            if item_id.startswith("custom/") and item_name == normalized_name:
+                return json_error("Component name already exists", "COMPONENTS_NAME_CONFLICT", 409)
+
+        if new_id != component_id:
+            for item in runtime_items:
+                if str(item.get("id") or "") == new_id:
+                    return json_error("Component id already exists", "COMPONENTS_ID_CONFLICT", 409)
+
+        updated_entry = {
+            "name": name,
+            "path": f"components/{new_id}",
+            "id": new_id,
+            "available": available,
+            "schemaPath": f"components/{new_id}.json",
+            "prefillConfig": {
+                "name": name,
+                "custom_config": custom_config,
+            },
+        }
+
+        schema_data = build_custom_component_schema(new_key)
+        new_schema_path = runtime_schema_target_path(updated_entry["schemaPath"])
+        if not new_schema_path:
+            return json_error("Invalid schema path", "COMPONENTS_SCHEMA_PATH_INVALID", 400)
+
+        old_schema_path = runtime_schema_target_path(str(existing_item.get("schemaPath") or ""))
+        old_id = str(existing_item.get("id") or component_id)
+
+        os.makedirs(os.path.dirname(new_schema_path), exist_ok=True)
+        with open(new_schema_path, "w", encoding="utf-8") as handle:
+            json.dump(schema_data, handle, ensure_ascii=False, indent=2)
+            handle.write("\n")
+
+        renamed = old_id != new_id
+        if renamed and old_schema_path and old_schema_path != new_schema_path and os.path.isfile(old_schema_path):
+            try:
+                os.remove(old_schema_path)
+            except Exception:
+                return json_error("Failed to delete old schema", "COMPONENTS_SCHEMA_DELETE_FAILED", 500)
+
+        target_items[target_index] = updated_entry
+        save_runtime_components_catalog(runtime_catalog)
+
+    return jsonify(
+        {
+            "status": "ok",
+            "item": updated_entry,
+            "renamed": renamed,
+            "previousId": old_id,
+            "currentId": new_id,
+        }
+    )
+
+
+@app.route("/api/custom-components/<path:id_or_key>", methods=["DELETE", "OPTIONS"])
+def api_custom_components_delete(id_or_key):
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    access = check_access()
+    if access:
+        return access
+
+    component_id = normalize_custom_component_lookup_id(id_or_key)
+    if not component_id:
+        return json_error("Invalid component id", "COMPONENTS_ID_INVALID", 400)
+
+    with COMPONENTS_LOCK:
+        runtime_path = components_runtime_list_path()
+        if not os.path.isfile(runtime_path):
+            return json_error("Component not found", "COMPONENTS_NOT_FOUND", 404)
+        runtime_catalog = load_components_catalog(runtime_path)
+        removed = remove_catalog_item(runtime_catalog, component_id)
+        if not removed:
+            return json_error("Component not found", "COMPONENTS_NOT_FOUND", 404)
+
+        schema_path = runtime_schema_target_path(str(removed.get("schemaPath") or ""))
+        if schema_path and os.path.isfile(schema_path):
+            try:
+                os.remove(schema_path)
+            except Exception:
+                return json_error("Failed to delete schema", "COMPONENTS_SCHEMA_DELETE_FAILED", 500)
+
+        save_runtime_components_catalog(runtime_catalog)
+
+    return jsonify({"status": "ok", "removed": component_id})
 
 
 @app.route("/api/assets/refresh", methods=["POST"])
@@ -1671,22 +2674,64 @@ def rename_project():
     new_name = normalize_filename(str(new_value), ".json")
     if not old_name or not new_name:
         return jsonify({"status": "error", "message": "Invalid name"}), 400
+    if old_name.lower() == "projects.json" or new_name.lower() == "projects.json":
+        return jsonify({"status": "error", "message": "Reserved project index name"}), 400
     if old_name == new_name:
         return jsonify({"status": "ok", "name": old_name, "new_name": new_name})
 
+    old_yaml = normalize_yaml_filename(f"{old_name[:-5]}.yaml")
+    new_yaml = normalize_yaml_filename(f"{new_name[:-5]}.yaml")
+    if not old_yaml or not new_yaml:
+        return jsonify({"status": "error", "message": "Invalid derived yaml name"}), 400
+
     old_path = os.path.join(PROJECT_DIR, old_name)
     new_path = os.path.join(PROJECT_DIR, new_name)
+    old_yaml_path = os.path.join(TARGET_DIR, old_yaml)
+    new_yaml_path = os.path.join(TARGET_DIR, new_yaml)
     if not os.path.isfile(old_path):
         return jsonify({"status": "error", "message": "Source not found"}), 404
     if os.path.exists(new_path):
         return jsonify({"status": "error", "message": "Target already exists"}), 409
+    if old_yaml != new_yaml and os.path.exists(new_yaml_path):
+        return jsonify({"status": "error", "message": "Target YAML already exists"}), 409
 
+    project_renamed = False
+    yaml_renamed = False
+    placement_updated = False
     try:
+        if old_yaml != new_yaml and os.path.isfile(old_yaml_path):
+            os.rename(old_yaml_path, new_yaml_path)
+            yaml_renamed = True
         os.rename(old_path, new_path)
+        project_renamed = True
+        placement_updated = rename_project_in_index(old_name, new_name)
     except Exception:
+        if placement_updated:
+            try:
+                rename_project_in_index(new_name, old_name)
+            except Exception:
+                pass
+        if project_renamed and os.path.isfile(new_path) and not os.path.exists(old_path):
+            try:
+                os.rename(new_path, old_path)
+            except Exception:
+                pass
+        if yaml_renamed and os.path.isfile(new_yaml_path) and not os.path.exists(old_yaml_path):
+            try:
+                os.rename(new_yaml_path, old_yaml_path)
+            except Exception:
+                pass
         return jsonify({"status": "error", "message": "Rename failed"}), 500
 
-    return jsonify({"status": "ok", "name": old_name, "new_name": new_name})
+    return jsonify(
+        {
+            "status": "ok",
+            "name": old_name,
+            "new_name": new_name,
+            "yaml": {"name": old_yaml, "new_name": new_yaml, "renamed": yaml_renamed},
+            "result": {"project_renamed": project_renamed, "placement_updated": placement_updated},
+        }
+    )
 
 
 @app.route("/yaml/delete", methods=["DELETE", "OPTIONS"])
@@ -1979,7 +3024,7 @@ def api_install():
         return jsonify({"status": "error", "message": "Invalid yaml"}), 400
 
     action = str(payload.get("action", "")).strip().lower()
-    if action not in ("compile", "ota", "logs"):
+    if action not in ("compile", "ota", "logs", "validate", "clean"):
         return jsonify({"status": "error", "message": "Invalid action"}), 400
 
     device = ""
@@ -1988,15 +3033,11 @@ def api_install():
         if not device:
             return jsonify({"status": "error", "message": "Invalid device"}), 400
 
-    clean = payload.get("clean", False)
-    if not isinstance(clean, bool):
-        return jsonify({"status": "error", "message": "Invalid clean"}), 400
-
     yaml_path = os.path.join(TARGET_DIR, yaml_name)
     if not os.path.isfile(yaml_path):
         return jsonify({"status": "error", "message": "YAML not found"}), 404
 
-    job = job_manager.submit(yaml_name, action, device, clean)
+    job = job_manager.submit(yaml_name, action, device)
     return jsonify({"status": "ok", "job_id": job.id, "job": job.to_dict()})
 
 

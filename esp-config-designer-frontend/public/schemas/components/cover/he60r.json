@@ -1,0 +1,32 @@
+{
+  "id": "cover.he60r",
+  "domain": "cover",
+  "platform": "he60r",
+  "requires": [
+    "uart"
+  ],
+  "helpUrl": "https://esphome.io/components/cover/he60r/",
+  "extends": "base_cover.json",
+  "fields": [
+    {
+      "key": "open_duration",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "15s"
+    },
+    {
+      "key": "close_duration",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "15s"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

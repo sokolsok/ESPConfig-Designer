@@ -1,0 +1,73 @@
+{
+  "id": "light.rgbww",
+  "domain": "light",
+  "platform": "rgbww",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/light/rgbww/",
+  "extends": "base_light.json",
+  "fields": [
+    {
+      "key": "red",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "green",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "blue",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "cold_white",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "warm_white",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "cold_white_color_temperature",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "6536 K"
+    },
+    {
+      "key": "warm_white_color_temperature",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "2000 K"
+    },
+    {
+      "key": "constant_brightness",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "color_interlock",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

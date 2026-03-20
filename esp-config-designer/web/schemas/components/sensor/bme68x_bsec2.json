@@ -1,0 +1,73 @@
+{
+  "id": "sensor.bme68x_bsec2",
+  "domain": "sensor",
+  "platform": "bme68x_bsec2",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/bme68x_bsec2/",
+  "fields": [
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x76"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor"
+    },
+    {
+      "key": "model",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "algorithm_output",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "operating_age",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "sample_rate",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "supply_voltage",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "3.3V",
+        "1.8V"
+      ]
+    },
+    {
+      "key": "temperature_offset",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0"
+    },
+    {
+      "key": "state_save_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "6h"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "switch.turn_off",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Switch",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "switch_id",
+      "domain": "switch",
+      "lvl": "normal"
+    }
+  ]
+}

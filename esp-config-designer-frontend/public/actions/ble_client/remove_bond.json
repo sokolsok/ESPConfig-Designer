@@ -1,0 +1,23 @@
+{
+  "id": "ble_client.remove_bond",
+  "fields": [
+    {
+      "key": "id",
+      "label": "BLE client",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "ble_client_id",
+      "domain": "ble_client",
+      "lvl": "normal"
+    },
+    {
+      "key": "confirm",
+      "label": "Confirm",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    }
+  ]
+}

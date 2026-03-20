@@ -1,0 +1,50 @@
+{
+  "id": "canbus.send",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Canbus",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "canbus_id",
+      "domain": "canbus",
+      "lvl": "normal"
+    },
+    {
+      "key": "can_id",
+      "label": "CAN ID",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "0x123"
+    },
+    {
+      "key": "use_extended_id",
+      "label": "Extended ID",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "remote_transmission_request",
+      "label": "Remote transmission request",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "data",
+      "label": "Data",
+      "type": "yaml",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "- 0x01\n- 0x02"
+    }
+  ]
+}

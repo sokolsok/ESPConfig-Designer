@@ -1,0 +1,24 @@
+{
+  "id": "hlk_fm22x.reset",
+  "fields": [
+    {
+      "key": "id",
+      "label": "HLK-FM22x",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "hlk_fm22x_id",
+      "domain": "hlk_fm22x",
+      "lvl": "normal"
+    },
+    {
+      "key": "timeout",
+      "label": "Timeout",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "5s",
+      "lambdaPlaceholder": "return 5000;"
+    }
+  ]
+}

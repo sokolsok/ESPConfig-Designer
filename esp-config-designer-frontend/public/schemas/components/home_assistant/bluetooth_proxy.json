@@ -1,0 +1,46 @@
+{
+  "id": "bluetooth_proxy",
+  "domain": "bluetooth_proxy",
+  "requires": [
+    "api",
+    "esp32"
+  ],
+  "helpUrl": "https://esphome.io/components/bluetooth_proxy/",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal",
+      "idDomain": "bluetooth_proxy"
+    },
+    {
+      "key": "active",
+      "type": "boolean",
+      "required": false,
+      "lvl": "simple",
+      "default": true
+    },
+    {
+      "key": "cache_services",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    },
+    {
+      "key": "connection_slots",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 3
+    },
+    {
+      "key": "connections",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "- mac_address: AA:BB:CC:DD:EE:FF"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "hlk_fm22x.delete",
+  "fields": [
+    {
+      "key": "id",
+      "label": "HLK-FM22x",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "hlk_fm22x_id",
+      "domain": "hlk_fm22x",
+      "lvl": "normal"
+    },
+    {
+      "key": "face_id",
+      "label": "Face ID",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "1",
+      "lambdaPlaceholder": "return 1;"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "key_collector.enable",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Key collector",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "key_collector_id",
+      "domain": "key_collector",
+      "lvl": "normal"
+    },
+    {
+      "key": "clear_buffer",
+      "label": "Clear buffer",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "timeout",
+      "label": "Timeout",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "10s",
+      "lambdaPlaceholder": "return 10000;"
+    }
+  ]
+}

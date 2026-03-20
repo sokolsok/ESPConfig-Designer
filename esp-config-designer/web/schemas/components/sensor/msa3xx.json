@@ -1,0 +1,113 @@
+{
+  "id": "sensor.msa3xx",
+  "domain": "sensor",
+  "platform": "msa3xx",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/msa3xx/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "type",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "10s"
+    },
+    {
+      "key": "range",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "2G",
+        "4G",
+        "8G",
+        "16G",
+        "-2g",
+        "2g"
+      ]
+    },
+    {
+      "key": "resolution",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "calibration",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "offset_x",
+          "type": "number",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0"
+        },
+        {
+          "key": "offset_y",
+          "type": "number",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0"
+        },
+        {
+          "key": "offset_z",
+          "type": "number",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0"
+        }
+      ]
+    },
+    {
+      "key": "transform",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "mirror_x",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "mirror_y",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "mirror_z",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "swap_xy",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal"
+        }
+      ]
+    }
+  ]
+}

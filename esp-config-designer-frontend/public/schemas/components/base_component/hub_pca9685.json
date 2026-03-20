@@ -1,0 +1,59 @@
+{
+  "id": "hub.pca9685",
+  "domain": "pca9685",
+  "platform": "",
+  "requires": [
+    "i2c"
+  ],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "pca9685_hub",
+      "idDomain": "pca9685"
+    },
+    {
+      "key": "frequency",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "1kHz"
+    },
+    {
+      "key": "external_clock_input",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x40",
+      "suppressQuotes": true
+    },
+    {
+      "key": "phase_balancer",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "linear",
+      "options": [
+        "linear",
+        "none"
+      ]
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "advanced",
+      "domain": "i2c"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "alarm_control_panel.arm_night",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Alarm Control Panel",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "alarm_control_panel_id",
+      "domain": "alarm_control_panel",
+      "lvl": "normal"
+    },
+    {
+      "key": "code",
+      "label": "Code",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1234"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "pulse_counter.set_total_pulses",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Pulse Counter",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "pulse_counter_id",
+      "domain": "pulse_counter",
+      "lvl": "normal"
+    },
+    {
+      "key": "total_pulses",
+      "label": "Total Pulses",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

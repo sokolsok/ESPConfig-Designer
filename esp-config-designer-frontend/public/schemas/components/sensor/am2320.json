@@ -1,0 +1,33 @@
+{
+  "id": "sensor.am2320",
+  "domain": "sensor",
+  "platform": "am2320",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/am2320/",
+  "fields": [
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": true,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "humidity",
+      "type": "object",
+      "required": true,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple"
+    }
+  ]
+}

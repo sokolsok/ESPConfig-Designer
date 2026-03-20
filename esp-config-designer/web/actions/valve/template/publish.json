@@ -1,0 +1,37 @@
+{
+  "id": "valve.template.publish",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Valve",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "valve_id",
+      "domain": "valve",
+      "lvl": "normal"
+    },
+    {
+      "key": "position",
+      "label": "Position",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "50%",
+      "lambdaPlaceholder": "return 0.5;"
+    },
+    {
+      "key": "current_operation",
+      "label": "Current operation",
+      "type": "select",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "IDLE",
+        "OPENING",
+        "CLOSING"
+      ]
+    }
+  ]
+}

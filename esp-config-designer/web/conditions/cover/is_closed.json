@@ -1,0 +1,14 @@
+{
+  "id": "cover.is_closed",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Cover",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "cover_id",
+      "domain": "cover",
+      "lvl": "normal"
+    }
+  ]
+}

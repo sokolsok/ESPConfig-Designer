@@ -1,0 +1,42 @@
+{
+  "id": "output.x9c",
+  "domain": "output",
+  "platform": "x9c",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/output/x9c/",
+  "extends": "base_output_float.json",
+  "fields": [
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "inc_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "ud_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "initial_value",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 1
+    },
+    {
+      "key": "step_delay",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "1us"
+    }
+  ]
+}

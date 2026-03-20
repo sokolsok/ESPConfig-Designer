@@ -1,0 +1,45 @@
+{
+  "id": "binary_sensor.cap1188",
+  "domain": "binary_sensor",
+  "platform": "cap1188",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/binary_sensor/cap1188/",
+  "extends": "base_binary_sensor.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "cap1188",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_cap1188.json",
+      "helpUrl": "https://esphome.io/components/binary_sensor/cap1188/"
+    },
+    {
+      "key": "cap1188_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "cap1188",
+      "allowSelfReference": true,
+      "default": "cap1188_component"
+    },
+    {
+      "key": "channel",
+      "type": "number",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "0"
+    }
+  ]
+}

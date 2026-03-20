@@ -1,0 +1,63 @@
+{
+  "id": "touchscreen.xpt2046",
+  "domain": "touchscreen",
+  "platform": "xpt2046",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/touchscreen/xpt2046/",
+  "extends": "base_touchscreen.json",
+  "fields": [
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "interrupt_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "threshold",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 400
+    },
+    {
+      "key": "calibration",
+      "type": "object",
+      "required": true,
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "x_min",
+          "type": "number",
+          "required": true,
+          "lvl": "normal"
+        },
+        {
+          "key": "x_max",
+          "type": "number",
+          "required": true,
+          "lvl": "normal"
+        },
+        {
+          "key": "y_min",
+          "type": "number",
+          "required": true,
+          "lvl": "normal"
+        },
+        {
+          "key": "y_max",
+          "type": "number",
+          "required": true,
+          "lvl": "normal"
+        }
+      ]
+    }
+  ]
+}

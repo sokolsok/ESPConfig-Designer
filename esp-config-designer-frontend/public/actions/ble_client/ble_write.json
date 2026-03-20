@@ -1,0 +1,41 @@
+{
+  "id": "ble_client.ble_write",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Ble Client",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "ble_client_id",
+      "domain": "ble_client",
+      "lvl": "normal"
+    },
+    {
+      "key": "service_uuid",
+      "label": "Service UUID",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "12345678-1234-1234-1234-1234567890ab"
+    },
+    {
+      "key": "characteristic_uuid",
+      "label": "Characteristic UUID",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "abcd"
+    },
+    {
+      "key": "value",
+      "label": "Value",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "hello"
+    }
+  ]
+}

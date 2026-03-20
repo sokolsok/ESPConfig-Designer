@@ -1,0 +1,22 @@
+{
+  "id": "dfplayer.set_device",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Dfplayer",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "dfplayer_id",
+      "domain": "dfplayer",
+      "lvl": "normal"
+    },
+    {
+      "key": "device",
+      "label": "Device",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

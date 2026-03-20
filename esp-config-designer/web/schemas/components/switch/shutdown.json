@@ -1,0 +1,9 @@
+{
+  "id": "switch.shutdown",
+  "domain": "switch",
+  "platform": "shutdown",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/switch/shutdown/",
+  "extends": "base_switch.json",
+  "fields": []
+}

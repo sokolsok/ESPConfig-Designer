@@ -1,0 +1,144 @@
+{
+  "id": "microphone.i2s_audio",
+  "domain": "microphone",
+  "platform": "i2s_audio",
+  "requires": [
+    "i2s_audio"
+  ],
+  "helpUrl": "https://esphome.io/components/microphone/i2s_audio/",
+  "extends": "base_microphone.json",
+  "fields": [
+    {
+      "key": "adc_type",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "external",
+      "options": [
+        "external",
+        "internal"
+      ]
+    },
+    {
+      "key": "channel",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "right",
+      "options": [
+        "left",
+        "right",
+        "stereo"
+      ]
+    },
+    {
+      "key": "sample_rate",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 16000
+    },
+    {
+      "key": "bits_per_sample",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "32bit",
+      "options": [
+        "8bit",
+        "16bit",
+        "24bit",
+        "32bit"
+      ]
+    },
+    {
+      "key": "bits_per_channel",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "32bit",
+      "options": [
+        "8bit",
+        "16bit",
+        "24bit",
+        "32bit"
+      ]
+    },
+    {
+      "key": "mclk_multiple",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "256",
+      "options": [
+        "128",
+        "256",
+        "384",
+        "512"
+      ]
+    },
+    {
+      "key": "use_apll",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "i2s_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "primary",
+      "options": [
+        "primary",
+        "secondary"
+      ]
+    },
+    {
+      "key": "i2s_audio_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2s_audio"
+    },
+    {
+      "key": "correct_dc_offset",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "i2s_din_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "adc_type",
+        "value": "external"
+      }
+    },
+    {
+      "key": "pdm",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false,
+      "dependsOn": {
+        "key": "adc_type",
+        "value": "external"
+      }
+    },
+    {
+      "key": "adc_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "adc_type",
+        "value": "internal"
+      }
+    }
+  ]
+}

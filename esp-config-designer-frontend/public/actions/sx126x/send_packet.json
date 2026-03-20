@@ -1,0 +1,23 @@
+{
+  "id": "sx126x.send_packet",
+  "fields": [
+    {
+      "key": "id",
+      "label": "SX126x",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "sx126x_id",
+      "domain": "sx126x",
+      "lvl": "normal"
+    },
+    {
+      "key": "data",
+      "label": "Data",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "payload"
+    }
+  ]
+}

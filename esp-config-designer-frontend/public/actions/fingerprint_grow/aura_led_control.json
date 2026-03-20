@@ -1,0 +1,67 @@
+{
+  "id": "fingerprint_grow.aura_led_control",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Fingerprint sensor",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "fingerprint_grow_id",
+      "domain": "fingerprint_grow",
+      "lvl": "normal"
+    },
+    {
+      "key": "state",
+      "label": "State",
+      "type": "select",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "options": [
+        "BREATHING",
+        "FLASHING",
+        "ALWAYS_ON",
+        "ALWAYS_OFF",
+        "GRADUAL_ON",
+        "GRADUAL_OFF"
+      ]
+    },
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "100",
+      "lambdaPlaceholder": "return 100;"
+    },
+    {
+      "key": "color",
+      "label": "Color",
+      "type": "select",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "RED",
+        "BLUE",
+        "PURPLE",
+        "GREEN",
+        "YELLOW",
+        "CYAN",
+        "WHITE"
+      ]
+    },
+    {
+      "key": "count",
+      "label": "Count",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1",
+      "lambdaPlaceholder": "return 1;"
+    }
+  ]
+}

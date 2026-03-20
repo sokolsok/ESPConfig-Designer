@@ -1,0 +1,101 @@
+{
+  "id": "light.fastled",
+  "domain": "light",
+  "platform": "fastled_clockless",
+  "platformByBus": {
+    "clockless": "fastled_clockless",
+    "spi": "fastled_spi"
+  },
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/light/fastled/",
+  "extends": "base_light.json",
+  "fields": [
+    {
+      "key": "bus",
+      "label": "Variant",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "clockless",
+      "options": [
+        "clockless",
+        "spi"
+      ]
+    },
+    {
+      "key": "chipset",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "WS2812B"
+    },
+    {
+      "key": "pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "bus",
+        "value": "clockless"
+      }
+    },
+    {
+      "key": "data_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "bus",
+        "value": "spi"
+      }
+    },
+    {
+      "key": "clock_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "bus",
+        "value": "spi"
+      }
+    },
+    {
+      "key": "num_leds",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "rgb_order",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "RGB",
+      "options": [
+        "RGB",
+        "RBG",
+        "GRB",
+        "GBR",
+        "BRG",
+        "BGR"
+      ]
+    },
+    {
+      "key": "max_refresh_rate",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "data_rate",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "bus",
+        "value": "spi"
+      },
+      "placeholder": "1MHz"
+    }
+  ]
+}

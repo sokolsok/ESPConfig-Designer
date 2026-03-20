@@ -5,6 +5,11 @@ import {
   normalizeAnimationElementEncoding,
   normalizeImageElementEncoding
 } from "./displayImageEncoding";
+import {
+  getTemplatableInnerValue,
+  getTemplatableMode,
+  isTemplatableField
+} from "./schemaTemplatable";
 
 const componentIdFromEntry = (entry) =>
   typeof entry === "string" ? entry : entry?.id || "";
@@ -106,6 +111,34 @@ const formatYamlAutoValue = (value) => {
   return `"${trimmed.replace(/"/g, "\\\"")}"`;
 };
 
+const renderLambdaAssignment = (prefix, value, indent, lines, tag = "") => {
+  const normalized = String(value || "");
+  const suffix = tag ? ` ${tag}` : "";
+  if (/[\r\n]/.test(normalized)) {
+    lines.push(`${prefix}:${suffix} |-`);
+    normalized.split(/\r?\n/).forEach((line) => {
+      lines.push(`${" ".repeat(indent)}${line}`);
+    });
+    return;
+  }
+  lines.push(`${prefix}:${suffix} ${normalized}`);
+};
+
+const resolveFieldRenderState = (field, rawValue) => {
+  if (!isTemplatableField(field)) {
+    return {
+      value: rawValue,
+      templatableLambda: false
+    };
+  }
+
+  const mode = getTemplatableMode(rawValue, field);
+  return {
+    value: getTemplatableInnerValue(rawValue, field),
+    templatableLambda: mode === "lambda"
+  };
+};
+
 const renderKeyValueMap = (entries, indent, lines) => {
   entries.forEach((entry) => {
     if (!entry || typeof entry !== "object") return;
@@ -178,27 +211,43 @@ const renderActionEntries = (actions, indent, lines, rootValue, globalStore) => 
     if (!entry?.type) return;
     const config = entry.config || {};
     const fields = Array.isArray(entry.fields) ? entry.fields : [];
-    const presentKeys = fields.filter((field) => config[field.key] !== undefined);
+    const declaredFields = fields.filter((field) => field?.key);
+    const declaredFieldKeys = new Set(declaredFields.map((field) => field.key));
+    const dynamicFields = Object.keys(config)
+      .filter((key) => key && !declaredFieldKeys.has(key))
+      .map((key) => ({ key, type: "text", required: false }));
+    const outputFields = declaredFields.concat(dynamicFields);
+    const presentKeys = outputFields.filter((field) => resolveFieldRenderState(field, config[field.key]).value !== undefined);
 
-    if (presentKeys.length === 1 && isYamlPrimitive(config[presentKeys[0].key])) {
+    if (presentKeys.length === 1 && isYamlPrimitive(resolveFieldRenderState(presentKeys[0], config[presentKeys[0].key]).value)) {
       const field = presentKeys[0];
-      const value = config[field.key];
-      if (field.type === "lambda" && typeof value === "string" && /[\r\n]/.test(value)) {
-        lines.push(`${" ".repeat(indent)}- ${entry.type}: |-`);
-        value.split(/\r?\n/).forEach((line) => {
-          lines.push(`${" ".repeat(indent + 4)}${line}`);
-        });
+      const state = resolveFieldRenderState(field, config[field.key]);
+      const value = state.value;
+      const isComplexShortFormField =
+        field.type === "raw_yaml" ||
+        field.type === "yaml" ||
+        field.type === "object" ||
+        field.type === "list";
+      if (!isComplexShortFormField) {
+        if (state.templatableLambda) {
+          renderLambdaAssignment(`${" ".repeat(indent)}- ${entry.type}`, value, indent + 4, lines, "!lambda");
+          return;
+        }
+        if (field.type === "lambda" && typeof value === "string") {
+          renderLambdaAssignment(`${" ".repeat(indent)}- ${entry.type}`, value, indent + 4, lines);
+          return;
+        }
+        lines.push(
+          `${" ".repeat(indent)}- ${entry.type}: ${formatYamlValue(value, field.type)}`
+        );
         return;
       }
-      lines.push(
-        `${" ".repeat(indent)}- ${entry.type}: ${formatYamlValue(value, field.type)}`
-      );
-      return;
     }
 
     lines.push(`${" ".repeat(indent)}- ${entry.type}:`);
-    fields.forEach((field) => {
-      let value = config[field.key];
+    outputFields.forEach((field) => {
+      const state = resolveFieldRenderState(field, config[field.key]);
+      let value = state.value;
       if (value === "") value = undefined;
       if (value === undefined) {
         if (field.required) {
@@ -206,9 +255,37 @@ const renderActionEntries = (actions, indent, lines, rootValue, globalStore) => 
         }
         return;
       }
-      if (field.type === "lambda" && typeof value === "string" && /[\r\n]/.test(value)) {
-        lines.push(`${" ".repeat(indent + 2)}${field.key}: |-`);
-        value.split(/\r?\n/).forEach((line) => {
+      if (state.templatableLambda) {
+        renderLambdaAssignment(`${" ".repeat(indent + 2)}${field.key}`, value, indent + 4, lines, "!lambda");
+        return;
+      }
+      if (field.type === "lambda" && typeof value === "string") {
+        renderLambdaAssignment(`${" ".repeat(indent + 2)}${field.key}`, value, indent + 4, lines);
+        return;
+      }
+      if (field.type === "raw_yaml") {
+        const raw = typeof value === "string" ? value.trimEnd() : "";
+        if (!raw) {
+          if (field.required) {
+            lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
+          }
+          return;
+        }
+        raw.split(/\r?\n/).forEach((line) => {
+          lines.push(`${" ".repeat(indent + 2)}${line}`);
+        });
+        return;
+      }
+      if (field.type === "yaml") {
+        const raw = typeof value === "string" ? value.trimEnd() : "";
+        if (!raw) {
+          if (field.required) {
+            lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
+          }
+          return;
+        }
+        lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
+        raw.split(/\r?\n/).forEach((line) => {
           lines.push(`${" ".repeat(indent + 4)}${line}`);
         });
         return;
@@ -221,6 +298,16 @@ const renderActionEntries = (actions, indent, lines, rootValue, globalStore) => 
       }
       if (Array.isArray(value)) {
         if (!value.length) return;
+        if (field.item?.extends === "base_actions.json") {
+          lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
+          renderActionEntries(value, indent + 4, lines, rootValue, globalStore);
+          return;
+        }
+        if (field.item?.extends === "base_conditions.json") {
+          lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
+          renderConditionEntries(value, indent + 4, lines, rootValue, globalStore);
+          return;
+        }
         lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
         renderYamlArray(value, field.item, indent + 4, lines, value, globalStore);
         return;
@@ -231,13 +318,136 @@ const renderActionEntries = (actions, indent, lines, rootValue, globalStore) => 
   });
 };
 
+const renderConditionEntry = (entry, indent, lines, rootValue, globalStore) => {
+  if (!entry?.type) return;
+  const config = entry.config || {};
+  const fields = Array.isArray(entry.fields) ? entry.fields : [];
+  const declaredFields = fields.filter((field) => field?.key);
+  const declaredFieldKeys = new Set(declaredFields.map((field) => field.key));
+  const dynamicFields = Object.keys(config)
+    .filter((key) => key && !declaredFieldKeys.has(key))
+    .map((key) => ({ key, type: "text", required: false }));
+  const outputFields = declaredFields.concat(dynamicFields);
+  const presentKeys = outputFields.filter((field) => resolveFieldRenderState(field, config[field.key]).value !== undefined);
+
+  if (!presentKeys.length) {
+    lines.push(`${" ".repeat(indent)}${entry.type}:`);
+    return;
+  }
+
+  if (presentKeys.length === 1 && isYamlPrimitive(resolveFieldRenderState(presentKeys[0], config[presentKeys[0].key]).value)) {
+    const field = presentKeys[0];
+    const state = resolveFieldRenderState(field, config[field.key]);
+    const value = state.value;
+    const isComplexShortFormField =
+      field.type === "raw_yaml" ||
+      field.type === "yaml" ||
+      field.type === "object" ||
+      field.type === "list";
+    if (!isComplexShortFormField) {
+      if (state.templatableLambda) {
+        renderLambdaAssignment(`${" ".repeat(indent)}${entry.type}`, value, indent + 4, lines, "!lambda");
+        return;
+      }
+      if (field.type === "lambda" && typeof value === "string") {
+        renderLambdaAssignment(`${" ".repeat(indent)}${entry.type}`, value, indent + 4, lines);
+        return;
+      }
+      lines.push(`${" ".repeat(indent)}${entry.type}: ${formatYamlValue(value, field.type)}`);
+      return;
+    }
+  }
+
+  lines.push(`${" ".repeat(indent)}${entry.type}:`);
+  outputFields.forEach((field) => {
+    const state = resolveFieldRenderState(field, config[field.key]);
+    let value = state.value;
+    if (value === "") value = undefined;
+    if (value === undefined) {
+      if (field.required) {
+        lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
+      }
+      return;
+    }
+    if (state.templatableLambda) {
+      renderLambdaAssignment(`${" ".repeat(indent + 2)}${field.key}`, value, indent + 4, lines, "!lambda");
+      return;
+    }
+    if (field.type === "lambda" && typeof value === "string") {
+      renderLambdaAssignment(`${" ".repeat(indent + 2)}${field.key}`, value, indent + 4, lines);
+      return;
+    }
+    if (field.type === "raw_yaml") {
+      const raw = typeof value === "string" ? value.trimEnd() : "";
+      if (!raw) return;
+      raw.split(/\r?\n/).forEach((line) => {
+        lines.push(`${" ".repeat(indent + 2)}${line}`);
+      });
+      return;
+    }
+    if (field.type === "yaml") {
+      const raw = typeof value === "string" ? value.trimEnd() : "";
+      if (!raw) return;
+      lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
+      raw.split(/\r?\n/).forEach((line) => {
+        lines.push(`${" ".repeat(indent + 4)}${line}`);
+      });
+      return;
+    }
+    if (isYamlPrimitive(value)) {
+      lines.push(`${" ".repeat(indent + 2)}${field.key}: ${formatYamlValue(value, field.type)}`);
+      return;
+    }
+    if (Array.isArray(value) && field.item?.extends === "base_conditions.json") {
+      if (field.emitKey === "inline") {
+        renderConditionEntries(value, indent + 2, lines, rootValue, globalStore);
+        return;
+      }
+      lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
+      renderConditionEntries(value, indent + 4, lines, rootValue, globalStore);
+      return;
+    }
+    if (Array.isArray(value) && field.item?.extends === "base_actions.json") {
+      lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
+      renderActionEntries(value, indent + 4, lines, rootValue, globalStore);
+      return;
+    }
+    if (Array.isArray(value)) {
+      lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
+      renderYamlArray(value, field.item, indent + 4, lines, rootValue, globalStore);
+      return;
+    }
+    lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
+    renderYamlObject(value, field.fields, indent + 4, lines, rootValue, globalStore);
+  });
+};
+
+const renderConditionEntries = (conditions, indent, lines, rootValue, globalStore) => {
+  if (!Array.isArray(conditions) || !conditions.length) return;
+  if (conditions.length === 1) {
+    renderConditionEntry(conditions[0], indent, lines, rootValue, globalStore);
+    return;
+  }
+  conditions.forEach((entry) => {
+    const nestedLines = [];
+    renderConditionEntry(entry, indent + 2, nestedLines, rootValue, globalStore);
+    if (!nestedLines.length) return;
+    const [firstLine, ...rest] = nestedLines;
+    lines.push(`${" ".repeat(indent)}- ${firstLine.slice(indent + 2)}`);
+    rest.forEach((line) => lines.push(line));
+  });
+};
+
 // Render on_boot/on_shutdown/on_loop blocks.
 const renderAutomationList = (entries, indent, lines, rootValue, globalStore) => {
-  (entries || []).forEach((entry, index) => {
+  (entries || []).forEach((entry) => {
     if (!entry || typeof entry !== "object") return;
     const hasPriority = entry.priority !== undefined && entry.priority !== "";
     const hasThen = Array.isArray(entry.then) && entry.then.length > 0;
-    if (index === 0 && hasPriority) {
+    if (!hasPriority && !hasThen) {
+      return;
+    }
+    if (hasPriority) {
       lines.push(`${" ".repeat(indent)}- priority: ${formatYamlValue(entry.priority)}`);
     } else {
       lines.push(`${" ".repeat(indent)}-`);
@@ -274,7 +484,8 @@ const renderYamlObject = (objectValue, schemaFields, indent, lines, rootValue, g
       return;
     }
     handledKeys.add(key);
-    let value = valueMap[key];
+    const state = resolveFieldRenderState(field, valueMap[key]);
+    let value = state.value;
     if (value === "") {
       value = undefined;
     }
@@ -360,11 +571,12 @@ const renderYamlObject = (objectValue, schemaFields, indent, lines, rootValue, g
       if (field.suppressDefault && field.default !== undefined && value === field.default) {
         return;
       }
-      if (field.type === "lambda" && typeof value === "string" && /[\r\n]/.test(value)) {
-        lines.push(`${" ".repeat(indent)}${key}: |-`);
-        value.split(/\r?\n/).forEach((line) => {
-          lines.push(`${" ".repeat(indent + 2)}${line}`);
-        });
+      if (state.templatableLambda) {
+        renderLambdaAssignment(`${" ".repeat(indent)}${key}`, value, indent + 2, lines, "!lambda");
+        return;
+      }
+      if (field.type === "lambda" && typeof value === "string") {
+        renderLambdaAssignment(`${" ".repeat(indent)}${key}`, value, indent + 2, lines);
         return;
       }
       lines.push(`${" ".repeat(indent)}${key}: ${formatYamlValue(value, field)}`);
@@ -378,8 +590,31 @@ const renderYamlObject = (objectValue, schemaFields, indent, lines, rootValue, g
     }
 
     if (field.item?.extends === "base_actions.json" && Array.isArray(value)) {
+      if (value.length === 0) {
+        if (field.required || alwaysEmit) {
+          lines.push(`${" ".repeat(indent)}${key}:`);
+        }
+        return;
+      }
       lines.push(`${" ".repeat(indent)}${key}:`);
+      if (field.wrapThen === true) {
+        lines.push(`${" ".repeat(indent + 2)}- then:`);
+        renderActionEntries(value, indent + 6, lines, rootValue, globalStore);
+        return;
+      }
       renderActionEntries(value, indent + 2, lines, rootValue, globalStore);
+      return;
+    }
+
+    if (field.item?.extends === "base_conditions.json" && Array.isArray(value)) {
+      if (value.length === 0) {
+        if (field.required || alwaysEmit) {
+          lines.push(`${" ".repeat(indent)}${key}:`);
+        }
+        return;
+      }
+      lines.push(`${" ".repeat(indent)}${key}:`);
+      renderConditionEntries(value, indent + 2, lines, rootValue, globalStore);
       return;
     }
 
@@ -489,6 +724,150 @@ const renderYamlArray = (arrayValue, itemSchema, indent, lines, rootValue, globa
     lines.push(`${prefix}${firstLine.slice(indent + 2)}`);
     objectLines.slice(1).forEach((line) => lines.push(line));
   });
+};
+
+const hasConfiguredData = (value) => {
+  if (value === undefined || value === null) return false;
+  if (typeof value === "string") return value.trim() !== "";
+  if (Array.isArray(value)) return value.some((item) => hasConfiguredData(item));
+  if (typeof value === "object") {
+    return Object.entries(value).some(([key, nested]) => {
+      if (key.startsWith("_")) return false;
+      return hasConfiguredData(nested);
+    });
+  }
+  return true;
+};
+
+const isPlainObject = (value) =>
+  value !== null && typeof value === "object" && !Array.isArray(value);
+
+const cloneYamlValue = (value) => {
+  if (Array.isArray(value)) {
+    return value.map((item) => cloneYamlValue(item));
+  }
+  if (isPlainObject(value)) {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, nested]) => [key, cloneYamlValue(nested)])
+    );
+  }
+  return value;
+};
+
+const mergeYamlObjects = (baseValue, overrideValue) => {
+  const base = isPlainObject(baseValue) ? cloneYamlValue(baseValue) : {};
+  if (!isPlainObject(overrideValue)) return base;
+
+  Object.entries(overrideValue).forEach(([key, value]) => {
+    if (isPlainObject(base[key]) && isPlainObject(value)) {
+      base[key] = mergeYamlObjects(base[key], value);
+      return;
+    }
+    base[key] = cloneYamlValue(value);
+  });
+
+  return base;
+};
+
+const mergeFieldDefinitions = (primaryFields, secondaryFields) => {
+  const merged = Array.isArray(primaryFields) ? [...primaryFields] : [];
+  const seen = new Set(merged.map((field) => field?.key).filter(Boolean));
+
+  (secondaryFields || []).forEach((field) => {
+    const key = field?.key;
+    if (key && seen.has(key)) return;
+    merged.push(field);
+    if (key) {
+      seen.add(key);
+    }
+  });
+
+  return merged;
+};
+
+const resolveFieldDefaultValue = (fields, key) => {
+  const list = Array.isArray(fields) ? fields : [];
+  const field = list.find((entry) => entry?.key === key);
+  if (!field) return undefined;
+  if (field.default !== undefined) return field.default;
+  if (field.type === "boolean") return false;
+  return undefined;
+};
+
+const resolveEmbeddedDedupeToken = (item) => {
+  const dedupeBy = item?.dedupeBy;
+  if (!dedupeBy) return "";
+  const explicitValue = item?.payload?.[dedupeBy];
+  const fallbackValue = resolveFieldDefaultValue(item?.fields, dedupeBy);
+  const tokenSource = explicitValue !== undefined ? explicitValue : fallbackValue;
+  return normalizeDedupeToken(tokenSource);
+};
+
+const normalizeDedupeToken = (value) => {
+  if (value === undefined || value === null) return "";
+  if (typeof value === "string") return value.trim().toLowerCase();
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  return "";
+};
+
+const resolveEmbeddedComponentItems = (schema, config, globalStore) => {
+  const embedded = Array.isArray(schema?.embedded) ? schema.embedded : [];
+  if (!embedded.length) return [];
+  const schemaFields = Array.isArray(schema?.fields) ? schema.fields : [];
+  const fieldByKey = new Map(schemaFields.map((field) => [field.key, field]));
+  const items = [];
+
+  embedded.forEach((definition) => {
+    const key = typeof definition?.key === "string" ? definition.key.trim() : "";
+    const domain = typeof definition?.domain === "string" ? definition.domain.trim() : "";
+    if (!key || !domain) return;
+
+    const emitAsValue =
+      typeof definition?.emitAs === "string" ? definition.emitAs.trim().toLowerCase() : "";
+    const emitAs = emitAsValue === "map" ? "map" : "list";
+    const singleton = Boolean(definition?.singleton);
+    const merge =
+      typeof definition?.merge === "string" && definition.merge.trim().toLowerCase() === "deep"
+        ? "deep"
+        : "first";
+
+    const sourceField = fieldByKey.get(key);
+    if (!sourceField || sourceField.type !== "object") return;
+    if (!isFieldVisible(sourceField, config, schemaFields, globalStore)) return;
+
+    const sourceValue = config?.[key];
+    const defaultPayload = isPlainObject(definition?.defaultPayload)
+      ? cloneYamlValue(definition.defaultPayload)
+      : null;
+
+    let payload = null;
+    if (isPlainObject(sourceValue)) {
+      payload = cloneYamlValue(sourceValue);
+    } else if (defaultPayload) {
+      payload = defaultPayload;
+    } else if (definition?.alwaysEmit) {
+      payload = {};
+    }
+
+    if (!payload) return;
+    if (!definition.alwaysEmit && !hasConfiguredData(payload)) return;
+
+    items.push({
+      domain,
+      payload,
+      fields: Array.isArray(sourceField.fields) ? sourceField.fields : [],
+      sourceKey: key,
+      dedupeBy:
+        typeof definition?.dedupeBy === "string" && definition.dedupeBy.trim()
+          ? definition.dedupeBy.trim()
+          : "",
+      emitAs,
+      singleton,
+      merge
+    });
+  });
+
+  return items;
 };
 
 // Build YAML for all component entries (grouped by domain).
@@ -1569,9 +1948,10 @@ const buildGraphIdMap = (graphsByKey) => {
   return map;
 };
 
-export const buildComponentsYaml = (
+const buildComponentsYamlInternal = (
   components,
   componentSchemas = {},
+  componentSchemaStates = {},
   globalStore = null,
   mdiSubstitutions = {}
 ) => {
@@ -1581,13 +1961,20 @@ export const buildComponentsYaml = (
   const graphIdByKey = buildGraphIdMap(displayData?.graphsByKey || new Map());
   const animationIdByKey = buildAnimationIdMap(displayData?.animationsByKey || new Map());
   const grouped = new Map();
+  const embeddedListByIdentity = new Map();
+  const embeddedMapSingleton = new Map();
   const missingSchemas = [];
+  const verbatimRootLines = [];
 
   (components || []).forEach((entry) => {
     const componentId = componentIdFromEntry(entry);
     if (!componentId) return;
     const schema = componentSchemas[componentId];
     if (!schema) {
+      const schemaState = String(componentSchemaStates?.[componentId] || "").toLowerCase();
+      if (!schemaState || schemaState === "idle" || schemaState === "loading") {
+        return;
+      }
       const customConfig = entry?.customConfig || "";
       const separator = componentId.includes(".") ? "." : "/";
       const [domain, platform] = componentId.split(separator);
@@ -1603,6 +1990,22 @@ export const buildComponentsYaml = (
         platform,
         config: customConfig
       });
+      return;
+    }
+    if (schema.renderStrategy === "verbatim_root") {
+      const rawField =
+        typeof schema.verbatimField === "string" && schema.verbatimField.trim()
+          ? schema.verbatimField.trim()
+          : "custom_config";
+      const rawValue = typeof entry?.config?.[rawField] === "string" ? entry.config[rawField] : "";
+      const normalized = rawValue.replace(/\r\n/g, "\n").replace(/\r/g, "\n").trimEnd();
+      if (!normalized) {
+        return;
+      }
+      if (verbatimRootLines.length) {
+        verbatimRootLines.push("");
+      }
+      verbatimRootLines.push(...normalized.split("\n"));
       return;
     }
     const domain = schema.domain || "component";
@@ -1640,6 +2043,54 @@ export const buildComponentsYaml = (
       grouped.set(domain, []);
     }
     grouped.get(domain).push({ type: "schema", payload, schema });
+
+    const embeddedItems = resolveEmbeddedComponentItems(schema, config, globalStore);
+    embeddedItems.forEach((item) => {
+      if (!grouped.has(item.domain)) {
+        grouped.set(item.domain, []);
+      }
+
+      const dedupeToken = item.emitAs === "list" ? resolveEmbeddedDedupeToken(item) : "";
+      const dedupeIdentity =
+        item.emitAs === "list" && item.dedupeBy && dedupeToken
+          ? `${item.domain}:${item.dedupeBy}:${dedupeToken}`
+          : "";
+
+      if (dedupeIdentity) {
+        if (embeddedListByIdentity.has(dedupeIdentity)) {
+          return;
+        }
+      }
+
+      if (item.emitAs === "map" && item.singleton) {
+        const existing = embeddedMapSingleton.get(item.domain);
+        if (existing) {
+          if (item.merge === "deep") {
+            existing.payload = mergeYamlObjects(existing.payload, item.payload);
+            existing.fields = mergeFieldDefinitions(existing.fields, item.fields);
+          }
+          return;
+        }
+      }
+
+      const groupedItem = {
+        type: "embedded",
+        payload: item.payload,
+        fields: item.fields,
+        emitAs: item.emitAs,
+        merge: item.merge
+      };
+
+      grouped.get(item.domain).push(groupedItem);
+
+      if (dedupeIdentity) {
+        embeddedListByIdentity.set(dedupeIdentity, groupedItem);
+      }
+
+      if (item.emitAs === "map" && item.singleton) {
+        embeddedMapSingleton.set(item.domain, groupedItem);
+      }
+    });
   });
 
   const lines = [];
@@ -1660,13 +2111,53 @@ export const buildComponentsYaml = (
     lines.push(...graphLines);
   }
   grouped.forEach((items, domain) => {
+    const mapItems = items.filter((item) => item.type === "embedded" && item.emitAs === "map");
+    const listItems = items.filter((item) => !(item.type === "embedded" && item.emitAs === "map"));
+
     lines.push(`${domain}:`);
-    items.forEach((item) => {
+    if (mapItems.length && !listItems.length) {
+      const firstMapItem = mapItems[0];
+      let mergedPayload = cloneYamlValue(firstMapItem.payload || {});
+      let mergedFields = Array.isArray(firstMapItem.fields) ? firstMapItem.fields : [];
+
+      mapItems.slice(1).forEach((item) => {
+        if (item.merge === "deep") {
+          mergedPayload = mergeYamlObjects(mergedPayload, item.payload || {});
+          mergedFields = mergeFieldDefinitions(mergedFields, item.fields || []);
+        }
+      });
+
+      const mapLines = [];
+      renderYamlObject(
+        mergedPayload,
+        mergedFields,
+        2,
+        mapLines,
+        mergedPayload,
+        globalStore
+      );
+      lines.push(...mapLines);
+      lines.push("");
+      return;
+    }
+
+    listItems.forEach((item) => {
       if (item.type === "custom") {
         lines.push(`  - platform: ${item.platform}`);
         item.config.split(/\r?\n/).forEach((line) => {
           lines.push(`    ${line}`);
         });
+        return;
+      }
+      if (item.type === "embedded") {
+        renderYamlArray(
+          [item.payload],
+          { type: "object", fields: item.fields || [] },
+          2,
+          lines,
+          item.payload,
+          globalStore
+        );
         return;
       }
       const schemaFields = [
@@ -1688,9 +2179,31 @@ export const buildComponentsYaml = (
     lines.push("");
   });
 
+  if (verbatimRootLines.length) {
+    if (lines.length) {
+      lines.push("");
+    }
+    lines.push(...verbatimRootLines);
+  }
+
   if (lines.length && lines[lines.length - 1] === "") {
     lines.pop();
   }
 
   return lines;
 };
+
+export const buildComponentsYaml = (
+  components,
+  componentSchemas = {},
+  componentSchemaStates = {},
+  globalStore = null,
+  mdiSubstitutions = {}
+) =>
+  buildComponentsYamlInternal(
+    components,
+    componentSchemas,
+    componentSchemaStates,
+    globalStore,
+    mdiSubstitutions
+  );

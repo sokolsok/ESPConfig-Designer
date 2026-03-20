@@ -1,0 +1,16 @@
+{
+  "id": "switch.tuya",
+  "domain": "switch",
+  "platform": "tuya",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/switch/tuya/",
+  "extends": "base_switch.json",
+  "fields": [
+    {
+      "key": "switch_datapoint",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    }
+  ]
+}

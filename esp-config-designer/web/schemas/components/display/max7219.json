@@ -1,0 +1,53 @@
+{
+  "id": "display.max7219",
+  "domain": "display",
+  "platform": "max7219",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/display/max7219/",
+  "extends": "base_display.json",
+  "display_builder": false,
+  "fields": [
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "num_chips",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 1
+    },
+    {
+      "key": "intensity",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 15
+    },
+    {
+      "key": "reverse_enable",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "spi_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "advanced",
+      "domain": "spi"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "1s"
+    }
+  ]
+}

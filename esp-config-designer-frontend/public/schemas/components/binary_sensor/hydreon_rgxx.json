@@ -1,0 +1,41 @@
+{
+  "id": "binary_sensor.hydreon_rgxx",
+  "domain": "binary_sensor",
+  "platform": "hydreon_rgxx",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/binary_sensor/hydreon_rgxx/",
+  "fields": [
+    {
+      "key": "hydreon_rgxx_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor",
+      "placeholder": "hydreon_sensor_id"
+    },
+    {
+      "key": "too_cold",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "lens_bad",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "em_sat",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    }
+  ]
+}

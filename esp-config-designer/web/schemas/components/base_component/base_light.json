@@ -1,0 +1,147 @@
+{
+  "id": "base.light",
+  "domain": "light",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "icon",
+      "type": "icon",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "effects",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "- pulse:\n- random:"
+    },
+    {
+      "key": "gamma_correct",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 2.8
+    },
+    {
+      "key": "default_transition_length",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "1s"
+    },
+    {
+      "key": "flash_transition_length",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "default": "0s"
+    },
+    {
+      "key": "initial_state",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "state: true\nbrightness: 80%"
+    },
+    {
+      "key": "restore_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "ALWAYS_OFF",
+      "options": [
+        "RESTORE_DEFAULT_OFF",
+        "RESTORE_DEFAULT_ON",
+        "RESTORE_INVERTED_DEFAULT_OFF",
+        "RESTORE_INVERTED_DEFAULT_ON",
+        "RESTORE_AND_OFF",
+        "RESTORE_AND_ON",
+        "ALWAYS_OFF",
+        "ALWAYS_ON"
+      ]
+    },
+    {
+      "key": "on_turn_on",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_turn_off",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_state",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "color_correct",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "[100%, 50%, 100%]"
+    },
+    {
+      "key": "power_supply",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "advanced",
+      "domain": "power_supply"
+    },
+    {
+      "key": "internal",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "disabled_by_default",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "entity_category",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "tag.set_write_message",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Tag",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "tag_id",
+      "domain": "tag",
+      "lvl": "normal"
+    },
+    {
+      "key": "write_message",
+      "label": "Write Message",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

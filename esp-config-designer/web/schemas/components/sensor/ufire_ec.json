@@ -1,0 +1,62 @@
+{
+  "id": "sensor.ufire_ec",
+  "domain": "sensor",
+  "platform": "ufire_ec",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/ufire_ec/",
+  "fields": [
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x3C"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "temperature_sensor",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor"
+    },
+    {
+      "key": "ec",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "temperature",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "temperature_compensation",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "21.0"
+    },
+    {
+      "key": "temperature_coefficient",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0.019"
+    }
+  ]
+}

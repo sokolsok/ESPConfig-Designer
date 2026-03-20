@@ -1,0 +1,174 @@
+{
+  "id": "display.mipi_dsi",
+  "domain": "display",
+  "platform": "mipi_dsi",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/display/mipi_dsi/",
+  "extends": "base_display.json",
+  "display_builder": true,
+  "displayType": "color",
+  "model_meta": {
+    "Custom 480x480": {
+      "w": 480,
+      "h": 480
+    },
+    "Custom 800x480": {
+      "w": 800,
+      "h": 480
+    }
+  },
+  "fields": [
+    {
+      "key": "model",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "EK79007AD3"
+    },
+    {
+      "key": "dimensions",
+      "type": "yaml",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "width: 800\nheight: 480"
+    },
+    {
+      "key": "reset_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "enable_pin",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "GPIOXX\n# or list of pins"
+    },
+    {
+      "key": "color_order",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "bgr",
+      "options": [
+        "bgr",
+        "rgb"
+      ]
+    },
+    {
+      "key": "invert_colors",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "rotation",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "0",
+      "options": [
+        "0",
+        "90",
+        "180",
+        "270"
+      ]
+    },
+    {
+      "key": "transform",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "mirror_x: false\nmirror_y: false\nswap_xy: false"
+    },
+    {
+      "key": "hsync_pulse_width",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "hsync_front_porch",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "hsync_back_porch",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "vsync_pulse_width",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "vsync_front_porch",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "vsync_back_porch",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "pclk_frequency",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "40MHz"
+    },
+    {
+      "key": "pclk_inverted",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "lanes",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "default": 2
+    },
+    {
+      "key": "lane_bit_rate",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "500Mbps"
+    },
+    {
+      "key": "init_sequence",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "auto_clear_enabled",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "pages",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "5s"
+    }
+  ]
+}

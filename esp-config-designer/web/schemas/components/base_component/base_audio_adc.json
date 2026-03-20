@@ -1,0 +1,16 @@
+{
+  "id": "base.audio_adc",
+  "domain": "audio_adc",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "placeholder": "audio_adc_id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple"
+    }
+  ]
+}

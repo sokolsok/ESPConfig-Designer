@@ -1,0 +1,66 @@
+{
+  "id": "sensor.mcp3008",
+  "domain": "sensor",
+  "platform": "mcp3008",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/mcp3008/",
+  "extends": "base_sensor.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "mcp3008",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_mcp3008.json"
+    },
+    {
+      "key": "mcp3008_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "mcp3008",
+      "allowSelfReference": true,
+      "default": "mcp3008_hub"
+    },
+    {
+      "key": "number",
+      "type": "number",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "0"
+    },
+    {
+      "key": "reference_voltage",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "3.3"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "1s",
+      "placeholder": "1s"
+    }
+  ]
+}

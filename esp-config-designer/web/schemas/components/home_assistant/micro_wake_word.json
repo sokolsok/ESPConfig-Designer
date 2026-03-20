@@ -1,0 +1,56 @@
+{
+  "id": "micro_wake_word",
+  "domain": "micro_wake_word",
+  "requires": [
+    "microphone"
+  ],
+  "helpUrl": "https://esphome.io/components/micro_wake_word/",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal",
+      "idDomain": "micro_wake_word"
+    },
+    {
+      "key": "microphone",
+      "type": "yaml",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "# microphone source configuration"
+    },
+    {
+      "key": "models",
+      "type": "yaml",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "- model: okay_nabu\n  probability_cutoff: 0.5\n  sliding_window_size: 5"
+    },
+    {
+      "key": "stop_after_detection",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    },
+    {
+      "key": "on_wake_word_detected",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "vad",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

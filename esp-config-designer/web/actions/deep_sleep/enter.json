@@ -1,0 +1,23 @@
+{
+  "id": "deep_sleep.enter",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Deep sleep component",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "deep_sleep_id",
+      "domain": "deep_sleep",
+      "lvl": "normal"
+    },
+    {
+      "key": "sleep_duration",
+      "label": "Sleep duration",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "10min"
+    }
+  ]
+}

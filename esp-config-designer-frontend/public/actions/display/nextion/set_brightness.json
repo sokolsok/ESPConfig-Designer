@@ -1,0 +1,24 @@
+{
+  "id": "display.nextion.set_brightness",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Display",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "display_id",
+      "domain": "display",
+      "lvl": "normal"
+    },
+    {
+      "key": "brightness",
+      "label": "Brightness",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "75%",
+      "lambdaPlaceholder": "return 0.75;"
+    }
+  ]
+}

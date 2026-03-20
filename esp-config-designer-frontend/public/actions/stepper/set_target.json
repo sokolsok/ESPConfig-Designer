@@ -1,0 +1,24 @@
+{
+  "id": "stepper.set_target",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Stepper",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "stepper_id",
+      "domain": "stepper",
+      "lvl": "normal"
+    },
+    {
+      "key": "target",
+      "label": "Target",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "1000",
+      "lambdaPlaceholder": "return 1000;"
+    }
+  ]
+}

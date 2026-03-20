@@ -22,6 +22,8 @@ export const useInstallConsoleFlow = (options) => {
   const installPlanSerialPort = ref(null);
   const installPlanDownloadReady = ref(false);
   const consoleSessionTitle = ref("");
+  const compileYamlName = ref("");
+  const compileDeviceHost = ref("");
   const localFlashRunning = ref(false);
   const compileSseLogSeen = ref(false);
   const compileReconnectAttempts = ref(0);
@@ -44,6 +46,10 @@ export const useInstallConsoleFlow = (options) => {
   const compileLogQueue = [];
 
   const canInstall = computed(() => Boolean(options.canInstall?.value ?? options.canInstall?.() ?? false));
+  const canValidate = computed(() => {
+    const fallbackInstall = options.canInstall?.value ?? options.canInstall?.() ?? false;
+    return Boolean(options.canValidate?.value ?? options.canValidate?.() ?? fallbackInstall);
+  });
   const canUseOta = computed(() => Boolean(options.canUseOta?.value ?? options.canUseOta?.() ?? false));
   const canLogs = computed(() => Boolean(options.canLogs?.value ?? options.canLogs?.() ?? false));
 
@@ -466,6 +472,8 @@ export const useInstallConsoleFlow = (options) => {
     backendJobState.value = "";
     compileJobState.value = "";
     compileJobError.value = "";
+    compileYamlName.value = "";
+    compileDeviceHost.value = "";
     resetCompileConsole();
     localFlashRunning.value = false;
     resetInstallPlan();
@@ -479,12 +487,24 @@ export const useInstallConsoleFlow = (options) => {
   };
 
   const startInstallJob = async ({ action, device = "", resetConsole = true, introLine = "" }) => {
-    if (!canInstall.value || compileIsActive.value || localFlashRunning.value) return;
+    const isAllowed =
+      action === "logs"
+        ? canLogs.value
+        : action === "validate"
+          ? canValidate.value
+          : canInstall.value;
+    if (!isAllowed || compileIsActive.value || localFlashRunning.value) return;
     const yamlName = getYamlName();
     if (!yamlName) return;
+    compileYamlName.value = yamlName;
+    compileDeviceHost.value = String(device || getDeviceHost() || "").trim();
 
     if (action === "logs") {
       consoleSessionTitle.value = "Logs Console";
+    } else if (action === "validate") {
+      consoleSessionTitle.value = "Validation Console";
+    } else if (action === "clean") {
+      consoleSessionTitle.value = "Clean Console";
     } else if (action === "ota") {
       consoleSessionTitle.value = "OTA Console";
     } else if (installPlanMode.value === "serial") {
@@ -512,7 +532,7 @@ export const useInstallConsoleFlow = (options) => {
 
     const requiresPreparation = action !== "logs";
     if (requiresPreparation && typeof options.prepareBeforeJob === "function") {
-      appendCompileLogLine("INFO Preparing project and device registration...");
+      appendCompileLogLine("INFO Preparing project...");
       try {
         const ready = await options.prepareBeforeJob({ action });
         if (!ready) {
@@ -583,7 +603,7 @@ export const useInstallConsoleFlow = (options) => {
     try {
       appendCompileLogLine("INFO Downloading factory firmware from add-on...");
       const response = await addonFetch(
-        `api/firmware?yaml=${encodeURIComponent(getYamlName())}&variant=factory`
+        `api/firmware?yaml=${encodeURIComponent(compileYamlName.value || getYamlName())}&variant=factory`
       );
       if (response.status === 404) {
         throw new Error("Factory firmware not found. Compile project first.");
@@ -648,10 +668,31 @@ export const useInstallConsoleFlow = (options) => {
     }
   };
 
+  const notifyInstallSuccess = async (action, context = null) => {
+    const yaml = String(context?.yaml || compileYamlName.value || getYamlName() || "").trim();
+    const host = String(context?.host || compileDeviceHost.value || getDeviceHost() || "").trim();
+    if (typeof options.onInstallSuccess !== "function") return;
+    try {
+      await options.onInstallSuccess({
+        action,
+        yaml,
+        host
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Post-install registration failed";
+      appendCompileLogLine(`WARN ${message}`);
+      setError(message);
+    }
+  };
+
   const handleTerminalActionFinished = async (finalState, finishedAction) => {
     stopCompileStream();
     stopCompileLongPoll();
     stopCompileStatusPoll();
+    const successContext = {
+      yaml: compileYamlName.value || getYamlName(),
+      host: compileDeviceHost.value || getDeviceHost()
+    };
 
     if (finalState !== "success") {
       if (finishedAction === "compile") {
@@ -673,8 +714,16 @@ export const useInstallConsoleFlow = (options) => {
         installPlanDownloadReady.value = true;
         appendCompileLogLine("INFO Compile successful. Use Download button to get firmware.");
         compileActiveAction.value = "";
+        void notifyInstallSuccess("download", successContext);
         return;
       }
+    }
+
+    if (finishedAction === "ota") {
+      await notifyInstallSuccess("ota", successContext);
+    }
+    if (finishedAction === "flash") {
+      await notifyInstallSuccess("flash", successContext);
     }
 
     if (finishedAction === "ota" || finishedAction === "flash") {
@@ -744,7 +793,8 @@ export const useInstallConsoleFlow = (options) => {
     clearError();
     try {
       const yamlName = getYamlName();
-      const response = await addonFetch(`api/firmware?yaml=${encodeURIComponent(yamlName)}&variant=factory`);
+      const compileYaml = compileYamlName.value || yamlName;
+      const response = await addonFetch(`api/firmware?yaml=${encodeURIComponent(compileYaml)}&variant=factory`);
       if (response.status === 404) {
         throw new Error("Factory firmware not found. Compile project first.");
       }
@@ -755,7 +805,7 @@ export const useInstallConsoleFlow = (options) => {
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = yamlName.replace(/\.yaml$/i, ".bin");
+      anchor.download = compileYaml.replace(/\.yaml$/i, ".bin");
       anchor.click();
       URL.revokeObjectURL(url);
       appendCompileLogLine("INFO Firmware download started.");
@@ -802,12 +852,30 @@ export const useInstallConsoleFlow = (options) => {
     });
   };
 
+  const startValidate = async () => {
+    if (!canValidate.value) return;
+    resetInstallPlan();
+    await startInstallJob({
+      action: "validate",
+      introLine: `INFO Starting validation for ${getYamlName()}`
+    });
+  };
+
   const handleInstallDownload = async () => {
     installPlanMode.value = "download";
     installPlanDownloadReady.value = false;
     await startInstallJob({
       action: "compile",
       introLine: `INFO Starting compile before firmware download for ${getYamlName()}`
+    });
+  };
+
+  const startCleanBuild = async () => {
+    if (!canInstall.value) return;
+    resetInstallPlan();
+    await startInstallJob({
+      action: "clean",
+      introLine: `INFO Starting clean build for ${getYamlName()}`
     });
   };
 
@@ -842,6 +910,8 @@ export const useInstallConsoleFlow = (options) => {
     handleInstallSerialPort,
     handleInstallOta,
     startLogs,
+    startValidate,
+    startCleanBuild,
     handleInstallDownload,
     downloadBinary,
     dispose

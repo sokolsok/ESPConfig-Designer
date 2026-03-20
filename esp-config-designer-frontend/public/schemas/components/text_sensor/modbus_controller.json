@@ -1,0 +1,95 @@
+{
+  "id": "text_sensor.modbus_controller",
+  "domain": "text_sensor",
+  "platform": "modbus_controller",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/text_sensor/modbus_controller/",
+  "extends": "base_text_sensor.json",
+  "fields": [
+    {
+      "key": "modbus_controller_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "modbus_controller",
+      "placeholder": "modbus_controller_id"
+    },
+    {
+      "key": "register_type",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "options": [
+        "coil",
+        "discrete_input",
+        "holding",
+        "read"
+      ]
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "0x03E8",
+      "suppressQuotes": true
+    },
+    {
+      "key": "skip_updates",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "register_count",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 1
+    },
+    {
+      "key": "response_size",
+      "type": "number",
+      "required": true,
+      "lvl": "normal"
+    },
+    {
+      "key": "raw_encode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "ANSI",
+      "options": [
+        "NONE",
+        "HEXBYTES",
+        "COMMA",
+        "ANSI"
+      ]
+    },
+    {
+      "key": "force_new_range",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "custom_command",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "- 0x01\n- 0x03\n- 0x00\n- 0x00"
+    },
+    {
+      "key": "lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "offset",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

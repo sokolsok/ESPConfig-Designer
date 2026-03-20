@@ -1,0 +1,98 @@
+{
+  "id": "light.tuya",
+  "domain": "light",
+  "platform": "tuya",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/light/tuya/",
+  "extends": "base_light.json",
+  "fields": [
+    {
+      "key": "dimmer_datapoint",
+      "type": "number",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "min_value_datapoint",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "switch_datapoint",
+      "type": "number",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "color_temperature_datapoint",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "color_datapoint",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "color_type",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "RGB",
+        "HSV",
+        "RGBHSV"
+      ]
+    },
+    {
+      "key": "color_type_lowercase",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "min_value",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 0
+    },
+    {
+      "key": "max_value",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 255
+    },
+    {
+      "key": "color_temperature_max_value",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 255
+    },
+    {
+      "key": "color_temperature_invert",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "cold_white_color_temperature",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "warm_white_color_temperature",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

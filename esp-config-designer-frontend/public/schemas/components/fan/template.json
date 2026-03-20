@@ -1,0 +1,39 @@
+{
+  "id": "fan.template",
+  "domain": "fan",
+  "platform": "template",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/fan/template/",
+  "extends": "base_fan.json",
+  "fields": [
+    {
+      "key": "has_direction",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "has_oscillating",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "speed_count",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "preset_modes",
+      "type": "list",
+      "required": false,
+      "lvl": "normal",
+      "item": {
+        "type": "text"
+      }
+    }
+  ]
+}

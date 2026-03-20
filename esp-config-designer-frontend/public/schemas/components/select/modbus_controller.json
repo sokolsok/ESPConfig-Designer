@@ -1,0 +1,114 @@
+{
+  "id": "select.modbus_controller",
+  "domain": "select",
+  "platform": "modbus_controller",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/select/modbus_controller/",
+  "extends": "base_select.json",
+  "fields": [
+    {
+      "key": "modbus_controller_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "modbus_controller"
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "0x03E8",
+      "suppressQuotes": true
+    },
+    {
+      "key": "optionsmap",
+      "type": "list",
+      "required": true,
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "key",
+            "type": "text",
+            "required": true,
+            "lvl": "simple",
+            "placeholder": "Auto"
+          },
+          {
+            "key": "value",
+            "type": "number",
+            "required": true,
+            "lvl": "simple",
+            "placeholder": 0
+          }
+        ]
+      }
+    },
+    {
+      "key": "value_type",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "U_WORD",
+      "options": [
+        "U_WORD",
+        "S_WORD",
+        "U_DWORD",
+        "S_DWORD",
+        "U_DWORD_R",
+        "S_DWORD_R",
+        "U_QWORD",
+        "S_QWORD",
+        "U_QWORD_R",
+        "S_QWORD_R",
+        "FP32",
+        "FP32_R"
+      ]
+    },
+    {
+      "key": "register_count",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "skip_updates",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "force_new_range",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "write_lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "use_write_multiple",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "optimistic",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

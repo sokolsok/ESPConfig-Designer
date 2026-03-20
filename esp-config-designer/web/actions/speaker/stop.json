@@ -1,0 +1,23 @@
+{
+  "id": "speaker.stop",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Speaker",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "speaker_id",
+      "domain": "speaker",
+      "lvl": "normal"
+    },
+    {
+      "key": "flush",
+      "label": "Flush",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

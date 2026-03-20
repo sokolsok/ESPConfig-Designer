@@ -1,0 +1,48 @@
+{
+  "id": "hub.gp8403",
+  "domain": "gp8403",
+  "platform": "",
+  "requires": [
+    "i2c"
+  ],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "gp8403_hub",
+      "idDomain": "gp8403"
+    },
+    {
+      "key": "voltage",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "5V",
+      "options": [
+        "5V",
+        "10V"
+      ]
+    },
+    {
+      "key": "model",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "GP8403",
+      "options": [
+        "GP8403",
+        "GP8413"
+      ]
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "advanced",
+      "domain": "i2c"
+    }
+  ]
+}

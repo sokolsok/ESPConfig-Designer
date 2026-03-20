@@ -18,6 +18,13 @@
   "helpUrl": "https://esphome.io/components/sensor/bme280/",
   "fields": [
     {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
       "key": "bus",
       "type": "select",
       "required": true,
@@ -124,15 +131,23 @@
       "key": "update_interval",
       "type": "duration",
       "required": false,
-      "lvl": "normal",
-      "default": "60s"
+      "lvl": "simple",
+      "default": "60s",
+      "placeholder": "60s"
     },
     {
       "key": "address",
-      "type": "text",
+      "type": "address",
       "required": false,
-      "lvl": "normal",
-      "default": "0x77"
+      "lvl": "simple",
+      "default": "0x77",
+      "placeholder": "0x77"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

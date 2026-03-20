@@ -1,0 +1,44 @@
+{
+  "id": "switch.hbridge",
+  "domain": "switch",
+  "platform": "hbridge",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/switch/hbridge/",
+  "extends": "base_switch.json",
+  "fields": [
+    {
+      "key": "on_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "helpUrl": "https://esphome.io/guides/configuration-types#pin-schema"
+    },
+    {
+      "key": "off_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "helpUrl": "https://esphome.io/guides/configuration-types#pin-schema"
+    },
+    {
+      "key": "pulse_length",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "100ms"
+    },
+    {
+      "key": "wait_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "optimistic",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "id": "light.sonoff_d1",
+  "domain": "light",
+  "platform": "sonoff_d1",
+  "requires": [
+    "uart"
+  ],
+  "helpUrl": "https://esphome.io/components/light/sonoff_d1/",
+  "extends": "base_light.json",
+  "fields": [
+    {
+      "key": "use_rm433_remote",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "min_value",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 0
+    },
+    {
+      "key": "max_value",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 100
+    }
+  ]
+}

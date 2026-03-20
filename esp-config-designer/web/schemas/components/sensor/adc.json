@@ -14,11 +14,20 @@
       "placeholder": "GPIOXX"
     },
     {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
       "key": "attenuation",
       "type": "select",
       "required": false,
       "lvl": "normal",
+	  "default": "0db",
       "options": [
+		"auto",
         "0db",
         "2.5db",
         "6db",
@@ -36,13 +45,15 @@
       "key": "samples",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "1"
     },
     {
       "key": "sampling_mode",
       "type": "select",
       "required": false,
       "lvl": "normal",
+	  "default": "avg",
       "options": [
         "avg",
         "min",
@@ -53,8 +64,14 @@
       "key": "update_interval",
       "type": "duration",
       "required": false,
-      "lvl": "normal",
-      "default": "60s"
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

@@ -1,0 +1,33 @@
+{
+  "id": "hub.ble_client",
+  "domain": "ble_client",
+  "platform": "",
+  "requires": [
+    "esp32_ble_tracker"
+  ],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "ble_client_hub",
+      "idDomain": "ble_client"
+    },
+    {
+      "key": "mac_address",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "AA:BB:CC:DD:EE:FF"
+    },
+    {
+      "key": "auto_connect",
+      "type": "boolean",
+      "required": false,
+      "lvl": "simple",
+      "default": true
+    }
+  ]
+}

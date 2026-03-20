@@ -1,0 +1,31 @@
+{
+  "id": "vbus",
+  "domain": "vbus",
+  "requires": [
+    "uart"
+  ],
+  "helpUrl": "https://esphome.io/components/vbus/",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple",
+      "idDomain": "vbus"
+    },
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "uart"
+    },
+    {
+      "key": "raw_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "# Optional advanced keys from docs\n# Add raw YAML lines inside this vbus entry"
+    }
+  ]
+}

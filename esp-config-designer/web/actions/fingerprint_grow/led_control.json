@@ -1,0 +1,22 @@
+{
+  "id": "fingerprint_grow.led_control",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Fingerprint sensor",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "fingerprint_grow_id",
+      "domain": "fingerprint_grow",
+      "lvl": "normal"
+    },
+    {
+      "key": "state",
+      "label": "State",
+      "type": "boolean",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

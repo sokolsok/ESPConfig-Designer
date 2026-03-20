@@ -1,0 +1,23 @@
+{
+  "id": "rtttl.play",
+  "fields": [
+    {
+      "key": "id",
+      "label": "RTTTL",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "rtttl_id",
+      "domain": "rtttl",
+      "lvl": "normal"
+    },
+    {
+      "key": "rtttl",
+      "label": "RTTTL",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "two_short:d=4,o=5,b=100:16e6,16e6"
+    }
+  ]
+}

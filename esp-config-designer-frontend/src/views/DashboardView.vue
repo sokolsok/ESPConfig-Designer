@@ -17,16 +17,6 @@
     @confirm="confirmRemoveProject"
     @cancel="cancelRemoveProject"
   />
-  <ConfirmModal
-    :open="confirmOpenBuilderOpen"
-    title="Confirm"
-    :message="confirmOpenBuilderMessage"
-    confirm-text="Yes"
-    cancel-text="Cancel"
-    @confirm="confirmOpenBuilderAction"
-    @cancel="cancelOpenBuilderAction"
-  />
-
   <div v-if="dashboardActionError" class="dashboard-state dashboard-state--error">{{ dashboardActionError }}</div>
 
   <InstallConsoleModal
@@ -280,10 +270,10 @@
       :style="projectMenuStyle"
     >
       <button type="button" @click.stop="requestOpenProjectInBuilderFromMenu">Edit</button>
-      <button type="button" @click.stop="handleProjectMenuInstall">Install</button>
+      <button type="button" @click.stop="handleProjectMenuValidate">Validate</button>
       <button type="button" :disabled="!canOpenProjectMenuLogs" @click.stop="handleProjectMenuLogs">Logs</button>
       <button type="button" @click.stop="handleProjectMenuExport">Download YAML</button>
-      <button type="button" @click.stop>Clead Build</button>
+      <button type="button" @click.stop="handleProjectMenuCleanBuild">Clean Build</button>
       <button type="button" @click.stop="requestCustomizeProjectFromMenu">Customize</button>
       <button type="button" @click.stop="requestDeleteProjectFromMenu">Delete Project</button>
     </div>
@@ -394,12 +384,26 @@ import IconPicker from "../components/IconPicker.vue";
 import ColorPickerModal from "../components/ColorPickerModal.vue";
 import ProjectTileCard from "../components/dashboard/ProjectTileCard.vue";
 import { useInstallConsoleFlow } from "../composables/useInstallConsoleFlow";
-import { BUILDER_CONFIG_STORAGE_KEY, hasUnsavedBuilderSession, writeBuilderSessionConfig } from "../utils/builderSession";
+import {
+  BUILDER_CONFIG_STORAGE_KEY,
+  BUILDER_PROJECT_NAME_STORAGE_KEY,
+  writeBuilderSessionConfig,
+  writeBuilderSessionProjectName
+} from "../utils/builderSession";
 import {
   mergeDeviceStatusCache,
   normalizeProjectKey,
   readDeviceStatusCache
 } from "../utils/deviceStatusCache";
+import {
+  computePendingPromotion,
+  computePostInstallDeploymentUpdate,
+  createDeploymentIdentityFromYaml,
+  isProjectOnlineForDeployment,
+  readProjectDeploymentState,
+  resolveActiveDeploymentHost,
+  writeProjectDeploymentState
+} from "../utils/projectDeploymentState";
 import { normalizeHexColor } from "../utils/displayColor";
 
 const ROOT_FOLDER_ID = "root";
@@ -416,6 +420,7 @@ const folders = ref([{ id: ROOT_FOLDER_ID, name: ROOT_FOLDER_LABEL, parentId: nu
 const projectPlacement = ref([]);
 const projectDisplayNames = ref(new Map());
 const projectTileCustomizations = ref(new Map());
+const projectDeploymentState = ref(new Map());
 const entriesPaneRef = ref(null);
 const selectedFolderId = ref(ROOT_FOLDER_ID);
 const selectedProjectName = ref("");
@@ -456,8 +461,6 @@ const customizeDraft = ref({
   titleColor: "",
   metaColor: ""
 });
-const confirmOpenBuilderOpen = ref(false);
-const pendingBuilderOpenTarget = ref(null);
 const openBuilderRunning = ref(false);
 const onlineProjectKeys = ref(new Set());
 const projectHosts = ref(new Map());
@@ -471,6 +474,7 @@ let refreshProjectsPromise = null;
 let projectDisplayNamesRequestId = 0;
 let projectMenuPlacementRafId = null;
 let projectMenuResizeObserver = null;
+const deploymentTransitionLocks = new Set();
 // View mode controls the main pane scope:
 // - "folder": show current folder content
 // - "all": show all projects globally
@@ -664,6 +668,7 @@ const refreshProjectDisplayNames = async (projectNames) => {
   if (uniqueProjectNames.length === 0) {
     projectDisplayNames.value = new Map();
     projectTileCustomizations.value = new Map();
+    projectDeploymentState.value = new Map();
     return;
   }
 
@@ -672,18 +677,33 @@ const refreshProjectDisplayNames = async (projectNames) => {
       try {
         const response = await fetchJson(projectLoadUrl(projectName));
         if (!response.ok) {
-          return [projectName, { title: fallbackProjectTitle(projectName), tile: normalizeTileCustomization(null) }];
+          return [
+            projectName,
+            {
+              title: fallbackProjectTitle(projectName),
+              tile: normalizeTileCustomization(null),
+              deployment: { active: null, pending: null }
+            }
+          ];
         }
         const payload = await response.json();
         return [
           projectName,
           {
             title: resolveProjectDisplayName(projectName, payload?.data),
-            tile: resolveProjectTileCustomization(payload?.data)
+            tile: resolveProjectTileCustomization(payload?.data),
+            deployment: readProjectDeploymentState(payload?.data)
           }
         ];
       } catch {
-        return [projectName, { title: fallbackProjectTitle(projectName), tile: normalizeTileCustomization(null) }];
+        return [
+          projectName,
+          {
+            title: fallbackProjectTitle(projectName),
+            tile: normalizeTileCustomization(null),
+            deployment: { active: null, pending: null }
+          }
+        ];
       }
     })
   );
@@ -694,14 +714,17 @@ const refreshProjectDisplayNames = async (projectNames) => {
 
   const names = new Map();
   const tileCustomizations = new Map();
+  const deployment = new Map();
   entries.forEach(([projectName, meta]) => {
     names.set(projectName, meta?.title || fallbackProjectTitle(projectName));
     if (hasTileCustomization(meta?.tile)) {
       tileCustomizations.set(projectName, meta.tile);
     }
+    deployment.set(projectName, readProjectDeploymentState({ deployment: meta?.deployment }));
   });
   projectDisplayNames.value = names;
   projectTileCustomizations.value = tileCustomizations;
+  projectDeploymentState.value = deployment;
 };
 
 const hostFromYamlName = (yamlName) => {
@@ -745,6 +768,107 @@ const applyCachedDeviceStatus = () => {
   }
 };
 
+const registerDeploymentIdentity = async (identity) => {
+  if (!identity?.yaml) return;
+  const response = await addonFetch("api/devices/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      yaml: identity.yaml,
+      ...(identity.host ? { host: identity.host } : {})
+    })
+  });
+  if (!response.ok) {
+    throw new Error(await parseResponseMessage(response, "Device registration failed"));
+  }
+};
+
+const unregisterDeviceByKey = async (deviceKey) => {
+  const normalized = projectKeyFromName(deviceKey);
+  if (!normalized) return;
+  const response = await addonFetch(`api/devices/unregister?name=${encodeURIComponent(normalized)}`, {
+    method: "DELETE"
+  });
+  if (!response.ok) {
+    throw new Error(await parseResponseMessage(response, "Device unregister failed"));
+  }
+};
+
+const loadProjectDataForDeployment = async (projectName) => {
+  const response = await addonFetch(`projects/load?name=${encodeURIComponent(projectName)}`);
+  if (!response.ok) {
+    throw new Error(await parseResponseMessage(response, "Failed to load project"));
+  }
+  const payload = await response.json();
+  const data = payload?.data;
+  if (!data || typeof data !== "object") {
+    throw new Error("Invalid project payload");
+  }
+  return JSON.parse(JSON.stringify(data));
+};
+
+const saveProjectDataForDeployment = async (projectName, data) => {
+  const response = await addonFetch("projects/save", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      name: projectName,
+      data
+    })
+  });
+  if (!response.ok) {
+    throw new Error(await parseResponseMessage(response, "Failed to save project deployment state"));
+  }
+};
+
+const persistProjectDeploymentState = async (projectName, nextState) => {
+  const data = await loadProjectDataForDeployment(projectName);
+  writeProjectDeploymentState(data, nextState);
+  await saveProjectDataForDeployment(projectName, data);
+  return readProjectDeploymentState(data);
+};
+
+const promotePendingDeploymentsIfNeeded = async (onlineKeys) => {
+  const projectNames = Array.from(projectDeploymentState.value.keys());
+  if (!projectNames.length) return;
+  let changed = false;
+  const nextDeployment = new Map(projectDeploymentState.value);
+  for (const projectName of projectNames) {
+    if (deploymentTransitionLocks.has(projectName)) continue;
+    const currentState = nextDeployment.get(projectName) || { active: null, pending: null };
+    const promotion = computePendingPromotion({
+      currentState,
+      onlineKeys
+    });
+    if (!promotion.shouldPromote) continue;
+    deploymentTransitionLocks.add(projectName);
+    try {
+      const persistedState = await persistProjectDeploymentState(projectName, promotion.state);
+      nextDeployment.set(projectName, persistedState);
+      changed = true;
+      for (const key of promotion.unregisterKeys) {
+        try {
+          await unregisterDeviceByKey(key);
+        } catch (error) {
+          console.warn("Failed to unregister old deployment key", key, error);
+        }
+      }
+    } catch (error) {
+      console.warn("Failed to promote pending deployment", projectName, error);
+    } finally {
+      deploymentTransitionLocks.delete(projectName);
+    }
+  }
+  if (changed) {
+    projectDeploymentState.value = nextDeployment;
+    emitProjectsUpdated();
+  }
+};
+
 // Manual/periodic status sync for dashboard project tiles.
 // It requests `api/devices/list?refresh=1` and updates local maps:
 // - `onlineProjectKeys` (online/offline view state)
@@ -781,9 +905,11 @@ const refreshOnlineProjects = async () => {
       })
       .map((device) => deviceKeyFromPayload(device))
       .filter(Boolean);
-    onlineProjectKeys.value = new Set(onlineKeys);
+    const onlineKeySet = new Set(onlineKeys);
+    onlineProjectKeys.value = onlineKeySet;
     projectHosts.value = hostsByProject;
     mergeDeviceStatusCache(cacheEntries);
+    await promotePendingDeploymentsIfNeeded(onlineKeySet);
   } catch {
     // keep previous known in-memory state
   }
@@ -810,6 +936,24 @@ const handleDashboardVisibilityChange = () => {
     return;
   }
   stopDevicesStatusPolling();
+};
+
+const projectStatusHost = (projectName) => {
+  const deployment = projectDeploymentState.value.get(projectName) || { active: null, pending: null };
+  return resolveActiveDeploymentHost(
+    deployment,
+    projectHosts.value,
+    hostFromYamlName(projectYamlName(projectName))
+  );
+};
+
+const isProjectOnline = (projectName) => {
+  const deployment = projectDeploymentState.value.get(projectName) || { active: null, pending: null };
+  return isProjectOnlineForDeployment(
+    deployment,
+    onlineProjectKeys.value,
+    projectKeyFromName(projectName)
+  );
 };
 
 const sanitizeProjectName = (value) => {
@@ -1353,7 +1497,7 @@ const visibleProjectEntries = computed(() => {
     })
     .sort((a, b) => a.localeCompare(b))
     .map((name) => {
-      const isOnline = onlineProjectKeys.value.has(projectKeyFromName(name));
+      const isOnline = isProjectOnline(name);
       const placement = projectPlacementByName.value.get(name);
       return {
         kind: "project",
@@ -1516,12 +1660,20 @@ const openProjectMenu = async (projectName, event) => {
 
 const getOpenProjectMenuProject = () => String(openProjectMenuName.value || "").trim();
 
-const handleProjectMenuInstall = () => {
+const handleProjectMenuValidate = () => {
   const projectName = getOpenProjectMenuProject();
   if (!projectName) return;
   selectProject(projectName);
   closeProjectMenu();
-  handleTopbarInstallOption({ detail: { mode: "serial" } });
+  handleTopbarValidate();
+};
+
+const handleProjectMenuCleanBuild = () => {
+  const projectName = getOpenProjectMenuProject();
+  if (!projectName) return;
+  selectProject(projectName);
+  closeProjectMenu();
+  handleTopbarCleanBuild();
 };
 
 const handleProjectMenuLogs = () => {
@@ -1778,6 +1930,7 @@ const openProjectInBuilder = async (projectName) => {
     }
 
     writeBuilderSessionConfig(payload.data);
+    writeBuilderSessionProjectName(payload?.name || projectName);
     await router.push({ name: "builder" });
   } catch (error) {
     dashboardActionError.value = error instanceof Error ? error.message : "Failed to open project in Builder";
@@ -1792,6 +1945,7 @@ const openBlankBuilder = async () => {
   dashboardActionError.value = "";
   try {
     localStorage.removeItem(BUILDER_CONFIG_STORAGE_KEY);
+    localStorage.removeItem(BUILDER_PROJECT_NAME_STORAGE_KEY);
     await router.push({ name: "builder" });
   } catch (error) {
     dashboardActionError.value = error instanceof Error ? error.message : "Failed to open new project in Builder";
@@ -1800,27 +1954,12 @@ const openBlankBuilder = async () => {
   }
 };
 
-const requestBuilderOpenWithUnsavedGuard = (target) => {
-  if (openBuilderRunning.value) return;
-  if (!target || typeof target !== "object") return;
-  if (!hasUnsavedBuilderSession()) {
-    if (target.type === "project") {
-      openProjectInBuilder(target.projectName);
-      return;
-    }
-    openBlankBuilder();
-    return;
-  }
-  pendingBuilderOpenTarget.value = target;
-  confirmOpenBuilderOpen.value = true;
-};
-
 const requestOpenProjectInBuilder = (projectName) => {
   const normalized = sanitizeProjectName(projectName);
   if (!normalized || openBuilderRunning.value) return;
   selectProject(normalized);
   closeProjectMenu();
-  requestBuilderOpenWithUnsavedGuard({ type: "project", projectName: normalized });
+  openProjectInBuilder(normalized);
 };
 
 const requestOpenProjectInBuilderFromMenu = () => {
@@ -1831,34 +1970,8 @@ const requestOpenBlankBuilder = () => {
   if (openBuilderRunning.value) return;
   closeProjectMenu();
   dashboardActionError.value = "";
-  requestBuilderOpenWithUnsavedGuard({ type: "blank" });
+  openBlankBuilder();
 };
-
-const cancelOpenBuilderAction = () => {
-  confirmOpenBuilderOpen.value = false;
-  pendingBuilderOpenTarget.value = null;
-};
-
-const confirmOpenBuilderAction = async () => {
-  if (openBuilderRunning.value) return;
-  const target = pendingBuilderOpenTarget.value;
-  cancelOpenBuilderAction();
-  if (!target || typeof target !== "object") return;
-  if (target.type === "project") {
-    const projectName = sanitizeProjectName(target.projectName);
-    if (!projectName) return;
-    await openProjectInBuilder(projectName);
-    return;
-  }
-  await openBlankBuilder();
-};
-
-const confirmOpenBuilderMessage = computed(() => {
-  if (pendingBuilderOpenTarget.value?.type === "blank") {
-    return "There is an unsaved project in Builder. Overwrite it by starting a new project?";
-  }
-  return "There is an unsaved project in Builder. Overwrite it by opening this project?";
-});
 
 const handleDashboardKeydown = (event) => {
   if (event.key !== "Escape") return;
@@ -1872,17 +1985,7 @@ const handleDashboardKeydown = (event) => {
   openFolderMenuId.value = null;
 };
 
-const isSelectedProjectOnline = computed(() => {
-  const selectedKey = projectKeyFromName(selectedProjectName.value);
-  if (!selectedKey) return false;
-  return onlineProjectKeys.value.has(selectedKey);
-});
-
-const isProjectOnline = (projectName) => {
-  const projectKey = projectKeyFromName(projectName);
-  if (!projectKey) return false;
-  return onlineProjectKeys.value.has(projectKey);
-};
+const isSelectedProjectOnline = computed(() => isProjectOnline(selectedProjectName.value));
 
 const canDashboardEdit = computed(() => Boolean(String(selectedProjectName.value || "").trim()));
 const canDashboardExport = computed(() => canDashboardEdit.value);
@@ -1891,11 +1994,7 @@ const canDashboardLogs = computed(() => canDashboardEdit.value && isSelectedProj
 const canOpenProjectMenuLogs = computed(() => isProjectOnline(openProjectMenuName.value));
 const selectedYamlName = computed(() => projectYamlName(selectedProjectName.value));
 const selectedHost = computed(() => {
-  const projectKey = projectKeyFromName(selectedProjectName.value);
-  if (!projectKey) return "";
-  const host = projectHosts.value.get(projectKey);
-  if (host) return host;
-  return hostFromYamlName(`${projectKey}.yaml`);
+  return projectStatusHost(selectedProjectName.value);
 });
 const canDashboardOta = computed(() => canDashboardInstall.value && isSelectedProjectOnline.value && Boolean(selectedHost.value));
 const projectMenuStyle = computed(() => ({
@@ -1906,6 +2005,7 @@ const projectMenuStyle = computed(() => ({
 
 const installFlow = useInstallConsoleFlow({
   canInstall: () => canDashboardInstall.value,
+  canValidate: () => canDashboardInstall.value,
   canUseOta: () => canDashboardOta.value,
   canLogs: () => canDashboardLogs.value,
   getYamlName: () => selectedYamlName.value,
@@ -1918,7 +2018,10 @@ const installFlow = useInstallConsoleFlow({
   clearError: () => {
     dashboardActionError.value = "";
   },
-  prepareBeforeJob: async () => ensureSelectedProjectSavedAndRegistered()
+  prepareBeforeJob: async () => ensureSelectedProjectSavedBeforeInstall(),
+  onInstallSuccess: async (payload) => {
+    await registerSelectedProjectAfterInstallSuccess(payload);
+  }
 });
 
 const {
@@ -1937,6 +2040,8 @@ const {
   handleInstallSerialPort,
   handleInstallOta,
   startLogs,
+  startValidate,
+  startCleanBuild,
   handleInstallDownload,
   downloadBinary,
   compileIsActive,
@@ -1949,6 +2054,7 @@ const emitDashboardActionsState = () => {
     new CustomEvent("app:dashboard-actions-state", {
       detail: {
         canInstall: canDashboardInstall.value,
+        canValidate: canDashboardInstall.value,
         canUseOta: canDashboardOta.value,
         canLogs: canDashboardLogs.value,
         canEdit: canDashboardEdit.value,
@@ -1979,6 +2085,18 @@ const handleTopbarLogs = () => {
   if (!canDashboardLogs.value) return;
   dashboardActionError.value = "";
   startLogs();
+};
+
+const handleTopbarValidate = () => {
+  if (!canDashboardInstall.value) return;
+  dashboardActionError.value = "";
+  startValidate();
+};
+
+const handleTopbarCleanBuild = () => {
+  if (!canDashboardInstall.value) return;
+  dashboardActionError.value = "";
+  startCleanBuild();
 };
 
 const handleTopbarExport = () => {
@@ -2152,6 +2270,10 @@ const removeProjectFromLocalState = (projectName) => {
   const nextTileCustomizations = new Map(projectTileCustomizations.value);
   nextTileCustomizations.delete(projectName);
   projectTileCustomizations.value = nextTileCustomizations;
+
+  const nextDeployment = new Map(projectDeploymentState.value);
+  nextDeployment.delete(projectName);
+  projectDeploymentState.value = nextDeployment;
 
   const projectKey = projectKeyFromName(projectName);
   if (projectKey) {
@@ -2333,7 +2455,7 @@ const exportYaml = async () => {
   }
 };
 
-const ensureSelectedProjectSavedAndRegistered = async () => {
+const ensureSelectedProjectSavedBeforeInstall = async () => {
   const projectName = String(selectedProjectName.value || "").trim();
   const yamlName = selectedYamlName.value;
   if (!projectName || !yamlName) {
@@ -2389,26 +2511,65 @@ const ensureSelectedProjectSavedAndRegistered = async () => {
       }
     }
 
-    const host = selectedHost.value || hostFromYamlName(yamlName);
-    const registerResponse = await addonFetch("api/devices/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        yaml: yamlName,
-        ...(host ? { host } : {})
-      })
-    });
-    if (!registerResponse.ok) {
-      throw new Error(await parseResponseMessage(registerResponse, "Device registration failed"));
-    }
-
-    // Do not force on-demand status refresh in install flow.
-    // Dashboard status is sourced from background polling to keep UX responsive.
     return true;
   } catch (error) {
     throw (error instanceof Error ? error : new Error("Install preparation failed"));
+  }
+};
+
+const registerSelectedProjectAfterInstallSuccess = async ({ action, yaml } = {}) => {
+  if (!["ota", "flash", "download"].includes(String(action || ""))) {
+    return;
+  }
+  const yamlPayload = String(yaml || "").trim();
+  const projectFromYaml = sanitizeProjectName(yamlPayload.replace(/\.yaml$/i, ".json"));
+  const projectName = projectFromYaml || sanitizeProjectName(selectedProjectName.value);
+  const yamlName = yamlPayload || projectYamlName(projectName);
+  if (!projectName || !yamlName) return;
+
+  const host = hostFromYamlName(yamlName);
+  const nextIdentity = createDeploymentIdentityFromYaml(yamlName, host);
+  if (!nextIdentity) return;
+
+  deploymentTransitionLocks.add(projectName);
+  try {
+    const data = await loadProjectDataForDeployment(projectName);
+    const currentState = readProjectDeploymentState(data);
+    const transition = computePostInstallDeploymentUpdate({
+      action,
+      currentState,
+      nextIdentity
+    });
+
+    if (transition.register) {
+      await registerDeploymentIdentity(transition.register);
+    }
+
+    let persistedState = currentState;
+    if (transition.changed) {
+      writeProjectDeploymentState(data, transition.state);
+      await saveProjectDataForDeployment(projectName, data);
+      persistedState = readProjectDeploymentState(data);
+    }
+
+    const deployment = new Map(projectDeploymentState.value);
+    deployment.set(projectName, persistedState);
+    projectDeploymentState.value = deployment;
+
+    for (const key of transition.unregisterKeys) {
+      try {
+        await unregisterDeviceByKey(key);
+      } catch (error) {
+        console.warn("Failed to unregister old deployment key", key, error);
+      }
+    }
+  } finally {
+    deploymentTransitionLocks.delete(projectName);
+  }
+
+  emitProjectsUpdated();
+  if (String(action || "").toLowerCase() !== "download") {
+    await refreshOnlineProjects();
   }
 };
 
@@ -2456,6 +2617,7 @@ onMounted(() => {
   window.addEventListener("mouseup", stopSidebarResize);
   window.addEventListener("app:install-option", handleTopbarInstallOption);
   window.addEventListener("app:builder-logs", handleTopbarLogs);
+  window.addEventListener("app:validate", handleTopbarValidate);
   window.addEventListener("app:dashboard-edit", handleTopbarEdit);
   emitDashboardActionsState();
 });
@@ -2471,6 +2633,7 @@ onBeforeUnmount(() => {
   window.removeEventListener("mouseup", stopSidebarResize);
   window.removeEventListener("app:install-option", handleTopbarInstallOption);
   window.removeEventListener("app:builder-logs", handleTopbarLogs);
+  window.removeEventListener("app:validate", handleTopbarValidate);
   window.removeEventListener("app:dashboard-edit", handleTopbarEdit);
   document.removeEventListener("visibilitychange", handleDashboardVisibilityChange);
   if (entriesPaneRef.value instanceof HTMLElement) {
@@ -2483,7 +2646,14 @@ onBeforeUnmount(() => {
   stopSidebarResize();
   window.dispatchEvent(
     new CustomEvent("app:dashboard-actions-state", {
-      detail: { canInstall: false, canUseOta: false, canLogs: false, canEdit: false, running: false }
+      detail: {
+        canInstall: false,
+        canValidate: false,
+        canUseOta: false,
+        canLogs: false,
+        canEdit: false,
+        running: false
+      }
     })
   );
 });

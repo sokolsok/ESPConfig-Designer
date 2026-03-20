@@ -1,0 +1,195 @@
+{
+  "id": "display.inkplate",
+  "domain": "display",
+  "platform": "inkplate",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/display/inkplate/",
+  "extends": "base_display.json",
+  "display_builder": true,
+  "displayType": "monochrome",
+  "model_meta": {
+    "inkplate_5": {
+      "w": 540,
+      "h": 960
+    },
+    "inkplate_6": {
+      "w": 800,
+      "h": 600
+    },
+    "inkplate_6_plus": {
+      "w": 1024,
+      "h": 758
+    },
+    "inkplate_10": {
+      "w": 1200,
+      "h": 825
+    }
+  },
+  "fields": [
+    {
+      "key": "model",
+      "type": "select",
+      "required": false,
+      "lvl": "simple",
+      "default": "inkplate_6",
+      "options": [
+        "inkplate_5",
+        "inkplate_6",
+        "inkplate_6_plus",
+        "inkplate_6_v2",
+        "inkplate_10"
+      ]
+    },
+    {
+      "key": "greyscale",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "partial_updating",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "custom_waveform",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "full_update_every",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "transform",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "ckv_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "gmod_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "gpio0_enable_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "oe_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "powerup_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "sph_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "spv_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "vcom_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "cl_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "le_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "display_data_0_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "display_data_1_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "display_data_2_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "display_data_3_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "display_data_4_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "display_data_5_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "display_data_6_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "display_data_7_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "pages",
+      "type": "yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "5s"
+    }
+  ]
+}

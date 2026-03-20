@@ -1,0 +1,24 @@
+{
+  "id": "component.resume",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Component",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "component_id",
+      "domain": "",
+      "lvl": "normal"
+    },
+    {
+      "key": "update_interval",
+      "label": "Update interval",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1s",
+      "lambdaPlaceholder": "return 1000;"
+    }
+  ]
+}

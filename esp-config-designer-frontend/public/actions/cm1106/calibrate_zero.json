@@ -1,0 +1,14 @@
+{
+  "id": "cm1106.calibrate_zero",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Cm1106",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "cm1106_id",
+      "domain": "cm1106",
+      "lvl": "normal"
+    }
+  ]
+}

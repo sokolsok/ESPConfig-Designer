@@ -1,0 +1,65 @@
+{
+  "id": "sensor.max31865",
+  "domain": "sensor",
+  "platform": "max31865",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/max31865/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "reference_resistance",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "rtd_nominal_resistance",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "mains_filter",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "60 Hz"
+    },
+    {
+      "key": "rtd_wires",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "4"
+    },
+    {
+      "key": "spi_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor"
+    }
+  ]
+}

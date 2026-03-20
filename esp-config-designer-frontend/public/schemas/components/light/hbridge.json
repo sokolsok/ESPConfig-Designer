@@ -1,0 +1,24 @@
+{
+  "id": "light.hbridge",
+  "domain": "light",
+  "platform": "hbridge",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/light/hbridge/",
+  "extends": "base_light.json",
+  "fields": [
+    {
+      "key": "pin_a",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "pin_b",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    }
+  ]
+}

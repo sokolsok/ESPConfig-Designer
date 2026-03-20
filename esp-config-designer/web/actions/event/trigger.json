@@ -1,0 +1,23 @@
+{
+  "id": "event.trigger",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Event",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "event_id",
+      "domain": "event",
+      "lvl": "normal"
+    },
+    {
+      "key": "event_type",
+      "label": "Event type",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "single_press"
+    }
+  ]
+}

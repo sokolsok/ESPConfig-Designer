@@ -1,0 +1,17 @@
+{
+  "id": "button.wake_on_lan",
+  "domain": "button",
+  "platform": "wake_on_lan",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/button/wake_on_lan/",
+  "extends": "base_button.json",
+  "fields": [
+    {
+      "key": "target_mac_address",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "12:34:56:78:9A:BC"
+    }
+  ]
+}

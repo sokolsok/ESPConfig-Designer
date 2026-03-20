@@ -1,7 +1,10 @@
+import { getTemplatableInnerValue, isTemplatableValue } from "./schemaTemplatable";
+
 // Resolve a dependency key from the current object, falling back to schema defaults.
 export const resolveDependentValue = (key, valueMap, schemaFields) => {
   if (valueMap && valueMap[key] !== undefined) {
-    return valueMap[key];
+    const value = valueMap[key];
+    return isTemplatableValue(value) ? getTemplatableInnerValue(value, { templatable: true }) : value;
   }
   const fieldDefinition = schemaFields?.find((field) => field.key === key);
   if (fieldDefinition && fieldDefinition.default !== undefined) {
@@ -58,6 +61,9 @@ export const buildGlobalRegistry = (entries = []) => {
         let resolved = value;
         if (resolved === undefined && field.default !== undefined) {
           resolved = field.default;
+        }
+        if (isTemplatableValue(resolved)) {
+          resolved = getTemplatableInnerValue(resolved, { templatable: true });
         }
         registerValue(field.set_global, resolved);
       }

@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
+    "generate:actions": "node scripts/generate-action-definitions.js",
     "dev": "vite",
     "serve": "vite",
     "build": "vite build",

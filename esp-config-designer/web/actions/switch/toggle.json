@@ -1,0 +1,14 @@
+{
+  "id": "switch.toggle",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Switch",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "switch_id",
+      "domain": "switch",
+      "lvl": "normal"
+    }
+  ]
+}

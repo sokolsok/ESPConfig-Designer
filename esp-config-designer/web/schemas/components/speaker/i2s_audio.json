@@ -1,0 +1,164 @@
+{
+  "id": "speaker.i2s_audio",
+  "domain": "speaker",
+  "platform": "i2s_audio",
+  "requires": [
+    "i2s_audio"
+  ],
+  "helpUrl": "https://esphome.io/components/speaker/i2s_audio/",
+  "extends": "base_speaker.json",
+  "fields": [
+    {
+      "key": "dac_type",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "external",
+      "options": [
+        "external",
+        "internal"
+      ]
+    },
+    {
+      "key": "channel",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "mono",
+      "options": [
+        "left",
+        "right",
+        "mono",
+        "stereo"
+      ]
+    },
+    {
+      "key": "sample_rate",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 16000
+    },
+    {
+      "key": "bits_per_sample",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "16bit",
+      "options": [
+        "8bit",
+        "16bit",
+        "24bit",
+        "32bit"
+      ]
+    },
+    {
+      "key": "bits_per_channel",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "options": [
+        "8bit",
+        "16bit",
+        "24bit",
+        "32bit"
+      ]
+    },
+    {
+      "key": "mclk_multiple",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "256",
+      "options": [
+        "128",
+        "256",
+        "384",
+        "512"
+      ]
+    },
+    {
+      "key": "use_apll",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "i2s_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "primary",
+      "options": [
+        "primary",
+        "secondary"
+      ]
+    },
+    {
+      "key": "i2s_audio_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2s_audio"
+    },
+    {
+      "key": "i2s_comm_fmt",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "stand_i2s",
+      "options": [
+        "stand_i2s",
+        "stand_msb",
+        "stand_pcm_short",
+        "stand_pcm_long",
+        "stand_max",
+        "i2s_msb",
+        "i2s_lsb",
+        "pcm",
+        "pcm_short",
+        "pcm_long"
+      ]
+    },
+    {
+      "key": "buffer_duration",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "500ms"
+    },
+    {
+      "key": "timeout",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "500ms"
+    },
+    {
+      "key": "i2s_dout_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "dac_type",
+        "value": "external"
+      }
+    },
+    {
+      "key": "mode",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "options": [
+        "left",
+        "right",
+        "stereo"
+      ],
+      "dependsOn": {
+        "key": "dac_type",
+        "value": "internal"
+      }
+    }
+  ]
+}

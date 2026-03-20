@@ -1,0 +1,14 @@
+{
+  "id": "ds1307.read_time",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Ds1307",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "ds1307_id",
+      "domain": "ds1307",
+      "lvl": "normal"
+    }
+  ]
+}

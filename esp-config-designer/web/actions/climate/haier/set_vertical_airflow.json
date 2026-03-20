@@ -1,0 +1,22 @@
+{
+  "id": "climate.haier.set_vertical_airflow",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Climate",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "climate_id",
+      "domain": "climate",
+      "lvl": "normal"
+    },
+    {
+      "key": "vertical_airflow",
+      "label": "Vertical Airflow",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

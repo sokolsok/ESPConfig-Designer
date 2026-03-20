@@ -1,0 +1,37 @@
+{
+  "id": "sensor.xiaomi_miscale",
+  "domain": "sensor",
+  "platform": "xiaomi_miscale",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/xiaomi_miscale/",
+  "fields": [
+    {
+      "key": "mac_address",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "weight",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "impedance",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "clear_impedance",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

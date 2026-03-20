@@ -1,0 +1,14 @@
+{
+  "id": "micro_wake_word.start",
+  "fields": [
+    {
+      "key": "model_id",
+      "label": "Model ID",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "okay_nabu"
+    }
+  ]
+}

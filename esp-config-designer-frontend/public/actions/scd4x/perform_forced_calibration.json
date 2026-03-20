@@ -1,0 +1,24 @@
+{
+  "id": "scd4x.perform_forced_calibration",
+  "fields": [
+    {
+      "key": "id",
+      "label": "SCD4X",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "scd4x_id",
+      "domain": "scd4x",
+      "lvl": "normal"
+    },
+    {
+      "key": "target_co2",
+      "label": "Target CO2",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "420",
+      "lambdaPlaceholder": "return 420;"
+    }
+  ]
+}

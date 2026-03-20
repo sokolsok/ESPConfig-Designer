@@ -1,0 +1,14 @@
+{
+  "id": "light.is_off",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Light",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "ceiling_light",
+      "domain": "light",
+      "lvl": "normal"
+    }
+  ]
+}

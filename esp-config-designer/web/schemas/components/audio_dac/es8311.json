@@ -1,0 +1,76 @@
+{
+  "id": "audio_dac.es8311",
+  "domain": "audio_dac",
+  "platform": "es8311",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/audio_dac/es8311/",
+  "extends": "base_audio_dac.json",
+  "fields": [
+    {
+      "key": "bits_per_sample",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "16bit",
+      "options": [
+        "16bit",
+        "24bit",
+        "32bit"
+      ]
+    },
+    {
+      "key": "sample_rate",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 16000
+    },
+    {
+      "key": "use_mclk",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    },
+    {
+      "key": "use_microphone",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "mic_gain",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "42DB",
+      "options": [
+        "0DB",
+        "6DB",
+        "12DB",
+        "18DB",
+        "24DB",
+        "30DB",
+        "36DB",
+        "42DB"
+      ]
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x18"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2c"
+    }
+  ]
+}

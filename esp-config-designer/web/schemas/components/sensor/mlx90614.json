@@ -1,0 +1,34 @@
+{
+  "id": "sensor.mlx90614",
+  "domain": "sensor",
+  "platform": "mlx90614",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/mlx90614/",
+  "fields": [
+    {
+      "key": "ambient",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "object",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "emissivity",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        }
+      ],
+      "extends": "base_sensor.json"
+    }
+  ]
+}

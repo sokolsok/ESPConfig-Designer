@@ -1,0 +1,33 @@
+{
+  "id": "lvgl.update",
+  "fields": [
+    {
+      "key": "disp_bg_color",
+      "label": "Background color",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "#000000"
+    },
+    {
+      "key": "disp_bg_image",
+      "label": "Background image",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "background.png"
+    },
+    {
+      "key": "disp_bg_opa",
+      "label": "Background opacity",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "100%",
+      "lambdaPlaceholder": "return 1.0;"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "id": "number.template",
+  "domain": "number",
+  "platform": "template",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/number/template/",
+  "extends": "base_number.json",
+  "fields": [
+    {
+      "key": "min_value",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "max_value",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "step",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "lambda",
+      "type": "lambda",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "set_action",
+      "type": "yaml",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "- logger.log: !lambda 'return to_string(x);'"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s"
+    },
+    {
+      "key": "optimistic",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "restore_value",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "initial_value",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

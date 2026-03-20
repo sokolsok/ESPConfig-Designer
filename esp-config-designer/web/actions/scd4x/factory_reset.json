@@ -1,0 +1,14 @@
+{
+  "id": "scd4x.factory_reset",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Scd4x",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "scd4x_id",
+      "domain": "scd4x",
+      "lvl": "normal"
+    }
+  ]
+}

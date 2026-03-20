@@ -1,0 +1,14 @@
+{
+  "id": "senseair.background_calibration_result",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Senseair",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "senseair_id",
+      "domain": "senseair",
+      "lvl": "normal"
+    }
+  ]
+}

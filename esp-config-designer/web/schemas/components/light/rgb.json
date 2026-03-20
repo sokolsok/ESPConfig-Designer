@@ -1,0 +1,31 @@
+{
+  "id": "light.rgb",
+  "domain": "light",
+  "platform": "rgb",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/light/rgb/",
+  "extends": "base_light.json",
+  "fields": [
+    {
+      "key": "red",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "green",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "blue",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    }
+  ]
+}

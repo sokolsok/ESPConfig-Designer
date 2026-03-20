@@ -1,0 +1,102 @@
+{
+  "id": "sensor.ina2xx",
+  "domain": "sensor",
+  "platform": "ina2xx",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/ina2xx/",
+  "extends": "base_sensor.json",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "model",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x40"
+    },
+    {
+      "key": "shunt_resistance",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "max_current",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "adc_range",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0"
+    },
+    {
+      "key": "adc_time",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "bus_voltage",
+          "type": "duration",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "shunt_voltage",
+          "type": "duration",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "temperature",
+          "type": "duration",
+          "required": false,
+          "lvl": "normal"
+        }
+      ]
+    },
+    {
+      "key": "adc_averaging",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "128"
+    },
+    {
+      "key": "temperature_coefficient",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "reset_on_boot",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

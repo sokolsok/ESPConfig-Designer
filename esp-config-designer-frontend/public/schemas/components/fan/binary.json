@@ -1,0 +1,31 @@
+{
+  "id": "fan.binary",
+  "domain": "fan",
+  "platform": "binary",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/fan/binary/",
+  "extends": "base_fan.json",
+  "fields": [
+    {
+      "key": "output",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "output"
+    },
+    {
+      "key": "oscillation_output",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "output"
+    },
+    {
+      "key": "direction_output",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "output"
+    }
+  ]
+}

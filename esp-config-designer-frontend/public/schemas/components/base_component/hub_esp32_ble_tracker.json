@@ -1,0 +1,8 @@
+{
+  "id": "hub.esp32_ble_tracker",
+  "domain": "esp32_ble_tracker",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": []
+}

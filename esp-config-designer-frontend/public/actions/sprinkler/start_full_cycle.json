@@ -1,0 +1,44 @@
+{
+  "id": "sprinkler.start_full_cycle",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Sprinkler",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "sprinkler_id",
+      "domain": "sprinkler",
+      "lvl": "normal"
+    },
+    {
+      "key": "repeat",
+      "label": "Repeat",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1",
+      "lambdaPlaceholder": "return 1;"
+    },
+    {
+      "key": "divider",
+      "label": "Divider",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1",
+      "lambdaPlaceholder": "return 1;"
+    },
+    {
+      "key": "multiplier",
+      "label": "Multiplier",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1",
+      "lambdaPlaceholder": "return 1;"
+    }
+  ]
+}

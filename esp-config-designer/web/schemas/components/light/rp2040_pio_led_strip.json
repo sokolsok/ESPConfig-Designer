@@ -1,0 +1,88 @@
+{
+  "id": "light.rp2040_pio_led_strip",
+  "domain": "light",
+  "platform": "rp2040_pio_led_strip",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/light/rp2040_pio_led_strip/",
+  "extends": "base_light.json",
+  "fields": [
+    {
+      "key": "pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "num_leds",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "pio",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "options": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "key": "chipset",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "options": [
+        "WS2812",
+        "WS2812B",
+        "SK6812",
+        "SM16703"
+      ]
+    },
+    {
+      "key": "rgb_order",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "options": [
+        "RGB",
+        "RBG",
+        "GRB",
+        "GBR",
+        "BGR",
+        "BRG"
+      ]
+    },
+    {
+      "key": "is_rgbw",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "bit0_high",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "bit0_low",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "bit1_high",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "bit1_low",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

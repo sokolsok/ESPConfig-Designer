@@ -1,0 +1,104 @@
+{
+  "id": "sensor.ads1115",
+  "domain": "sensor",
+  "platform": "ads1115",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/ads1115/",
+  "extends": "base_sensor.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "ads1115",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_ads1115.json"
+    },
+    {
+      "key": "ads1115_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "ads1115",
+      "allowSelfReference": true,
+      "default": "ads1115_hub"
+    },
+    {
+      "key": "multiplexer",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "A0_GND",
+      "options": [
+        "A0_A1",
+        "A0_A3",
+        "A1_A3",
+        "A2_A3",
+        "A0_GND",
+        "A1_GND",
+        "A2_GND",
+        "A3_GND"
+      ]
+    },
+    {
+      "key": "gain",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "6.144",
+      "options": [
+        "6.144",
+        "4.096",
+        "2.048",
+        "1.024",
+        "0.512",
+        "0.256"
+      ]
+    },
+    {
+      "key": "resolution",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "16_BITS",
+      "options": [
+        "16_BITS",
+        "12_BITS"
+      ]
+    },
+    {
+      "key": "sample_rate",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "860",
+      "options": [
+        "8",
+        "16",
+        "32",
+        "64",
+        "128",
+        "250",
+        "475",
+        "860"
+      ]
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

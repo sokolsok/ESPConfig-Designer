@@ -1,0 +1,23 @@
+{
+  "id": "sim800l.disconnect",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Sim800l",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "sim800l_id",
+      "domain": "sim800l",
+      "lvl": "normal"
+    },
+    {
+      "key": "force",
+      "label": "Force",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

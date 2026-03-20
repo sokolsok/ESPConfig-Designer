@@ -1,0 +1,17 @@
+{
+  "id": "hub.ttp229_lsf",
+  "domain": "ttp229_lsf",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "ttp229_component",
+      "idDomain": "ttp229"
+    }
+  ]
+}

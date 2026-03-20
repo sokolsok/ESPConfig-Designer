@@ -1,0 +1,61 @@
+{
+  "id": "output.template",
+  "domain": "output",
+  "platform": "template",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/output/template/",
+  "extends": "base_output.json",
+  "fields": [
+    {
+      "key": "type",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "float",
+      "options": [
+        "binary",
+        "float"
+      ]
+    },
+    {
+      "key": "write_action",
+      "type": "yaml",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "- output.set_level:\n    id: another_output\n    level: !lambda return state;"
+    },
+    {
+      "key": "min_power",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 0,
+      "dependsOn": {
+        "key": "type",
+        "value": "float"
+      }
+    },
+    {
+      "key": "max_power",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 1,
+      "dependsOn": {
+        "key": "type",
+        "value": "float"
+      }
+    },
+    {
+      "key": "zero_means_zero",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false,
+      "dependsOn": {
+        "key": "type",
+        "value": "float"
+      }
+    }
+  ]
+}

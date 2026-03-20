@@ -1,0 +1,14 @@
+{
+  "id": "lvgl.pause",
+  "fields": [
+    {
+      "key": "show_snow",
+      "label": "Show snow",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

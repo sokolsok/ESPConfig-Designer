@@ -1,0 +1,78 @@
+{
+  "id": "sensor.bmp3xx",
+  "domain": "sensor",
+  "platform": "bmp3xx",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/bmp3xx/",
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "address",
+      "type": "select",
+      "required": false,
+      "lvl": "simple",
+      "options": [
+        "0x77",
+        "0x76"
+      ]
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "oversampling",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "pressure",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "oversampling",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "iir_filter",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "OFF",
+        "2x",
+        "4x",
+        "16x",
+        "32",
+        "64x",
+        "128x"
+      ]
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

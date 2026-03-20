@@ -1,0 +1,24 @@
+{
+  "id": "ezo_pmp.dose_continuously",
+  "fields": [
+    {
+      "key": "id",
+      "label": "EZO PMP",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "ezo_pmp_id",
+      "domain": "ezo_pmp",
+      "lvl": "normal"
+    },
+    {
+      "key": "flow_rate",
+      "label": "Flow rate",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "1.5",
+      "lambdaPlaceholder": "return 1.5;"
+    }
+  ]
+}

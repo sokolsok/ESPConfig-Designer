@@ -1,0 +1,22 @@
+{
+  "id": "output.set_min_power",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Output",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "output_id",
+      "domain": "output",
+      "lvl": "normal"
+    },
+    {
+      "key": "min_power",
+      "label": "Min Power",
+      "type": "text",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal"
+    }
+  ]
+}

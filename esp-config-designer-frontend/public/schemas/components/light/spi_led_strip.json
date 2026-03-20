@@ -1,0 +1,38 @@
+{
+  "id": "light.spi_led_strip",
+  "domain": "light",
+  "platform": "spi_led_strip",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/light/spi_led_strip/",
+  "extends": "base_light.json",
+  "fields": [
+    {
+      "key": "num_leds",
+      "type": "number",
+      "required": false,
+      "lvl": "simple",
+      "default": 1
+    },
+    {
+      "key": "data_rate",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "1MHz",
+      "options": [
+        "80MHz",
+        "40MHz",
+        "20MHz",
+        "10MHz",
+        "5MHz",
+        "2MHz",
+        "1MHz",
+        "200kHz",
+        "75kHz",
+        "1kHz"
+      ]
+    }
+  ]
+}

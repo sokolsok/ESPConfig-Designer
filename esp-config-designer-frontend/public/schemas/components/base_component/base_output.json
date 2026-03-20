@@ -1,0 +1,29 @@
+{
+  "id": "base.output",
+  "domain": "output",
+  "platform": "",
+  "requires": [],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "power_supply",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "advanced",
+      "domain": "power_supply"
+    },
+    {
+      "key": "inverted",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

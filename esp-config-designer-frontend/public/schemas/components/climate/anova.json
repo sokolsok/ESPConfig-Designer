@@ -1,0 +1,28 @@
+{
+  "id": "climate.anova",
+  "domain": "climate",
+  "platform": "anova",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/climate/anova/",
+  "extends": "base_climate.json",
+  "fields": [
+    {
+      "key": "ble_client_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "ble_client"
+    },
+    {
+      "key": "unit_of_measurement",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "c",
+      "options": [
+        "c",
+        "f"
+      ]
+    }
+  ]
+}

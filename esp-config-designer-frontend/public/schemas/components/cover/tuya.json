@@ -1,0 +1,79 @@
+{
+  "id": "cover.tuya",
+  "domain": "cover",
+  "platform": "tuya",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/cover/tuya/",
+  "extends": "base_cover.json",
+  "fields": [
+    {
+      "key": "control_datapoint",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "position_datapoint",
+      "type": "number",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "position_report_datapoint",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "direction_datapoint",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "min_value",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 0
+    },
+    {
+      "key": "max_value",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 255
+    },
+    {
+      "key": "invert_position",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "invert_position_report",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "restore_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "RESTORE",
+      "options": [
+        "RESTORE",
+        "RESTORE_AND_CALL",
+        "NO_RESTORE"
+      ]
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

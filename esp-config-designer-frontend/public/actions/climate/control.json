@@ -1,0 +1,210 @@
+{
+  "id": "climate.control",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Climate",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "climate_id",
+      "domain": "climate",
+      "lvl": "normal"
+    },
+    {
+      "key": "mode",
+      "label": "Mode",
+      "type": "select",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "OFF",
+        "AUTO",
+        "HEAT",
+        "COOL",
+        "HEAT_COOL",
+        "FAN_ONLY",
+        "DRY"
+      ]
+    },
+    {
+      "key": "setpoint_type",
+      "label": "Setpoint type",
+      "type": "select",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "default": "single",
+      "emitYAML": "never",
+      "options": [
+        "single",
+        "range"
+      ]
+    },
+    {
+      "key": "target_temperature",
+      "label": "Target temperature",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "21.5",
+      "lambdaPlaceholder": "return 21.5;",
+      "dependsOn": {
+        "key": "setpoint_type",
+        "value": "single"
+      }
+    },
+    {
+      "key": "target_temperature_low",
+      "label": "Low target temperature",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "19.0",
+      "lambdaPlaceholder": "return 19.0;",
+      "dependsOn": {
+        "key": "setpoint_type",
+        "value": "range"
+      }
+    },
+    {
+      "key": "target_temperature_high",
+      "label": "High target temperature",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "23.0",
+      "lambdaPlaceholder": "return 23.0;",
+      "dependsOn": {
+        "key": "setpoint_type",
+        "value": "range"
+      }
+    },
+    {
+      "key": "target_humidity",
+      "label": "Target humidity",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "45%",
+      "lambdaPlaceholder": "return 45;"
+    },
+    {
+      "key": "preset_type",
+      "label": "Preset type",
+      "type": "select",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "default": "standard",
+      "emitYAML": "never",
+      "options": [
+        "standard",
+        "custom"
+      ]
+    },
+    {
+      "key": "preset",
+      "label": "Preset",
+      "type": "select",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "preset_type",
+        "value": "standard"
+      },
+      "options": [
+        "ECO",
+        "AWAY",
+        "BOOST",
+        "COMFORT",
+        "HOME",
+        "SLEEP",
+        "ACTIVITY"
+      ]
+    },
+    {
+      "key": "custom_preset",
+      "label": "Custom preset",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "movie",
+      "dependsOn": {
+        "key": "preset_type",
+        "value": "custom"
+      }
+    },
+    {
+      "key": "fan_mode_type",
+      "label": "Fan mode type",
+      "type": "select",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "default": "standard",
+      "emitYAML": "never",
+      "options": [
+        "standard",
+        "custom"
+      ]
+    },
+    {
+      "key": "fan_mode",
+      "label": "Fan mode",
+      "type": "select",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "fan_mode_type",
+        "value": "standard"
+      },
+      "options": [
+        "ON",
+        "OFF",
+        "AUTO",
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "MIDDLE",
+        "FOCUS",
+        "DIFFUSE",
+        "QUIET"
+      ]
+    },
+    {
+      "key": "custom_fan_mode",
+      "label": "Custom fan mode",
+      "type": "text",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "turbo",
+      "dependsOn": {
+        "key": "fan_mode_type",
+        "value": "custom"
+      }
+    },
+    {
+      "key": "swing_mode",
+      "label": "Swing mode",
+      "type": "select",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "OFF",
+        "BOTH",
+        "VERTICAL",
+        "HORIZONTAL"
+      ]
+    }
+  ]
+}

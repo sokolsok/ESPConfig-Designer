@@ -1,0 +1,60 @@
+{
+  "id": "sensor.lc709203f",
+  "domain": "sensor",
+  "platform": "lc709203f",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/sensor/lc709203f/",
+  "fields": [
+    {
+      "key": "size",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "voltage",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "3.7"
+    },
+    {
+      "key": "battery_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "battery_level",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "b_constant",
+          "type": "text",
+          "required": true,
+          "lvl": "simple"
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

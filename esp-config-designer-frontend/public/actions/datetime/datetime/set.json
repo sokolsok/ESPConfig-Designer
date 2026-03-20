@@ -1,0 +1,23 @@
+{
+  "id": "datetime.datetime.set",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Datetime",
+      "type": "id_ref",
+      "required": true,
+      "placeholder": "datetime_id",
+      "domain": "datetime",
+      "lvl": "normal"
+    },
+    {
+      "key": "datetime",
+      "label": "Date/time",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "2026-03-17 14:30:00"
+    }
+  ]
+}

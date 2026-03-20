@@ -1,0 +1,17 @@
+{
+  "id": "text_sensor.wl_134",
+  "domain": "text_sensor",
+  "platform": "wl_134",
+  "requires": [],
+  "helpUrl": "https://esphome.io/components/text_sensor/wl_134/",
+  "extends": "base_text_sensor.json",
+  "fields": [
+    {
+      "key": "reset",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "id": "sensor.hdc2010",
+  "domain": "sensor",
+  "platform": "hdc2010",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/hdc2010/",
+  "fields": [
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": true,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "humidity",
+      "type": "object",
+      "required": true,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

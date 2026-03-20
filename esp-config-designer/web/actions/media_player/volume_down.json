@@ -1,0 +1,24 @@
+{
+  "id": "media_player.volume_down",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Media Player",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "media_player_id",
+      "domain": "media_player",
+      "lvl": "normal"
+    },
+    {
+      "key": "step",
+      "label": "Step",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1",
+      "lambdaPlaceholder": "return 1;"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "espnow.peer.add",
+  "fields": [
+    {
+      "key": "mac_address",
+      "label": "MAC address",
+      "type": "text",
+      "templatable": false,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "AA:BB:CC:DD:EE:FF"
+    },
+    {
+      "key": "channel",
+      "label": "Channel",
+      "type": "number",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1",
+      "lambdaPlaceholder": "return 1;"
+    },
+    {
+      "key": "lmk",
+      "label": "LMK",
+      "type": "text",
+      "templatable": false,
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "00112233445566778899AABBCCDDEEFF"
+    },
+    {
+      "key": "encrypt",
+      "label": "Encrypt",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

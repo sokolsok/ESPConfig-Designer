@@ -1,0 +1,14 @@
+{
+  "id": "cs5460a.restart",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Cs5460a",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "cs5460a_id",
+      "domain": "cs5460a",
+      "lvl": "normal"
+    }
+  ]
+}

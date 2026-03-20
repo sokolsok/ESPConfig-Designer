@@ -1,0 +1,64 @@
+{
+  "id": "binary_sensor.mpr121",
+  "domain": "binary_sensor",
+  "platform": "mpr121",
+  "requires": ["i2c"],
+  "helpUrl": "https://esphome.io/components/binary_sensor/mpr121/",
+  "extends": "base_binary_sensor.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "mpr121",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_mpr121.json",
+      "helpUrl": "https://esphome.io/components/binary_sensor/mpr121/#componenthub"
+    },
+    {
+      "key": "name",
+      "placeholder": "Binary Sensor Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
+      "key": "mpr121_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "mpr121",
+      "allowSelfReference": true,
+      "default": "mpr121_hub_id"
+    },
+    {
+      "key": "channel",
+      "type": "number",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "0"
+    },
+    {
+      "key": "touch_threshold",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "12"
+    },
+    {
+      "key": "release_threshold",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "6"
+    }
+  ]
+}

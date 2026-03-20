@@ -1,0 +1,33 @@
+{
+  "id": "midea_ac.follow_me",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Midea AC",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "midea_ac_id",
+      "domain": "midea_ac",
+      "lvl": "normal"
+    },
+    {
+      "key": "temperature",
+      "label": "Temperature",
+      "type": "number",
+      "templatable": true,
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "23",
+      "lambdaPlaceholder": "return 23;"
+    },
+    {
+      "key": "beeper",
+      "label": "Beeper",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "id": "sensor.xgzp68xx",
+  "domain": "sensor",
+  "platform": "xgzp68xx",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/xgzp68xx/",
+  "fields": [
+    {
+      "key": "temperature",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "pressure",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "oversampling",
+          "type": "select",
+          "required": false,
+          "lvl": "normal",
+          "options": [
+            "256x",
+            "512x",
+            "1024x",
+            "2048x",
+            "4096x",
+            "8192x",
+            "16384x",
+            "32768x"
+          ]
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "k_value",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

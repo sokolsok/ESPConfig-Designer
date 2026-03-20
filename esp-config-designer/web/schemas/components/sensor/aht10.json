@@ -1,0 +1,44 @@
+{
+  "id": "sensor.aht10",
+  "domain": "sensor",
+  "platform": "aht10",
+  "requires": [
+    "i2c"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/aht10/",
+  "fields": [
+    {
+      "key": "variant",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "AHT10",
+        "AHT20"
+      ]
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": true,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "humidity",
+      "type": "object",
+      "required": true,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

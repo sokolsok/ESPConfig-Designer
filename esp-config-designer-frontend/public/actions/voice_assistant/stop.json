@@ -1,0 +1,23 @@
+{
+  "id": "voice_assistant.stop",
+  "fields": [
+    {
+      "key": "id",
+      "label": "Voice assistant",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "voice_assistant_id",
+      "domain": "voice_assistant",
+      "lvl": "normal"
+    },
+    {
+      "key": "end_stream",
+      "label": "End stream",
+      "type": "boolean",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    }
+  ]
+}

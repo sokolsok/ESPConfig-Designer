@@ -1,0 +1,86 @@
+{
+  "id": "sensor.cs5460a",
+  "domain": "sensor",
+  "platform": "cs5460a",
+  "requires": [
+    "spi"
+  ],
+  "helpUrl": "https://esphome.io/components/sensor/cs5460a/",
+  "fields": [
+    {
+      "key": "current",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "voltage",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "power",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "samples",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "4000"
+    },
+    {
+      "key": "pga_gain",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "current_gain",
+      "type": "number",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "voltage_gain",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0.001"
+    },
+    {
+      "key": "phase_offset",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0"
+    },
+    {
+      "key": "pulse_energy",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "current_hpf",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "voltage_hpf",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    }
+  ]
+}

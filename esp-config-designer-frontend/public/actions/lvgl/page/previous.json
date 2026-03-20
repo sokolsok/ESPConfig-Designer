@@ -1,0 +1,46 @@
+{
+  "id": "lvgl.page.previous",
+  "fields": [
+    {
+      "key": "animation",
+      "label": "Animation",
+      "type": "select",
+      "templatable": false,
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        "NONE",
+        "OVER_LEFT",
+        "OVER_RIGHT",
+        "OVER_TOP",
+        "OVER_BOTTOM",
+        "MOVE_LEFT",
+        "MOVE_RIGHT",
+        "MOVE_TOP",
+        "MOVE_BOTTOM",
+        "FADE_IN",
+        "FADE_OUT"
+      ]
+    },
+    {
+      "key": "time",
+      "label": "Time",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "300ms",
+      "lambdaPlaceholder": "return 300;"
+    },
+    {
+      "key": "delay",
+      "label": "Delay",
+      "type": "duration",
+      "templatable": true,
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "0ms",
+      "lambdaPlaceholder": "return 0;"
+    }
+  ]
+}
