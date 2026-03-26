@@ -53,5 +53,5 @@ defineProps({
   globalStore: { type: Object, default: () => ({}) }
 });
 
-defineEmits(['update', 'open-secrets']);
+const emit = defineEmits(['update', 'open-secrets']);
 </script>

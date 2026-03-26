@@ -146,7 +146,6 @@
 <script setup>
 import { computed, ref, watch } from "vue";
 import FixedListField from "./schema-fields/FixedListField.vue";
-import GpioField from "./schema-fields/GpioField.vue";
 import ListField from "./schema-fields/ListField.vue";
 import ObjectField from "./schema-fields/ObjectField.vue";
 import PrimitiveField from "./schema-fields/PrimitiveField.vue";
@@ -381,7 +380,7 @@ const iconPickerOpen = ref(false);
 
 // Store icons as mdi:<name>, but show only the name in the picker.
 const iconName = computed(() => {
-  const raw = resolvedValue.value || "";
+  const raw = typeof resolvedValue.value === "string" ? resolvedValue.value : "";
   if (!raw) return "";
   return raw.startsWith("mdi:") ? raw.slice(4) : raw;
 });
