@@ -6,7 +6,6 @@
     "clockless": "fastled_clockless",
     "spi": "fastled_spi"
   },
-  "requires": [],
   "helpUrl": "https://esphome.io/components/light/fastled/",
   "extends": "base_light.json",
   "fields": [

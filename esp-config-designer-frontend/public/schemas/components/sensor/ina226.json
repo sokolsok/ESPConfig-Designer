@@ -2,10 +2,12 @@
   "id": "sensor.ina226",
   "domain": "sensor",
   "platform": "ina226",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/ina226/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

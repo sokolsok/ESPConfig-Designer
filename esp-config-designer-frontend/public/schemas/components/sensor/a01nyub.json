@@ -2,11 +2,13 @@
   "id": "sensor.a01nyub",
   "domain": "sensor",
   "platform": "a01nyub",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/a01nyub/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "name",

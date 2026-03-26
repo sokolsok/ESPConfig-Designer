@@ -2,7 +2,6 @@
   "id": "sensor.pulse_width",
   "domain": "sensor",
   "platform": "pulse_width",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/pulse_width/",
   "extends": "base_sensor.json",
   "fields": [

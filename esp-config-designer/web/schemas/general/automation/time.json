@@ -2,7 +2,6 @@
   "id": "other.time",
   "domain": "time",
   "platform": "core",
-  "requires": [],
   "fields": [
     {
       "key": "time",

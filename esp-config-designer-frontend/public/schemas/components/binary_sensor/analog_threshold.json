@@ -2,7 +2,6 @@
   "id": "binary_sensor.analog_threshold",
   "domain": "binary_sensor",
   "platform": "analog_threshold",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/binary_sensor/analog_threshold/",
   "extends": "base_binary_sensor.json",
   "fields": [

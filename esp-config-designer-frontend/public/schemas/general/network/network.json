@@ -2,7 +2,6 @@
   "id": "network.core",
   "domain": "network",
   "platform": "core",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/#network-hardware",
   "fields": [
     {

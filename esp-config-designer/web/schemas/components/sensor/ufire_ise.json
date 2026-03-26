@@ -2,10 +2,12 @@
   "id": "sensor.ufire_ise",
   "domain": "sensor",
   "platform": "ufire_ise",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/ufire_ise/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "address",

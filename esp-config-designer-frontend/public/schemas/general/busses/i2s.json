@@ -2,7 +2,6 @@
   "id": "busses.i2s",
   "domain": "i2s",
   "platform": "core",
-  "requires": [],
   "fields": [
     {
       "key": "enabled",
@@ -83,8 +82,8 @@
     {
       "key": "id",
       "type": "id",
-      "required": false,
-      "lvl": "normal",
+      "required": true,
+      "lvl": "simple",
       "default": "i2s_id",
       "dependsOn": {
         "key": "enabled",

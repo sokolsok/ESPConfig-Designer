@@ -2,7 +2,6 @@
   "id": "light.tuya",
   "domain": "light",
   "platform": "tuya",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/light/tuya/",
   "extends": "base_light.json",
   "fields": [

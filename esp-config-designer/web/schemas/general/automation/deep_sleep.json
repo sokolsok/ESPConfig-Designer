@@ -2,7 +2,6 @@
   "id": "other.deep_sleep",
   "domain": "deep_sleep",
   "platform": "core",
-  "requires": [],
   "fields": [
     {
       "key": "deep_sleep",

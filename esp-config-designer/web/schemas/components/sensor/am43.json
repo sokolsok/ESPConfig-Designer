@@ -2,7 +2,6 @@
   "id": "sensor.am43",
   "domain": "sensor",
   "platform": "am43",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/am43/",
   "embedded": [
     {

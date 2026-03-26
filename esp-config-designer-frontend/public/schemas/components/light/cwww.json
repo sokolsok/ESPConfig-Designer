@@ -2,7 +2,6 @@
   "id": "light.cwww",
   "domain": "light",
   "platform": "cwww",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/light/cwww/",
   "extends": "base_light.json",
   "fields": [

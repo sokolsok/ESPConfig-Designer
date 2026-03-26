@@ -1,11 +1,12 @@
 {
   "id": "bluetooth_proxy",
   "domain": "bluetooth_proxy",
-  "requires": [
-    "api",
-    "esp32"
-  ],
   "helpUrl": "https://esphome.io/components/bluetooth_proxy/",
+  "requirements": [
+    {
+      "require": "protocol:api"
+    }
+  ],
   "fields": [
     {
       "key": "id",

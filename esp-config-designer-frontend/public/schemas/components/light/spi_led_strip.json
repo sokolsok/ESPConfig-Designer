@@ -2,11 +2,13 @@
   "id": "light.spi_led_strip",
   "domain": "light",
   "platform": "spi_led_strip",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/light/spi_led_strip/",
   "extends": "base_light.json",
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "num_leds",

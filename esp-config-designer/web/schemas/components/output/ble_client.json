@@ -2,7 +2,6 @@
   "id": "output.ble_client",
   "domain": "output",
   "platform": "ble_client",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/output/ble_client/",
   "extends": "base_output.json",
   "fields": [

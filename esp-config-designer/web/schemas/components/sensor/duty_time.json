@@ -2,7 +2,6 @@
   "id": "sensor.duty_time",
   "domain": "sensor",
   "platform": "duty_time",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/duty_time/",
   "fields": [
     {

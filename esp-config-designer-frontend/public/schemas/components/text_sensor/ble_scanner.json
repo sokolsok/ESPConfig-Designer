@@ -2,10 +2,12 @@
   "id": "text_sensor.ble_scanner",
   "domain": "text_sensor",
   "platform": "ble_scanner",
-  "requires": [
-    "esp32_ble_tracker"
-  ],
   "helpUrl": "https://esphome.io/components/text_sensor/ble_scanner/",
   "extends": "base_text_sensor.json",
+  "requirements": [
+    {
+      "require": "component:esp32_ble_tracker"
+    }
+  ],
   "fields": []
 }

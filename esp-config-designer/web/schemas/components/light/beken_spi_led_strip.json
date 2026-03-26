@@ -2,7 +2,6 @@
   "id": "light.beken_spi_led_strip",
   "domain": "light",
   "platform": "beken_spi_led_strip",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/light/beken_spi_led_strip/",
   "extends": "base_light.json",
   "fields": [

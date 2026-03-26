@@ -2,10 +2,12 @@
   "id": "sensor.pmsa003i",
   "domain": "sensor",
   "platform": "pmsa003i",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/pmsa003i/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "address",
@@ -21,11 +23,11 @@
       "lvl": "simple",
       "placeholder": "60s"
     },
-     {
+    {
       "key": "standard_units",
       "type": "boolean",
       "required": false,
-	  "default": true,
+      "default": true,
       "lvl": "normal"
     },
     {

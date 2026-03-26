@@ -6,16 +6,23 @@
     "i2c": "bmp280_i2c",
     "spi": "bmp280_spi"
   },
-  "requiresByBus": {
-    "i2c": [
-      "i2c"
-    ],
-    "spi": [
-      "spi"
-    ]
-  },
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/bmp280/",
+  "requirements": [
+    {
+      "require": "bus:i2c",
+      "when": {
+        "key": "bus",
+        "value": "i2c"
+      }
+    },
+    {
+      "require": "bus:spi",
+      "when": {
+        "key": "bus",
+        "value": "spi"
+      }
+    }
+  ],
   "fields": [
     {
       "key": "name",

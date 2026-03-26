@@ -2,7 +2,6 @@
   "id": "sensor.dht12",
   "domain": "sensor",
   "platform": "dht12",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/dht12/",
   "fields": [
     {

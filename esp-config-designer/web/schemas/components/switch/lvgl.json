@@ -2,7 +2,6 @@
   "id": "switch.lvgl",
   "domain": "switch",
   "platform": "lvgl",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/switch/lvgl/",
   "extends": "base_switch.json",
   "fields": [

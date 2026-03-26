@@ -2,10 +2,12 @@
   "id": "sensor.bl0942",
   "domain": "sensor",
   "platform": "bl0942",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/bl0942/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "voltage",

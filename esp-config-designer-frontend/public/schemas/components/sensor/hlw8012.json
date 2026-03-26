@@ -2,7 +2,6 @@
   "id": "sensor.hlw8012",
   "domain": "sensor",
   "platform": "hlw8012",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/hlw8012/",
   "fields": [
     {

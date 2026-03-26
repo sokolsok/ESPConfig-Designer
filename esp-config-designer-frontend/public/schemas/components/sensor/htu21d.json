@@ -2,10 +2,12 @@
   "id": "sensor.htu21d",
   "domain": "sensor",
   "platform": "htu21d",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/htu21d/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "temperature",

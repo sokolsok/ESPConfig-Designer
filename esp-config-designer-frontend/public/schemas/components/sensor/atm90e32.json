@@ -2,10 +2,12 @@
   "id": "sensor.atm90e32",
   "domain": "sensor",
   "platform": "atm90e32",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/atm90e32/",
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "cs_pin",

@@ -2,11 +2,13 @@
   "id": "sensor.bmi160",
   "domain": "sensor",
   "platform": "bmi160",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/bmi160/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

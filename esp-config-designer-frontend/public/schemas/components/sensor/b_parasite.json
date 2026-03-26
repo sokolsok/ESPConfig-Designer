@@ -2,7 +2,6 @@
   "id": "sensor.b_parasite",
   "domain": "sensor",
   "platform": "b_parasite",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/b_parasite/",
   "fields": [
     {

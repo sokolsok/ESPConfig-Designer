@@ -2,7 +2,6 @@
   "id": "platform.core",
   "domain": "platform",
   "platform": "core",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/#supported-microcontrollers",
   "fields": [
     {

@@ -2,11 +2,13 @@
   "id": "sensor.veml7700",
   "domain": "sensor",
   "platform": "veml7700",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/veml7700/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

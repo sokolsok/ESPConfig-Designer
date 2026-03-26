@@ -6,16 +6,18 @@
     "i2c": "lcd_pcf8574",
     "gpio": "lcd_gpio"
   },
-  "requires": [],
-  "requiresByBus": {
-    "i2c": [
-      "i2c"
-    ],
-    "gpio": []
-  },
   "helpUrl": "https://esphome.io/components/display/lcd_display/",
   "extends": "base_display.json",
   "display_builder": false,
+  "requirements": [
+    {
+      "require": "bus:i2c",
+      "when": {
+        "key": "bus",
+        "value": "i2c"
+      }
+    }
+  ],
   "fields": [
     {
       "key": "bus",

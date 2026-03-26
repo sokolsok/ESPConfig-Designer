@@ -2,11 +2,13 @@
   "id": "sensor.tem3200",
   "domain": "sensor",
   "platform": "tem3200",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/tem3200/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

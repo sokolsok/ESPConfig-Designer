@@ -6,7 +6,6 @@
     "ttp229_bsf": "ttp229_bsf",
     "ttp229_lsf": "ttp229_lsf"
   },
-  "requires": [],
   "helpUrl": "https://esphome.io/components/binary_sensor/ttp229/",
   "extends": "base_binary_sensor.json",
   "embedded": [

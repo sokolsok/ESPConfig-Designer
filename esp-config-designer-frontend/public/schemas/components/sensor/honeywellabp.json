@@ -2,10 +2,12 @@
   "id": "sensor.honeywellabp",
   "domain": "sensor",
   "platform": "honeywellabp",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/honeywellabp/",
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "pressure",

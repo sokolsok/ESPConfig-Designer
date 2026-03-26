@@ -2,7 +2,6 @@
   "id": "valve.template",
   "domain": "valve",
   "platform": "template",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/valve/template/",
   "extends": "base_valve.json",
   "fields": [

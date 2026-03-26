@@ -2,7 +2,6 @@
   "id": "sensor.combination",
   "domain": "sensor",
   "platform": "combination",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/combination/",
   "extends": "base_sensor.json",
   "fields": [

@@ -2,7 +2,6 @@
   "id": "sensor.absolute_humidity",
   "domain": "sensor",
   "platform": "absolute_humidity",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/absolute_humidity/",
   "extends": "base_sensor.json",
   "fields": [

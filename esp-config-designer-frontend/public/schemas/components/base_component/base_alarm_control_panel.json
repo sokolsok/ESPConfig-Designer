@@ -2,7 +2,6 @@
   "id": "base.alarm_control_panel",
   "domain": "alarm_control_panel",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

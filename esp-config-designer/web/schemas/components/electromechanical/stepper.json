@@ -1,7 +1,6 @@
 {
   "id": "stepper",
   "domain": "stepper",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/stepper/",
   "fields": [
     {

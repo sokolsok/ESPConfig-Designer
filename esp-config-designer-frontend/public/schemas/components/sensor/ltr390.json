@@ -2,10 +2,12 @@
   "id": "sensor.ltr390",
   "domain": "sensor",
   "platform": "ltr390",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/ltr390/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "uv_index",

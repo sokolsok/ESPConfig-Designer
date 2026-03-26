@@ -2,10 +2,12 @@
   "id": "hub.pca9685",
   "domain": "pca9685",
   "platform": "",
-  "requires": [
-    "i2c"
-  ],
   "type": "object",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "id",

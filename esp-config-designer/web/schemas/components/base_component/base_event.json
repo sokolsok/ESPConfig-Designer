@@ -2,7 +2,6 @@
   "id": "base.event",
   "domain": "event",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

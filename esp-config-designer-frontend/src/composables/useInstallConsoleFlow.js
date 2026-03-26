@@ -1,5 +1,21 @@
 import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
-import { ESPLoader, Transport } from "esptool-js";
+
+let esptoolModule = null;
+let esptoolModulePromise = null;
+
+const ensureEsptoolModule = async () => {
+  if (esptoolModule) return esptoolModule;
+  if (esptoolModulePromise) return esptoolModulePromise;
+  esptoolModulePromise = import("esptool-js")
+    .then((module) => {
+      esptoolModule = module;
+      return module;
+    })
+    .finally(() => {
+      esptoolModulePromise = null;
+    });
+  return esptoolModulePromise;
+};
 
 export const useInstallConsoleFlow = (options) => {
   const compileModalOpen = ref(false);
@@ -618,6 +634,7 @@ export const useInstallConsoleFlow = (options) => {
       }
 
       appendCompileLogLine("INFO Starting flash...");
+      const { ESPLoader, Transport } = await ensureEsptoolModule();
       transport = new Transport(port);
       if (!transport.device) {
         transport.device = port;

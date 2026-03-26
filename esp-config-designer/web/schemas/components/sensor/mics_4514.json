@@ -2,10 +2,12 @@
   "id": "sensor.mics_4514",
   "domain": "sensor",
   "platform": "mics_4514",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/mics_4514/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "update_interval",

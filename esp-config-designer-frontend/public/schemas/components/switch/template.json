@@ -2,7 +2,6 @@
   "id": "switch.template",
   "domain": "switch",
   "platform": "template",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/switch/template/",
   "extends": "base_switch.json",
   "fields": [

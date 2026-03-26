@@ -2,9 +2,6 @@
   "id": "output.pca9685",
   "domain": "output",
   "platform": "pca9685",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/output/pca9685/",
   "extends": "base_output_float.json",
   "embedded": [
@@ -12,6 +9,11 @@
       "key": "hub",
       "domain": "pca9685",
       "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:i2c"
     }
   ],
   "fields": [

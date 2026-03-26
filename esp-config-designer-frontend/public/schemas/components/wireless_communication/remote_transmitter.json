@@ -1,7 +1,6 @@
 {
   "id": "remote_transmitter",
   "domain": "remote_transmitter",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/remote_transmitter/",
   "fields": [
     {

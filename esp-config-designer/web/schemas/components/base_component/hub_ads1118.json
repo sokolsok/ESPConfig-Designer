@@ -2,10 +2,12 @@
   "id": "hub.ads1118",
   "domain": "ads1118",
   "platform": "",
-  "requires": [
-    "spi"
-  ],
   "type": "object",
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "cs_pin",

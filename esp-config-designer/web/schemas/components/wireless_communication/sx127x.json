@@ -1,10 +1,12 @@
 {
   "id": "sx127x",
   "domain": "sx127x",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/sx127x/",
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "id",

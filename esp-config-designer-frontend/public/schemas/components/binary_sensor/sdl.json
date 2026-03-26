@@ -2,7 +2,6 @@
   "id": "binary_sensor.sdl",
   "domain": "binary_sensor",
   "platform": "sdl",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/binary_sensor/sdl/",
   "extends": "base_binary_sensor.json",
   "fields": [

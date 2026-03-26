@@ -2,7 +2,6 @@
   "id": "sensor.tx20",
   "domain": "sensor",
   "platform": "tx20",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/tx20/",
   "fields": [
     {

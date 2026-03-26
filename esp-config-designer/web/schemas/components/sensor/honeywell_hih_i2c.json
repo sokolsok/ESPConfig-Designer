@@ -2,10 +2,12 @@
   "id": "sensor.honeywell_hih_i2c",
   "domain": "sensor",
   "platform": "honeywell_hih_i2c",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/honeywell_hih_i2c/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "temperature",

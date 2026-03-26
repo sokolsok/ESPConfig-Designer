@@ -2,10 +2,12 @@
   "id": "sensor.ags10",
   "domain": "sensor",
   "platform": "ags10",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/ags10/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "address",

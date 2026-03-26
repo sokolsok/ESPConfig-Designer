@@ -2,10 +2,12 @@
   "id": "sensor.sps30",
   "domain": "sensor",
   "platform": "sps30",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/sps30/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "address",

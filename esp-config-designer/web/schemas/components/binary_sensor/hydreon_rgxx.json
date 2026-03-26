@@ -2,7 +2,6 @@
   "id": "binary_sensor.hydreon_rgxx",
   "domain": "binary_sensor",
   "platform": "hydreon_rgxx",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/binary_sensor/hydreon_rgxx/",
   "fields": [
     {

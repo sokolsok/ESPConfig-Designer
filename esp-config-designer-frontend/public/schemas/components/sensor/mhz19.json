@@ -2,10 +2,12 @@
   "id": "sensor.mhz19",
   "domain": "sensor",
   "platform": "mhz19",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/mhz19/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "update_interval",

@@ -2,7 +2,6 @@
   "id": "base.text",
   "domain": "text",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

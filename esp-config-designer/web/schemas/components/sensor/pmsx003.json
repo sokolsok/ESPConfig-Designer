@@ -2,10 +2,12 @@
   "id": "sensor.pmsx003",
   "domain": "sensor",
   "platform": "pmsx003",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/pmsx003/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "type",

@@ -2,9 +2,6 @@
   "id": "display.mipi_spi",
   "domain": "display",
   "platform": "mipi_spi",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/display/mipi_spi/",
   "extends": "base_display.json",
   "display_builder": true,
@@ -19,6 +16,11 @@
       "h": 320
     }
   },
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "model",

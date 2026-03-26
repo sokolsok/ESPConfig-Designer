@@ -2,7 +2,6 @@
   "id": "sensor.zyaura",
   "domain": "sensor",
   "platform": "zyaura",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/zyaura/",
   "fields": [
     {

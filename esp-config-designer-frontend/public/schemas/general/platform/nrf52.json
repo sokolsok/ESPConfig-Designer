@@ -2,7 +2,6 @@
   "id": "platform.nrf52",
   "domain": "platform",
   "platform": "nrf52",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/nrf52/",
   "fields": [
     {

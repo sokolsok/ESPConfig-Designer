@@ -2,11 +2,13 @@
   "id": "sensor.ld2420",
   "domain": "sensor",
   "platform": "ld2420",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/ld2420/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "name",

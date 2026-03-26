@@ -2,7 +2,6 @@
   "id": "switch.ble_client",
   "domain": "switch",
   "platform": "ble_client",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/switch/ble_client/",
   "extends": "base_switch.json",
   "fields": [

@@ -2,7 +2,6 @@
   "id": "hub.esp32_touch",
   "domain": "esp32_touch",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

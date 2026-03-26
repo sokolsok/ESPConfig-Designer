@@ -2,7 +2,6 @@
   "id": "sensor.tuya",
   "domain": "sensor",
   "platform": "tuya",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/tuya/",
   "extends": "base_sensor.json",
   "fields": [

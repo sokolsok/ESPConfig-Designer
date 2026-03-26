@@ -2,7 +2,6 @@
   "id": "light.rp2040_pio_led_strip",
   "domain": "light",
   "platform": "rp2040_pio_led_strip",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/light/rp2040_pio_led_strip/",
   "extends": "base_light.json",
   "fields": [

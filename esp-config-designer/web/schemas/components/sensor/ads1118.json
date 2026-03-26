@@ -2,9 +2,6 @@
   "id": "sensor.ads1118",
   "domain": "sensor",
   "platform": "ads1118",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/ads1118/",
   "extends": "base_sensor.json",
   "embedded": [
@@ -12,6 +9,11 @@
       "key": "hub",
       "domain": "ads1118",
       "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:spi"
     }
   ],
   "fields": [

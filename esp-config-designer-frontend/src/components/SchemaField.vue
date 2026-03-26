@@ -1,495 +1,156 @@
 <template>
-  <div v-if="isObjectField" class="schema-group schema-object-group">
-    <div class="schema-group-title">
-      <span>{{ fieldLabel }}</span>
-    </div>
-    <div class="schema-levels">
-      <SchemaField
-        v-for="child in visibleObjectFields"
-        :key="child.key"
-        :field="child"
-        :path="fieldPath"
-        :value="value"
-        :root-value="rootValue || value"
-        :mode-level="modeLevel"
-        :id-registry="idRegistry"
-        :name-registry="nameRegistry"
-        :id-index="idIndex"
-        :gpio-options="gpioOptions"
-        :gpio-usage="gpioUsage"
-        :gpio-title="gpioTitle"
-        :context-component-id="contextComponentId"
-        :context-scope-id="contextScopeId"
-        :global-store="globalStore"
-        @update="emitUpdate"
-        @open-secrets="emitOpenSecrets"
-      />
-    </div>
-  </div>
-  <div
+  <ObjectField
+    v-if="isObjectField"
+    :field-label="fieldLabel"
+    :field-path="fieldPath"
+    :visible-object-fields="visibleObjectFields"
+    :value="value"
+    :root-value="rootValue"
+    :mode-level="modeLevel"
+    :id-registry="idRegistry"
+    :name-registry="nameRegistry"
+    :id-index="idIndex"
+    :gpio-options="gpioOptions"
+    :gpio-usage="gpioUsage"
+    :gpio-title="gpioTitle"
+    :context-component-id="contextComponentId"
+    :context-scope-id="contextScopeId"
+    :global-store="globalStore"
+    @update="emitUpdate"
+    @open-secrets="emitOpenSecrets"
+  />
+  <FixedListField
+    v-else-if="isFixedListField"
+    :field-label="fieldLabel"
+    :field-path="fieldPath"
+    :fixed-list-value="fixedListValue"
+    :fixed-list-child-field="fixedListChildField"
+    :root-value="rootValue"
+    :value="value"
+    :mode-level="modeLevel"
+    :id-registry="idRegistry"
+    :name-registry="nameRegistry"
+    :id-index="idIndex"
+    :gpio-options="gpioOptions"
+    :gpio-usage="gpioUsage"
+    :gpio-title="gpioTitle"
+    :context-component-id="contextComponentId"
+    :context-scope-id="contextScopeId"
+    :global-store="globalStore"
+    @update="emitUpdate"
+    @open-secrets="emitOpenSecrets"
+  />
+  <ListField
+    v-else-if="isListField"
+    :field="field"
+    :field-label="fieldLabel"
+    :field-path="fieldPath"
+    :value="value"
+    :root-value="rootValue"
+    :mode-level="modeLevel"
+    :id-registry="idRegistry"
+    :name-registry="nameRegistry"
+    :id-index="idIndex"
+    :gpio-options="gpioOptions"
+    :gpio-usage="gpioUsage"
+    :gpio-title="gpioTitle"
+    :context-component-id="contextComponentId"
+    :context-scope-id="contextScopeId"
+    :global-store="globalStore"
+    @update="emitUpdate"
+    @open-secrets="emitOpenSecrets"
+  />
+  <PrimitiveField
     v-else
-    class="schema-field"
-    :class="{
-      'schema-field--stacked': hasInlineNote,
-      'schema-field--custom-config': field.key === 'custom_config'
-    }"
-  >
-      <label v-if="!isListField && !field.hideLabel" :for="inputId">
-      {{ fieldLabel }}<span v-if="field.required" class="schema-required">*</span>
-      <a
-        v-if="field.helpUrl"
-        class="filter-help"
-        :href="field.helpUrl"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Field help"
-      >
-        ?
-      </a>
-      </label>
-
-    <select
-      v-if="isBooleanField"
-      :id="inputId"
-      :value="booleanDisplayValue"
-      @change="onBooleanSelect"
-    >
-      <option :value="booleanDisplayValue" hidden>{{ booleanSelectedLabel }}</option>
-      <option value="__opt_true">{{ booleanTrueOptionLabel }}</option>
-      <option value="__opt_false">{{ booleanFalseOptionLabel }}</option>
-    </select>
-
-      <div
-        v-else-if="isListField"
-        class="schema-list"
-        :class="[listLevelClass, { 'is-empty': listValue.length === 0 }, { 'schema-list--compact': isCompactListField }]"
-      >
-      <div class="schema-list-header">
-        <div class="schema-list-title">
-          <span>{{ fieldLabel }}</span>
-          <button type="button" class="secondary compact btn-add schema-list-add" @click="handleAddListItem">
-            Add
-          </button>
-          <span v-if="field.required" class="schema-required">*</span>
-        </div>
-      </div>
-      <div v-if="listValue.length === 0" class="note">No items yet</div>
-      <div v-for="(item, index) in listValue" :key="index" class="schema-list-item">
-        <template v-if="isCatalogListField">
-          <div class="components-header">
-            <div class="filter-title-row">
-              <h3 class="filter-title">{{ entryLabel(item) }}</h3>
-              <a
-                v-if="entryDocLink(item)"
-                class="filter-help"
-                :href="entryDocLink(item)"
-                target="_blank"
-                rel="noopener noreferrer"
-                :aria-label="catalogDocLabel"
-              >
-                ?
-              </a>
-            </div>
-          </div>
-          <div class="schema-grid" v-if="entryFields(item).length">
-            <SchemaField
-              v-for="child in entryFields(item)"
-              :key="child.key"
-              :field="child"
-              :path="[]"
-              :value="item.config || {}"
-              :root-value="rootValue || value"
-              :mode-level="modeLevel"
-              :id-registry="idRegistry"
-              :name-registry="nameRegistry"
-              :id-index="idIndex"
-              :gpio-options="gpioOptions"
-              :gpio-usage="gpioUsage"
-              :gpio-title="gpioTitle"
-              :context-component-id="contextComponentId"
-              :context-scope-id="contextScopeId"
-              :global-store="globalStore"
-              @update="(payload) => updateCatalogEntryConfig(index, payload)"
-            />
-          </div>
-          <div v-else class="note">Brak pol konfiguracyjnych.</div>
-          <div v-if="item?.definitionError" class="field-error">
-            {{ item.definitionError }}
-            <button
-              type="button"
-              class="secondary compact btn-standard"
-              :disabled="retryActionIndex === index"
-              @click="retryCatalogEntryDefinition(index)"
-            >
-              {{ retryActionIndex === index ? "Retrying..." : "Retry" }}
-            </button>
-          </div>
-        </template>
-        <template v-else-if="isObjectListItem">
-          <div class="schema-levels">
-            <SchemaField
-              v-for="child in visibleListItemFields(item)"
-              :key="`${index}-${child.key}`"
-              :field="child"
-              :path="[]"
-              :value="item || {}"
-              :root-value="rootValue || value"
-              :mode-level="modeLevel"
-              :id-registry="idRegistry"
-              :name-registry="nameRegistry"
-              :id-index="idIndex"
-              :gpio-options="gpioOptions"
-              :gpio-usage="gpioUsage"
-              :gpio-title="gpioTitle"
-              :context-component-id="contextComponentId"
-              :context-scope-id="contextScopeId"
-              :global-store="globalStore"
-              @update="(payload) => updateListObjectItem(index, payload)"
-              @open-secrets="emitOpenSecrets"
-            />
-          </div>
-        </template>
-        <select
-          v-else-if="isBooleanListItem"
-          :id="listInputId(index)"
-          :value="booleanListDisplayValue(item)"
-          @change="(event) => onBooleanListSelect(index, event)"
-        >
-          <option :value="booleanListDisplayValue(item)" hidden>
-            {{ booleanListSelectedLabel(item) }}
-          </option>
-          <option value="__opt_true">{{ booleanListTrueOptionLabel }}</option>
-          <option value="__opt_false">{{ booleanListFalseOptionLabel }}</option>
-        </select>
-        <select
-          v-else-if="isSelectListItem"
-          :id="listInputId(index)"
-          :value="item ?? ''"
-          @change="(event) => onSelectListChange(index, event)"
-        >
-          <option v-if="showSelectedListOption(item)" :value="item" hidden>
-            {{ listSelectedOptionLabel(item) }}
-          </option>
-          <option v-if="!field.required" value="">--</option>
-          <option
-            v-for="(option, optionIndex) in field.item?.options || []"
-            :key="option"
-            :value="selectListOptionToken(optionIndex)"
-          >
-            {{ selectListOptionDropdownLabel(option) }}
-          </option>
-        </select>
-        <div v-else-if="isGpioListItem" class="schema-gpio-input">
-          <input
-            :id="listInputId(index)"
-            type="text"
-            :placeholder="field.item?.placeholder || field.placeholder"
-            :value="item ?? ''"
-            @input="(event) => updateListPrimitive(index, event.target.value)"
-          />
-          <button
-            type="button"
-            class="secondary compact schema-icon-btn"
-            aria-label="Open GPIO picker"
-            @click="openListGpioPicker(index)"
-          >
-            <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/chip.svg" alt="" />
-          </button>
-        </div>
-        <input
-          v-else
-          :id="listInputId(index)"
-          :type="listInputType"
-          :value="item ?? ''"
-          @input="(event) => updateListPrimitive(index, event.target.value)"
-        />
-        <div
-          class="schema-list-actions"
-          :class="{ 'schema-list-actions--catalog': isCatalogListField }"
-        >
-          <button type="button" class="secondary compact btn-standard" @click="removeListItem(index)">
-            {{ listRemoveLabel }}
-          </button>
-        </div>
-      </div>
-      <PickerModal
-        v-if="isCatalogListField"
-        :open="catalogPickerOpen"
-        :items="catalogItems"
-        :sections="catalogSections"
-        :use-sections="useCatalogSections"
-        :title="catalogPickerTitle"
-        :help-url="catalogHelpUrl"
-        :help-label="catalogDocLabel"
-        :search-placeholder="catalogSearchPlaceholder"
-        :empty-label="catalogEmptyLabel"
-        @close="catalogPickerOpen = false"
-        @select="addCatalogEntry"
-      />
-      <GpioPickerModal
-        :open="gpioListPickerOpen"
-        :options="gpioOptions"
-        :usage="gpioUsage"
-        :selected="gpioListSelected"
-        :initial-query="gpioListSelected"
-        :title="gpioTitle"
-        @close="gpioListPickerOpen = false"
-        @select="handleListGpioSelect"
-      />
-    </div>
-
-    <div v-else-if="isIconField" class="schema-icon">
-      <div class="schema-icon-row">
-        <input
-          :id="inputId"
-          type="text"
-          :value="iconValue"
-          :placeholder="field.placeholder"
-          @input="onIconInput"
-        />
-        <button type="button" class="secondary compact schema-icon-btn" @click="openIconPicker">
-          <img :src="iconButtonUrl" alt="Add icon" />
-        </button>
-      </div>
-      <IconPicker
-        :open="iconPickerOpen"
-        :selected="iconName"
-        :initial-query="iconName"
-        @close="handleIconClose"
-        @select="handleIconSelect"
-      />
-    </div>
-
-    <div v-else-if="isTemplatableField" class="schema-templatable">
-      <div class="schema-templatable-toolbar">
-        <button
-          type="button"
-          class="secondary compact btn-standard"
-          :class="{ 'is-active': templatableMode === 'literal' }"
-          @click="setTemplatableMode('literal')"
-        >
-          Value
-        </button>
-        <button
-          type="button"
-          class="secondary compact btn-standard"
-          :class="{ 'is-active': templatableMode === 'lambda' }"
-          @click="setTemplatableMode('lambda')"
-        >
-          Lambda
-        </button>
-      </div>
-      <SchemaField
-        :field="templatableEditorField"
-        :path="[]"
-        :value="templatableEditorValue"
-        :root-value="rootValue || value"
-        :mode-level="modeLevel"
-        :id-registry="idRegistry"
-        :name-registry="nameRegistry"
-        :id-index="idIndex"
-        :gpio-options="gpioOptions"
-        :gpio-usage="gpioUsage"
-        :gpio-title="gpioTitle"
-        :context-component-id="contextComponentId"
-        :context-scope-id="contextScopeId"
-        :global-store="globalStore"
-        @update="handleTemplatableEditorUpdate"
-        @open-secrets="emitOpenSecrets"
-      />
-    </div>
-
-    <textarea
-      v-else-if="isYamlField"
-      :id="inputId"
-      :value="resolvedValue"
-      :rows="textAreaRows"
-      wrap="off"
-      class="lambda-textarea"
-      @input="onInput"
-    ></textarea>
-
-    <textarea
-      v-else-if="isLambdaField"
-      :id="inputId"
-      :value="resolvedValue"
-      :rows="textAreaRows"
-      wrap="off"
-      class="lambda-textarea"
-      @input="onInput"
-    ></textarea>
-
-    <div v-else-if="isSearchableSelect" class="schema-search-select">
-      <input
-        :id="inputId"
-        type="text"
-        :value="resolvedValue"
-        :placeholder="field.placeholder"
-        :class="{ 'field-invalid': searchSelectInvalid }"
-        @focus="openSearch"
-        @blur="closeSearch"
-        @input="onSearchInput"
-      />
-      <div v-if="showSearchOptions" class="schema-search-options">
-        <button
-          v-for="option in searchOptions"
-          :key="option"
-          type="button"
-          class="schema-search-option"
-          @mousedown.prevent="chooseSearchOption(option)"
-        >
-          {{ option }}
-        </button>
-      </div>
-    </div>
-
-    <select v-else-if="isSelectField" :id="inputId" :value="resolvedValue" @change="onSelect">
-      <option v-if="showSelectedOption" :value="resolvedValue" hidden>
-        {{ selectedOptionLabel }}
-      </option>
-      <option v-if="field.placeholder" value="" disabled>
-        {{ field.placeholder }}
-      </option>
-      <option
-        v-for="(option, optionIndex) in selectOptions"
-        :key="option"
-        :value="selectOptionToken(optionIndex)"
-      >
-        {{ selectOptionDropdownLabel(option) }}
-      </option>
-    </select>
-
-    <div v-else-if="isIdField" class="schema-id">
-      <input
-        :id="inputId"
-        type="text"
-        :value="resolvedValue"
-        :maxlength="24"
-        :placeholder="field.placeholder"
-        :class="{ 'field-invalid': fieldError }"
-        @input="onInput"
-      />
-    </div>
-
-    <div v-else-if="isIdRefField" class="schema-id">
-      <input
-        :id="inputId"
-        type="text"
-        :value="resolvedValue"
-        :placeholder="field.placeholder"
-        :class="{ 'field-invalid': idRefError }"
-        @focus="openIdRef"
-        @blur="scheduleCloseIdRef"
-        @input="onIdRefInput"
-      />
-      <div v-if="idRefOpen && idRefOptions.length" class="id-ref-list">
-        <button
-          v-for="option in idRefOptions"
-          :key="option"
-          type="button"
-          class="id-ref-option"
-          @mousedown.prevent="selectIdRef(option)"
-        >
-          {{ option }}
-        </button>
-      </div>
-    </div>
-
-    <div v-else-if="isGpioField" class="schema-gpio">
-      <div class="schema-gpio-input">
-        <input
-          :id="inputId"
-          type="text"
-          :value="resolvedValue"
-          :placeholder="field.placeholder"
-          @input="onInput"
-        />
-        <button
-          type="button"
-          class="secondary compact schema-icon-btn"
-          aria-label="Open GPIO picker"
-          @click="openGpioPicker"
-        >
-          <img src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/chip.svg" alt="" />
-        </button>
-      </div>
-      <GpioPickerModal
-        :open="gpioPickerOpen"
-        :options="gpioOptions"
-        :usage="gpioUsage"
-        :selected="gpioPickerSelected"
-        :initial-query="resolvedValue"
-        :title="gpioTitle"
-        @close="gpioPickerOpen = false"
-        @select="handleGpioSelect"
-      />
-    </div>
-
-    <div v-else-if="showInlineAction" class="inline">
-      <input
-        :id="inputId"
-        :type="inputType"
-        :value="resolvedValue"
-        :placeholder="field.placeholder"
-        :class="{ 'field-invalid': fieldError }"
-        @input="onInput"
-      />
-      <button
-        type="button"
-        class="secondary icon-button"
-        :aria-label="showSecretAction ? 'Secret reference' : 'Generate'"
-        @click="showSecretAction ? handleSecretClick() : handleGenerate()"
-      >
-        <img
-          :src="showSecretAction ? 'https://cdn.jsdelivr.net/npm/@mdi/svg/svg/file-key-outline.svg' : 'https://cdn.jsdelivr.net/npm/@mdi/svg/svg/lock-reset.svg'"
-          alt=""
-          class="icon-button-img"
-        />
-      </button>
-    </div>
-
-    <input
-      v-else
-      :id="inputId"
-      :type="inputType"
-      :value="resolvedValue"
-      :placeholder="field.placeholder"
-      :class="{ 'field-invalid': fieldError }"
-      @input="onInput"
-    />
-    <div v-if="fieldError" class="field-error">{{ fieldError }}</div>
-    <div
-      v-if="fieldNotice"
-      :class="[
-        'field-note',
-        'notice',
-        fieldNotice.variant === 'warning' ? 'notice--warning' : '',
-        fieldNotice.variant === 'error' ? 'notice--error' : ''
-      ]"
-    >
-      {{ fieldNotice.text }}
-    </div>
-    <div v-if="idRefError" class="field-error">{{ idRefError }}</div>
-  </div>
+    :field="field"
+    :field-label="fieldLabel"
+    :has-inline-note="hasInlineNote"
+    :input-id="inputId"
+    :field-notice="fieldNotice"
+    :is-boolean-field="isBooleanField"
+    :boolean-display-value="booleanDisplayValue"
+    :boolean-selected-label="booleanSelectedLabel"
+    :boolean-true-option-label="booleanTrueOptionLabel"
+    :boolean-false-option-label="booleanFalseOptionLabel"
+    :on-boolean-select="onBooleanSelect"
+    :is-icon-field="isIconField"
+    :icon-value="iconValue"
+    :on-icon-input="onIconInput"
+    :open-icon-picker="openIconPicker"
+    :icon-button-url="iconButtonUrl"
+    :icon-picker-open="iconPickerOpen"
+    :icon-name="iconName"
+    :handle-icon-close="handleIconClose"
+    :handle-icon-select="handleIconSelect"
+    :is-templatable-field="isTemplatableField"
+    :templatable-mode="templatableMode"
+    :set-templatable-mode="setTemplatableMode"
+    :templatable-editor-field="templatableEditorField"
+    :templatable-editor-value="templatableEditorValue"
+    :handle-templatable-editor-update="handleTemplatableEditorUpdate"
+    :root-value="rootValue"
+    :value="value"
+    :mode-level="modeLevel"
+    :id-registry="idRegistry"
+    :name-registry="nameRegistry"
+    :id-index="idIndex"
+    :gpio-options="gpioOptions"
+    :gpio-usage="gpioUsage"
+    :gpio-title="gpioTitle"
+    :context-component-id="contextComponentId"
+    :context-scope-id="contextScopeId"
+    :global-store="globalStore"
+    :is-yaml-field="isYamlField"
+    :is-lambda-field="isLambdaField"
+    :resolved-value="resolvedValue"
+    :text-area-rows="textAreaRows"
+    :on-input="onInput"
+    :is-searchable-select="isSearchableSelect"
+    :search-select-invalid="searchSelectInvalid"
+    :open-search="openSearch"
+    :close-search="closeSearch"
+    :on-search-input="onSearchInput"
+    :show-search-options="showSearchOptions"
+    :search-options="searchOptions"
+    :choose-search-option="chooseSearchOption"
+    :is-select-field="isSelectField"
+    :on-select="onSelect"
+    :show-selected-option="showSelectedOption"
+    :selected-option-label="selectedOptionLabel"
+    :select-options="selectOptions"
+    :select-option-token="selectOptionToken"
+    :select-option-dropdown-label="selectOptionDropdownLabel"
+    :is-id-field="isIdField"
+    :field-error="fieldError"
+    :is-id-ref-field="isIdRefField"
+    :id-ref-error="idRefError"
+    :id-ref-open="idRefOpen"
+    :open-id-ref="openIdRef"
+    :schedule-close-id-ref="scheduleCloseIdRef"
+    :on-id-ref-input="onIdRefInput"
+    :id-ref-options="idRefOptions"
+    :select-id-ref="selectIdRef"
+    :is-gpio-field="isGpioField"
+    :field-path="fieldPath"
+    :wrap-input-value="wrapInputValue"
+    :show-inline-action="showInlineAction"
+    :input-type="inputType"
+    :show-secret-action="showSecretAction"
+    :handle-secret-click="handleSecretClick"
+    :handle-generate="handleGenerate"
+    @update="emitUpdate"
+    @open-secrets="emitOpenSecrets"
+  />
 </template>
 
 <script setup>
 import { computed, ref, watch } from "vue";
-import IconPicker from "./IconPicker.vue";
-import PickerModal from "./PickerModal.vue";
-import GpioPickerModal from "./GpioPickerModal.vue";
+import FixedListField from "./schema-fields/FixedListField.vue";
+import GpioField from "./schema-fields/GpioField.vue";
+import ListField from "./schema-fields/ListField.vue";
+import ObjectField from "./schema-fields/ObjectField.vue";
+import PrimitiveField from "./schema-fields/PrimitiveField.vue";
 import { isFieldVisible } from "../utils/schemaVisibility";
-import {
-  actionIdToSchemaUrl,
-  loadActionCatalog,
-  loadActionDefinition,
-  conditionIdToSchemaUrl,
-  loadConditionCatalog,
-  loadConditionDefinition,
-  loadFilterCatalog
-} from "../utils/schemaLoader";
-import { buildActionSections } from "../utils/actionCatalogSections";
-import { buildConditionSections } from "../utils/conditionCatalogSections";
 import {
   generateFieldValue,
   normalizeSlugValue,
@@ -505,6 +166,10 @@ import {
 } from "../utils/schemaTemplatable";
 
 defineOptions({ name: "SchemaField" });
+
+// SchemaField is now a thin dispatcher for schema-driven field families.
+// The goal is to keep one public component contract for the rest of Builder while
+// moving the heavy rendering branches into smaller field-specific components.
 
 const props = defineProps({
   field: {
@@ -620,6 +285,7 @@ const selectOptions = computed(() => {
   }
   return props.field.options || [];
 });
+const isFixedListField = computed(() => props.field.type === "fixed_list");
 const isListField = computed(() => props.field.type === "list");
 const isIconField = computed(() => props.field.type === "icon");
 const isYamlField = computed(() =>
@@ -649,22 +315,18 @@ const hasGenerate = computed(() => generationSpec.value.mode !== "none");
 const hasSecretReference = computed(() => /^\s*!secret\b/.test(String(resolvedValue.value || "")));
 const showSecretAction = computed(() => hasSecretReference.value);
 const showInlineAction = computed(() => hasGenerate.value || hasSecretReference.value);
-const isFilterListField = computed(
-  () => props.field.type === "list" && props.field.item?.extends === "base_filters.json"
-);
-const isActionListField = computed(
-  () => props.field.type === "list" && props.field.item?.extends === "base_actions.json"
-);
-const isConditionListField = computed(
-  () => props.field.type === "list" && props.field.item?.extends === "base_conditions.json"
-);
-// Catalog-backed list (filters/actions).
-const isCatalogListField = computed(
-  () => isFilterListField.value || isActionListField.value || isConditionListField.value
-);
-const isCompactListField = computed(() =>
-  props.field?.listStyle === "compact" || props.field?.compact === true || props.field?.key === "then"
-);
+const fixedListLength = computed(() => {
+  const explicit = Number(props.field?.length);
+  return Number.isInteger(explicit) && explicit > 0 ? explicit : 0;
+});
+
+const normalizeFixedListValue = (value) => {
+  const source = Array.isArray(value) ? value.slice(0, fixedListLength.value) : [];
+  while (source.length < fixedListLength.value) {
+    source.push("");
+  }
+  return source;
+};
 
 // Normalize list values to an array for list renderers.
 const listValue = computed(() => {
@@ -672,379 +334,21 @@ const listValue = computed(() => {
   if (Array.isArray(props.field.default)) return props.field.default;
   return [];
 });
+const fixedListValue = computed(() => normalizeFixedListValue(listValue.value));
 
-const listItemType = computed(() => props.field.item?.type || "text");
-const isObjectListItem = computed(() => listItemType.value === "object");
-const isBooleanListItem = computed(() => listItemType.value === "boolean");
-const isSelectListItem = computed(() => listItemType.value === "select");
-const isGpioListItem = computed(() => listItemType.value === "gpio");
+const fixedListItemLabel = (index) => {
+  const labels = Array.isArray(props.field?.labels) ? props.field.labels : [];
+  const explicit = typeof labels[index] === "string" ? labels[index].trim() : "";
+  return explicit || `${props.field.item?.labelPrefix || "Item"} ${index + 1}`;
+};
 
-const listInputType = computed(() =>
-  listItemType.value === "number" ? "number" : "text"
-);
-
-const listRemoveLabel = computed(() => {
-  if (typeof props.field?.removeLabel === "string" && props.field.removeLabel.trim()) {
-    return props.field.removeLabel.trim();
-  }
-  if (isActionListField.value) return "Remove action";
-  if (isFilterListField.value) return "Remove filter";
-  if (props.field?.key === "on_value_range") return "Remove whole range";
-  return "Remove";
+const fixedListChildField = (index) => ({
+  ...(props.field?.item || {}),
+  key: "value",
+  label: fixedListItemLabel(index),
+  required: props.field?.required === true,
+  helpUrl: props.field?.item?.helpUrl || props.field?.helpUrl
 });
-
-const catalogPickerOpen = ref(false);
-const catalogData = ref([]);
-const catalogLoading = ref(false);
-
-const allowedActionDomains = computed(() => {
-  if (!isActionListField.value) return null;
-  const allowed = Array.isArray(props.field.actions) ? props.field.actions : null;
-  return allowed && allowed.length ? allowed : null;
-});
-
-const catalogItems = computed(() => {
-  if (!isCatalogListField.value) return [];
-  if (isConditionListField.value) return catalogData.value;
-  if (!isActionListField.value || !allowedActionDomains.value) return catalogData.value;
-  return catalogData.value.filter((action) => allowedActionDomains.value.includes(action.domain));
-});
-
-const catalogSections = computed(() => {
-  if (isConditionListField.value) return buildConditionSections(catalogItems.value);
-  if (!isActionListField.value) return [];
-  return buildActionSections(catalogItems.value);
-});
-
-const useCatalogSections = computed(() => isActionListField.value || isConditionListField.value);
-
-const catalogPickerTitle = computed(() => {
-  if (isFilterListField.value) return "Choose filter";
-  if (isConditionListField.value) return "Choose condition";
-  return "Choose action";
-});
-const catalogHelpUrl = computed(() =>
-  isFilterListField.value
-    ? "https://esphome.io/components/sensor/#sensor-filters"
-    : isConditionListField.value
-      ? "https://esphome.io/automations/actions/#conditions"
-      : "https://esphome.io/automations/actions/"
-);
-const catalogDocLabel = computed(() =>
-  isFilterListField.value
-    ? "Filter documentation"
-    : isConditionListField.value
-      ? "Condition documentation"
-      : "Action documentation"
-);
-const catalogSearchPlaceholder = computed(() =>
-  isFilterListField.value
-    ? "Search filters"
-    : isConditionListField.value
-      ? "Search conditions"
-      : "Search actions"
-);
-const catalogEmptyLabel = computed(() =>
-  isFilterListField.value
-    ? "No filters to show."
-    : isConditionListField.value
-      ? "No conditions to show."
-      : "No actions to show."
-);
-
-const ensureCatalogLoaded = async () => {
-  if (!isCatalogListField.value) return;
-  if (catalogData.value.length || catalogLoading.value) return;
-  catalogLoading.value = true;
-  try {
-    catalogData.value = isFilterListField.value
-      ? await loadFilterCatalog()
-      : isConditionListField.value
-        ? await loadConditionCatalog()
-        : await loadActionCatalog();
-  } finally {
-    catalogLoading.value = false;
-  }
-};
-
-const handleAddListItem = async () => {
-  if (!isCatalogListField.value) {
-    addListItem();
-    return;
-  }
-  await ensureCatalogLoaded();
-  catalogPickerOpen.value = true;
-};
-
-const addCatalogEntry = async (item) => {
-  const next = listValue.value.slice();
-  if (isFilterListField.value) {
-    next.push({
-      type: item.id,
-      style: item.style,
-      valueKey: item.valueKey || item.fields?.[0]?.key || "value",
-      valueType: item.valueType || "text",
-      config: {}
-    });
-  } else if (isConditionListField.value) {
-    const schemaUrl = item.schemaUrl || conditionIdToSchemaUrl(item.id);
-    let definition = { fields: [] };
-    let definitionError = "";
-    if (schemaUrl) {
-      try {
-        definition = await loadConditionDefinition(schemaUrl, item.id);
-      } catch (error) {
-        definitionError = conditionDefinitionErrorMessage(item.id);
-        definition = { fields: CONDITION_FALLBACK_FIELDS };
-        if (import.meta.env.DEV) {
-          console.warn(`[SchemaField] Failed to load condition definition for ${item.id}`, error);
-        }
-      }
-    }
-    next.push({
-      type: item.id,
-      schemaUrl,
-      fields: Array.isArray(definition?.fields) ? definition.fields : [],
-      definitionError,
-      config: {}
-    });
-  } else {
-    const schemaUrl = item.schemaUrl || actionIdToSchemaUrl(item.id);
-    let definition = { fields: [] };
-    let definitionError = "";
-    if (schemaUrl) {
-      try {
-        definition = await loadActionDefinition(schemaUrl, item.id);
-      } catch (error) {
-        definitionError = actionDefinitionErrorMessage(item.id);
-        definition = { fields: ACTION_FALLBACK_FIELDS };
-        if (import.meta.env.DEV) {
-          console.warn(`[SchemaField] Failed to load action definition for ${item.id}`, error);
-        }
-      }
-    }
-    next.push({
-      type: item.id,
-      schemaUrl,
-      fields: Array.isArray(definition?.fields) ? definition.fields : [],
-      definitionError,
-      config: {}
-    });
-  }
-  emit("update", { path: fieldPath.value, value: next });
-  catalogPickerOpen.value = false;
-};
-
-const retryActionIndex = ref(null);
-let actionHydrationToken = 0;
-
-const retryCatalogEntryDefinition = async (index) => {
-  const entry = listValue.value[index];
-  if (!entry?.type) return;
-  const schemaUrl = isConditionListField.value
-    ? entry.schemaUrl || conditionIdToSchemaUrl(entry.type)
-    : entry.schemaUrl || actionIdToSchemaUrl(entry.type);
-  if (!schemaUrl) return;
-
-  retryActionIndex.value = index;
-  try {
-    const definition = isConditionListField.value
-      ? await loadConditionDefinition(schemaUrl, entry.type)
-      : await loadActionDefinition(schemaUrl, entry.type);
-    const next = listValue.value.map((item, itemIndex) => {
-      if (itemIndex !== index) return item;
-      return {
-        ...item,
-        schemaUrl,
-        fields: Array.isArray(definition?.fields) ? definition.fields : [],
-        definitionError: ""
-      };
-    });
-    emit("update", { path: fieldPath.value, value: next });
-  } catch (error) {
-    const next = listValue.value.map((item, itemIndex) => {
-      if (itemIndex !== index) return item;
-      return {
-        ...item,
-        fields: isConditionListField.value ? CONDITION_FALLBACK_FIELDS : ACTION_FALLBACK_FIELDS,
-        definitionError: isConditionListField.value
-          ? conditionDefinitionErrorMessage(entry.type)
-          : actionDefinitionErrorMessage(entry.type)
-      };
-    });
-    emit("update", { path: fieldPath.value, value: next });
-    if (import.meta.env.DEV) {
-      console.warn(
-        `[SchemaField] Retry failed for ${isConditionListField.value ? "condition" : "action"} definition ${entry.type}`,
-        error
-      );
-    }
-  } finally {
-    retryActionIndex.value = null;
-  }
-};
-
-const hydrateCatalogEntryFields = async () => {
-  if (!isActionListField.value && !isConditionListField.value) return;
-  if (!Array.isArray(listValue.value) || !listValue.value.length) return;
-
-  const localToken = ++actionHydrationToken;
-
-  let changed = false;
-  const source = listValue.value;
-  const next = await Promise.all(
-    source.map(async (entry) => {
-      if (!entry?.type) return entry;
-      const hasFields = Array.isArray(entry.fields) && entry.fields.length > 0;
-      if (hasFields) return entry;
-
-      const schemaUrl = isConditionListField.value
-        ? entry.schemaUrl || conditionIdToSchemaUrl(entry.type)
-        : entry.schemaUrl || actionIdToSchemaUrl(entry.type);
-      if (!schemaUrl) return entry;
-
-      try {
-        const definition = isConditionListField.value
-          ? await loadConditionDefinition(schemaUrl, entry.type)
-          : await loadActionDefinition(schemaUrl, entry.type);
-        const resolvedFields = Array.isArray(definition?.fields) ? definition.fields : [];
-        const currentFields = Array.isArray(entry.fields) ? entry.fields : [];
-        const schemaUrlChanged = entry.schemaUrl !== schemaUrl;
-        const fieldsChanged = JSON.stringify(currentFields) !== JSON.stringify(resolvedFields);
-        if (!schemaUrlChanged && !fieldsChanged) {
-          return entry;
-        }
-        changed = true;
-        return {
-          ...entry,
-          schemaUrl,
-          fields: resolvedFields,
-          definitionError: ""
-        };
-      } catch (error) {
-        if (entry.definitionError) {
-          return entry;
-        }
-        changed = true;
-        const fallback = {
-          ...entry,
-          schemaUrl,
-          fields: isConditionListField.value ? CONDITION_FALLBACK_FIELDS : ACTION_FALLBACK_FIELDS,
-          definitionError: isConditionListField.value
-            ? conditionDefinitionErrorMessage(entry.type)
-            : actionDefinitionErrorMessage(entry.type)
-        };
-        if (import.meta.env.DEV) {
-          console.warn(
-            `[SchemaField] Failed to hydrate ${isConditionListField.value ? "condition" : "action"} definition for ${entry.type}`,
-            error
-          );
-        }
-        return fallback;
-      }
-    })
-  );
-
-  if (localToken !== actionHydrationToken) {
-    return;
-  }
-
-  if (source !== listValue.value) {
-    return;
-  }
-
-  if (changed) {
-    emit("update", { path: fieldPath.value, value: next });
-  }
-};
-
-const updateCatalogEntryConfig = (index, { path, value }) => {
-  const next = listValue.value.map((entry, itemIndex) => {
-    if (itemIndex !== index) return entry;
-    const config = { ...(entry.config || {}) };
-    let cursor = config;
-    path.slice(0, -1).forEach((key) => {
-      if (!cursor[key] || typeof cursor[key] !== "object") {
-        cursor[key] = {};
-      }
-      cursor = cursor[key];
-    });
-    cursor[path[path.length - 1]] = value;
-    return { ...entry, config };
-  });
-  emit("update", { path: fieldPath.value, value: next });
-};
-
-const entryDefinition = (entry) =>
-  catalogData.value.find((catalogItem) => catalogItem.id === entry?.type);
-
-const ACTION_FALLBACK_FIELDS = Object.freeze([
-  {
-    key: "custom_config",
-    label: "custom_config",
-    type: "raw_yaml",
-    required: false,
-    lvl: "advanced",
-    placeholder: "key: value"
-  }
-]);
-
-const CONDITION_FALLBACK_FIELDS = Object.freeze([
-  {
-    key: "custom_config",
-    label: "custom_config",
-    type: "raw_yaml",
-    required: false,
-    lvl: "advanced",
-    placeholder: "condition_key: value"
-  }
-]);
-
-const actionDefinitionErrorMessage = (actionId) =>
-  `Definition missing for ${actionId || "this action"}. Using custom_config fallback.`;
-
-const conditionDefinitionErrorMessage = (conditionId) =>
-  `Definition missing for ${conditionId || "this condition"}. Using custom_config fallback.`;
-
-const entryLabel = (entry) => {
-  const def = entryDefinition(entry);
-  const fallback = isFilterListField.value ? "Filter" : isConditionListField.value ? "Condition" : "Action";
-  return def?.label || entry?.type || fallback;
-};
-
-const entryFields = (entry) => {
-  const def = entryDefinition(entry);
-  if (isFilterListField.value) {
-    if (!def) return [];
-    if (def.style === "scalar") {
-      return [
-        {
-          key: "value",
-          type: def.valueType || "text",
-          required: true
-        }
-      ];
-    }
-    if (def.style === "scalar_or_object") {
-      return def.fields || [];
-    }
-    return def.fields || [];
-  }
-  const entryDefinedFields = Array.isArray(entry?.fields) ? entry.fields : null;
-  const definitionFields = Array.isArray(def?.fields) ? def.fields : null;
-  const fields = entryDefinedFields ?? definitionFields ?? [];
-  return fields;
-};
-
-const entryDocLink = (entry) => {
-  if (!entry?.type) return "";
-  if (isFilterListField.value) {
-    return `https://esphome.io/components/sensor/#${entry.type}`;
-  }
-  if (entry?.helpUrl) return entry.helpUrl;
-  const def = entryDefinition(entry);
-  return def?.helpUrl || "";
-};
 
 const modeOrder = {
   simple: 1,
@@ -1073,14 +377,6 @@ const filterVisibleFields = (fields = [], contextValue = null) =>
 const visibleObjectFields = computed(() =>
   filterVisibleFields(props.field.fields || [], fieldValue.value || {})
 );
-const visibleListItemFields = (itemValue = {}) =>
-  filterVisibleFields(props.field.item?.fields || [], itemValue || {});
-
-const listLevelClass = computed(() => {
-  const lvl = props.field?.lvl?.toLowerCase() || "simple";
-  return `list-group list-${lvl}`;
-});
-
 const iconPickerOpen = ref(false);
 
 // Store icons as mdi:<name>, but show only the name in the picker.
@@ -1199,41 +495,6 @@ const selectOptionDropdownLabel = (option) => {
   return option === props.field.default ? `${option} (default)` : option;
 };
 
-const booleanListDisplayValue = (item) => {
-  if (item === true) return "true";
-  if (item === false) return "false";
-  return "false";
-};
-
-const hasExplicitListItemDefault = computed(() =>
-  Object.prototype.hasOwnProperty.call(props.field.item || {}, "default")
-);
-
-const booleanListTrueOptionLabel = computed(() =>
-  hasExplicitListItemDefault.value && props.field.item?.default === true
-    ? "TRUE (default)"
-    : "TRUE"
-);
-
-const booleanListFalseOptionLabel = computed(() =>
-  hasExplicitListItemDefault.value && props.field.item?.default === false
-    ? "FALSE (default)"
-    : "FALSE"
-);
-
-const booleanListSelectedLabel = (item) =>
-  booleanListDisplayValue(item) === "true" ? "TRUE" : "FALSE";
-
-const showSelectedListOption = (item) =>
-  item !== undefined && item !== null && String(item) !== "";
-
-const listSelectedOptionLabel = (item) => String(item ?? "");
-
-const selectListOptionDropdownLabel = (option) => {
-  if (!hasExplicitListItemDefault.value) return option;
-  return option === props.field.item?.default ? `${option} (default)` : option;
-};
-
 // Build id_ref options filtered by domain and excluding current component.
 const idOptions = computed(() => {
   const allowedDomain = props.field?.domain || "";
@@ -1287,6 +548,12 @@ const fieldError = computed(() => {
   if (props.externalError) return props.externalError;
   if (hasSecretReference.value) return "";
   const rawValue = resolvedValue.value;
+  if (isFixedListField.value) {
+    if (props.field?.item?.type === "object") {
+      return "Fixed list supports only primitive item types.";
+    }
+    return fixedListLength.value <= 0 ? "Fixed list requires a positive length." : "";
+  }
   if (passwordFormat.value === "base64_44") {
     const value = typeof rawValue === "string" ? rawValue.trim() : "";
     if (!/^[A-Za-z0-9+/]{43}=$/.test(value)) {
@@ -1315,8 +582,6 @@ const idRefError = computed(() => {
   return match ? "" : "No matching identifiers available";
 });
 
-const gpioPickerOpen = ref(false);
-
 const hasAppliedDefault = ref(false);
 const autoOverride = ref(false);
 const lastAutoValue = ref("");
@@ -1335,24 +600,22 @@ const wrapInputValue = (value) =>
     : value;
 
 watch(
-  () => [isCatalogListField.value, listValue.value.length],
-  async ([isCatalog, listLength]) => {
-    if (!isCatalog) return;
-    if (listLength <= 0) return;
-    await ensureCatalogLoaded();
-    await hydrateCatalogEntryFields();
-  },
-  { immediate: true }
-);
-
-watch(
   () => [fieldValue.value, props.field.default, props.field.required],
   ([currentValue, defaultValue, isRequired]) => {
+    if (isFixedListField.value && currentValue === undefined && fixedListLength.value > 0) {
+      const sourceDefault = Array.isArray(defaultValue) ? defaultValue : [];
+      emit("update", {
+        path: fieldPath.value,
+        value: normalizeFixedListValue(sourceDefault)
+      });
+      hasAppliedDefault.value = true;
+      return;
+    }
     if (!isRequired) return;
     if (hasAppliedDefault.value) return;
     if (currentValue !== undefined || defaultValue === undefined) return;
     if (props.field.type === "object") return;
-    if (props.field.type === "list" && !Array.isArray(defaultValue)) return;
+    if ((props.field.type === "list" || props.field.type === "fixed_list") && !Array.isArray(defaultValue)) return;
     if (props.field.type === "boolean") return;
     emit("update", {
       path: fieldPath.value,
@@ -1562,104 +825,4 @@ const handleIconClose = ({ query }) => {
   }
 };
 
-const handleGpioSelect = (value) => {
-  const normalized = normalizeGpioValue(value);
-  emit("update", { path: fieldPath.value, value: wrapInputValue(normalized) });
-  gpioPickerOpen.value = false;
-};
-
-const openGpioPicker = () => {
-  gpioPickerOpen.value = true;
-};
-
-const gpioPickerSelected = computed(() => {
-  return normalizeGpioPickerSelected(resolvedValue.value);
-});
-
-const gpioListPickerOpen = ref(false);
-const gpioListPickerIndex = ref(null);
-
-const gpioListSelected = computed(() => {
-  if (gpioListPickerIndex.value === null) return "";
-  return normalizeGpioPickerSelected(listValue.value[gpioListPickerIndex.value]);
-});
-
-const openListGpioPicker = (index) => {
-  gpioListPickerIndex.value = index;
-  gpioListPickerOpen.value = true;
-};
-
-const handleListGpioSelect = (value) => {
-  if (gpioListPickerIndex.value === null) return;
-  const normalized = normalizeGpioValue(value);
-  updateListPrimitive(gpioListPickerIndex.value, normalized);
-  gpioListPickerOpen.value = false;
-};
-
-const normalizeGpioValue = (rawValue) => {
-  const value = String(rawValue || "").trim();
-  if (!value) return "";
-  return `GPIO${value.replace(/^gpio\s*/i, "").trim()}`;
-};
-
-const normalizeGpioPickerSelected = (rawValue) =>
-  String(rawValue || "")
-    .replace(/^gpio\s*/i, "")
-    .trim();
-
-const listInputId = (index) => `${inputId.value}-${index}`;
-
-const updateNestedValue = (target, path, value) => {
-  if (!path.length) return value;
-  const next = { ...(target || {}) };
-  let cursor = next;
-  path.slice(0, -1).forEach((key) => {
-    if (!cursor[key] || typeof cursor[key] !== "object") {
-      cursor[key] = {};
-    }
-    cursor = cursor[key];
-  });
-  cursor[path[path.length - 1]] = value;
-  return next;
-};
-
-const updateListObjectItem = (index, { path, value }) => {
-  const next = listValue.value.map((item, itemIndex) => {
-    if (itemIndex !== index) return item;
-    return updateNestedValue(item || {}, path, value);
-  });
-  emit("update", { path: fieldPath.value, value: next });
-};
-
-const updateListPrimitive = (index, value) => {
-  const next = listValue.value.map((item, itemIndex) =>
-    itemIndex === index ? value : item
-  );
-  emit("update", { path: fieldPath.value, value: next });
-};
-
-const onBooleanListSelect = (index, event) => {
-  const value = event.target.value;
-  const booleanValue = value === "__opt_true";
-  updateListPrimitive(index, booleanValue);
-  syncHiddenSelectedOption(event.target, booleanValue ? "true" : "false");
-};
-
-const onSelectListChange = (index, event) => {
-  const options = props.field.item?.options || [];
-  const value = parseOptionToken(event.target.value, options);
-  updateListPrimitive(index, value);
-  syncHiddenSelectedOption(event.target, value);
-};
-
-const addListItem = () => {
-  const next = listValue.value.slice();
-  next.push(isObjectListItem.value ? {} : "");
-  emit("update", { path: fieldPath.value, value: next });
-};
-
-const removeListItem = (index) => {
-  const next = listValue.value.filter((_, itemIndex) => itemIndex !== index);
-  emit("update", { path: fieldPath.value, value: next });
-};
 </script>

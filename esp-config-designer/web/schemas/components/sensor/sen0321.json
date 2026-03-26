@@ -2,11 +2,13 @@
   "id": "sensor.sen0321",
   "domain": "sensor",
   "platform": "sen0321",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/sen0321/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",
@@ -20,7 +22,7 @@
       "type": "select",
       "required": false,
       "lvl": "simple",
-	  "default": "0x73",
+      "default": "0x73",
       "options": [
         "0x73",
         "0x70",

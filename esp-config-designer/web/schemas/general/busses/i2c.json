@@ -2,7 +2,6 @@
   "id": "busses.i2c",
   "domain": "i2c",
   "platform": "core",
-  "requires": [],
   "fields": [
     {
       "key": "enabled",
@@ -105,8 +104,8 @@
     {
       "key": "id",
       "type": "id",
-      "required": false,
-      "lvl": "normal",
+      "required": true,
+      "lvl": "simple",
       "default": "i2c_id",
       "dependsOn": {
         "key": "enabled",

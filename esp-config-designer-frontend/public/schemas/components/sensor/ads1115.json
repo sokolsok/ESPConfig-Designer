@@ -2,9 +2,6 @@
   "id": "sensor.ads1115",
   "domain": "sensor",
   "platform": "ads1115",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/ads1115/",
   "extends": "base_sensor.json",
   "embedded": [
@@ -12,6 +9,11 @@
       "key": "hub",
       "domain": "ads1115",
       "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:i2c"
     }
   ],
   "fields": [

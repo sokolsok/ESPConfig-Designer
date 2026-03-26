@@ -2,7 +2,6 @@
   "id": "sensor.internal_temperature",
   "domain": "sensor",
   "platform": "internal_temperature",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/internal_temperature/",
   "extends": "base_sensor.json",
   "fields": [

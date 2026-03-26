@@ -1,10 +1,12 @@
 {
   "id": "sim800l",
   "domain": "sim800l",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sim800l/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "id",

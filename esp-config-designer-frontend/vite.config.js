@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
 import fs from "node:fs/promises";
+import packageJson from "./package.json";
 import path from "node:path";
 
 const ROOT_FOLDER_ID = "root";
@@ -107,6 +108,9 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [vue(), runtimeProjectsPlugin()],
     base,
+    define: {
+      __APP_VERSION__: JSON.stringify(packageJson.version)
+    },
     build: {
       outDir: "dist"
     }

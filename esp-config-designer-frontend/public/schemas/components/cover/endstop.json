@@ -2,7 +2,6 @@
   "id": "cover.endstop",
   "domain": "cover",
   "platform": "endstop",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/cover/endstop/",
   "extends": "base_cover.json",
   "fields": [

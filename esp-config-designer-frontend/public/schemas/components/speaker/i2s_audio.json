@@ -2,11 +2,13 @@
   "id": "speaker.i2s_audio",
   "domain": "speaker",
   "platform": "i2s_audio",
-  "requires": [
-    "i2s_audio"
-  ],
   "helpUrl": "https://esphome.io/components/speaker/i2s_audio/",
   "extends": "base_speaker.json",
+  "requirements": [
+    {
+      "require": "component:i2s_audio"
+    }
+  ],
   "fields": [
     {
       "key": "dac_type",

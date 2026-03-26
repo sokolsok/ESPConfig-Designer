@@ -2,11 +2,13 @@
   "id": "touchscreen.ft5x06",
   "domain": "touchscreen",
   "platform": "ft5x06",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/touchscreen/ft5x06/",
   "extends": "base_touchscreen.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "rotation",

@@ -2,7 +2,6 @@
   "id": "light.lvgl",
   "domain": "light",
   "platform": "lvgl",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/light/lvgl/",
   "extends": "base_light.json",
   "fields": [

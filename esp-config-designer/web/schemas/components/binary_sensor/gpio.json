@@ -2,7 +2,6 @@
   "id": "binary_sensor.gpio",
   "domain": "binary_sensor",
   "platform": "gpio",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/binary_sensor/gpio/",
   "extends": "base_binary_sensor.json",
   "fields": [

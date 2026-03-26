@@ -2,10 +2,12 @@
   "id": "sensor.sm300d2",
   "domain": "sensor",
   "platform": "sm300d2",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/sm300d2/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "update_interval",

@@ -2,7 +2,6 @@
   "id": "climate.tuya",
   "domain": "climate",
   "platform": "tuya",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/climate/tuya/",
   "extends": "base_climate.json",
   "fields": [

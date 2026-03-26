@@ -2,7 +2,6 @@
   "id": "sensor.bmp3xx",
   "domain": "sensor",
   "platform": "bmp3xx",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/bmp3xx/",
   "fields": [
     {

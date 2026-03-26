@@ -2,7 +2,6 @@
   "id": "sensor.wifi_signal",
   "domain": "sensor",
   "platform": "wifi_signal",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/wifi_signal/",
   "extends": "base_sensor.json",
   "fields": [

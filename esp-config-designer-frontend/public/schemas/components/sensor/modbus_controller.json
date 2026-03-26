@@ -2,7 +2,6 @@
   "id": "sensor.modbus_controller",
   "domain": "sensor",
   "platform": "modbus_controller",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/modbus_controller/",
   "extends": "base_sensor.json",
   "fields": [

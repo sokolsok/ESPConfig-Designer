@@ -2,10 +2,12 @@
   "id": "sensor.sgp30",
   "domain": "sensor",
   "platform": "sgp30",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/sgp30/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "eco2",

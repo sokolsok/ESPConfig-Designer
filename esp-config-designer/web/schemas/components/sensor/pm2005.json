@@ -2,17 +2,19 @@
   "id": "sensor.pm2005",
   "domain": "sensor",
   "platform": "pm2005",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/pm2005/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "type",
       "type": "select",
       "required": false,
       "lvl": "simple",
-	  "default": "pm2005",
+      "default": "pm2005",
       "options": [
         "pm2005",
         "pm2105"

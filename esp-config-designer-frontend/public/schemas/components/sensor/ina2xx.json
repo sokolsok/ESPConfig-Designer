@@ -2,7 +2,6 @@
   "id": "sensor.ina2xx",
   "domain": "sensor",
   "platform": "ina2xx",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/ina2xx/",
   "extends": "base_sensor.json",
   "fields": [

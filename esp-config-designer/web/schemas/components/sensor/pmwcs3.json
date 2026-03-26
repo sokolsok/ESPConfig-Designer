@@ -2,10 +2,12 @@
   "id": "sensor.pmwcs3",
   "domain": "sensor",
   "platform": "pmwcs3",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/pmwcs3/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "e25",

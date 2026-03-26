@@ -2,10 +2,12 @@
   "id": "sensor.mpl3115a2",
   "domain": "sensor",
   "platform": "mpl3115a2",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/mpl3115a2/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "pressure",

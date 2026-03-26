@@ -2,9 +2,11 @@
   "id": "sensor.kamstrup_kmp",
   "domain": "sensor",
   "platform": "kamstrup_kmp",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/kamstrup_kmp/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": []
 }

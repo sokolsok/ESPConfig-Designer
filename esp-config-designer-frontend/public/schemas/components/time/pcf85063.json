@@ -2,11 +2,13 @@
   "id": "time.pcf85063",
   "domain": "time",
   "platform": "pcf85063",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/time/pcf85063/",
   "extends": "base_time.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "address",

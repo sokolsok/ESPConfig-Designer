@@ -2,10 +2,12 @@
   "id": "sensor.t6615",
   "domain": "sensor",
   "platform": "t6615",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/t6615/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "update_interval",

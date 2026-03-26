@@ -2,7 +2,6 @@
   "id": "sensor.as3935",
   "domain": "sensor",
   "platform": "as3935",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/as3935/",
   "fields": [
     {

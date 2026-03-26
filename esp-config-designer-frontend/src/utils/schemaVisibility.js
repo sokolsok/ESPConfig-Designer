@@ -1,5 +1,11 @@
 import { getTemplatableInnerValue, isTemplatableValue } from "./schemaTemplatable";
 
+const isObjectArrayLikeField = (field, value) =>
+  (field?.type === "list" || field?.type === "fixed_list") &&
+  Array.isArray(value) &&
+  field?.item?.type === "object" &&
+  field?.item?.fields;
+
 // Resolve a dependency key from the current object, falling back to schema defaults.
 export const resolveDependentValue = (key, valueMap, schemaFields) => {
   if (valueMap && valueMap[key] !== undefined) {
@@ -20,7 +26,7 @@ const resolveGlobalValue = (key, globalStore) => {
 };
 
 // Compare a dependency object against the actual value.
-const matchesDependency = (dependency, actual) => {
+export const matchesDependency = (dependency, actual) => {
   if (!dependency) return true;
   if (dependency.value !== undefined) return actual === dependency.value;
   if (Array.isArray(dependency.values)) return dependency.values.includes(actual);
@@ -70,12 +76,7 @@ export const buildGlobalRegistry = (entries = []) => {
       if (field.type === "object") {
         walkFields(value || {}, field.fields || []);
       }
-      if (
-        field.type === "list" &&
-        Array.isArray(value) &&
-        field.item?.type === "object" &&
-        field.item?.fields
-      ) {
+      if (isObjectArrayLikeField(field, value)) {
         value.forEach((item) => walkFields(item || {}, field.item.fields));
       }
     });

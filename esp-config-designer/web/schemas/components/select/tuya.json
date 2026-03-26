@@ -2,7 +2,6 @@
   "id": "select.tuya",
   "domain": "select",
   "platform": "tuya",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/select/tuya/",
   "extends": "base_select.json",
   "fields": [

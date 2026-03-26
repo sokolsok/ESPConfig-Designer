@@ -1678,6 +1678,26 @@ button.btn-add {
   padding: 0;
 }
 
+.schema-field > .schema-fixed-list {
+  grid-column: 1 / -1;
+}
+
+.schema-fixed-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 22px;
+  margin-bottom: 10px;
+}
+
+.schema-fixed-list > .schema-levels {
+  border-left: 2px solid #e2e8f0;
+  padding-left: 18px;
+}
+
+.schema-fixed-list-grid {
+  gap: 8px;
+}
+
 .schema-list-actions {
   display: flex;
   justify-content: flex-end;

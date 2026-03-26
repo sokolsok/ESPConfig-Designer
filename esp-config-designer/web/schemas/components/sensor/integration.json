@@ -2,7 +2,6 @@
   "id": "sensor.integration",
   "domain": "sensor",
   "platform": "integration",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/integration/",
   "extends": "base_sensor.json",
   "fields": [

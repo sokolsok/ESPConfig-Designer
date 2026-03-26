@@ -2,11 +2,13 @@
   "id": "touchscreen.gt911",
   "domain": "touchscreen",
   "platform": "gt911",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/touchscreen/gt911/",
   "extends": "base_touchscreen.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "interrupt_pin",

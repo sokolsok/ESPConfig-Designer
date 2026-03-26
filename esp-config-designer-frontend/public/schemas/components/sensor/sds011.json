@@ -2,10 +2,12 @@
   "id": "sensor.sds011",
   "domain": "sensor",
   "platform": "sds011",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/sds011/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "update_interval",

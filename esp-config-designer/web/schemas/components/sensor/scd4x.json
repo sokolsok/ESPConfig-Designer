@@ -2,10 +2,12 @@
   "id": "sensor.scd4x",
   "domain": "sensor",
   "platform": "scd4x",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/scd4x/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "address",

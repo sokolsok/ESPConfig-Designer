@@ -2,11 +2,13 @@
   "id": "sensor.mpu6050",
   "domain": "sensor",
   "platform": "mpu6050",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/mpu6050/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

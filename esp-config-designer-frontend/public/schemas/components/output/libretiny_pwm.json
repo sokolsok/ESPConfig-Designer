@@ -2,7 +2,6 @@
   "id": "output.libretiny_pwm",
   "domain": "output",
   "platform": "libretiny_pwm",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/output/libretiny_pwm/",
   "extends": "base_output_float.json",
   "fields": [

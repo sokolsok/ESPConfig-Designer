@@ -2,11 +2,13 @@
   "id": "switch.uart",
   "domain": "switch",
   "platform": "uart",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/switch/uart/",
   "extends": "base_switch.json",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "uart_id",

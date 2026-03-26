@@ -2,9 +2,6 @@
   "id": "output.gp8403",
   "domain": "output",
   "platform": "gp8403",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/output/gp8403/",
   "extends": "base_output_float.json",
   "embedded": [
@@ -12,6 +9,11 @@
       "key": "hub",
       "domain": "gp8403",
       "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:i2c"
     }
   ],
   "fields": [

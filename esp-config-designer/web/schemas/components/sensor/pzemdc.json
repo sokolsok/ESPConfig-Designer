@@ -2,10 +2,12 @@
   "id": "sensor.pzemdc",
   "domain": "sensor",
   "platform": "pzemdc",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/pzemdc/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "current",

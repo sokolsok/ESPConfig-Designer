@@ -2,11 +2,13 @@
   "id": "audio_dac.es8156",
   "domain": "audio_dac",
   "platform": "es8156",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/audio_dac/es8156/",
   "extends": "base_audio_dac.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "address",

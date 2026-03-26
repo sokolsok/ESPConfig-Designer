@@ -2,10 +2,12 @@
   "id": "text_sensor.openthread_info",
   "domain": "text_sensor",
   "platform": "openthread_info",
-  "requires": [
-    "openthread"
-  ],
   "helpUrl": "https://esphome.io/components/text_sensor/openthread_info/",
+  "requirements": [
+    {
+      "require": "network:openthread"
+    }
+  ],
   "fields": [
     {
       "key": "ip_address",

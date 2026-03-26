@@ -2,7 +2,6 @@
   "id": "output.esp32_dac",
   "domain": "output",
   "platform": "esp32_dac",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/output/esp32_dac/",
   "extends": "base_output_float.json",
   "fields": [

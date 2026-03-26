@@ -2,7 +2,6 @@
   "id": "light.partition",
   "domain": "light",
   "platform": "partition",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/light/partition/",
   "extends": "base_light.json",
   "fields": [

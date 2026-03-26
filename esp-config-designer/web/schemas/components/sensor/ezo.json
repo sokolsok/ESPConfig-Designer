@@ -2,11 +2,13 @@
   "id": "sensor.ezo",
   "domain": "sensor",
   "platform": "ezo",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/ezo/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

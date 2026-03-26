@@ -2,9 +2,6 @@
   "id": "display.qspi_dbi",
   "domain": "display",
   "platform": "qspi_dbi",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/display/qspi_dbi/",
   "extends": "base_display.json",
   "display_builder": true,
@@ -35,6 +32,11 @@
       "h": 240
     }
   },
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "model",

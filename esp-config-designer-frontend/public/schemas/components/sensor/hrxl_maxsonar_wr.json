@@ -2,11 +2,13 @@
   "id": "sensor.hrxl_maxsonar_wr",
   "domain": "sensor",
   "platform": "hrxl_maxsonar_wr",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/hrxl_maxsonar_wr/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "name",

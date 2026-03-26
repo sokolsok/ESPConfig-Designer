@@ -2,7 +2,6 @@
   "id": "base.sensor",
   "domain": "sensor",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {
@@ -21,7 +20,7 @@
     },
     {
       "key": "unit_of_measurement",
-      "placeholder": "C\u00b0, mm, kg, V ..",
+      "placeholder": "C°, mm, kg, V ..",
       "type": "text",
       "required": false,
       "lvl": "normal"

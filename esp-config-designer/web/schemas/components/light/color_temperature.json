@@ -2,7 +2,6 @@
   "id": "light.color_temperature",
   "domain": "light",
   "platform": "color_temperature",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/light/color_temperature/",
   "extends": "base_light.json",
   "fields": [

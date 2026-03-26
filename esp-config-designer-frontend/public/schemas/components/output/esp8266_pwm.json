@@ -2,7 +2,6 @@
   "id": "output.esp8266_pwm",
   "domain": "output",
   "platform": "esp8266_pwm",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/output/esp8266_pwm/",
   "extends": "base_output_float.json",
   "fields": [

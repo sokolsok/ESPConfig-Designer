@@ -2,11 +2,13 @@
   "id": "sensor.tc74",
   "domain": "sensor",
   "platform": "tc74",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/tc74/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

@@ -2,7 +2,6 @@
   "id": "climate.bang_bang",
   "domain": "climate",
   "platform": "bang_bang",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/climate/bang_bang/",
   "extends": "base_climate.json",
   "fields": [

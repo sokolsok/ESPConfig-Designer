@@ -2,7 +2,6 @@
   "id": "sensor.duty_cycle",
   "domain": "sensor",
   "platform": "duty_cycle",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/duty_cycle/",
   "extends": "base_sensor.json",
   "fields": [

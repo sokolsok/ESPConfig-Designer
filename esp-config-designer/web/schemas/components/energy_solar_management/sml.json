@@ -1,10 +1,12 @@
 {
   "id": "sml",
   "domain": "sml",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sml/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "id",

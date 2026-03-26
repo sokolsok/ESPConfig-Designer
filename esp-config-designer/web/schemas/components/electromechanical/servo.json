@@ -1,7 +1,6 @@
 {
   "id": "servo",
   "domain": "servo",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/servo/",
   "fields": [
     {

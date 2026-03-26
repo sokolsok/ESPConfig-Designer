@@ -2,9 +2,6 @@
   "id": "binary_sensor.cap1188",
   "domain": "binary_sensor",
   "platform": "cap1188",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/binary_sensor/cap1188/",
   "extends": "base_binary_sensor.json",
   "embedded": [
@@ -12,6 +9,11 @@
       "key": "hub",
       "domain": "cap1188",
       "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:i2c"
     }
   ],
   "fields": [

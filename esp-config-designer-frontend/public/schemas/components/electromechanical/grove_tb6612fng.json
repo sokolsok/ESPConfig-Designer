@@ -1,10 +1,12 @@
 {
   "id": "grove_tb6612fng",
   "domain": "grove_tb6612fng",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/grove_tb6612fng/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "id",

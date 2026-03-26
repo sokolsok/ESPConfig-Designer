@@ -2,9 +2,6 @@
   "id": "display.ssd1331_spi",
   "domain": "display",
   "platform": "ssd1331_spi",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/display/ssd1331/",
   "display_builder": true,
   "displayType": "color",
@@ -14,6 +11,11 @@
       "h": 64
     }
   },
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "dc_pin",

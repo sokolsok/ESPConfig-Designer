@@ -2,7 +2,6 @@
   "id": "protocols.espnow",
   "domain": "espnow",
   "platform": "core",
-  "requires": [],
   "fields": [
     {
       "key": "enabled",

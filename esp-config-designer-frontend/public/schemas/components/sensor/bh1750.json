@@ -2,11 +2,13 @@
   "id": "sensor.bh1750",
   "domain": "sensor",
   "platform": "bh1750",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/bh1750/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

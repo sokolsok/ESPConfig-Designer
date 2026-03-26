@@ -2,11 +2,13 @@
   "id": "touchscreen.cst816",
   "domain": "touchscreen",
   "platform": "cst816",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/touchscreen/cst816/",
   "extends": "base_touchscreen.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "interrupt_pin",

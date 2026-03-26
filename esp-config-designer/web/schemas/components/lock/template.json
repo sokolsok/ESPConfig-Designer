@@ -2,7 +2,6 @@
   "id": "lock.template",
   "domain": "lock",
   "platform": "template",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/lock/template/",
   "extends": "base_lock.json",
   "fields": [

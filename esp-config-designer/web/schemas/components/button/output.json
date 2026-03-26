@@ -2,7 +2,6 @@
   "id": "button.output",
   "domain": "button",
   "platform": "output",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/button/output/",
   "extends": "base_button.json",
   "fields": [

@@ -2,7 +2,6 @@
   "id": "sensor.ultrasonic",
   "domain": "sensor",
   "platform": "ultrasonic",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/ultrasonic/",
   "extends": "base_sensor.json",
   "fields": [

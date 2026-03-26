@@ -2,7 +2,6 @@
   "id": "sensor.uptime",
   "domain": "sensor",
   "platform": "uptime",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/uptime/",
   "extends": "base_sensor.json",
   "fields": [

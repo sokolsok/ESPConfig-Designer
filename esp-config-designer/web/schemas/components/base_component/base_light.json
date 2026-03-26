@@ -2,7 +2,6 @@
   "id": "base.light",
   "domain": "light",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

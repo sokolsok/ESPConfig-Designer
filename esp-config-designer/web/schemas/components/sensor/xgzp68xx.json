@@ -2,10 +2,12 @@
   "id": "sensor.xgzp68xx",
   "domain": "sensor",
   "platform": "xgzp68xx",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/xgzp68xx/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "temperature",

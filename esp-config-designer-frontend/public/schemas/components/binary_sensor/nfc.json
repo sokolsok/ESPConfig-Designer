@@ -2,7 +2,6 @@
   "id": "binary_sensor.nfc",
   "domain": "binary_sensor",
   "platform": "nfc",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/binary_sensor/nfc/",
   "extends": "base_binary_sensor.json",
   "fields": [

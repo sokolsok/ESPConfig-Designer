@@ -2,10 +2,12 @@
   "id": "sensor.bmp085",
   "domain": "sensor",
   "platform": "bmp085",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/bmp085/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "temperature",

@@ -2,7 +2,6 @@
   "id": "base.output_float",
   "domain": "output",
   "platform": "",
-  "requires": [],
   "type": "object",
   "extends": "base_output.json",
   "fields": [

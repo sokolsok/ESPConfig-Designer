@@ -1,0 +1,476 @@
+{
+  "id": "esp32_camera",
+  "domain": "esp32_camera",
+  "platform": "",
+  "renderAs": "root_map",
+  "helpUrl": "https://esphome.io/components/esp32_camera/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    },
+    {
+      "require": "system:psram",
+      "when": {
+        "key": "frame_buffer_location",
+        "value": "PSRAM"
+      }
+    }
+  ],
+  "fields": [
+    {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "My Camera"
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal",
+      "idDomain": "esp32_camera"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "i2c"
+    },
+    {
+      "key": "icon",
+      "type": "icon",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "mdi:cctv"
+    },
+    {
+      "key": "frame_buffer_count",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "1",
+      "options": [
+        "1",
+        "2"
+      ]
+    },
+    {
+      "key": "frame_buffer_location",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "PSRAM",
+      "options": [
+        "PSRAM",
+        "DRAM"
+      ]
+    },
+    {
+      "key": "external_clock",
+      "type": "object",
+      "required": true,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "pin",
+          "type": "gpio",
+          "required": true,
+          "lvl": "simple",
+		  "placeholder": "GPIOXX"
+        },
+        {
+          "key": "frequency",
+          "type": "select",
+          "required": false,
+          "lvl": "normal",
+          "default": "20MHz",
+          "options": [
+            "8MHz",
+            "9MHz",
+            "10MHz",
+            "11MHz",
+            "12MHz",
+            "13MHz",
+            "14MHz",
+            "15MHz",
+            "16MHz",
+            "17MHz",
+            "18MHz",
+            "19MHz",
+            "20MHz"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "data_pins",
+      "type": "fixed_list",
+      "required": true,
+      "lvl": "simple",
+      "length": 8,
+      "labels": [
+        "data_pin_0",
+        "data_pin_1",
+        "data_pin_2",
+        "data_pin_3",
+        "data_pin_4",
+        "data_pin_5",
+        "data_pin_6",
+        "data_pin_7"
+      ],
+      "yamlStyle": "flow",
+      "item": {
+        "type": "gpio",
+        "placeholder": "GPIOXX"
+      }
+    },
+    {
+      "key": "vsync_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
+    },
+    {
+      "key": "href_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
+    },
+    {
+      "key": "pixel_clock_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
+    },
+    {
+      "key": "power_down_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal",
+	  "placeholder": "GPIOXX"
+    },
+    {
+      "key": "reset_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal",
+	  "placeholder": "GPIOXX"
+    },
+    {
+      "key": "internal",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "disabled_by_default",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "test_pattern",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "max_framerate",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 10
+    },
+    {
+      "key": "idle_framerate",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 0.1
+    },
+    {
+      "key": "resolution",
+      "type": "select",
+      "required": false,
+      "lvl": "simple",
+      "default": "640x480",
+      "options": [
+        "160x120",
+        "176x144",
+        "240x176",
+        "320x240",
+        "400x296",
+        "640x480",
+        "800x600",
+        "1024x768",
+        "1280x1024",
+        "1600x1200",
+        "1920x1080",
+        "720x1280",
+        "864x1536",
+        "2048x1536",
+        "2560x1440",
+        "2560x1600",
+        "1080x1920",
+        "2560x1920"
+      ]
+    },
+    {
+      "key": "pixel_format",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "jpeg",
+      "options": [
+        "jpeg",
+        "rgb565",
+        "yuv422",
+        "yuv420",
+        "grayscale",
+        "rgb888",
+        "raw",
+        "rgb444",
+        "rgb555"
+      ]
+    },
+    {
+      "key": "jpeg_quality",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 10,
+      "placeholder": "10"
+    },
+    {
+      "key": "vertical_flip",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    },
+    {
+      "key": "horizontal_mirror",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    },
+    {
+      "key": "contrast",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "0",
+      "options": [
+        "-2",
+        "-1",
+        "0",
+        "1",
+        "2"
+      ]
+    },
+    {
+      "key": "brightness",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "0",
+      "options": [
+        "-2",
+        "-1",
+        "0",
+        "1",
+        "2"
+      ]
+    },
+    {
+      "key": "saturation",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "0",
+      "options": [
+        "-2",
+        "-1",
+        "0",
+        "1",
+        "2"
+      ]
+    },
+    {
+      "key": "special_effect",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "none",
+      "options": [
+        "none",
+        "negative",
+        "grayscale",
+        "red_tint",
+        "green_tint",
+        "blue_tint",
+        "sepia"
+      ]
+    },
+    {
+      "key": "aec_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "auto",
+      "options": [
+        "manual",
+        "auto"
+      ]
+    },
+    {
+      "key": "aec2",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "ae_level",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "0",
+      "dependsOn": {
+        "key": "aec_mode",
+        "value": "auto"
+      },
+      "options": [
+        "-2",
+        "-1",
+        "0",
+        "1",
+        "2"
+      ]
+    },
+    {
+      "key": "aec_value",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 300,
+      "dependsOn": {
+        "key": "aec_mode",
+        "value": "manual"
+      }
+    },
+    {
+      "key": "agc_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "auto",
+      "options": [
+        "manual",
+        "auto"
+      ]
+    },
+    {
+      "key": "agc_value",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 0,
+      "dependsOn": {
+        "key": "agc_mode",
+        "value": "manual"
+      }
+    },
+    {
+      "key": "agc_gain_ceiling",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "2x",
+      "dependsOn": {
+        "key": "agc_mode",
+        "value": "auto"
+      },
+      "options": [
+        "2x",
+        "4x",
+        "8x",
+        "16x",
+        "32x",
+        "64x",
+        "128x"
+      ]
+    },
+    {
+      "key": "wb_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "auto",
+      "options": [
+        "auto",
+        "sunny",
+        "cloudy",
+        "office",
+        "home"
+      ]
+    },
+    {
+      "key": "on_stream_start",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_stream_stop",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_image",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "entity_category",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "configuration"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

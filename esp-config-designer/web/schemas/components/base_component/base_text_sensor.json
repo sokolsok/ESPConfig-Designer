@@ -2,7 +2,6 @@
   "id": "base.text_sensor",
   "domain": "text_sensor",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

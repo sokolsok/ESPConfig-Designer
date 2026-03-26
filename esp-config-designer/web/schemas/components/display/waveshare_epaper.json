@@ -2,9 +2,6 @@
   "id": "display.waveshare_epaper",
   "domain": "display",
   "platform": "waveshare_epaper",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/display/waveshare_epaper/",
   "extends": "base_display.json",
   "display_builder": true,
@@ -27,6 +24,11 @@
       "h": 300
     }
   },
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "model",

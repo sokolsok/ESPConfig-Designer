@@ -2,11 +2,13 @@
   "id": "sensor.zio_ultrasonic",
   "domain": "sensor",
   "platform": "zio_ultrasonic",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/zio_ultrasonic/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

@@ -2,7 +2,6 @@
   "id": "fan.hbridge",
   "domain": "fan",
   "platform": "hbridge",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/fan/hbridge/",
   "extends": "base_fan.json",
   "fields": [

@@ -2,11 +2,13 @@
   "id": "output.mcp47a1",
   "domain": "output",
   "platform": "mcp47a1",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/output/mcp47a1/",
   "extends": "base_output_float.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "address",

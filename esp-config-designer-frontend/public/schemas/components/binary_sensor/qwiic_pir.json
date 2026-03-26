@@ -2,11 +2,13 @@
   "id": "binary_sensor.qwiic_pir",
   "domain": "binary_sensor",
   "platform": "qwiic_pir",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/binary_sensor/qwiic_pir/",
   "extends": "base_binary_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "debounce_mode",

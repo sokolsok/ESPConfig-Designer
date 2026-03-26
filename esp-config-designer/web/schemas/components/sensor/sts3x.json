@@ -2,11 +2,13 @@
   "id": "sensor.sts3x",
   "domain": "sensor",
   "platform": "sts3x",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/sts3x/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

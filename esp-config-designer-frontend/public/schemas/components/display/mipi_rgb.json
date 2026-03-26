@@ -2,7 +2,6 @@
   "id": "display.mipi_rgb",
   "domain": "display",
   "platform": "mipi_rgb",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/display/mipi_rgb/",
   "extends": "base_display.json",
   "display_builder": true,

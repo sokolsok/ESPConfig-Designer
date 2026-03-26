@@ -2,10 +2,12 @@
   "id": "sensor.sdm_meter",
   "domain": "sensor",
   "platform": "sdm_meter",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/sdm_meter/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "phase_a",

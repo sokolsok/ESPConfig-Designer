@@ -2,7 +2,6 @@
   "id": "esphome.core",
   "domain": "esphome",
   "platform": "core",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/esphome/",
   "fields": [
     {

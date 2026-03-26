@@ -2,10 +2,12 @@
   "id": "sensor.cs5460a",
   "domain": "sensor",
   "platform": "cs5460a",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/cs5460a/",
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "current",

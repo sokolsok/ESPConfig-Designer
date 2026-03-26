@@ -2,7 +2,6 @@
   "id": "base.button",
   "domain": "button",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

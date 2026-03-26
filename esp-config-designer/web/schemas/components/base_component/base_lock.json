@@ -2,7 +2,6 @@
   "id": "base.lock",
   "domain": "lock",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

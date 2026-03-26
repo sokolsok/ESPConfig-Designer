@@ -2,11 +2,13 @@
   "id": "media_player.speaker",
   "domain": "media_player",
   "platform": "speaker",
-  "requires": [
-    "network"
-  ],
   "helpUrl": "https://esphome.io/components/media_player/speaker/",
   "extends": "base_media_player.json",
+  "requirements": [
+    {
+      "require": "network:network"
+    }
+  ],
   "fields": [
     {
       "key": "announcement_pipeline",

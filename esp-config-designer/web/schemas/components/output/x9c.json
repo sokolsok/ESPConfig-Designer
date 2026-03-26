@@ -2,7 +2,6 @@
   "id": "output.x9c",
   "domain": "output",
   "platform": "x9c",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/output/x9c/",
   "extends": "base_output_float.json",
   "fields": [

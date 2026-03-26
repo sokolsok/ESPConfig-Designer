@@ -2,11 +2,13 @@
   "id": "light.shelly_dimmer",
   "domain": "light",
   "platform": "shelly_dimmer",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/light/shelly_dimmer/",
   "extends": "base_light.json",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "uart_id",

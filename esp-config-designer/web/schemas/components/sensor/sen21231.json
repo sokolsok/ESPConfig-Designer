@@ -2,11 +2,13 @@
   "id": "sensor.sen21231",
   "domain": "sensor",
   "platform": "sen21231",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/sen21231/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

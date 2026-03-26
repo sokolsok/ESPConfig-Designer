@@ -2,9 +2,6 @@
   "id": "output.dac7678",
   "domain": "output",
   "platform": "dac7678",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/output/dac7678/",
   "extends": "base_output_float.json",
   "embedded": [
@@ -12,6 +9,11 @@
       "key": "hub",
       "domain": "dac7678",
       "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:i2c"
     }
   ],
   "fields": [

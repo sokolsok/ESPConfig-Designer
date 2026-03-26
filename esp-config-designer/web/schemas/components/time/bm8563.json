@@ -2,11 +2,13 @@
   "id": "time.bm8563",
   "domain": "time",
   "platform": "bm8563",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/time/bm8563/",
   "extends": "base_time.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "address",

@@ -2,9 +2,11 @@
   "id": "sensor.bme680_bsec",
   "domain": "sensor",
   "platform": "bme680_bsec",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/bme680_bsec/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": []
 }

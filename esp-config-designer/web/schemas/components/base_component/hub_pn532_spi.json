@@ -2,10 +2,12 @@
   "id": "hub.pn532_spi",
   "domain": "pn532_spi",
   "platform": "",
-  "requires": [
-    "spi"
-  ],
   "type": "object",
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "id",

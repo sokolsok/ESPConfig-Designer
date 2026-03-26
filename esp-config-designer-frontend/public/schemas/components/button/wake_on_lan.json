@@ -2,7 +2,6 @@
   "id": "button.wake_on_lan",
   "domain": "button",
   "platform": "wake_on_lan",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/button/wake_on_lan/",
   "extends": "base_button.json",
   "fields": [

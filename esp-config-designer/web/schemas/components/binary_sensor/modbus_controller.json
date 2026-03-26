@@ -2,7 +2,6 @@
   "id": "binary_sensor.modbus_controller",
   "domain": "binary_sensor",
   "platform": "modbus_controller",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/binary_sensor/modbus_controller/",
   "extends": "base_binary_sensor.json",
   "fields": [

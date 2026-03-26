@@ -2,7 +2,6 @@
   "id": "display.st7920",
   "domain": "display",
   "platform": "st7920",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/display/st7920/",
   "extends": "base_display.json",
   "display_builder": true,

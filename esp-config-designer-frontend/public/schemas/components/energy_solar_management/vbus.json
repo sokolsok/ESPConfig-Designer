@@ -1,10 +1,12 @@
 {
   "id": "vbus",
   "domain": "vbus",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/vbus/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "id",

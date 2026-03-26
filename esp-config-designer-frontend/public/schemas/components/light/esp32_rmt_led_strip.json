@@ -2,7 +2,6 @@
   "id": "light.esp32_rmt_led_strip",
   "domain": "light",
   "platform": "esp32_rmt_led_strip",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/light/esp32_rmt_led_strip/",
   "extends": "base_light.json",
   "fields": [

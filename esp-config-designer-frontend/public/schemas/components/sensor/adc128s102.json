@@ -2,9 +2,6 @@
   "id": "sensor.adc128s102",
   "domain": "sensor",
   "platform": "adc128s102",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/adc128s102/",
   "extends": "base_sensor.json",
   "embedded": [
@@ -12,6 +9,11 @@
       "key": "hub",
       "domain": "adc128s102",
       "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:spi"
     }
   ],
   "fields": [

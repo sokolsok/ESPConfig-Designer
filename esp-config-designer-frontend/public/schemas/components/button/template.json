@@ -2,7 +2,6 @@
   "id": "button.template",
   "domain": "button",
   "platform": "template",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/button/template/",
   "extends": "base_button.json",
   "fields": []

@@ -2,9 +2,6 @@
   "id": "output.mcp4461",
   "domain": "output",
   "platform": "mcp4461",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/output/mcp4461/",
   "extends": "base_output_float.json",
   "embedded": [
@@ -12,6 +9,11 @@
       "key": "hub",
       "domain": "mcp4461",
       "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:i2c"
     }
   ],
   "fields": [

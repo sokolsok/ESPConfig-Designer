@@ -2,10 +2,12 @@
   "id": "hub.mcp3008",
   "domain": "mcp3008",
   "platform": "",
-  "requires": [
-    "spi"
-  ],
   "type": "object",
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "id",

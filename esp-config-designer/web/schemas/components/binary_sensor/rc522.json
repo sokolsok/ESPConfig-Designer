@@ -2,15 +2,6 @@
   "id": "binary_sensor.rc522",
   "domain": "binary_sensor",
   "platform": "rc522",
-  "requiresByBus": {
-    "spi": [
-      "spi"
-    ],
-    "i2c": [
-      "i2c"
-    ]
-  },
-  "requires": [],
   "helpUrl": "https://esphome.io/components/binary_sensor/rc522/",
   "extends": "base_binary_sensor.json",
   "embedded": [
@@ -23,6 +14,22 @@
       "key": "hub_i2c",
       "domain": "rc522_i2c",
       "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:spi",
+      "when": {
+        "key": "bus",
+        "value": "spi"
+      }
+    },
+    {
+      "require": "bus:i2c",
+      "when": {
+        "key": "bus",
+        "value": "i2c"
+      }
     }
   ],
   "fields": [

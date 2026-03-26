@@ -2,11 +2,13 @@
   "id": "media_player.i2s_audio",
   "domain": "media_player",
   "platform": "i2s_audio",
-  "requires": [
-    "i2s_audio"
-  ],
   "helpUrl": "https://esphome.io/components/media_player/i2s_audio/",
   "extends": "base_media_player.json",
+  "requirements": [
+    {
+      "require": "component:i2s_audio"
+    }
+  ],
   "fields": [
     {
       "key": "dac_type",

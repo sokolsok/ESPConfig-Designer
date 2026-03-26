@@ -2,11 +2,13 @@
   "id": "sensor.teleinfo",
   "domain": "sensor",
   "platform": "teleinfo",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/teleinfo/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "name",

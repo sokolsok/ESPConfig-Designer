@@ -2,7 +2,6 @@
   "id": "sensor.cd74hc4067",
   "domain": "sensor",
   "platform": "cd74hc4067",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/cd74hc4067/",
   "extends": "base_sensor.json",
   "embedded": [

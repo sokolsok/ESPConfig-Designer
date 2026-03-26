@@ -2,7 +2,6 @@
   "id": "other.status_led",
   "domain": "status_led",
   "platform": "core",
-  "requires": [],
   "fields": [
     {
       "key": "enabled",

@@ -2,11 +2,13 @@
   "id": "sensor.hmc5883l",
   "domain": "sensor",
   "platform": "hmc5883l",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/hmc5883l/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

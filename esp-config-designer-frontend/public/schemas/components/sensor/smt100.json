@@ -2,10 +2,12 @@
   "id": "sensor.smt100",
   "domain": "sensor",
   "platform": "smt100",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/smt100/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "counts",

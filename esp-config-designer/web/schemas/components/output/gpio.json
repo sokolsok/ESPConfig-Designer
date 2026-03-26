@@ -2,7 +2,6 @@
   "id": "output.gpio",
   "domain": "output",
   "platform": "gpio",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/output/gpio/",
   "extends": "base_output.json",
   "fields": [

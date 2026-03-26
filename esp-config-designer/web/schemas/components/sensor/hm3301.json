@@ -2,10 +2,12 @@
   "id": "sensor.hm3301",
   "domain": "sensor",
   "platform": "hm3301",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/hm3301/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "pm_1_0",
@@ -41,7 +43,7 @@
           "type": "select",
           "required": true,
           "lvl": "simple",
-		  "default": "AQI",
+          "default": "AQI",
           "options": [
             "AQI",
             "CAQI"

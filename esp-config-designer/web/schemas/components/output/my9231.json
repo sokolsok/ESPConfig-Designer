@@ -2,7 +2,6 @@
   "id": "output.my9231",
   "domain": "output",
   "platform": "my9231",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/output/my9231/",
   "extends": "base_output_float.json",
   "embedded": [

@@ -2,7 +2,6 @@
   "id": "display.pvvx_mithermometer",
   "domain": "display",
   "platform": "pvvx_mithermometer",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/display/pvvx_mithermometer/",
   "extends": "base_display.json",
   "display_builder": false,

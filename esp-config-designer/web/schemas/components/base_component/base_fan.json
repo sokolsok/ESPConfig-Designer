@@ -2,7 +2,6 @@
   "id": "base.fan",
   "domain": "fan",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

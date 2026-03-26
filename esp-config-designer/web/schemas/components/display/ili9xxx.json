@@ -2,9 +2,6 @@
   "id": "display.ili9xxx",
   "domain": "display",
   "platform": "ili9xxx",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/display/ili9xxx/",
   "extends": "base_display.json",
   "display_builder": true,
@@ -87,6 +84,11 @@
       "h": 160
     }
   },
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "model",

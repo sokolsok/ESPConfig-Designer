@@ -2,11 +2,13 @@
   "id": "sensor.jsn_sr04t",
   "domain": "sensor",
   "platform": "jsn_sr04t",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/jsn_sr04t/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "name",

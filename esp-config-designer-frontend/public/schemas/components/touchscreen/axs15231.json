@@ -2,11 +2,13 @@
   "id": "touchscreen.axs15231",
   "domain": "touchscreen",
   "platform": "axs15231",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/touchscreen/axs15231/",
   "extends": "base_touchscreen.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "interrupt_pin",

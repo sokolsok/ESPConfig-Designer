@@ -2,10 +2,12 @@
   "id": "sensor.ms8607",
   "domain": "sensor",
   "platform": "ms8607",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/ms8607/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "temperature",

@@ -2,11 +2,13 @@
   "id": "cover.he60r",
   "domain": "cover",
   "platform": "he60r",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/cover/he60r/",
   "extends": "base_cover.json",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "open_duration",

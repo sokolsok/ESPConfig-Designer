@@ -2,7 +2,6 @@
   "id": "sensor.ct_clamp",
   "domain": "sensor",
   "platform": "ct_clamp",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/ct_clamp/",
   "extends": "base_sensor.json",
   "fields": [

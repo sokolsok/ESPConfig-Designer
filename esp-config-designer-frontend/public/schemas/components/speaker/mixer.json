@@ -2,7 +2,6 @@
   "id": "speaker.mixer",
   "domain": "speaker",
   "platform": "mixer",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/speaker/mixer/",
   "extends": "base_speaker.json",
   "fields": [

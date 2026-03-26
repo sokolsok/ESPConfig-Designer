@@ -2,11 +2,13 @@
   "id": "sensor.gl_r01",
   "domain": "sensor",
   "platform": "gl_r01",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/gl_r01/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

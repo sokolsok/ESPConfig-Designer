@@ -1,10 +1,12 @@
 {
   "id": "dfplayer",
   "domain": "dfplayer",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/dfplayer/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "id",

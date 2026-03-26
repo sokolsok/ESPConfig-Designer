@@ -2,7 +2,6 @@
   "id": "alarm_control_panel.template",
   "domain": "alarm_control_panel",
   "platform": "template",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/alarm_control_panel/template/",
   "extends": "base_alarm_control_panel.json",
   "fields": [

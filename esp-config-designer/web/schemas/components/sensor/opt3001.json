@@ -2,11 +2,13 @@
   "id": "sensor.opt3001",
   "domain": "sensor",
   "platform": "opt3001",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/opt3001/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

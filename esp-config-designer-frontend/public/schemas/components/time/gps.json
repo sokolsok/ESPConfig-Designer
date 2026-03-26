@@ -2,10 +2,12 @@
   "id": "time.gps",
   "domain": "time",
   "platform": "gps",
-  "requires": [
-    "gps"
-  ],
   "helpUrl": "https://esphome.io/components/time/gps/",
   "extends": "base_time.json",
+  "requirements": [
+    {
+      "require": "component:gps"
+    }
+  ],
   "fields": []
 }

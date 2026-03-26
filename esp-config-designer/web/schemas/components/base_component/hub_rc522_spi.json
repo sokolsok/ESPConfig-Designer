@@ -2,10 +2,12 @@
   "id": "hub.rc522_spi",
   "domain": "rc522_spi",
   "platform": "",
-  "requires": [
-    "spi"
-  ],
   "type": "object",
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "id",

@@ -2,15 +2,22 @@
   "id": "network.ethernet",
   "domain": "network",
   "platform": "ethernet",
-  "requires": [],
-  "requiresByType": {
-    "W5500": [
-      "spi"
-    ],
-    "DM9051": [
-      "spi"
-    ]
-  },
+  "requirements": [
+    {
+      "require": "bus:spi",
+      "when": {
+        "key": "type",
+        "value": "W5500"
+      }
+    },
+    {
+      "require": "bus:spi",
+      "when": {
+        "key": "type",
+        "value": "DM9051"
+      }
+    }
+  ],
   "fields": [
     {
       "key": "type",

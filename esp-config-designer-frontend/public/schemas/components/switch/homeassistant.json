@@ -2,7 +2,6 @@
   "id": "switch.homeassistant",
   "domain": "switch",
   "platform": "homeassistant",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/switch/homeassistant/",
   "extends": "base_switch.json",
   "fields": [

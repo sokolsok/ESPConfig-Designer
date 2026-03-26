@@ -2,7 +2,6 @@
   "id": "display.addressable_light",
   "domain": "display",
   "platform": "addressable_light",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/display/addressable_light/",
   "extends": "base_display.json",
   "display_builder": true,

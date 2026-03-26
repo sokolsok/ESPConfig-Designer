@@ -1,10 +1,12 @@
 {
   "id": "micro_wake_word",
   "domain": "micro_wake_word",
-  "requires": [
-    "microphone"
-  ],
   "helpUrl": "https://esphome.io/components/micro_wake_word/",
+  "requirements": [
+    {
+      "require": "component:microphone"
+    }
+  ],
   "fields": [
     {
       "key": "id",

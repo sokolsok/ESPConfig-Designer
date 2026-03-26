@@ -2,10 +2,12 @@
   "id": "sensor.ee895",
   "domain": "sensor",
   "platform": "ee895",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/ee895/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "address",

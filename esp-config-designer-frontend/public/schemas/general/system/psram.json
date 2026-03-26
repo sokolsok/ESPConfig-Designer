@@ -1,0 +1,91 @@
+{
+  "id": "other.psram",
+  "domain": "psram",
+  "platform": "core",
+  "fields": [
+    {
+      "key": "enabled",
+      "label": "Enable PSRAM",
+      "type": "boolean",
+      "required": false,
+      "lvl": "simple",
+      "default": false,
+      "emitYAML": "never",
+      "helpUrl": "https://esphome.io/components/psram/"
+    },
+    {
+      "key": "mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "options": [
+        "quad",
+        "octal",
+        "hex"
+      ]
+    },
+    {
+      "key": "speed",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": "40MHz",
+      "options": [
+        "40MHz",
+        "80MHz",
+        "120MHz"
+      ]
+    },
+    {
+      "key": "enable_ecc",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": false
+    },
+    {
+      "key": "disabled",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": false
+    },
+    {
+      "key": "ignore_not_found",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "default": true
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    }
+  ]
+}

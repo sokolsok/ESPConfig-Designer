@@ -2,10 +2,12 @@
   "id": "sensor.ade7880",
   "domain": "sensor",
   "platform": "ade7880",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/ade7880/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

@@ -2,7 +2,6 @@
   "id": "sensor.xiaomi_miscale",
   "domain": "sensor",
   "platform": "xiaomi_miscale",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/xiaomi_miscale/",
   "fields": [
     {

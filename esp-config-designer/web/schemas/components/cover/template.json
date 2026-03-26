@@ -2,7 +2,6 @@
   "id": "cover.template",
   "domain": "cover",
   "platform": "template",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/cover/template/",
   "extends": "base_cover.json",
   "fields": [

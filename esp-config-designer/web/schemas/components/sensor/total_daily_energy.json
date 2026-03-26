@@ -2,7 +2,6 @@
   "id": "sensor.total_daily_energy",
   "domain": "sensor",
   "platform": "total_daily_energy",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/total_daily_energy/",
   "extends": "base_sensor.json",
   "fields": [

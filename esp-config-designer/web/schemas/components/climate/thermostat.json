@@ -2,7 +2,6 @@
   "id": "climate.thermostat",
   "domain": "climate",
   "platform": "thermostat",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/climate/thermostat/",
   "extends": "base_climate.json",
   "fields": [

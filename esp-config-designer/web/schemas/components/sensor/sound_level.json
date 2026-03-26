@@ -2,7 +2,6 @@
   "id": "sensor.sound_level",
   "domain": "sensor",
   "platform": "sound_level",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/sound_level/",
   "fields": [
     {

@@ -2,10 +2,12 @@
   "id": "sensor.dps310",
   "domain": "sensor",
   "platform": "dps310",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/dps310/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "pressure",

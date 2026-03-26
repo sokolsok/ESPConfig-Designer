@@ -2,7 +2,6 @@
   "id": "text.template",
   "domain": "text",
   "platform": "template",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/text/template/",
   "extends": "base_text.json",
   "fields": [

@@ -2,7 +2,6 @@
   "id": "fan.template",
   "domain": "fan",
   "platform": "template",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/fan/template/",
   "extends": "base_fan.json",
   "fields": [

@@ -2,7 +2,6 @@
   "id": "output.template",
   "domain": "output",
   "platform": "template",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/output/template/",
   "extends": "base_output.json",
   "fields": [

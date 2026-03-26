@@ -2,7 +2,6 @@
   "id": "sensor.lc709203f",
   "domain": "sensor",
   "platform": "lc709203f",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/lc709203f/",
   "fields": [
     {

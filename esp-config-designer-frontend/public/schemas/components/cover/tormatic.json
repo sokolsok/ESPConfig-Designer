@@ -2,11 +2,13 @@
   "id": "cover.tormatic",
   "domain": "cover",
   "platform": "tormatic",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/cover/tormatic/",
   "extends": "base_cover.json",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "name",

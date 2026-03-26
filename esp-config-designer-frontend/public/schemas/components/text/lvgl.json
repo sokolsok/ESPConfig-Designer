@@ -2,7 +2,6 @@
   "id": "text.lvgl",
   "domain": "text",
   "platform": "lvgl",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/text/lvgl/",
   "extends": "base_text.json",
   "fields": [

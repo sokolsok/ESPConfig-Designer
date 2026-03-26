@@ -2,10 +2,12 @@
   "id": "hub.gp8403",
   "domain": "gp8403",
   "platform": "",
-  "requires": [
-    "i2c"
-  ],
   "type": "object",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "id",

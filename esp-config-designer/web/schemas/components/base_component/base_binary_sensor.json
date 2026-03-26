@@ -2,7 +2,6 @@
   "id": "base.binary_sensor",
   "domain": "binary_sensor",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

@@ -2,7 +2,6 @@
   "id": "base.select",
   "domain": "select",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

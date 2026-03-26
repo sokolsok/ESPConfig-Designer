@@ -2,10 +2,12 @@
   "id": "sensor.max31855",
   "domain": "sensor",
   "platform": "max31855",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/max31855/",
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "cs_pin",

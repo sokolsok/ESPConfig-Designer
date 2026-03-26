@@ -18,7 +18,7 @@
       <div class="app-topbar-left">
         <div class="builder-hero-brand">
         <img src="/ECD_logo.png" alt="ECD" />
-        <span class="builder-hero-meta">v 1.0.12</span>
+        <span class="builder-hero-meta">v {{ appVersion }}</span>
         </div>
       </div>
 
@@ -89,6 +89,8 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { RouterView, useRoute, useRouter } from "vue-router";
 import UnsavedChangesModal from "./components/UnsavedChangesModal.vue";
+
+const appVersion = __APP_VERSION__;
 
 const route = useRoute();
 const router = useRouter();

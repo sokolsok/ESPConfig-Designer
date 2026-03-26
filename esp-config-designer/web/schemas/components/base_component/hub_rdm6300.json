@@ -2,10 +2,12 @@
   "id": "hub.rdm6300",
   "domain": "rdm6300",
   "platform": "",
-  "requires": [
-    "uart"
-  ],
   "type": "object",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "id",

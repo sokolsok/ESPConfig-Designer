@@ -2,10 +2,12 @@
   "id": "hub.tlc59208f",
   "domain": "tlc59208f",
   "platform": "",
-  "requires": [
-    "i2c"
-  ],
   "type": "object",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "id",

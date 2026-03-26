@@ -2,12 +2,14 @@
   "id": "display.nextion",
   "domain": "display",
   "platform": "nextion",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/display/nextion/",
   "extends": "base_display.json",
   "display_builder": false,
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "uart_id",

@@ -2,7 +2,6 @@
   "id": "output.ac_dimmer",
   "domain": "output",
   "platform": "ac_dimmer",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/output/ac_dimmer/",
   "extends": "base_output_float.json",
   "fields": [

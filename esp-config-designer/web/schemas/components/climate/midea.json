@@ -2,11 +2,13 @@
   "id": "climate.midea",
   "domain": "climate",
   "platform": "midea",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/climate/midea/",
   "extends": "base_climate.json",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "uart_id",

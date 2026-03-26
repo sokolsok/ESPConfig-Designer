@@ -2,10 +2,12 @@
   "id": "hub.mcp4461",
   "domain": "mcp4461",
   "platform": "",
-  "requires": [
-    "i2c"
-  ],
   "type": "object",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "id",

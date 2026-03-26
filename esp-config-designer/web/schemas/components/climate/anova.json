@@ -2,7 +2,6 @@
   "id": "climate.anova",
   "domain": "climate",
   "platform": "anova",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/climate/anova/",
   "extends": "base_climate.json",
   "fields": [

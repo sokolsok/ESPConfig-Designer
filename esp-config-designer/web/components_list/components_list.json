@@ -4006,8 +4006,8 @@
           "name": "ESP32 Camera",
           "path": "components/esp32_camera",
           "id": "esp32_camera",
-          "available": false,
-          "schemaPath": ""
+          "available": true,
+          "schemaPath": "components/miscellaneous/esp32_camera.json"
         },
         {
           "name": "Exposure Notifications",

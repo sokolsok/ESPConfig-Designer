@@ -2,11 +2,13 @@
   "id": "sensor.bh1900nux",
   "domain": "sensor",
   "platform": "bh1900nux",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/bh1900nux/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

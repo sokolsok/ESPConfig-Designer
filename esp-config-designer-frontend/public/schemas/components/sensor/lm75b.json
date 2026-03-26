@@ -2,11 +2,13 @@
   "id": "sensor.lm75b",
   "domain": "sensor",
   "platform": "lm75b",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/lm75b/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

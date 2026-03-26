@@ -2,7 +2,6 @@
   "id": "climate.bedjet",
   "domain": "climate",
   "platform": "bedjet",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/climate/bedjet/",
   "extends": "base_climate.json",
   "fields": [

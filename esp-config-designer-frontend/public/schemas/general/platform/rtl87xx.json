@@ -2,7 +2,6 @@
   "id": "platform.rtl87xx",
   "domain": "platform",
   "platform": "rtl87xx",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/rtl87xx/",
   "fields": [
     {

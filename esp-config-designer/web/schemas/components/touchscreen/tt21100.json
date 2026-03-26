@@ -2,11 +2,13 @@
   "id": "touchscreen.tt21100",
   "domain": "touchscreen",
   "platform": "tt21100",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/touchscreen/tt21100/",
   "extends": "base_touchscreen.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "interrupt_pin",

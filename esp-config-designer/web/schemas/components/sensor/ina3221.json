@@ -2,10 +2,12 @@
   "id": "sensor.ina3221",
   "domain": "sensor",
   "platform": "ina3221",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/ina3221/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "address",

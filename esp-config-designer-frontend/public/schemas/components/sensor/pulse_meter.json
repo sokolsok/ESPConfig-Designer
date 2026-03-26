@@ -2,7 +2,6 @@
   "id": "sensor.pulse_meter",
   "domain": "sensor",
   "platform": "pulse_meter",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/pulse_meter/",
   "extends": "base_sensor.json",
   "fields": [

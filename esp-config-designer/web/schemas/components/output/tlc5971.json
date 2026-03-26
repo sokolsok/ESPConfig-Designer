@@ -2,7 +2,6 @@
   "id": "output.tlc5971",
   "domain": "output",
   "platform": "tlc5971",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/output/tlc5971/",
   "extends": "base_output_float.json",
   "embedded": [

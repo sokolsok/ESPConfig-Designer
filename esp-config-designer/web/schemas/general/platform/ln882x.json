@@ -2,7 +2,6 @@
   "id": "platform.ln882x",
   "domain": "platform",
   "platform": "ln882x",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/ln882x/",
   "fields": [
     {

@@ -2,7 +2,6 @@
   "id": "sensor.thermopro_ble",
   "domain": "sensor",
   "platform": "thermopro_ble",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/thermopro_ble/",
   "embedded": [
     {

@@ -2,7 +2,6 @@
   "id": "cover.current_based",
   "domain": "cover",
   "platform": "current_based",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/cover/current_based/",
   "extends": "base_cover.json",
   "fields": [

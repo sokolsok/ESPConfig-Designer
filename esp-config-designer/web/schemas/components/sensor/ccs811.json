@@ -2,10 +2,12 @@
   "id": "sensor.ccs811",
   "domain": "sensor",
   "platform": "ccs811",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/ccs811/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "update_interval",

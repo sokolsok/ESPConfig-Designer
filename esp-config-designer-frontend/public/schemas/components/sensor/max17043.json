@@ -2,11 +2,13 @@
   "id": "sensor.max17043",
   "domain": "sensor",
   "platform": "max17043",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/max17043/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

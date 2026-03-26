@@ -2,7 +2,6 @@
   "id": "fan.binary",
   "domain": "fan",
   "platform": "binary",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/fan/binary/",
   "extends": "base_fan.json",
   "fields": [

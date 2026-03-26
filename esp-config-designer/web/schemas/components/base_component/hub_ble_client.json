@@ -2,10 +2,12 @@
   "id": "hub.ble_client",
   "domain": "ble_client",
   "platform": "",
-  "requires": [
-    "esp32_ble_tracker"
-  ],
   "type": "object",
+  "requirements": [
+    {
+      "require": "component:esp32_ble_tracker"
+    }
+  ],
   "fields": [
     {
       "key": "id",

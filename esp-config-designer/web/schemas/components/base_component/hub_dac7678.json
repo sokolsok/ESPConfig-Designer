@@ -2,10 +2,12 @@
   "id": "hub.dac7678",
   "domain": "dac7678",
   "platform": "",
-  "requires": [
-    "i2c"
-  ],
   "type": "object",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "id",

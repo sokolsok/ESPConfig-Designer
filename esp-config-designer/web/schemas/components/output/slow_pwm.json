@@ -2,7 +2,6 @@
   "id": "output.slow_pwm",
   "domain": "output",
   "platform": "slow_pwm",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/output/slow_pwm/",
   "extends": "base_output_float.json",
   "fields": [

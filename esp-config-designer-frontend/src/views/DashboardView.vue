@@ -1,26 +1,9 @@
 <template>
-  <ConfirmModal
-    :open="confirmDeleteFolderOpen"
-    title="Confirm"
-    message="Delete this folder and all nested folders?"
-    confirm-text="Yes"
-    cancel-text="Cancel"
-    @confirm="confirmRemoveFolder"
-    @cancel="cancelRemoveFolder"
-  />
-  <ConfirmModal
-    :open="confirmDeleteProjectOpen"
-    title="Confirm"
-    message="Delete this project and all related files?"
-    confirm-text="Yes"
-    cancel-text="Cancel"
-    @confirm="confirmRemoveProject"
-    @cancel="cancelRemoveProject"
-  />
-  <div v-if="dashboardActionError" class="dashboard-state dashboard-state--error">{{ dashboardActionError }}</div>
-
-  <InstallConsoleModal
-    :compile-open="compileModalOpen"
+  <DashboardModalHost
+    :confirm-delete-folder-open="confirmDeleteFolderOpen"
+    :confirm-delete-project-open="confirmDeleteProjectOpen"
+    :dashboard-action-error="dashboardActionError"
+    :compile-modal-open="compileModalOpen"
     :terminal-title="terminalTitle"
     :compile-state-class="compileStateClass"
     :compile-state-label="compileStateLabel"
@@ -29,10 +12,50 @@
     :compile-log-lines="compileLogLines"
     :can-download-compiled-binary="canDownloadCompiledBinary"
     :can-close-compile="canCloseCompile"
-    :on-console-ref="setCompileConsoleElement"
-    @toggle-autoscroll="toggleCompileAutoscroll"
-    @download="downloadBinary"
-    @close-compile="closeCompileModal"
+    :set-compile-console-element="setCompileConsoleElement"
+    :open-project-menu-name="openProjectMenuName"
+    :set-project-menu-ref="setProjectMenuRef"
+    :project-menu-style="projectMenuStyle"
+    :can-open-project-menu-logs="canOpenProjectMenuLogs"
+    :customize-modal-open="customizeModalOpen"
+    :customize-project-title="customizeProjectTitle"
+    :customize-preview-yaml-name="customizePreviewYamlName"
+    :customize-preview-date-label="customizePreviewDateLabel"
+    :customize-preview-style="customizePreviewStyle"
+    :customize-preview-icon-style="customizePreviewIconStyle"
+    :customize-draft="customizeDraft"
+    :customize-icon-value="customizeIconValue"
+    :customize-error="customizeError"
+    :customize-busy="customizeBusy"
+    :customize-icon-picker-open="customizeIconPickerOpen"
+    :customize-icon-query="customizeIconQuery"
+    :customize-color-picker-open="customizeColorPickerOpen"
+    :customize-color-picker-value="customizeColorPickerValue"
+    @confirm-remove-folder="confirmRemoveFolder"
+    @cancel-remove-folder="cancelRemoveFolder"
+    @confirm-remove-project="confirmRemoveProject"
+    @cancel-remove-project="cancelRemoveProject"
+    @toggle-compile-autoscroll="toggleCompileAutoscroll"
+    @download-binary="downloadBinary"
+    @close-compile-modal="closeCompileModal"
+    @edit-project-from-menu="requestOpenProjectInBuilderFromMenu"
+    @validate-project-from-menu="handleProjectMenuValidate"
+    @logs-project-from-menu="handleProjectMenuLogs"
+    @export-project-from-menu="handleProjectMenuExport"
+    @clean-build-from-menu="handleProjectMenuCleanBuild"
+    @customize-project-from-menu="requestCustomizeProjectFromMenu"
+    @delete-project-from-menu="requestDeleteProjectFromMenu"
+    @close-customize-modal="closeCustomizeModal"
+    @reset-project-customization="resetProjectCustomization"
+    @apply-project-customization="applyProjectCustomization"
+    @update:customizeIconValue="customizeIconValue = $event"
+    @open-customize-icon-picker="openCustomizeIconPicker"
+    @open-customize-color-picker="openCustomizeColorPicker"
+    @update-customize-draft="(key, value) => (customizeDraft[key] = value)"
+    @close-customize-icon-picker="handleCustomizeIconPickerClose"
+    @select-customize-icon="handleCustomizeIconSelect"
+    @close-customize-color-picker="customizeColorPickerOpen = false"
+    @select-customize-color="handleCustomizeColorSelect"
   />
 
   <section
@@ -40,98 +63,32 @@
     class="dashboard-view"
     :style="{ gridTemplateColumns: `${sidebarWidth}px 8px minmax(0, 1fr)` }"
   >
-    <aside class="dashboard-sidebar">
-      <div v-for="row in folderRows" :key="row.id" class="folder-row">
-        <template v-if="row.kind === 'folder'">
-          <button
-            type="button"
-            class="folder-row-button"
-            :class="{
-              active: isFolderActive(row.id),
-              'drop-target': dragOverFolderId === row.id
-            }"
-            :style="{ paddingLeft: `${10 + row.depth * 14}px` }"
-            @click="selectFolder(row.id)"
-            @dragover.prevent="handleFolderDragOver(row.id)"
-            @dragenter.prevent="handleFolderDragOver(row.id)"
-            @dragleave="handleFolderDragLeave(row.id, $event)"
-            @drop.prevent="handleFolderDrop(row.id)"
-          >
-            <span class="folder-row-label">
-              <span
-                v-if="row.hasChildren"
-                class="folder-inline-toggle"
-                role="button"
-                tabindex="0"
-                aria-label="Toggle folder"
-                @click.stop="toggleFolderExpanded(row.id)"
-                @keydown.enter.stop.prevent="toggleFolderExpanded(row.id)"
-                @keydown.space.stop.prevent="toggleFolderExpanded(row.id)"
-              >
-                <img
-                  :src="row.isExpanded ? CHEVRON_DOWN_ICON_URL : CHEVRON_RIGHT_ICON_URL"
-                  alt=""
-                  aria-hidden="true"
-                />
-              </span>
-              <span v-else class="folder-inline-toggle-placeholder"></span>
-              <img class="tree-row-icon" :src="FOLDER_ICON_URL" alt="" aria-hidden="true" />
-              <span class="folder-row-name">{{ row.name }}</span>
-            </span>
-            <span
-              class="folder-menu-toggle"
-              role="button"
-              tabindex="0"
-              aria-label="Folder menu"
-              @click.stop="toggleFolderMenu(row.id)"
-              @keydown.enter.stop.prevent="toggleFolderMenu(row.id)"
-              @keydown.space.stop.prevent="toggleFolderMenu(row.id)"
-            >
-              <span class="vertical-dots" aria-hidden="true">
-                <span></span>
-                <span></span>
-                <span></span>
-              </span>
-            </span>
-          </button>
-
-          <div v-if="openFolderMenuId === row.id" class="folder-menu">
-            <button type="button" @click.stop="beginAddFolder(row.id)">Add folder</button>
-            <button type="button" v-if="!row.isRoot" @click.stop="removeFolder(row.id)">
-              Delete folder
-            </button>
-          </div>
-        </template>
-
-        <template v-else-if="row.kind === 'project'">
-          <button
-            type="button"
-            class="project-tree-item"
-            :class="{ active: row.projectName === selectedProjectName }"
-            :style="projectTreeItemStyle(row.projectName, 10 + row.depth * 14)"
-            @click="selectProject(row.projectName, { forceFolderView: true })"
-          >
-            <span class="tree-row-icon tree-row-icon--project" :style="projectTreeIconStyle(row.projectName)" aria-hidden="true"></span>
-            <span class="project-tree-label">{{ row.name }}</span>
-          </button>
-        </template>
-
-        <template v-else>
-          <div class="folder-draft-item" :style="{ paddingLeft: `${10 + row.depth * 14}px` }">
-            <input
-              :ref="setPendingFolderInputRef"
-              v-model="pendingFolderName"
-              type="text"
-              class="folder-draft-input"
-              placeholder="New folder"
-              @keydown.enter.prevent="commitPendingFolder"
-              @keydown.esc.prevent="cancelPendingFolder"
-              @blur="commitPendingFolder"
-            />
-          </div>
-        </template>
-        </div>
-    </aside>
+    <DashboardFolderTree
+      :folder-rows="folderRows"
+      :is-folder-active="isFolderActive"
+      :drag-over-folder-id="dragOverFolderId"
+      :open-folder-menu-id="openFolderMenuId"
+      :selected-project-name="selectedProjectName"
+      :project-tree-item-style="projectTreeItemStyle"
+      :project-tree-icon-style="projectTreeIconStyle"
+      :pending-folder-name="pendingFolderName"
+      :set-pending-folder-input-ref="setPendingFolderInputRef"
+      :chevron-down-icon-url="CHEVRON_DOWN_ICON_URL"
+      :chevron-right-icon-url="CHEVRON_RIGHT_ICON_URL"
+      :folder-icon-url="FOLDER_ICON_URL"
+      @select-folder="selectFolder"
+      @folder-drag-over="handleFolderDragOver"
+      @folder-drag-leave="handleFolderDragLeave"
+      @folder-drop="handleFolderDrop"
+      @toggle-folder-expanded="toggleFolderExpanded"
+      @toggle-folder-menu="toggleFolderMenu"
+      @begin-add-folder="beginAddFolder"
+      @remove-folder="removeFolder"
+      @select-project="selectProject"
+      @update:pendingFolderName="pendingFolderName = $event"
+      @commit-pending-folder="commitPendingFolder"
+      @cancel-pending-folder="cancelPendingFolder"
+    />
 
     <div
       class="dashboard-resizer"
@@ -141,248 +98,49 @@
       @mousedown.prevent="startSidebarResize"
     ></div>
 
-    <section class="dashboard-content">
-      <div class="dashboard-toolbar-wrap">
-        <div class="dashboard-toolbar">
-          <button
-            type="button"
-            class="toolbar-mode-toggle"
-            @click="viewMode = viewMode === 'folder' ? 'all' : 'folder'"
-          >
-            {{ viewMode === "folder" ? "All devices" : "Folder view" }}
-          </button>
-
-          <button
-            type="button"
-            class="toolbar-up-button"
-            :disabled="isRootFolderSelected"
-            @click="goToParentFolder"
-          >
-            <img :src="ARROW_UP_ICON_URL" alt="" aria-hidden="true" />
-          </button>
-
-          <div class="toolbar-breadcrumb" role="navigation" aria-label="Folder path">
-            <button
-              v-for="(crumb, index) in folderPath"
-              :key="crumb.id"
-              type="button"
-              class="breadcrumb-item"
-              @click="selectFolder(crumb.id)"
-            >
-              <span>{{ crumb.name }}</span>
-              <span v-if="index < folderPath.length - 1" class="breadcrumb-sep">›</span>
-            </button>
-          </div>
-
-          <label class="dashboard-search" for="dashboardSearch">
-            <img
-              class="dashboard-search-icon"
-              src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/magnify.svg"
-              alt=""
-              aria-hidden="true"
-            />
-            <input
-              id="dashboardSearch"
-              type="search"
-              placeholder="Search files, folders"
-              autocomplete="off"
-              v-model="searchText"
-            />
-          </label>
-        </div>
-      </div>
-
-      <div v-if="loading" class="dashboard-state">Loading projects...</div>
-      <div v-else-if="errorMessage" class="dashboard-state dashboard-state--error">{{ errorMessage }}</div>
-      <div v-else-if="saveMessage" class="dashboard-state dashboard-state--warning">{{ saveMessage }}</div>
-
-      <template v-else>
-        <div class="dashboard-content-actions">
-          <button type="button" class="btn-standard dashboard-new-device" @click="requestOpenBlankBuilder">
-            New device
-          </button>
-        </div>
-
-        <section ref="entriesPaneRef" class="entries-pane">
-        <section v-if="viewMode === 'folder' && visibleFolderEntries.length" class="entries-section">
-          <h3 class="entries-title">Folders</h3>
-          <div class="folders-grid">
-            <article
-              v-for="entry in visibleFolderEntries"
-              :key="entry.key"
-              class="folder-tile"
-              @dragover.prevent="handleFolderDragOver(entry.id)"
-              @dragenter.prevent="handleFolderDragOver(entry.id)"
-              @dragleave="handleFolderDragLeave(entry.id, $event)"
-              @drop.prevent="handleFolderDrop(entry.id)"
-              @dblclick="openFolderFromTile(entry.id)"
-            >
-              <div class="folder-tile-top">
-                <span class="project-icon project-icon--folder">
-                  <img :src="entry.icon" alt="" aria-hidden="true" />
-                </span>
-                <h4>{{ entry.title }}</h4>
-              </div>
-              <p class="folder-tile-hint">{{ entry.folderCount }} folders - {{ entry.projectCount }} projects</p>
-            </article>
-          </div>
-        </section>
-
-        <section v-if="visibleProjectEntries.length" class="entries-section">
-          <h3 class="entries-title">{{ viewMode === "all" ? "All devices" : "Projects" }}</h3>
-          <div class="projects-grid">
-            <ProjectTileCard
-              v-for="entry in visibleProjectEntries"
-              :key="entry.key"
-              class="project-tile"
-              :active="entry.name === selectedProjectName"
-              :online="entry.online"
-              :interactive="true"
-              :show-menu="true"
-              :title="entry.title"
-              :yaml-name="entry.yamlName"
-              :last-edited-label="entry.lastEditedLabel"
-              :tile-style="projectTileStyle(entry.name)"
-              :icon-style="projectTileIconStyle(entry.name)"
-              :draggable="true"
-              @click="selectProject(entry.name)"
-              @dblclick="requestOpenProjectInBuilder(entry.name)"
-              @menu="openProjectMenu(entry.name, $event)"
-              @dragstart="handleProjectDragStart(entry.name, $event)"
-              @dragend="handleProjectDragEnd()"
-            />
-          </div>
-        </section>
-
-        <article v-if="visibleFolderEntries.length === 0 && visibleProjectEntries.length === 0" class="project-empty">
-          No folders or projects match your search.
-        </article>
-        </section>
-      </template>
-    </section>
+    <DashboardEntriesPane
+      :loading="loading"
+      :error-message="errorMessage"
+      :save-message="saveMessage"
+      :view-mode="viewMode"
+      :is-root-folder-selected="isRootFolderSelected"
+      :folder-path="folderPath"
+      :search-text="searchText"
+      :visible-folder-entries="visibleFolderEntries"
+      :visible-project-entries="visibleProjectEntries"
+      :selected-project-name="selectedProjectName"
+      :project-tile-style="projectTileStyle"
+      :project-tile-icon-style="projectTileIconStyle"
+      :entries-pane-ref="setEntriesPaneRef"
+      :arrow-up-icon-url="ARROW_UP_ICON_URL"
+      :search-icon-url="SEARCH_ICON_URL"
+      @toggle-view-mode="viewMode = viewMode === 'folder' ? 'all' : 'folder'"
+      @go-parent-folder="goToParentFolder"
+      @select-folder="selectFolder"
+      @update:search-text="searchText = $event"
+      @open-blank-builder="requestOpenBlankBuilder"
+      @folder-drag-over="handleFolderDragOver"
+      @folder-drag-leave="handleFolderDragLeave"
+      @folder-drop="handleFolderDrop"
+      @open-folder-tile="openFolderFromTile"
+      @select-project="selectProject"
+      @open-project-builder="requestOpenProjectInBuilder"
+      @open-project-menu="openProjectMenu"
+      @project-drag-start="handleProjectDragStart"
+      @project-drag-end="handleProjectDragEnd"
+    />
   </section>
 
-  <Teleport to="body">
-    <div
-      v-if="openProjectMenuName"
-      :ref="setProjectMenuRef"
-      class="project-menu project-menu--floating"
-      :style="projectMenuStyle"
-    >
-      <button type="button" @click.stop="requestOpenProjectInBuilderFromMenu">Edit</button>
-      <button type="button" @click.stop="handleProjectMenuValidate">Validate</button>
-      <button type="button" :disabled="!canOpenProjectMenuLogs" @click.stop="handleProjectMenuLogs">Logs</button>
-      <button type="button" @click.stop="handleProjectMenuExport">Download YAML</button>
-      <button type="button" @click.stop="handleProjectMenuCleanBuild">Clean Build</button>
-      <button type="button" @click.stop="requestCustomizeProjectFromMenu">Customize</button>
-      <button type="button" @click.stop="requestDeleteProjectFromMenu">Delete Project</button>
-    </div>
-  </Teleport>
-
-  <div v-if="customizeModalOpen" class="customize-modal-overlay" @click.self="closeCustomizeModal">
-    <div class="customize-modal" role="dialog" aria-modal="true" aria-label="Customize tile">
-      <div class="customize-modal-header">
-        <div>
-          <h3>Customize tile</h3>
-          <p>{{ customizeProjectTitle }}</p>
-        </div>
-      </div>
-
-      <div class="customize-modal-preview">
-        <ProjectTileCard
-          class="customize-preview-card"
-          :title="customizeProjectTitle"
-          :yaml-name="customizePreviewYamlName"
-          :last-edited-label="customizePreviewDateLabel"
-          :tile-style="customizePreviewStyle"
-          :icon-style="customizePreviewIconStyle"
-        />
-      </div>
-
-      <div class="customize-modal-body">
-        <div class="customize-field-row">
-          <label for="tileIconInput">Icon</label>
-          <div class="customize-field-inputs">
-            <input id="tileIconInput" type="text" v-model="customizeIconValue" placeholder="mdi:memory" />
-            <button type="button" class="btn-standard compact" @click="openCustomizeIconPicker">Pick icon</button>
-          </div>
-        </div>
-
-        <div class="customize-field-row">
-          <label for="tileIconColorInput">Icon color</label>
-          <div class="customize-field-inputs">
-            <input id="tileIconColorInput" type="text" v-model="customizeDraft.iconColor" placeholder="#0F172A" />
-            <button type="button" class="btn-standard compact" @click="openCustomizeColorPicker('icon')">Pick color</button>
-          </div>
-        </div>
-
-        <div class="customize-field-row">
-          <label for="tileBackgroundInput">Tile background</label>
-          <div class="customize-field-inputs">
-            <input id="tileBackgroundInput" type="text" v-model="customizeDraft.backgroundColor" placeholder="#FFFFFF" />
-            <button type="button" class="btn-standard compact" @click="openCustomizeColorPicker('background')">
-              Pick color
-            </button>
-          </div>
-        </div>
-
-        <div class="customize-field-row">
-          <label for="tileTitleColorInput">Title color</label>
-          <div class="customize-field-inputs">
-            <input id="tileTitleColorInput" type="text" v-model="customizeDraft.titleColor" placeholder="#1F3F6D" />
-            <button type="button" class="btn-standard compact" @click="openCustomizeColorPicker('title')">
-              Pick color
-            </button>
-          </div>
-        </div>
-
-        <div class="customize-field-row">
-          <label for="tileMetaColorInput">Metadata color</label>
-          <div class="customize-field-inputs">
-            <input id="tileMetaColorInput" type="text" v-model="customizeDraft.metaColor" placeholder="#7190B8" />
-            <button type="button" class="btn-standard compact" @click="openCustomizeColorPicker('meta')">
-              Pick color
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="customizeError" class="customize-modal-error">{{ customizeError }}</div>
-
-      <div class="customize-modal-actions">
-        <button type="button" class="btn-standard secondary" :disabled="customizeBusy" @click="closeCustomizeModal">Cancel</button>
-        <button type="button" class="btn-standard secondary" :disabled="customizeBusy" @click="resetProjectCustomization">
-          Reset to default
-        </button>
-        <button type="button" class="btn-standard" :disabled="customizeBusy" @click="applyProjectCustomization">Apply</button>
-      </div>
-    </div>
-  </div>
-
-  <IconPicker
-    :open="customizeIconPickerOpen"
-    :selected="customizeDraft.iconName"
-    :initial-query="customizeIconQuery"
-    @close="handleCustomizeIconPickerClose"
-    @select="handleCustomizeIconSelect"
-  />
-
-  <ColorPickerModal
-    :open="customizeColorPickerOpen"
-    :selected="customizeColorPickerValue"
-    @close="customizeColorPickerOpen = false"
-    @select="handleCustomizeColorSelect"
-  />
 </template>
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import ConfirmModal from "../components/ConfirmModal.vue";
-import InstallConsoleModal from "../components/InstallConsoleModal.vue";
-import IconPicker from "../components/IconPicker.vue";
-import ColorPickerModal from "../components/ColorPickerModal.vue";
-import ProjectTileCard from "../components/dashboard/ProjectTileCard.vue";
+import DashboardEntriesPane from "../components/dashboard/DashboardEntriesPane.vue";
+import DashboardFolderTree from "../components/dashboard/DashboardFolderTree.vue";
+import DashboardModalHost from "../components/dashboard/DashboardModalHost.vue";
+import { useDashboardDeviceStatus } from "../composables/dashboard/useDashboardDeviceStatus";
+import { useDashboardTree } from "../composables/dashboard/useDashboardTree";
 import { useInstallConsoleFlow } from "../composables/useInstallConsoleFlow";
 import {
   BUILDER_CONFIG_STORAGE_KEY,
@@ -391,20 +149,20 @@ import {
   writeBuilderSessionProjectName
 } from "../utils/builderSession";
 import {
-  mergeDeviceStatusCache,
   normalizeProjectKey,
-  readDeviceStatusCache
 } from "../utils/deviceStatusCache";
 import {
   computePendingPromotion,
   computePostInstallDeploymentUpdate,
   createDeploymentIdentityFromYaml,
-  isProjectOnlineForDeployment,
   readProjectDeploymentState,
-  resolveActiveDeploymentHost,
   writeProjectDeploymentState
 } from "../utils/projectDeploymentState";
 import { normalizeHexColor } from "../utils/displayColor";
+
+// DashboardView coordinates explorer state, shared top-bar actions, and modal flows.
+// Rendering details, tree logic, and device status polling are delegated to focused
+// components/composables so the view can stay centered on dashboard workflows.
 
 const ROOT_FOLDER_ID = "root";
 const ROOT_FOLDER_LABEL = "Projects";
@@ -437,6 +195,9 @@ const folderIdCounter = ref(0);
 const persistAvailable = ref(true);
 const dashboardViewRef = ref(null);
 const sidebarWidth = ref(250);
+const setEntriesPaneRef = (element) => {
+  entriesPaneRef.value = element;
+};
 const isSidebarResizing = ref(false);
 const pendingFolderParentId = ref("");
 const pendingFolderName = ref("");
@@ -462,13 +223,9 @@ const customizeDraft = ref({
   metaColor: ""
 });
 const openBuilderRunning = ref(false);
-const onlineProjectKeys = ref(new Set());
-const projectHosts = ref(new Map());
 const dashboardActionError = ref("");
 const PROJECTS_UPDATED_STORAGE_KEY = "vebProjectsUpdatedSignal";
 const PROJECTS_UPDATED_CHANNEL = "ecd-projects";
-const POLL_INTERVAL_MS = 5000;
-let devicesStatusPollId = null;
 let projectsEventsChannel = null;
 let refreshProjectsPromise = null;
 let projectDisplayNamesRequestId = 0;
@@ -496,6 +253,7 @@ const FOLDER_ICON_URL = "https://cdn.jsdelivr.net/npm/@mdi/svg/svg/folder-outlin
 const CHEVRON_RIGHT_ICON_URL = "https://cdn.jsdelivr.net/npm/@mdi/svg/svg/chevron-right.svg";
 const CHEVRON_DOWN_ICON_URL = "https://cdn.jsdelivr.net/npm/@mdi/svg/svg/chevron-down.svg";
 const ARROW_UP_ICON_URL = "https://cdn.jsdelivr.net/npm/@mdi/svg/svg/arrow-up.svg";
+const SEARCH_ICON_URL = "https://cdn.jsdelivr.net/npm/@mdi/svg/svg/magnify.svg";
 
 const getApiUrl = (path) => new URL(path, baseUrl).toString();
 // In development we use local runtime files via Vite middleware.
@@ -742,32 +500,6 @@ const deviceKeyFromPayload = (device) => {
   return projectKeyFromName(device?.name || "");
 };
 
-const applyCachedDeviceStatus = () => {
-  const cache = readDeviceStatusCache();
-  const hosts = new Map();
-  const onlineKeys = [];
-
-  Object.entries(cache).forEach(([projectKey, entry]) => {
-    const key = projectKeyFromName(projectKey);
-    if (!key) return;
-    const status = String(entry?.status || "").toLowerCase();
-    const host = String(entry?.host || "").trim();
-    if (host) {
-      hosts.set(key, host);
-    }
-    if (status === "online") {
-      onlineKeys.push(key);
-    }
-  });
-
-  if (onlineKeys.length) {
-    onlineProjectKeys.value = new Set(onlineKeys);
-  }
-  if (hosts.size) {
-    projectHosts.value = hosts;
-  }
-};
-
 const registerDeploymentIdentity = async (identity) => {
   if (!identity?.yaml) return;
   const response = await addonFetch("api/devices/register", {
@@ -869,92 +601,27 @@ const promotePendingDeploymentsIfNeeded = async (onlineKeys) => {
   }
 };
 
-// Manual/periodic status sync for dashboard project tiles.
-// It requests `api/devices/list?refresh=1` and updates local maps:
-// - `onlineProjectKeys` (online/offline view state)
-// - `projectHosts` (host mapping for actions)
-// This function is intentionally reusable for a future explicit "Refresh" UI action.
-const refreshOnlineProjects = async () => {
-  try {
-    const response = await fetchJson(getApiUrl("api/devices/list?refresh=1"));
-    if (!response.ok) {
-      return;
-    }
-    const payload = await response.json();
-    const devices = Array.isArray(payload?.devices) ? payload.devices : [];
-    const hostsByProject = new Map();
-    const cacheEntries = {};
-    const onlineKeys = devices
-      .filter((device) => {
-        const deviceKey = deviceKeyFromPayload(device);
-        if (!deviceKey) return false;
-        const yamlName = `${deviceKey}.yaml`;
-        const fallbackHost = hostFromYamlName(yamlName);
-        const host = String(device?.host || fallbackHost).trim();
-        if (host) {
-          hostsByProject.set(deviceKey, host);
-        }
-        const status = String(device?.status || "").toLowerCase() === "online" ? "online" : "offline";
-        cacheEntries[deviceKey] = {
-          status,
-          host,
-          name: String(device?.name || "").trim(),
-          updatedAt: Date.now()
-        };
-        return status === "online";
-      })
-      .map((device) => deviceKeyFromPayload(device))
-      .filter(Boolean);
-    const onlineKeySet = new Set(onlineKeys);
-    onlineProjectKeys.value = onlineKeySet;
-    projectHosts.value = hostsByProject;
-    mergeDeviceStatusCache(cacheEntries);
-    await promotePendingDeploymentsIfNeeded(onlineKeySet);
-  } catch {
-    // keep previous known in-memory state
-  }
-};
-
-const startDevicesStatusPolling = () => {
-  if (document.visibilityState !== "visible") return;
-  if (devicesStatusPollId) return;
-  devicesStatusPollId = setInterval(() => {
-    refreshOnlineProjects();
-  }, POLL_INTERVAL_MS);
-};
-
-const stopDevicesStatusPolling = () => {
-  if (!devicesStatusPollId) return;
-  clearInterval(devicesStatusPollId);
-  devicesStatusPollId = null;
-};
-
-const handleDashboardVisibilityChange = () => {
-  if (document.visibilityState === "visible") {
-    refreshOnlineProjects();
-    startDevicesStatusPolling();
-    return;
-  }
-  stopDevicesStatusPolling();
-};
-
-const projectStatusHost = (projectName) => {
-  const deployment = projectDeploymentState.value.get(projectName) || { active: null, pending: null };
-  return resolveActiveDeploymentHost(
-    deployment,
-    projectHosts.value,
-    hostFromYamlName(projectYamlName(projectName))
-  );
-};
-
-const isProjectOnline = (projectName) => {
-  const deployment = projectDeploymentState.value.get(projectName) || { active: null, pending: null };
-  return isProjectOnlineForDeployment(
-    deployment,
-    onlineProjectKeys.value,
-    projectKeyFromName(projectName)
-  );
-};
+const {
+  applyCachedDeviceStatus,
+  handleDashboardVisibilityChange,
+  isProjectOnline,
+  onlineProjectKeys,
+  projectHosts,
+  projectStatusHost,
+  refreshOnlineProjects,
+  startDevicesStatusPolling,
+  stopDevicesStatusPolling
+} = useDashboardDeviceStatus({
+  fetchJson,
+  getApiUrl,
+  projectKeyFromName,
+  projectDeploymentState,
+  hostFromYamlName,
+  projectYamlName,
+  deviceKeyFromPayload,
+  promotePendingDeploymentsIfNeeded,
+  pollIntervalMs: 5000
+});
 
 const sanitizeProjectName = (value) => {
   // Accept only project JSON files and explicitly exclude the index file.
@@ -1319,241 +986,72 @@ const loadDashboardData = async () => {
   }
 };
 
-const folderChildrenMap = computed(() => {
-  // Parent -> direct children index used by tree + breadcrumb + folder cards.
-  const map = new Map();
-  folders.value.forEach((folder) => {
-    const parentId = folder.parentId || ROOT_FOLDER_ID;
-    if (!map.has(parentId)) map.set(parentId, []);
-    if (folder.id !== ROOT_FOLDER_ID) {
-      map.get(parentId).push(folder.id);
-    }
-  });
-  return map;
+const {
+  clearActiveProjectSelection,
+  commitPendingFolder,
+  folderById,
+  folderChildrenMap,
+  folderPath,
+  folderRows,
+  getProjectFolderId,
+  goToParentFolder,
+  handleFolderDragLeave,
+  handleFolderDragOver,
+  handleFolderDrop,
+  handleProjectDragEnd,
+  handleProjectDragStart,
+  isFolderActive,
+  isRootFolderSelected,
+  openFolderFromTile,
+  projectPlacementByName,
+  projectsByName,
+  selectFolder,
+  selectProject,
+  setPendingFolderInputRef,
+  toggleFolderExpanded,
+  toggleFolderMenu,
+  visibleFolderEntries,
+  visibleProjectEntries,
+  beginAddFolder,
+  cancelPendingFolder,
+  performRemoveFolder
+} = useDashboardTree({
+  ROOT_FOLDER_ID,
+  folders,
+  projectFiles,
+  projectPlacement,
+  projectDisplayNames,
+  selectedFolderId,
+  selectedProjectName,
+  viewMode,
+  expandedFolderIds,
+  pendingFolderParentId,
+  pendingFolderName,
+  pendingFolderInputRef,
+  openFolderMenuId,
+  dragOverFolderId,
+  draggedProjectName,
+  folderIdCounter,
+  searchText,
+  sanitizeProjectName,
+  sanitizeFolderName,
+  sanitizeLastEditedAt,
+  fallbackProjectTitle,
+  projectYamlName,
+  formatLastEditedAt,
+  persistProjectsIndex,
+  isProjectOnline,
+  folderIconUrl: FOLDER_ICON_URL,
+  onProjectSelection: () => {
+    cancelProjectMenuPlacementUpdate();
+    stopProjectMenuResizeObserver();
+    openProjectMenuName.value = '';
+    openProjectMenuElement.value = null;
+    openProjectMenuAnchor.value = null;
+    projectMenuPositionReady.value = false;
+  },
+  onProjectRemovedFromSelection: () => {}
 });
-
-const folderById = computed(() => new Map(folders.value.map((item) => [item.id, item])));
-
-const projectsByFolder = computed(() => {
-  // Folder -> direct projects index used by tree labels and folder cards.
-  const map = new Map();
-  folders.value.forEach((folder) => {
-    map.set(folder.id, []);
-  });
-
-  projectFiles.value.forEach((name) => {
-    const folderId = projectsByName.value.get(name) || ROOT_FOLDER_ID;
-    const targetFolderId = folderById.value.has(folderId) ? folderId : ROOT_FOLDER_ID;
-    if (!map.has(targetFolderId)) {
-      map.set(targetFolderId, []);
-    }
-    map.get(targetFolderId).push(name);
-  });
-
-  map.forEach((list) => {
-    list.sort((a, b) => a.localeCompare(b));
-  });
-  return map;
-});
-
-const getDescendantFolderIds = (folderId) => {
-  // Utility kept for subtree operations (delete and potential future filters).
-  const output = [folderId];
-  const stack = [folderId];
-  while (stack.length) {
-    const current = stack.pop();
-    const children = folderChildrenMap.value.get(current) || [];
-    children.forEach((childId) => {
-      output.push(childId);
-      stack.push(childId);
-    });
-  }
-  return output;
-};
-
-const folderRows = computed(() => {
-  // Flat render model for the sidebar tree.
-  // We keep this separate from raw folder storage to simplify UI rendering.
-  const rows = [];
-  const walk = (id, depth) => {
-    const folder = folderById.value.get(id);
-    if (!folder) return;
-    const isExpanded = expandedFolderIds.value.has(id);
-    const directProjects = projectsByFolder.value.get(id) || [];
-    const children = folderChildrenMap.value.get(id) || [];
-    const hasChildren = children.length > 0 || directProjects.length > 0 || pendingFolderParentId.value === id;
-    rows.push({
-      kind: "folder",
-      id: folder.id,
-      name: folder.name,
-      depth,
-      isRoot: folder.id === ROOT_FOLDER_ID,
-      isExpanded,
-      hasChildren
-    });
-
-    if (!isExpanded) return;
-    children.forEach((childId) => walk(childId, depth + 1));
-
-    if (pendingFolderParentId.value === id) {
-      rows.push({
-        kind: "draft",
-        id: `draft:${id}`,
-        depth: depth + 1
-      });
-    }
-
-    directProjects.forEach((projectName) => {
-      rows.push({
-        kind: "project",
-        id: `project:${projectName}`,
-        projectName,
-        name: projectName.replace(/\.json$/i, ""),
-        depth: depth + 1
-      });
-    });
-  };
-  walk(ROOT_FOLDER_ID, 0);
-  return rows;
-});
-
-const projectsByName = computed(() => {
-  // Fast lookup for selection, placement, and filtering.
-  const map = new Map();
-  projectPlacement.value.forEach((item) => {
-    map.set(item.name, item.folderId || ROOT_FOLDER_ID);
-  });
-  return map;
-});
-
-const projectPlacementByName = computed(() => {
-  const map = new Map();
-  projectPlacement.value.forEach((item) => {
-    const name = sanitizeProjectName(item?.name || "");
-    if (!name) return;
-    map.set(name, {
-      name,
-      folderId: item?.folderId || ROOT_FOLDER_ID,
-      lastEditedAt: sanitizeLastEditedAt(item?.lastEditedAt || "")
-    });
-  });
-  return map;
-});
-
-const getProjectFolderId = (projectName) => {
-  return projectsByName.value.get(projectName) || ROOT_FOLDER_ID;
-};
-
-const visibleFolderEntries = computed(() => {
-  // Folder tiles represent only direct child folders of the selected folder.
-  const currentFolderId = selectedFolderId.value;
-  const query = searchText.value.trim().toLowerCase();
-
-  if (viewMode.value !== "folder") {
-    return [];
-  }
-
-  const childFolderIds = [...(folderChildrenMap.value.get(currentFolderId) || [])].sort((a, b) => {
-    const first = folderById.value.get(a)?.name || "";
-    const second = folderById.value.get(b)?.name || "";
-    return first.localeCompare(second);
-  });
-
-  const folderEntries = childFolderIds
-    .map((folderId) => {
-      const folder = folderById.value.get(folderId);
-      if (!folder) return null;
-      const directChildFolders = folderChildrenMap.value.get(folderId) || [];
-      const directProjects = projectFiles.value.filter((name) => getProjectFolderId(name) === folderId);
-      return {
-        kind: "folder",
-        key: `folder:${folder.id}`,
-        id: folder.id,
-        title: folder.name,
-        icon: FOLDER_ICON_URL,
-        folderCount: directChildFolders.length,
-        projectCount: directProjects.length
-      };
-    })
-    .filter(Boolean);
-
-  if (!query) return folderEntries;
-  return folderEntries.filter((entry) => entry.title.toLowerCase().includes(query));
-});
-
-const visibleProjectEntries = computed(() => {
-  // Project tiles depend on view mode:
-  // - all: every project
-  // - folder: only direct projects in selected folder
-  const currentFolderId = selectedFolderId.value;
-  const query = searchText.value.trim().toLowerCase();
-
-  const projectEntries = projectFiles.value
-    .filter((name) => {
-      if (viewMode.value === "all") {
-        return true;
-      }
-      return getProjectFolderId(name) === currentFolderId;
-    })
-    .sort((a, b) => a.localeCompare(b))
-    .map((name) => {
-      const isOnline = isProjectOnline(name);
-      const placement = projectPlacementByName.value.get(name);
-      return {
-        kind: "project",
-        key: `project:${name}`,
-        name,
-        title: projectDisplayNames.value.get(name) || fallbackProjectTitle(name),
-        yamlName: projectYamlName(name),
-        lastEditedLabel: formatLastEditedAt(placement?.lastEditedAt || ""),
-        online: isOnline
-      };
-    });
-
-  if (!query) return projectEntries;
-  return projectEntries.filter((entry) => {
-    return entry.title.toLowerCase().includes(query) || String(entry.name || "").toLowerCase().includes(query);
-  });
-});
-
-const openFolderFromTile = (folderId) => {
-  // Explorer-like behavior: open folder on double click.
-  selectFolder(folderId);
-  const next = new Set(expandedFolderIds.value);
-  next.add(folderId);
-  expandedFolderIds.value = next;
-};
-
-const selectFolder = (folderId) => {
-  // Folder selection resets project selection by design.
-  selectedFolderId.value = folderId;
-  selectedProjectName.value = "";
-  viewMode.value = "folder";
-};
-
-const isFolderActive = (folderId) => {
-  // When a project is active we intentionally suppress folder highlight.
-  if (selectedProjectName.value) return false;
-  return folderId === selectedFolderId.value;
-};
-
-const selectProject = (projectName, options = {}) => {
-  // Project selection always syncs folder context, but folder mode is forced only
-  // for tree interactions. Clicking a tile in "All devices" should not shift view mode.
-  const { forceFolderView = false } = options;
-  const folderId = getProjectFolderId(projectName);
-  cancelProjectMenuPlacementUpdate();
-  stopProjectMenuResizeObserver();
-  openProjectMenuName.value = "";
-  openProjectMenuElement.value = null;
-  openProjectMenuAnchor.value = null;
-  projectMenuPositionReady.value = false;
-  selectedProjectName.value = projectName;
-  selectedFolderId.value = folderId;
-  if (forceFolderView) {
-    viewMode.value = "folder";
-  }
-};
 
 const closeProjectMenu = () => {
   cancelProjectMenuPlacementUpdate();
@@ -1562,10 +1060,6 @@ const closeProjectMenu = () => {
   openProjectMenuElement.value = null;
   openProjectMenuAnchor.value = null;
   projectMenuPositionReady.value = false;
-};
-
-const clearActiveProjectSelection = () => {
-  selectedProjectName.value = "";
 };
 
 const cancelProjectMenuPlacementUpdate = () => {
@@ -2111,135 +1605,6 @@ const handleTopbarEdit = () => {
   requestOpenProjectInBuilder(selectedProjectName.value);
 };
 
-const folderPath = computed(() => {
-  // Breadcrumb path from root to selected folder.
-  const parts = [];
-  let cursor = selectedFolderId.value;
-  const maxSteps = folders.value.length + 2;
-  let steps = 0;
-  while (cursor && steps < maxSteps) {
-    const folder = folderById.value.get(cursor);
-    if (!folder) break;
-    parts.push({ id: folder.id, name: folder.name });
-    if (!folder.parentId) break;
-    cursor = folder.parentId;
-    steps += 1;
-  }
-  return parts.reverse();
-});
-
-const goToParentFolder = () => {
-  // One-level up navigation button in toolbar.
-  const current = folderById.value.get(selectedFolderId.value);
-  if (!current || !current.parentId) return;
-  selectFolder(current.parentId);
-};
-
-const isRootFolderSelected = computed(() => selectedFolderId.value === ROOT_FOLDER_ID);
-
-const toggleFolderExpanded = (folderId) => {
-  // Local tree expansion state (UI only).
-  const next = new Set(expandedFolderIds.value);
-  if (next.has(folderId)) next.delete(folderId);
-  else next.add(folderId);
-  expandedFolderIds.value = next;
-};
-
-const toggleFolderMenu = (folderId) => {
-  openFolderMenuId.value = openFolderMenuId.value === folderId ? null : folderId;
-};
-
-const siblingNameExists = (parentId, name, excludeId = "") => {
-  // Enforce sibling-level unique names (case-insensitive).
-  const needle = name.trim().toLowerCase();
-  return folders.value.some((folder) => {
-    if (folder.id === excludeId) return false;
-    if ((folder.parentId || ROOT_FOLDER_ID) !== parentId) return false;
-    return folder.name.trim().toLowerCase() === needle;
-  });
-};
-
-const createFolder = async (parentFolderId, name) => {
-  // Add folder, keep parent expanded, then persist index.
-  folderIdCounter.value += 1;
-  const folderId = `fld_${folderIdCounter.value}`;
-  folders.value = [...folders.value, { id: folderId, name, parentId: parentFolderId }];
-
-  const next = new Set(expandedFolderIds.value);
-  next.add(parentFolderId);
-  next.add(folderId);
-  expandedFolderIds.value = next;
-  await persistProjectsIndex();
-};
-
-const setPendingFolderInputRef = (element) => {
-  // Keep a direct handle for focusing the inline create input.
-  pendingFolderInputRef.value = element;
-};
-
-const beginAddFolder = async (parentFolderId) => {
-  // Start inline folder draft under selected parent.
-  pendingFolderParentId.value = parentFolderId;
-  pendingFolderName.value = "";
-  openFolderMenuId.value = null;
-  const next = new Set(expandedFolderIds.value);
-  next.add(parentFolderId);
-  expandedFolderIds.value = next;
-  await nextTick();
-  pendingFolderInputRef.value?.focus();
-};
-
-const cancelPendingFolder = () => {
-  // Drop inline draft without writing data.
-  pendingFolderParentId.value = "";
-  pendingFolderName.value = "";
-};
-
-const commitPendingFolder = async () => {
-  // Finalize inline draft and write folder metadata.
-  const parentFolderId = pendingFolderParentId.value;
-  if (!parentFolderId) return;
-  const name = sanitizeFolderName(pendingFolderName.value || "");
-  if (!name) {
-    cancelPendingFolder();
-    return;
-  }
-  if (siblingNameExists(parentFolderId, name)) {
-    window.alert("Folder with this name already exists in the selected location.");
-    await nextTick();
-    pendingFolderInputRef.value?.focus();
-    pendingFolderInputRef.value?.select?.();
-    return;
-  }
-  cancelPendingFolder();
-  await createFolder(parentFolderId, name);
-};
-
-const performRemoveFolder = async (folderId) => {
-  // Removing a folder removes its subtree and moves projects back to root.
-  if (folderId === ROOT_FOLDER_ID) return;
-
-  const subtree = new Set(getDescendantFolderIds(folderId));
-  folders.value = folders.value.filter((folder) => !subtree.has(folder.id));
-  projectPlacement.value = projectPlacement.value.map((item) => {
-    if (subtree.has(item.folderId)) {
-      return { ...item, folderId: ROOT_FOLDER_ID };
-    }
-    return item;
-  });
-
-  const nextExpanded = new Set(expandedFolderIds.value);
-  subtree.forEach((id) => nextExpanded.delete(id));
-  nextExpanded.add(ROOT_FOLDER_ID);
-  expandedFolderIds.value = nextExpanded;
-  if (subtree.has(selectedFolderId.value)) {
-    selectedFolderId.value = ROOT_FOLDER_ID;
-  }
-
-  openFolderMenuId.value = null;
-  await persistProjectsIndex();
-};
-
 const removeFolder = (folderId) => {
   // Confirm first; destructive action is handled by modal.
   if (folderId === ROOT_FOLDER_ID) return;
@@ -2332,57 +1697,6 @@ const confirmRemoveProject = async () => {
   } finally {
     projectPurgeRunning.value = false;
   }
-};
-
-const setProjectFolder = (projectName, folderId) => {
-  // Keep placement unique per project by replace-then-push strategy.
-  const next = projectPlacement.value.filter((item) => item.name !== projectName);
-  const previous = projectPlacementByName.value.get(projectName);
-  next.push({
-    name: projectName,
-    folderId,
-    ...(previous?.lastEditedAt ? { lastEditedAt: previous.lastEditedAt } : {})
-  });
-  projectPlacement.value = next;
-};
-
-const handleProjectDragStart = (projectName, event) => {
-  // Store dragged project so dropping onto a folder can update placement.
-  draggedProjectName.value = projectName;
-  if (event.dataTransfer) {
-    event.dataTransfer.effectAllowed = "move";
-    event.dataTransfer.setData("text/plain", projectName);
-  }
-};
-
-const handleProjectDragEnd = () => {
-  // Always clear drag UI state, even when drop is canceled.
-  draggedProjectName.value = "";
-  dragOverFolderId.value = "";
-};
-
-const handleFolderDragOver = (folderId) => {
-  if (!draggedProjectName.value) return;
-  dragOverFolderId.value = folderId;
-};
-
-const handleFolderDragLeave = (folderId, event) => {
-  const target = event.currentTarget;
-  if (!(target instanceof Element)) return;
-  const related = event.relatedTarget;
-  if (related instanceof Node && target.contains(related)) return;
-  if (dragOverFolderId.value === folderId) {
-    dragOverFolderId.value = "";
-  }
-};
-
-const handleFolderDrop = async (folderId) => {
-  const projectName = draggedProjectName.value;
-  dragOverFolderId.value = "";
-  draggedProjectName.value = "";
-  if (!projectName) return;
-  setProjectFolder(projectName, folderId);
-  await persistProjectsIndex();
 };
 
 const handleGlobalClick = (event) => {

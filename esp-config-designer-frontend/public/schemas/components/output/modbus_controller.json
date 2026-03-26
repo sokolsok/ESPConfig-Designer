@@ -2,7 +2,6 @@
   "id": "output.modbus_controller",
   "domain": "output",
   "platform": "modbus_controller",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/output/modbus_controller/",
   "extends": "base_output.json",
   "fields": [

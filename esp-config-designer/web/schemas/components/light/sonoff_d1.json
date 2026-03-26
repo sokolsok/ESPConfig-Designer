@@ -2,11 +2,13 @@
   "id": "light.sonoff_d1",
   "domain": "light",
   "platform": "sonoff_d1",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/light/sonoff_d1/",
   "extends": "base_light.json",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "use_rm433_remote",

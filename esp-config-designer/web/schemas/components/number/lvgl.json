@@ -2,7 +2,6 @@
   "id": "number.lvgl",
   "domain": "number",
   "platform": "lvgl",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/number/lvgl/",
   "extends": "base_number.json",
   "fields": [

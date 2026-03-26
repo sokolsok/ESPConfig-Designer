@@ -2,7 +2,6 @@
   "id": "light.rgb",
   "domain": "light",
   "platform": "rgb",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/light/rgb/",
   "extends": "base_light.json",
   "fields": [

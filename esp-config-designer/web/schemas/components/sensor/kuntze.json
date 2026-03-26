@@ -2,11 +2,13 @@
   "id": "sensor.kuntze",
   "domain": "sensor",
   "platform": "kuntze",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/kuntze/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "name",

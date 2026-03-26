@@ -2,9 +2,6 @@
   "id": "display.ssd1322",
   "domain": "display",
   "platform": "ssd1322",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/display/ssd1322/",
   "extends": "base_display.json",
   "display_builder": true,
@@ -15,6 +12,11 @@
       "h": 64
     }
   },
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "model",

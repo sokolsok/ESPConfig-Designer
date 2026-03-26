@@ -2,7 +2,6 @@
   "id": "sensor.dsmr",
   "domain": "sensor",
   "platform": "dsmr",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/dsmr/",
   "extends": "base_sensor.json",
   "fields": [

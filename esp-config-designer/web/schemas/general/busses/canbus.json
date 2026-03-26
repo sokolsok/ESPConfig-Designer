@@ -2,7 +2,6 @@
   "id": "busses.canbus",
   "domain": "canbus",
   "platform": "core",
-  "requires": [],
   "fields": [
     {
       "key": "enabled",
@@ -50,8 +49,8 @@
     {
       "key": "id",
       "type": "id",
-      "required": false,
-      "lvl": "normal",
+      "required": true,
+      "lvl": "simple",
       "default": "canbus_id",
       "dependsOn": {
         "key": "enabled",

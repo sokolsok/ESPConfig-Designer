@@ -2,7 +2,6 @@
   "id": "display.st7701s",
   "domain": "display",
   "platform": "st7701s",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/display/st7701s/",
   "extends": "base_display.json",
   "display_builder": true,

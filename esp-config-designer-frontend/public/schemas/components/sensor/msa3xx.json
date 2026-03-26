@@ -2,11 +2,13 @@
   "id": "sensor.msa3xx",
   "domain": "sensor",
   "platform": "msa3xx",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/msa3xx/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

@@ -2,10 +2,12 @@
   "id": "hub.rc522_i2c",
   "domain": "rc522_i2c",
   "platform": "",
-  "requires": [
-    "i2c"
-  ],
   "type": "object",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "id",

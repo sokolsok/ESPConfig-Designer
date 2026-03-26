@@ -2,10 +2,12 @@
   "id": "hub.mcp3204",
   "domain": "mcp3204",
   "platform": "",
-  "requires": [
-    "spi"
-  ],
   "type": "object",
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "id",

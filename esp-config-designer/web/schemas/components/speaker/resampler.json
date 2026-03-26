@@ -2,7 +2,6 @@
   "id": "speaker.resampler",
   "domain": "speaker",
   "platform": "resampler",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/speaker/resampler/",
   "extends": "base_speaker.json",
   "fields": [

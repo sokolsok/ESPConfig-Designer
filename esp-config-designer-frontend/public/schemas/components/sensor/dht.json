@@ -2,7 +2,6 @@
   "id": "sensor.dht",
   "domain": "sensor",
   "platform": "dht",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/dht/",
   "fields": [
     {

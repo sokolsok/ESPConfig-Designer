@@ -2,10 +2,12 @@
   "id": "sensor.mcp9600",
   "domain": "sensor",
   "platform": "mcp9600",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/mcp9600/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "hot_junction",

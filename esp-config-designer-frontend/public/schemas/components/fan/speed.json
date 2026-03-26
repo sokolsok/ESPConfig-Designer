@@ -2,7 +2,6 @@
   "id": "fan.speed",
   "domain": "fan",
   "platform": "speed",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/fan/speed/",
   "extends": "base_fan.json",
   "fields": [

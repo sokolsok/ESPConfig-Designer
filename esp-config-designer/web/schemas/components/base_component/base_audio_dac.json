@@ -2,7 +2,6 @@
   "id": "base.audio_dac",
   "domain": "audio_dac",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

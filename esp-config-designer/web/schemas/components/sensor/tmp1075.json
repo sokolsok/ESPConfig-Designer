@@ -2,11 +2,13 @@
   "id": "sensor.tmp1075",
   "domain": "sensor",
   "platform": "tmp1075",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/tmp1075/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

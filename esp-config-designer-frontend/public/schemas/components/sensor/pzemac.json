@@ -2,11 +2,15 @@
   "id": "sensor.pzemac",
   "domain": "sensor",
   "platform": "pzemac",
-  "requires": [
-    "uart",
-    "modbus"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/pzemac/",
+  "requirements": [
+    {
+      "require": [
+        "bus:uart",
+        "component:modbus"
+      ]
+    }
+  ],
   "fields": [
     {
       "key": "current",

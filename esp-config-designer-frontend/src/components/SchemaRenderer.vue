@@ -102,11 +102,12 @@
 </template>
 
 <script setup>
-import { computed, inject, onBeforeUnmount, ref, watch } from "vue";
+import { computed, defineAsyncComponent, inject, onBeforeUnmount, ref, watch } from "vue";
 import SchemaField from "./SchemaField.vue";
-import DisplayBuilder from "./display/DisplayBuilder.vue";
 import { loadComponentSchema, loadSchemaByPath } from "../utils/schemaLoader";
 import { isFieldVisible } from "../utils/schemaVisibility";
+
+const DisplayBuilder = defineAsyncComponent(() => import("./display/DisplayBuilder.vue"));
 
 const props = defineProps({
   componentId: {

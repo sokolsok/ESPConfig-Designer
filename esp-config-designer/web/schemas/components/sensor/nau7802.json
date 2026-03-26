@@ -2,7 +2,6 @@
   "id": "sensor.nau7802",
   "domain": "sensor",
   "platform": "nau7802",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/nau7802/",
   "extends": "base_sensor.json",
   "fields": [
@@ -25,7 +24,7 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
-	  "default": "128",
+      "default": "128",
       "options": [
         "1",
         "2",
@@ -42,7 +41,7 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
-	  "default": "3.0V",
+      "default": "3.0V",
       "options": [
         "2.4V",
         "2.7V",
@@ -63,7 +62,7 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
-	  "default": "10",
+      "default": "10",
       "options": [
         "10",
         "20",
@@ -77,14 +76,14 @@
       "type": "text",
       "required": false,
       "lvl": "normal",
-	  "placeholder": "0"
+      "placeholder": "0"
     },
     {
       "key": "gain_calibration",
       "type": "number",
       "required": false,
       "lvl": "normal",
-	  "placeholder": "0"
+      "placeholder": "0"
     }
   ]
 }

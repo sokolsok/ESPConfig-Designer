@@ -2,11 +2,13 @@
   "id": "audio_adc.es7243e",
   "domain": "audio_adc",
   "platform": "es7243e",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/audio_adc/es7243e/",
   "extends": "base_audio_adc.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "mic_gain",

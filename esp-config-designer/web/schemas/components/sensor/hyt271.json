@@ -2,10 +2,12 @@
   "id": "sensor.hyt271",
   "domain": "sensor",
   "platform": "hyt271",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/hyt271/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "temperature",

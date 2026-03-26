@@ -2,11 +2,13 @@
   "id": "climate.haier",
   "domain": "climate",
   "platform": "haier",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/climate/haier/",
   "extends": "base_climate.json",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "uart_id",

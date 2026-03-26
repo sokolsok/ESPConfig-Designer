@@ -2,7 +2,6 @@
   "id": "text_sensor.libretiny",
   "domain": "text_sensor",
   "platform": "libretiny",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/text_sensor/libretiny/",
   "fields": [
     {

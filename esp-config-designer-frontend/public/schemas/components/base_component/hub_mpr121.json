@@ -2,8 +2,12 @@
   "id": "hub.mpr121",
   "domain": "mpr121",
   "platform": "",
-  "requires": ["i2c"],
   "type": "object",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "id",
@@ -18,7 +22,7 @@
       "type": "text",
       "required": false,
       "lvl": "normal",
-	  "suppressQuotes": true,
+      "suppressQuotes": true,
       "default": "0x5A",
       "placeholder": "0x5A"
     },

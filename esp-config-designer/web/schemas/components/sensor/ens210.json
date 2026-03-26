@@ -2,7 +2,6 @@
   "id": "sensor.ens210",
   "domain": "sensor",
   "platform": "ens210",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/ens210/",
   "fields": [
     {

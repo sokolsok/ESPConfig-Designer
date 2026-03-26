@@ -11,7 +11,6 @@
     "toshiba": "toshiba",
     "whynter": "whynter"
   },
-  "requires": [],
   "helpUrl": "https://esphome.io/components/climate/climate_ir/",
   "extends": "base_climate.json",
   "fields": [

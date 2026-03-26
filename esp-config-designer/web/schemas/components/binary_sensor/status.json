@@ -2,7 +2,6 @@
   "id": "binary_sensor.status",
   "domain": "binary_sensor",
   "platform": "status",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/binary_sensor/status/",
   "extends": "base_binary_sensor.json",
   "fields": [

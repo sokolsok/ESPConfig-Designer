@@ -2,7 +2,6 @@
   "id": "sensor.rotary_encoder",
   "domain": "sensor",
   "platform": "rotary_encoder",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/rotary_encoder/",
   "extends": "base_sensor.json",
   "fields": [

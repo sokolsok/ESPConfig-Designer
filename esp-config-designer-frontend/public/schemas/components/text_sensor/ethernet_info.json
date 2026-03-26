@@ -2,10 +2,12 @@
   "id": "text_sensor.ethernet_info",
   "domain": "text_sensor",
   "platform": "ethernet_info",
-  "requires": [
-    "ethernet"
-  ],
   "helpUrl": "https://esphome.io/components/text_sensor/ethernet_info/",
+  "requirements": [
+    {
+      "require": "network:ethernet"
+    }
+  ],
   "fields": [
     {
       "key": "ip_address",

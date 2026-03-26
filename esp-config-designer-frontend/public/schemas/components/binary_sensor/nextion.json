@@ -2,7 +2,6 @@
   "id": "binary_sensor.nextion",
   "domain": "binary_sensor",
   "platform": "nextion",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/binary_sensor/nextion/",
   "extends": "base_binary_sensor.json",
   "fields": [

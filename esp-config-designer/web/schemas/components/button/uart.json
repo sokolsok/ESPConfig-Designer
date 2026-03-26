@@ -2,11 +2,13 @@
   "id": "button.uart",
   "domain": "button",
   "platform": "uart",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/button/uart/",
   "extends": "base_button.json",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "data",

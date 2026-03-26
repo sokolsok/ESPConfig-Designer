@@ -2,7 +2,6 @@
   "id": "hub.tlc5971",
   "domain": "tlc5971",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

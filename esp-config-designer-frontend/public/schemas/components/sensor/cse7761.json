@@ -2,10 +2,12 @@
   "id": "sensor.cse7761",
   "domain": "sensor",
   "platform": "cse7761",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/cse7761/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "voltage",

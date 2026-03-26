@@ -2,7 +2,6 @@
   "id": "base.valve",
   "domain": "valve",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

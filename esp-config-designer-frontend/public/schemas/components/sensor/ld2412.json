@@ -2,10 +2,12 @@
   "id": "sensor.ld2412",
   "domain": "sensor",
   "platform": "ld2412",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/ld2412/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "uart_id",

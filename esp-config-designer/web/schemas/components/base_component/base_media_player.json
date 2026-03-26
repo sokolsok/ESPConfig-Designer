@@ -2,7 +2,6 @@
   "id": "base.media_player",
   "domain": "media_player",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

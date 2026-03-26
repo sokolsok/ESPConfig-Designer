@@ -2,7 +2,6 @@
   "id": "base.touchscreen",
   "domain": "touchscreen",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

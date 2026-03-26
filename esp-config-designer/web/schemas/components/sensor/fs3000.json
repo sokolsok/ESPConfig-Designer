@@ -2,11 +2,13 @@
   "id": "sensor.fs3000",
   "domain": "sensor",
   "platform": "fs3000",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/fs3000/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

@@ -2,7 +2,6 @@
   "id": "lock.output",
   "domain": "lock",
   "platform": "output",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/lock/output/",
   "extends": "base_lock.json",
   "fields": [

@@ -2,7 +2,6 @@
   "id": "display.inkplate",
   "domain": "display",
   "platform": "inkplate",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/display/inkplate/",
   "extends": "base_display.json",
   "display_builder": true,

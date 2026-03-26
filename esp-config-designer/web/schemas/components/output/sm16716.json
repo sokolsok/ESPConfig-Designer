@@ -2,7 +2,6 @@
   "id": "output.sm16716",
   "domain": "output",
   "platform": "sm16716",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/output/sm16716/",
   "extends": "base_output_float.json",
   "embedded": [

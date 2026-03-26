@@ -2,11 +2,13 @@
   "id": "sensor.qmc5883l",
   "domain": "sensor",
   "platform": "qmc5883l",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/qmc5883l/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

@@ -2,7 +2,6 @@
   "id": "esphome.substitutions",
   "domain": "substitutions",
   "platform": "core",
-  "requires": [],
   "fields": [
     {
       "key": "substitutions",

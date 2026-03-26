@@ -2,7 +2,6 @@
   "id": "sensor.ntc",
   "domain": "sensor",
   "platform": "ntc",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/ntc/",
   "extends": "base_sensor.json",
   "fields": [

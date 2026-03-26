@@ -2,11 +2,13 @@
   "id": "sensor.apds9960",
   "domain": "sensor",
   "platform": "apds9960",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/apds9960/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

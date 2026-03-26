@@ -2,7 +2,6 @@
   "id": "output.ledc",
   "domain": "output",
   "platform": "ledc",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/output/ledc/",
   "extends": "base_output_float.json",
   "fields": [

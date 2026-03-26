@@ -2,10 +2,12 @@
   "id": "sensor.hte501",
   "domain": "sensor",
   "platform": "hte501",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/hte501/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "temperature",

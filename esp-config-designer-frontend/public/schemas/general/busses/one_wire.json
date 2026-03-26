@@ -2,7 +2,6 @@
   "id": "busses.one_wire",
   "domain": "one_wire",
   "platform": "core",
-  "requires": [],
   "fields": [
     {
       "key": "enabled",
@@ -40,8 +39,8 @@
     {
       "key": "id",
       "type": "id",
-      "required": false,
-      "lvl": "normal",
+      "required": true,
+      "lvl": "simple",
       "default": "one_wire_id",
       "dependsOn": {
         "key": "enabled",

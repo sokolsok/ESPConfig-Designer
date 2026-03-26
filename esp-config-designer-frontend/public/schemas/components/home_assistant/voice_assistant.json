@@ -1,11 +1,15 @@
 {
   "id": "voice_assistant",
   "domain": "voice_assistant",
-  "requires": [
-    "api",
-    "microphone"
-  ],
   "helpUrl": "https://esphome.io/components/voice_assistant/",
+  "requirements": [
+    {
+      "require": [
+        "protocol:api",
+        "component:microphone"
+      ]
+    }
+  ],
   "fields": [
     {
       "key": "id",

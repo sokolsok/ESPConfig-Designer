@@ -2,9 +2,6 @@
   "id": "display.epaper_spi",
   "domain": "display",
   "platform": "epaper_spi",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/display/epaper_spi/",
   "extends": "base_display.json",
   "display_builder": true,
@@ -19,6 +16,11 @@
       "h": 128
     }
   },
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "model",

@@ -2,7 +2,6 @@
   "id": "base.audio_adc",
   "domain": "audio_adc",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

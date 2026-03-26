@@ -11,8 +11,18 @@ import {
   isTemplatableField
 } from "./schemaTemplatable";
 
+// schemaYaml is the central YAML emission pipeline for the Builder.
+// It converts normalized runtime config plus schema metadata into final ESPHome YAML,
+// including special handling for actions/conditions, embedded sections, root_map
+// components, and display-builder generated assets/lambdas.
+
 const componentIdFromEntry = (entry) =>
   typeof entry === "string" ? entry : entry?.id || "";
+
+const resolveComponentRenderAs = (schema) => {
+  const renderAs = typeof schema?.renderAs === "string" ? schema.renderAs.trim().toLowerCase() : "";
+  return renderAs === "root_map" ? "root_map" : "list";
+};
 
 const isYamlPrimitive = (value) =>
   value === null || ["string", "number", "boolean"].includes(typeof value);
@@ -122,6 +132,14 @@ const renderLambdaAssignment = (prefix, value, indent, lines, tag = "") => {
     return;
   }
   lines.push(`${prefix}:${suffix} ${normalized}`);
+};
+
+const canRenderFlowArray = (arrayValue) =>
+  Array.isArray(arrayValue) && arrayValue.length > 0 && arrayValue.every((item) => isYamlPrimitive(item));
+
+const renderFlowArrayLine = (prefix, arrayValue, itemSchema, lines) => {
+  const values = arrayValue.map((item) => formatYamlValue(item, itemSchema || itemSchema?.type));
+  lines.push(`${prefix}: [${values.join(", ")}]`);
 };
 
 const resolveFieldRenderState = (field, rawValue) => {
@@ -308,6 +326,10 @@ const renderActionEntries = (actions, indent, lines, rootValue, globalStore) => 
           renderConditionEntries(value, indent + 4, lines, rootValue, globalStore);
           return;
         }
+        if (field.yamlStyle === "flow" && canRenderFlowArray(value)) {
+          renderFlowArrayLine(`${" ".repeat(indent + 2)}${field.key}`, value, field.item, lines);
+          return;
+        }
         lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
         renderYamlArray(value, field.item, indent + 4, lines, value, globalStore);
         return;
@@ -413,6 +435,10 @@ const renderConditionEntry = (entry, indent, lines, rootValue, globalStore) => {
       return;
     }
     if (Array.isArray(value)) {
+      if (field.yamlStyle === "flow" && canRenderFlowArray(value)) {
+        renderFlowArrayLine(`${" ".repeat(indent + 2)}${field.key}`, value, field.item, lines);
+        return;
+      }
       lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
       renderYamlArray(value, field.item, indent + 4, lines, rootValue, globalStore);
       return;
@@ -648,6 +674,10 @@ const renderYamlObject = (objectValue, schemaFields, indent, lines, rootValue, g
       ) {
         lines.push(`${" ".repeat(indent)}${key}:`);
         renderKeyValueMap(value, indent + 2, lines);
+        return;
+      }
+      if (field.yamlStyle === "flow" && canRenderFlowArray(value)) {
+        renderFlowArrayLine(`${" ".repeat(indent)}${key}`, value, field.item, lines);
         return;
       }
         lines.push(`${" ".repeat(indent)}${key}:`);
@@ -1963,6 +1993,7 @@ const buildComponentsYamlInternal = (
   const grouped = new Map();
   const embeddedListByIdentity = new Map();
   const embeddedMapSingleton = new Map();
+  const rootMapByDomain = new Map();
   const missingSchemas = [];
   const verbatimRootLines = [];
 
@@ -2013,6 +2044,65 @@ const buildComponentsYamlInternal = (
     const busValue = config.bus;
     if (busValue !== undefined) {
       delete config.bus;
+    }
+    const renderAs = resolveComponentRenderAs(schema);
+    if (renderAs === "root_map") {
+      if (!grouped.has(domain)) {
+        grouped.set(domain, []);
+      }
+      if (!rootMapByDomain.has(domain)) {
+        grouped.get(domain).push({ type: "root_map", payload: config, schema });
+        rootMapByDomain.set(domain, true);
+      }
+
+      const embeddedItems = resolveEmbeddedComponentItems(schema, config, globalStore);
+      embeddedItems.forEach((item) => {
+        if (!grouped.has(item.domain)) {
+          grouped.set(item.domain, []);
+        }
+
+        const dedupeToken = item.emitAs === "list" ? resolveEmbeddedDedupeToken(item) : "";
+        const dedupeIdentity =
+          item.emitAs === "list" && item.dedupeBy && dedupeToken
+            ? `${item.domain}:${item.dedupeBy}:${dedupeToken}`
+            : "";
+
+        if (dedupeIdentity) {
+          if (embeddedListByIdentity.has(dedupeIdentity)) {
+            return;
+          }
+        }
+
+        if (item.emitAs === "map" && item.singleton) {
+          const existing = embeddedMapSingleton.get(item.domain);
+          if (existing) {
+            if (item.merge === "deep") {
+              existing.payload = mergeYamlObjects(existing.payload, item.payload);
+              existing.fields = mergeFieldDefinitions(existing.fields, item.fields);
+            }
+            return;
+          }
+        }
+
+        const groupedItem = {
+          type: "embedded",
+          payload: item.payload,
+          fields: item.fields,
+          emitAs: item.emitAs,
+          merge: item.merge
+        };
+
+        grouped.get(item.domain).push(groupedItem);
+
+        if (dedupeIdentity) {
+          embeddedListByIdentity.set(dedupeIdentity, groupedItem);
+        }
+
+        if (item.emitAs === "map" && item.singleton) {
+          embeddedMapSingleton.set(item.domain, groupedItem);
+        }
+      });
+      return;
     }
     const platform = schema.platformByBus?.[busValue] || schema.platform;
     let payload = {
@@ -2111,10 +2201,28 @@ const buildComponentsYamlInternal = (
     lines.push(...graphLines);
   }
   grouped.forEach((items, domain) => {
+    const rootMapItems = items.filter((item) => item.type === "root_map");
     const mapItems = items.filter((item) => item.type === "embedded" && item.emitAs === "map");
-    const listItems = items.filter((item) => !(item.type === "embedded" && item.emitAs === "map"));
+    const listItems = items.filter(
+      (item) => item.type !== "root_map" && !(item.type === "embedded" && item.emitAs === "map")
+    );
 
     lines.push(`${domain}:`);
+    if (rootMapItems.length) {
+      const rootItem = rootMapItems[0];
+      const mapLines = [];
+      renderYamlObject(
+        rootItem.payload || {},
+        rootItem.schema?.fields || [],
+        2,
+        mapLines,
+        rootItem.payload || {},
+        globalStore
+      );
+      lines.push(...mapLines);
+      lines.push("");
+      return;
+    }
     if (mapItems.length && !listItems.length) {
       const firstMapItem = mapItems[0];
       let mergedPayload = cloneYamlValue(firstMapItem.payload || {});

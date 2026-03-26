@@ -2,7 +2,6 @@
   "id": "cover.tuya",
   "domain": "cover",
   "platform": "tuya",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/cover/tuya/",
   "extends": "base_cover.json",
   "fields": [

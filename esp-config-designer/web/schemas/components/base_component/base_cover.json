@@ -2,7 +2,6 @@
   "id": "base.cover",
   "domain": "cover",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

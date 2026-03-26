@@ -2,10 +2,12 @@
   "id": "sensor.scd30",
   "domain": "sensor",
   "platform": "scd30",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/scd30/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "address",
@@ -31,7 +33,7 @@
       "key": "automatic_self_calibration",
       "type": "boolean",
       "required": false,
-	  "default": true,
+      "default": true,
       "lvl": "normal"
     },
     {

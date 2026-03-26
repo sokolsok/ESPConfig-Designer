@@ -2,7 +2,6 @@
   "id": "other.debug",
   "domain": "debug",
   "platform": "core",
-  "requires": [],
   "fields": [
     {
       "key": "enabled",

@@ -2,9 +2,6 @@
   "id": "sensor.mcp3008",
   "domain": "sensor",
   "platform": "mcp3008",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/mcp3008/",
   "extends": "base_sensor.json",
   "embedded": [
@@ -12,6 +9,11 @@
       "key": "hub",
       "domain": "mcp3008",
       "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:spi"
     }
   ],
   "fields": [

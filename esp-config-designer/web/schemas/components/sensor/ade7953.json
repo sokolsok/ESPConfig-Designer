@@ -2,7 +2,6 @@
   "id": "sensor.ade7953",
   "domain": "sensor",
   "platform": "ade7953",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/ade7953/",
   "extends": "base_sensor.json",
   "fields": [

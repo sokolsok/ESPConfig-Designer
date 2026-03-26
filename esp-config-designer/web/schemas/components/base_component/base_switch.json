@@ -2,7 +2,6 @@
   "id": "base.switch",
   "domain": "switch",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

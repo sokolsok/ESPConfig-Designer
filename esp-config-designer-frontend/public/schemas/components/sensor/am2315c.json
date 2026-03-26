@@ -2,7 +2,6 @@
   "id": "sensor.am2315c",
   "domain": "sensor",
   "platform": "am2315c",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/am2315c/",
   "fields": [
     {

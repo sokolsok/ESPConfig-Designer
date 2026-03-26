@@ -2,10 +2,12 @@
   "id": "sensor.pzem004t",
   "domain": "sensor",
   "platform": "pzem004t",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/pzem004t/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "current",

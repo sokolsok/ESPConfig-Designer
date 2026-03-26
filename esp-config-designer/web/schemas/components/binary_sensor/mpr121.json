@@ -2,7 +2,6 @@
   "id": "binary_sensor.mpr121",
   "domain": "binary_sensor",
   "platform": "mpr121",
-  "requires": ["i2c"],
   "helpUrl": "https://esphome.io/components/binary_sensor/mpr121/",
   "extends": "base_binary_sensor.json",
   "embedded": [
@@ -10,6 +9,11 @@
       "key": "hub",
       "domain": "mpr121",
       "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:i2c"
     }
   ],
   "fields": [

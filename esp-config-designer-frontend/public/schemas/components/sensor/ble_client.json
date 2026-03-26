@@ -2,7 +2,6 @@
   "id": "sensor.ble_client",
   "domain": "sensor",
   "platform": "ble_client",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/ble_client/",
   "extends": "base_sensor.json",
   "embedded": [

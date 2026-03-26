@@ -2,7 +2,6 @@
   "id": "platform.esp8266",
   "domain": "platform",
   "platform": "esp8266",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/esp8266/",
   "fields": [
     {

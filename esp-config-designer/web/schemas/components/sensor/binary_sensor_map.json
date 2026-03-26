@@ -2,7 +2,6 @@
   "id": "sensor.binary_sensor_map",
   "domain": "sensor",
   "platform": "binary_sensor_map",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/binary_sensor_map/",
   "extends": "base_sensor.json",
   "fields": [

@@ -2,10 +2,12 @@
   "id": "sensor.sen5x",
   "domain": "sensor",
   "platform": "sen5x",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/sen5x/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "address",
@@ -54,7 +56,7 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
-	  "default": "low",
+      "default": "low",
       "options": [
         "low",
         "medium",

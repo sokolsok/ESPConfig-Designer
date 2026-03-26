@@ -2,9 +2,6 @@
   "id": "sensor.mcp3204",
   "domain": "sensor",
   "platform": "mcp3204",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/mcp3204/",
   "extends": "base_sensor.json",
   "embedded": [
@@ -12,6 +9,11 @@
       "key": "hub",
       "domain": "mcp3204",
       "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:spi"
     }
   ],
   "fields": [

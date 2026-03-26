@@ -2,11 +2,13 @@
   "id": "microphone.i2s_audio",
   "domain": "microphone",
   "platform": "i2s_audio",
-  "requires": [
-    "i2s_audio"
-  ],
   "helpUrl": "https://esphome.io/components/microphone/i2s_audio/",
   "extends": "base_microphone.json",
+  "requirements": [
+    {
+      "require": "component:i2s_audio"
+    }
+  ],
   "fields": [
     {
       "key": "adc_type",

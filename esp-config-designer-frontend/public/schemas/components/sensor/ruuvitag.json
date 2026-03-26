@@ -2,7 +2,6 @@
   "id": "sensor.ruuvitag",
   "domain": "sensor",
   "platform": "ruuvitag",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/ruuvitag/",
   "embedded": [
     {

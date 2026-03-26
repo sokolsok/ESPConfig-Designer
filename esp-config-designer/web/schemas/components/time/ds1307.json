@@ -2,11 +2,13 @@
   "id": "time.ds1307",
   "domain": "time",
   "platform": "ds1307",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/time/ds1307/",
   "extends": "base_time.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "address",

@@ -2,10 +2,12 @@
   "id": "hub.mcp4728",
   "domain": "mcp4728",
   "platform": "",
-  "requires": [
-    "i2c"
-  ],
   "type": "object",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "id",

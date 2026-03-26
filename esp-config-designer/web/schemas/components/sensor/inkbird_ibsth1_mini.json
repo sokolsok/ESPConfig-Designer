@@ -2,7 +2,6 @@
   "id": "sensor.inkbird_ibsth1_mini",
   "domain": "sensor",
   "platform": "inkbird_ibsth1_mini",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/inkbird_ibsth1_mini/",
   "embedded": [
     {

@@ -2,10 +2,12 @@
   "id": "sensor.qmp6988",
   "domain": "sensor",
   "platform": "qmp6988",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/qmp6988/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

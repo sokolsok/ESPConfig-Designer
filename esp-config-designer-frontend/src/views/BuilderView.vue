@@ -1,64 +1,34 @@
 <template>
   <div class="builder-layout">
-  <ConfirmModal
-    :open="confirmOpen"
-    :title="confirmTitle"
-    :message="confirmMessage"
-    :confirm-text="confirmConfirmText"
-    :cancel-text="confirmCancelText"
-    @confirm="confirmRemove"
-    @cancel="cancelRemove"
-  />
-    <GpioGuideModal
-      :open="gpioGuideOpen"
-      :guide="gpioGuide"
-      :fallback-title="gpioGuideFallbackTitle"
-      @close="gpioGuideOpen = false"
-    />
-    <AssetManagerModal
-      :open="assetManagerOpen"
-      :images="displayImages"
-      :fonts="displayFonts"
-      :audio="displayAudio"
-      :loading="assetsLoading"
-      :working="assetsWorking"
-      :error="assetsError"
-      @close="assetManagerOpen = false"
-      @refresh="refreshAssets(true)"
-      @upload="handleAssetUpload"
-      @rename="handleAssetRename"
-      @delete-asset="handleAssetDelete"
-    />
-    <SecretsModal
-      :open="secretsModalOpen"
-      :content="secretsRawContent"
-      :loading="secretsLoading"
-      :saving="secretsSaving"
-      :error="secretsError"
-      @save="handleSecretsSave"
-      @close="closeSecretsModal"
-    />
-    <FormErrorsModal
-      :open="formErrorsModalOpen"
-      :errors="formErrors"
-      @close="formErrorsModalOpen = false"
-    />
-    <FormErrorsModal
-      :open="importSummaryModalOpen"
-      :errors="importSummaryModalRows"
-      :message="importSummaryModalMessage"
-      tone="neutral"
-      @close="importSummaryModalOpen = false"
-    />
-    <div v-if="projectSaveError" class="notice notice--error notice--block">
-      <strong>Project save failed.</strong>
-      <div>{{ projectSaveError }}</div>
-    </div>
-    <div v-else-if="projectSaveMessage" class="notice notice--warning notice--block">
-      {{ projectSaveMessage }}
-    </div>
-    <InstallConsoleModal
-      :compile-open="compileModalOpen"
+    <BuilderModalHost
+      :confirm-open="confirmOpen"
+      :confirm-title="confirmTitle"
+      :confirm-message="confirmMessage"
+      :confirm-confirm-text="confirmConfirmText"
+      :confirm-cancel-text="confirmCancelText"
+      :gpio-guide-open="gpioGuideOpen"
+      :gpio-guide="gpioGuide"
+      :gpio-guide-fallback-title="gpioGuideFallbackTitle"
+      :asset-manager-open="assetManagerOpen"
+      :display-images="displayImages"
+      :display-fonts="displayFonts"
+      :display-audio="displayAudio"
+      :assets-loading="assetsLoading"
+      :assets-working="assetsWorking"
+      :assets-error="assetsError"
+      :secrets-modal-open="secretsModalOpen"
+      :secrets-raw-content="secretsRawContent"
+      :secrets-loading="secretsLoading"
+      :secrets-saving="secretsSaving"
+      :secrets-error="secretsError"
+      :form-errors-modal-open="formErrorsModalOpen"
+      :form-errors="formErrors"
+      :import-summary-modal-open="importSummaryModalOpen"
+      :import-summary-modal-rows="importSummaryModalRows"
+      :import-summary-modal-message="importSummaryModalMessage"
+      :project-save-error="projectSaveError"
+      :project-save-message="projectSaveMessage"
+      :compile-modal-open="compileModalOpen"
       :terminal-title="terminalTitle"
       :compile-state-class="compileStateClass"
       :compile-state-label="compileStateLabel"
@@ -67,10 +37,22 @@
       :compile-log-lines="compileLogLines"
       :can-download-compiled-binary="canDownloadCompiledBinary"
       :can-close-compile="canCloseCompile"
-      :on-console-ref="setCompileConsoleElement"
-      @toggle-autoscroll="toggleCompileAutoscroll"
-      @download="downloadBinary"
-      @close-compile="closeCompileModal"
+      :set-compile-console-element="setCompileConsoleElement"
+      @confirm-remove="confirmRemove"
+      @cancel-remove="cancelRemove"
+      @close-gpio-guide="gpioGuideOpen = false"
+      @close-asset-manager="assetManagerOpen = false"
+      @refresh-assets="refreshAssets(true)"
+      @upload-asset="handleAssetUpload"
+      @rename-asset="handleAssetRename"
+      @delete-asset="handleAssetDelete"
+      @save-secrets="handleSecretsSave"
+      @close-secrets="closeSecretsModal"
+      @close-form-errors="formErrorsModalOpen = false"
+      @close-import-summary="importSummaryModalOpen = false"
+      @toggle-compile-autoscroll="toggleCompileAutoscroll"
+      @download-binary="downloadBinary"
+      @close-compile-modal="closeCompileModal"
     />
     <div class="builder-shell">
       <aside class="builder-sidebar">
@@ -125,9 +107,7 @@
                     class="component-chip"
                     :class="{
                       active: activeTab === tab,
-                      'component-chip--pulse':
-                        (tab === 'Busses' && busTabPulse) ||
-                        (tab === 'Protocols' && protocolTabPulse),
+                      'component-chip--pulse': isTabPulsing(tab),
                       'component-chip--error': hasTabErrors(tab)
                     }"
                     @click="activeTab = tab"
@@ -185,97 +165,15 @@
               <option value="tabs">Tabbed YAML Preview</option>
             </select>
           </div>
-          <div class="preview-shell" :class="{ split: splitPreviewEnabled }">
-            <div v-if="splitPreviewEnabled" class="preview-tabs">
-              <button
-                class="preview-scroll"
-                type="button"
-                aria-label="Scroll tabs left"
-                :disabled="!canScrollLeft"
-                @click="scrollPreviewTabs(-1)"
-              >
-                <span class="preview-scroll-icon">‹</span>
-              </button>
-              <div class="preview-tab-list" ref="previewTabList">
-                <button
-                  v-for="tab in visiblePreviewTabs"
-                  :key="tab.key"
-                  class="preview-tab-button"
-                  :class="{ active: activePreviewTab === tab.key }"
-                  type="button"
-                  @click="activePreviewTab = tab.key"
-                >
-                  {{ tab.label }}
-                </button>
-              </div>
-              <button
-                class="preview-scroll"
-                type="button"
-                aria-label="Scroll tabs right"
-                :disabled="!canScrollRight"
-                @click="scrollPreviewTabs(1)"
-              >
-                <span class="preview-scroll-icon">›</span>
-              </button>
-            </div>
-            <div v-if="splitPreviewEnabled" class="preview-tab-measure">
-              <button
-                v-for="tab in previewTabs"
-                :key="tab.key"
-                ref="previewTabMeasureButtons"
-                class="preview-tab-button"
-                type="button"
-              >
-                {{ tab.label }}
-              </button>
-            </div>
-            <div class="yaml-scroll">
-              <div class="preview-card">
-                <button
-                  type="button"
-                  class="preview-copy"
-                  :class="{ 'preview-copy--shift': hasPreviewScrollbar }"
-                  @click="handleCopyPreview"
-                >
-                  <img
-                    src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/content-copy.svg"
-                    alt="Copy code"
-                  />
-                  <span>{{ copyLabel }}</span>
-                </button>
-                <div
-                  v-if="showDisplayAutomationNotice"
-                  class="preview-callout hljs"
-                >
-                  <span class="hljs-comment">
-                    # Interval section live in the Automation tab -
-                    <a
-                      href="#"
-                      class="preview-callout-link"
-                      @click.prevent="switchPreviewTab('automation')"
-                    >
-                      LINK
-                    </a>
-                  </span>
-                </div>
-                <div v-if="showHubNotice" class="preview-callout hljs">
-                  <span class="hljs-comment">
-                    # One or more components require HUB configuration -
-                    <a
-                      href="#"
-                      class="preview-callout-link"
-                      @click.prevent="switchPreviewTab('hubs')"
-                    >
-                      LINK
-                    </a>
-                  </span>
-                </div>
-                <div class="yaml-scroll-inner" ref="previewScrollInner">
-                  <pre><code class="hljs" v-html="highlightedYaml"></code></pre>
-                </div>
-              </div>
-            </div>
-          </div>
+          <BuilderPreviewPane
+            :split-preview-enabled="splitPreviewEnabled"
+            :preview-tabs="previewTabs"
+            :yaml-preview="yamlPreview"
+            :main-preview-target-key="mainPreviewTargetKey"
+            :is-hydrating="isHydrating"
+            :display-automation-has-interval="displayAutomationHasInterval"
+            :hub-notice-domains="hubNoticeDomains"
+          />
         </div>
 
         <div class="builder-panel">
@@ -292,523 +190,190 @@
             </select>
           </div>
           <div class="config-scroll">
-        <div class="module-card" v-if="activeTab === 'Core'">
-          <div class="components-header">
-            <div class="components-title">
-              <h2>Core</h2>
-              <a
-                v-if="activeTabHelpUrl"
-                class="filter-help"
-                :href="activeTabHelpUrl"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Documentation"
-              >
-                ?
-              </a>
-            </div>
-          </div>
-          <div class="module-card__body">
-            <SchemaRenderer
-              :component-id="esphomeCoreId"
-              :component-config="esphomeCoreConfig"
-              :root-value="config"
-              :mode-level="activeModeLevel"
-              :id-registry="idRegistry"
-              :name-registry="nameRegistry"
-              :id-index="idIndex"
-              :gpio-options="gpioOptions"
-              :gpio-usage="gpioUsageIndex"
-              :gpio-title="gpioTitle"
-              :context-component-id="esphomeCoreId"
-              :context-scope-id="esphomeCoreScopeId"
-              :mode-upgrade-section="'core'"
-              :mode-upgrade-key="'esphome'"
-              :global-store="globalStore"
-              @update="handleCoreSchemaUpdate"
-              @open-secrets="openSecretsModal"
-              @mode-upgrade-availability="handleModeUpgradeAvailability"
-            />
-            <SchemaRenderer
-              :component-id="substitutionsCoreId"
-              :component-config="substitutionsCoreConfig"
-              :root-value="config"
-              :mode-level="activeModeLevel"
-              :id-registry="idRegistry"
-              :name-registry="nameRegistry"
-              :id-index="idIndex"
-              :gpio-options="gpioOptions"
-              :gpio-usage="gpioUsageIndex"
-              :gpio-title="gpioTitle"
-              :context-component-id="substitutionsCoreId"
-              :context-scope-id="substitutionsCoreScopeId"
-              :mode-upgrade-section="'core'"
-              :mode-upgrade-key="'substitutions'"
-              :global-store="globalStore"
-              @update="handleSubstitutionsSchemaUpdate"
-              @open-secrets="openSecretsModal"
-              @mode-upgrade-availability="handleModeUpgradeAvailability"
-            />
-            <button
-              v-if="shouldShowModeUpgrade('core')"
-              type="button"
-              class="btn-standard module-mode-upgrade"
-              @click="promoteModeLevel"
-            >
-              {{ modeUpgradeButtonLabel }}
-            </button>
-          </div>
-        </div>
+        <BuilderCoreTab
+          v-if="activeTab === 'Core'"
+          :active-tab-help-url="activeTabHelpUrl"
+          :esphome-core-id="esphomeCoreId"
+          :esphome-core-config="esphomeCoreConfig"
+          :substitutions-core-id="substitutionsCoreId"
+          :substitutions-core-config="substitutionsCoreConfig"
+          :config="config"
+          :active-mode-level="activeModeLevel"
+          :id-registry="idRegistry"
+          :name-registry="nameRegistry"
+          :id-index="idIndex"
+          :gpio-options="gpioOptions"
+          :gpio-usage-index="gpioUsageIndex"
+          :gpio-title="gpioTitle"
+          :esphome-core-scope-id="esphomeCoreScopeId"
+          :substitutions-core-scope-id="substitutionsCoreScopeId"
+          :global-store="globalStore"
+          :should-show-mode-upgrade="shouldShowModeUpgrade('core')"
+          :mode-upgrade-button-label="modeUpgradeButtonLabel"
+          @update-core-schema="handleCoreSchemaUpdate"
+          @update-substitutions-schema="handleSubstitutionsSchemaUpdate"
+          @open-secrets="openSecretsModal"
+          @mode-upgrade-availability="handleModeUpgradeAvailability"
+          @promote-mode-level="promoteModeLevel"
+        />
 
-        <div class="module-card" v-if="activeTab === 'Platform'">
-          <div class="components-header">
-            <div class="components-title">
-              <h2>Platform</h2>
-              <a
-                v-if="activeTabHelpUrl"
-                class="filter-help"
-                :href="activeTabHelpUrl"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Documentation"
-              >
-                ?
-              </a>
-            </div>
-          </div>
-          <div class="module-card__body">
-            <SchemaRenderer
-              :component-id="platformCoreId"
-              :component-config="platformCoreConfig"
-              :root-value="config"
-              :mode-level="activeModeLevel"
-              :id-registry="idRegistry"
-              :name-registry="nameRegistry"
-              :id-index="idIndex"
-              :gpio-options="gpioOptions"
-              :gpio-usage="gpioUsageIndex"
-              :gpio-title="gpioTitle"
-              :context-component-id="platformCoreId"
-              :context-scope-id="platformCoreScopeId"
-              :mode-upgrade-section="'platform'"
-              :mode-upgrade-key="'core'"
-              :global-store="globalStore"
-              @update="handlePlatformSchemaUpdate"
-              @open-secrets="openSecretsModal"
-              @mode-upgrade-availability="handleModeUpgradeAvailability"
-            />
-            <SchemaRenderer
-              v-if="platformDetailId"
-              :component-id="platformDetailId"
-              :component-config="platformCoreConfig"
-              :root-value="config"
-              :mode-level="activeModeLevel"
-              :id-registry="idRegistry"
-              :name-registry="nameRegistry"
-              :id-index="idIndex"
-              :gpio-options="gpioOptions"
-              :gpio-usage="gpioUsageIndex"
-              :gpio-title="gpioTitle"
-              :context-component-id="platformDetailId"
-              :context-scope-id="platformDetailScopeId"
-              :mode-upgrade-section="'platform'"
-              :mode-upgrade-key="'detail'"
-              :global-store="globalStore"
-              @update="handlePlatformSchemaUpdate"
-              @open-secrets="openSecretsModal"
-              @mode-upgrade-availability="handleModeUpgradeAvailability"
-            />
-            <button
-              v-if="shouldShowModeUpgrade('platform')"
-              type="button"
-              class="btn-standard module-mode-upgrade"
-              @click="promoteModeLevel"
-            >
-              {{ modeUpgradeButtonLabel }}
-            </button>
-          </div>
-        </div>
+        <BuilderPlatformTab
+          v-if="activeTab === 'Platform'"
+          :active-tab-help-url="activeTabHelpUrl"
+          :platform-core-id="platformCoreId"
+          :platform-core-config="platformCoreConfig"
+          :platform-detail-id="platformDetailId"
+          :config="config"
+          :active-mode-level="activeModeLevel"
+          :id-registry="idRegistry"
+          :name-registry="nameRegistry"
+          :id-index="idIndex"
+          :gpio-options="gpioOptions"
+          :gpio-usage-index="gpioUsageIndex"
+          :gpio-title="gpioTitle"
+          :platform-core-scope-id="platformCoreScopeId"
+          :platform-detail-scope-id="platformDetailScopeId"
+          :global-store="globalStore"
+          :should-show-mode-upgrade="shouldShowModeUpgrade('platform')"
+          :mode-upgrade-button-label="modeUpgradeButtonLabel"
+          @update-platform-schema="handlePlatformSchemaUpdate"
+          @open-secrets="openSecretsModal"
+          @mode-upgrade-availability="handleModeUpgradeAvailability"
+          @promote-mode-level="promoteModeLevel"
+        />
 
-        <div class="module-card" v-if="activeTab === 'Network'">
-          <div class="components-header">
-            <div class="components-title">
-              <h2>Network</h2>
-              <a
-                v-if="activeTabHelpUrl"
-                class="filter-help"
-                :href="activeTabHelpUrl"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Documentation"
-              >
-                ?
-              </a>
-            </div>
-          </div>
-          <div class="module-card__body">
-            <SchemaRenderer
-              :component-id="networkCoreId"
-              :component-config="networkCoreConfig"
-              :root-value="config"
-              :mode-level="activeModeLevel"
-              :id-registry="idRegistry"
-              :name-registry="nameRegistry"
-              :id-index="idIndex"
-              :gpio-options="gpioOptions"
-              :gpio-usage="gpioUsageIndex"
-              :gpio-title="gpioTitle"
-              :context-component-id="networkCoreId"
-              :context-scope-id="networkTransportScopeId"
-              :field-filter="['transport']"
-              :mode-upgrade-section="'network'"
-              :mode-upgrade-key="'transport'"
-              :global-store="globalStore"
-              @update="handleNetworkSchemaUpdate"
-              @open-secrets="openSecretsModal"
-              @mode-upgrade-availability="handleModeUpgradeAvailability"
-            />
-            <SchemaRenderer
-              v-if="networkDetailId"
-              :component-id="networkDetailId"
-              :component-config="networkCoreConfig"
-              :root-value="config"
-              :mode-level="activeModeLevel"
-              :id-registry="idRegistry"
-              :name-registry="nameRegistry"
-              :id-index="idIndex"
-              :gpio-options="gpioOptions"
-              :gpio-usage="gpioUsageIndex"
-              :gpio-title="gpioTitle"
-              :context-component-id="networkDetailId"
-              :context-scope-id="networkDetailScopeId"
-              :mode-upgrade-section="'network'"
-              :mode-upgrade-key="'detail'"
-              :global-store="globalStore"
-              @update="handleNetworkSchemaUpdate"
-              @open-secrets="openSecretsModal"
-              @mode-upgrade-availability="handleModeUpgradeAvailability"
-            />
-            <SchemaRenderer
-              :component-id="networkCoreId"
-              :component-config="networkCoreConfig"
-              :root-value="config"
-              :mode-level="activeModeLevel"
-              :id-registry="idRegistry"
-              :name-registry="nameRegistry"
-              :id-index="idIndex"
-              :gpio-options="gpioOptions"
-              :gpio-usage="gpioUsageIndex"
-              :gpio-title="gpioTitle"
-              :context-component-id="networkCoreId"
-              :context-scope-id="networkOtaScopeId"
-              :field-filter="['ota']"
-              :mode-upgrade-section="'network'"
-              :mode-upgrade-key="'ota'"
-              :global-store="globalStore"
-              @update="handleNetworkSchemaUpdate"
-              @open-secrets="openSecretsModal"
-              @mode-upgrade-availability="handleModeUpgradeAvailability"
-            />
-            <SchemaRenderer
-              :component-id="networkCoreId"
-              :component-config="networkCoreConfig"
-              :root-value="config"
-              :mode-level="activeModeLevel"
-              :id-registry="idRegistry"
-              :name-registry="nameRegistry"
-              :id-index="idIndex"
-              :gpio-options="gpioOptions"
-              :gpio-usage="gpioUsageIndex"
-              :gpio-title="gpioTitle"
-              :context-component-id="networkCoreId"
-              :context-scope-id="networkWebServerScopeId"
-              :field-filter="['web_server']"
-              :mode-upgrade-section="'network'"
-              :mode-upgrade-key="'web_server'"
-              :global-store="globalStore"
-              @update="handleNetworkSchemaUpdate"
-              @open-secrets="openSecretsModal"
-              @mode-upgrade-availability="handleModeUpgradeAvailability"
-            />
-            <button
-              v-if="shouldShowModeUpgrade('network')"
-              type="button"
-              class="btn-standard module-mode-upgrade"
-              @click="promoteModeLevel"
-            >
-              {{ modeUpgradeButtonLabel }}
-            </button>
-          </div>
-        </div>
+        <BuilderNetworkTab
+          v-if="activeTab === 'Network'"
+          :active-tab-help-url="activeTabHelpUrl"
+          :network-core-id="networkCoreId"
+          :network-core-config="networkCoreConfig"
+          :network-detail-id="networkDetailId"
+          :config="config"
+          :active-mode-level="activeModeLevel"
+          :id-registry="idRegistry"
+          :name-registry="nameRegistry"
+          :id-index="idIndex"
+          :gpio-options="gpioOptions"
+          :gpio-usage-index="gpioUsageIndex"
+          :gpio-title="gpioTitle"
+          :network-transport-scope-id="networkTransportScopeId"
+          :network-detail-scope-id="networkDetailScopeId"
+          :network-ota-scope-id="networkOtaScopeId"
+          :network-web-server-scope-id="networkWebServerScopeId"
+          :global-store="globalStore"
+          :should-show-mode-upgrade="shouldShowModeUpgrade('network')"
+          :mode-upgrade-button-label="modeUpgradeButtonLabel"
+          @update-network-schema="handleNetworkSchemaUpdate"
+          @open-secrets="openSecretsModal"
+          @mode-upgrade-availability="handleModeUpgradeAvailability"
+          @promote-mode-level="promoteModeLevel"
+        />
 
-        <div class="module-card" v-if="activeTab === 'Protocols'">
-          <div class="components-header">
-            <div class="components-title">
-              <h2>Protocols</h2>
-              <a
-                v-if="activeTabHelpUrl"
-                class="filter-help"
-                :href="activeTabHelpUrl"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Documentation"
-              >
-                ?
-              </a>
-            </div>
-          </div>
-          <div class="module-card__body">
-            <div class="module-tabs">
-              <button
-                v-for="tab in protocolTabs"
-                :key="tab.key"
-                class="btn-standard"
-                :class="{ active: activeProtocolKey === tab.key }"
-                @click="activeProtocolKey = tab.key"
-              >
-                {{ tab.label }}
-              </button>
-            </div>
-            <SchemaRenderer
-              v-if="protocolDetailId"
-              :component-id="protocolDetailId"
-              :component-config="protocolDetailConfig"
-              :root-value="config"
-              :mode-level="activeModeLevel"
-              :id-registry="idRegistry"
-              :name-registry="nameRegistry"
-              :id-index="idIndex"
-              :gpio-options="gpioOptions"
-              :gpio-usage="gpioUsageIndex"
-              :gpio-title="gpioTitle"
-              :context-component-id="protocolDetailId"
-              :context-scope-id="protocolDetailScopeId"
-              :mode-upgrade-section="'protocols'"
-              :mode-upgrade-key="'detail'"
-              :global-store="globalStore"
-              @update="handleProtocolDetailUpdate"
-              @open-secrets="openSecretsModal"
-              @mode-upgrade-availability="handleModeUpgradeAvailability"
-            />
-            <button
-              v-if="shouldShowModeUpgrade('protocols')"
-              type="button"
-              class="btn-standard module-mode-upgrade"
-              @click="promoteModeLevel"
-            >
-              {{ modeUpgradeButtonLabel }}
-            </button>
-          </div>
-        </div>
+        <BuilderProtocolsTab
+          v-if="activeTab === 'Protocols'"
+          :active-tab-help-url="activeTabHelpUrl"
+          :protocol-tabs="protocolTabs"
+          :active-protocol-key="activeProtocolKey"
+          :protocol-detail-id="protocolDetailId"
+          :protocol-detail-config="protocolDetailConfig"
+          :protocol-detail-scope-id="protocolDetailScopeId"
+          :config="config"
+          :active-mode-level="activeModeLevel"
+          :id-registry="idRegistry"
+          :name-registry="nameRegistry"
+          :id-index="idIndex"
+          :gpio-options="gpioOptions"
+          :gpio-usage-index="gpioUsageIndex"
+          :gpio-title="gpioTitle"
+          :global-store="globalStore"
+          :should-show-mode-upgrade="shouldShowModeUpgrade('protocols')"
+          :mode-upgrade-button-label="modeUpgradeButtonLabel"
+          @update:active-protocol-key="activeProtocolKey = $event"
+          @update-protocol-detail="handleProtocolDetailUpdate"
+          @open-secrets="openSecretsModal"
+          @mode-upgrade-availability="handleModeUpgradeAvailability"
+          @promote-mode-level="promoteModeLevel"
+        />
 
-        <div class="module-card" v-if="activeTab === 'Busses'">
-          <div class="components-header">
-            <div class="components-title">
-              <h2>Busses</h2>
-              <a
-                v-if="activeTabHelpUrl"
-                class="filter-help"
-                :href="activeTabHelpUrl"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Documentation"
-              >
-                ?
-              </a>
-            </div>
-          </div>
-          <div class="module-card__body">
-            <div class="notice notice--warning">
-              Required interfaces are enabled automatically when you add a component that needs them, so
-              you do not have to enable them right away. You still need to configure them manually.
-            </div>
-            <div class="module-tabs">
-              <button
-                v-for="tab in bussesTabs"
-                :key="tab.key"
-                class="btn-standard"
-                :class="{ active: activeBussesKey === tab.key }"
-                @click="activeBussesKey = tab.key"
-              >
-                {{ tab.label }}
-              </button>
-            </div>
-            <SchemaRenderer
-              v-if="bussesDetailId"
-              :component-id="bussesDetailId"
-              :component-config="bussesDetailConfig"
-              :root-value="config"
-              :mode-level="activeModeLevel"
-              :id-registry="idRegistry"
-              :name-registry="nameRegistry"
-              :id-index="idIndex"
-              :gpio-options="gpioOptions"
-              :gpio-usage="gpioUsageIndex"
-              :gpio-title="gpioTitle"
-              :context-component-id="bussesDetailId"
-              :context-scope-id="bussesDetailScopeId"
-              :mode-upgrade-section="'busses'"
-              :mode-upgrade-key="'detail'"
-              :global-store="globalStore"
-              @update="handleBussesDetailUpdate"
-              @open-secrets="openSecretsModal"
-              @mode-upgrade-availability="handleModeUpgradeAvailability"
-            />
-            <button
-              v-if="shouldShowModeUpgrade('busses')"
-              type="button"
-              class="btn-standard module-mode-upgrade"
-              @click="promoteModeLevel"
-            >
-              {{ modeUpgradeButtonLabel }}
-            </button>
-          </div>
-        </div>
+        <BuilderBussesTab
+          v-if="activeTab === 'Busses'"
+          :active-tab-help-url="activeTabHelpUrl"
+          :busses-tabs="bussesTabs"
+          :active-busses-key="activeBussesKey"
+          :busses-detail-id="bussesDetailId"
+          :busses-detail-config="bussesDetailConfig"
+          :busses-detail-scope-id="bussesDetailScopeId"
+          :config="config"
+          :active-mode-level="activeModeLevel"
+          :id-registry="idRegistry"
+          :name-registry="nameRegistry"
+          :id-index="idIndex"
+          :gpio-options="gpioOptions"
+          :gpio-usage-index="gpioUsageIndex"
+          :gpio-title="gpioTitle"
+          :global-store="globalStore"
+          :should-show-mode-upgrade="shouldShowModeUpgrade('busses')"
+          :mode-upgrade-button-label="modeUpgradeButtonLabel"
+          @update:active-busses-key="activeBussesKey = $event"
+          @update-busses-detail="handleBussesDetailUpdate"
+          @open-secrets="openSecretsModal"
+          @mode-upgrade-availability="handleModeUpgradeAvailability"
+          @promote-mode-level="promoteModeLevel"
+        />
 
-        <div class="module-card" v-if="activeTab === 'System'">
-          <div class="components-header">
-            <div class="components-title">
-              <h2>System</h2>
-              <a
-                v-if="activeTabHelpUrl"
-                class="filter-help"
-                :href="activeTabHelpUrl"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Documentation"
-              >
-                ?
-              </a>
-            </div>
-          </div>
-          <div class="module-card__body">
-            <div class="module-tabs">
-              <button
-                v-for="tab in otherTabs"
-                :key="tab.key"
-                class="btn-standard"
-                :class="{ active: activeOtherKey === tab.key }"
-                @click="activeOtherKey = tab.key"
-              >
-                {{ tab.label }}
-              </button>
-            </div>
-            <SchemaRenderer
-              v-if="otherDetailId"
-              :component-id="otherDetailId"
-              :component-config="otherDetailConfig"
-              :root-value="config"
-              :mode-level="activeModeLevel"
-              :id-registry="idRegistry"
-              :name-registry="nameRegistry"
-              :id-index="idIndex"
-              :gpio-options="gpioOptions"
-              :gpio-usage="gpioUsageIndex"
-              :gpio-title="gpioTitle"
-              :context-component-id="otherDetailId"
-              :context-scope-id="otherDetailScopeId"
-              :mode-upgrade-section="'system'"
-              :mode-upgrade-key="'detail'"
-              :global-store="globalStore"
-              @update="handleOtherDetailUpdate"
-              @open-secrets="openSecretsModal"
-              @mode-upgrade-availability="handleModeUpgradeAvailability"
-            />
-            <button
-              v-if="shouldShowModeUpgrade('system')"
-              type="button"
-              class="btn-standard module-mode-upgrade"
-              @click="promoteModeLevel"
-            >
-              {{ modeUpgradeButtonLabel }}
-            </button>
-          </div>
-        </div>
+        <BuilderSystemTab
+          v-if="activeTab === 'System'"
+          :active-tab-help-url="activeTabHelpUrl"
+          :other-tabs="otherTabs"
+          :active-other-key="activeOtherKey"
+          :other-detail-id="otherDetailId"
+          :other-detail-config="otherDetailConfig"
+          :other-detail-scope-id="otherDetailScopeId"
+          :config="config"
+          :active-mode-level="activeModeLevel"
+          :id-registry="idRegistry"
+          :name-registry="nameRegistry"
+          :id-index="idIndex"
+          :gpio-options="gpioOptions"
+          :gpio-usage-index="gpioUsageIndex"
+          :gpio-title="gpioTitle"
+          :global-store="globalStore"
+          :should-show-mode-upgrade="shouldShowModeUpgrade('system')"
+          :mode-upgrade-button-label="modeUpgradeButtonLabel"
+          @update:active-other-key="activeOtherKey = $event"
+          @update-other-detail="handleOtherDetailUpdate"
+          @open-secrets="openSecretsModal"
+          @mode-upgrade-availability="handleModeUpgradeAvailability"
+          @promote-mode-level="promoteModeLevel"
+        />
 
-        <div class="module-card" v-if="activeTab === 'Automation'">
-          <div class="components-header">
-            <div class="components-title">
-              <h2>Automation</h2>
-              <a
-                v-if="activeTabHelpUrl"
-                class="filter-help"
-                :href="activeTabHelpUrl"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Documentation"
-              >
-                ?
-              </a>
-            </div>
-          </div>
-          <div class="module-card__body">
-            <div class="module-tabs">
-              <button
-                v-for="tab in automationTabs"
-                :key="tab.key"
-                type="button"
-                class="btn-standard"
-                :class="{ active: activeAutomationKey === tab.key }"
-                @click="activeAutomationKey = tab.key"
-              >
-                {{ tab.label }}
-              </button>
-            </div>
-            <SchemaRenderer
-              v-if="automationDetailId"
-              :component-id="automationDetailId"
-              :component-config="automationDetailConfig"
-              :root-value="config"
-              :mode-level="activeModeLevel"
-              :id-registry="idRegistry"
-              :name-registry="nameRegistry"
-              :id-index="idIndex"
-              :gpio-options="gpioOptions"
-              :gpio-usage="gpioUsageIndex"
-              :gpio-title="gpioTitle"
-              :context-component-id="automationDetailId"
-              :context-scope-id="automationDetailScopeId"
-              :mode-upgrade-section="'automation'"
-              :mode-upgrade-key="'detail'"
-              :global-store="globalStore"
-              @update="handleAutomationDetailUpdate"
-              @open-secrets="openSecretsModal"
-              @mode-upgrade-availability="handleModeUpgradeAvailability"
-            />
-            <div
-              v-if="
-                (activeModeLevel === 'Normal' || activeModeLevel === 'Advanced') &&
-                generatedAutomation[activeAutomationKey]?.length
-              "
-              class="schema-group"
-            >
-              <div
-                v-for="(entry, index) in generatedAutomation[activeAutomationKey]"
-                :key="`generated-${activeAutomationKey}-${index}`"
-                class="schema-list list-normal read-only-box"
-              >
-                <div class="schema-list-header">Auto-generated (read-only)</div>
-                <div class="schema-list-item">
-                  <div
-                    v-for="(line, lineIndex) in generatedEntryLines(entry)"
-                    :key="`generated-line-${index}-${lineIndex}`"
-                    class="note"
-                  >
-                    {{ line }}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <button
-              v-if="shouldShowModeUpgrade('automation')"
-              type="button"
-              class="btn-standard module-mode-upgrade"
-              @click="promoteModeLevel"
-            >
-              {{ modeUpgradeButtonLabel }}
-            </button>
-          </div>
-        </div>
+        <BuilderAutomationTab
+          v-if="activeTab === 'Automation'"
+          :active-tab-help-url="activeTabHelpUrl"
+          :automation-tabs="automationTabs"
+          :active-automation-key="activeAutomationKey"
+          :automation-detail-id="automationDetailId"
+          :automation-detail-config="automationDetailConfig"
+          :automation-detail-scope-id="automationDetailScopeId"
+          :generated-automation="generatedAutomation"
+          :generated-entry-lines="generatedEntryLines"
+          :config="config"
+          :active-mode-level="activeModeLevel"
+          :id-registry="idRegistry"
+          :name-registry="nameRegistry"
+          :id-index="idIndex"
+          :gpio-options="gpioOptions"
+          :gpio-usage-index="gpioUsageIndex"
+          :gpio-title="gpioTitle"
+          :global-store="globalStore"
+          :should-show-mode-upgrade="shouldShowModeUpgrade('automation')"
+          :mode-upgrade-button-label="modeUpgradeButtonLabel"
+          @update:active-automation-key="activeAutomationKey = $event"
+          @update-automation-detail="handleAutomationDetailUpdate"
+          @open-secrets="openSecretsModal"
+          @mode-upgrade-availability="handleModeUpgradeAvailability"
+          @promote-mode-level="promoteModeLevel"
+        />
 
         <div class="module-card" v-if="activeTab === 'Components'">
           <div class="components-header">
@@ -853,174 +418,64 @@
             </div>
           </div>
           <div :class="['module-card__body', { 'module-card__body--picker': isComponentPickerOpen }]">
-            <div v-if="isComponentPickerOpen" class="components-picker-shell">
-              <div class="components-picker">
-                <input
-                    id="componentsSearch"
-                    v-model="componentsQuery"
-                    placeholder="Search components"
-                  />
-                  <div v-if="componentCatalogError" class="notice notice--error components-error">
-                    {{ componentCatalogError?.message || "Component catalog not available" }}
-                  </div>
-                  <div class="components-list">
-                    <details
-                      v-for="(category, categoryIndex) in filteredCategories"
-                      :key="`${category.slug}-${categoryIndex}`"
-                      class="components-category"
-                      :open="Boolean(componentsQuery)"
-                    >
-                      <summary>{{ category.title }}</summary>
-                      <div class="components-items" v-if="category.items.length">
-                        <div
-                          v-for="(item, itemIndex) in category.items"
-                          :key="`${item.id}-${category.slug}-${itemIndex}`"
-                          class="component-item-row"
-                        >
-                          <button
-                            type="button"
-                            class="component-item"
-                            :class="{
-                              selected: selectedComponentIds.has(item.id),
-                              unavailable: !isComponentAvailable(item)
-                            }"
-                            :disabled="!isComponentAvailable(item) || isResolvingComponentSelection"
-                            :title="!isComponentAvailable(item) ? 'Component not available' : ''"
-                            @click="selectComponent(item)"
-                          >
-                            <span>{{ item.name }}</span>
-                            <span class="component-id">{{ item.id }}</span>
-                          </button>
-                          <button
-                            v-if="isSavedCustomComponentItem(item)"
-                            type="button"
-                            class="component-item-delete"
-                            title="Delete saved component"
-                            :disabled="deletingCustomComponentId === item.id"
-                            @click.stop="requestDeleteSavedCustomComponent(item)"
-                          >
-                            <img
-                              src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/delete-forever.svg"
-                              alt=""
-                            />
-                          </button>
-                        </div>
-                      </div>
-                      <div
-                        v-for="(subcategory, subIndex) in category.subcategories"
-                        :key="`${subcategory.slug}-${subIndex}`"
-                        class="components-subcategory"
-                      >
-                        <h3>{{ subcategory.title }}</h3>
-                        <div class="components-items">
-                          <div
-                            v-for="(item, itemIndex) in subcategory.items"
-                            :key="`${item.id}-${subcategory.slug}-${itemIndex}`"
-                            class="component-item-row"
-                          >
-                            <button
-                              class="component-item"
-                              type="button"
-                              :class="{
-                                selected: selectedComponentIds.has(item.id),
-                                unavailable: !isComponentAvailable(item)
-                              }"
-                              :disabled="!isComponentAvailable(item) || isResolvingComponentSelection"
-                              :title="!isComponentAvailable(item) ? 'Component not available' : ''"
-                              @click="selectComponent(item)"
-                            >
-                              <span>{{ item.name }}</span>
-                              <span class="component-id">{{ item.id }}</span>
-                            </button>
-                            <button
-                              v-if="isSavedCustomComponentItem(item)"
-                              type="button"
-                              class="component-item-delete"
-                              title="Delete saved component"
-                              :disabled="deletingCustomComponentId === item.id"
-                              @click.stop="requestDeleteSavedCustomComponent(item)"
-                            >
-                              <img
-                                src="https://cdn.jsdelivr.net/npm/@mdi/svg/svg/delete-forever.svg"
-                                alt=""
-                              />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </details>
-                  </div>
-                </div>
-            </div>
-            <div v-else class="component-form">
-              <div
-                v-if="activeComponentBusLabels || activeComponentProtocolLabels"
-                class="notice notice--warning component-bus-note"
-              >
-                <template v-if="activeComponentBusLabels">
-                  Make sure {{ activeComponentBusLabels }} is configured correctly.
-                  <a href="#" class="preview-callout-link" @click.prevent="focusRequiredBus">
-                    BUSSES
-                  </a>
-                </template>
-                <template v-if="activeComponentProtocolLabels">
-                  <span v-if="activeComponentBusLabels"> </span>
-                  Make sure {{ activeComponentProtocolLabels }} is configured correctly.
-                  <a href="#" class="preview-callout-link" @click.prevent="focusRequiredProtocol">
-                    PROTOCOLS
-                  </a>
-                </template>
-              </div>
-              <SchemaRenderer
-                :component-id="activeComponentId"
-                :schema-path="activeComponentSchemaPath"
-                :component-config="activeComponentConfig"
-                :field-errors="activeComponentFieldErrors"
-                :custom-config="activeComponentCustomConfig"
-                :mode-level="activeModeLevel"
-                :id-registry="idRegistry"
-                :name-registry="nameRegistry"
-                :id-index="idIndex"
-                :gpio-options="gpioOptions"
-                :gpio-usage="gpioUsageIndex"
-                :gpio-title="gpioTitle"
-                :context-component-id="activeComponentId"
-                :context-scope-id="activeComponentScopeId"
-                :global-store="globalStore"
-                :display-images="displayImages"
-                :display-fonts="displayFonts"
-                :display-google-fonts="displayGoogleFonts"
-                :assets-base="assetsBase"
-                :mode-upgrade-section="'components'"
-                :mode-upgrade-key="'main'"
-                @update="handleSchemaUpdate"
-                @update-custom="handleCustomConfigUpdate"
-                @open-asset-manager="openAssetManager"
-                @open-secrets="openSecretsModal"
-                @mode-upgrade-availability="handleModeUpgradeAvailability"
-              />
-              <button
-                v-if="shouldShowModeUpgrade('components')"
-                type="button"
-                class="btn-standard module-mode-upgrade"
-                @click="promoteModeLevel"
-              >
-                {{ modeUpgradeButtonLabel }}
-              </button>
-              <div v-if="showSaveCustomComponentAction" class="component-save-custom">
-                <button
-                  type="button"
-                  class="btn-standard"
-                  :disabled="!canSaveCustomComponent"
-                  @click="saveCustomComponentTemplate"
-                >
-                  {{ isSavingCustomComponent ? "Saving..." : customComponentActionLabel }}
-                </button>
-                <div v-if="customComponentSaveError" class="notice notice--error">
-                  {{ customComponentSaveError }}
-                </div>
-              </div>
-            </div>
+            <BuilderComponentPicker
+              v-if="isComponentPickerOpen"
+              :components-query="componentsQuery"
+              :component-catalog-error="componentCatalogError"
+              :filtered-categories="filteredCategories"
+              :selected-component-ids="selectedComponentIds"
+              :is-component-available="isComponentAvailable"
+              :is-resolving-component-selection="isResolvingComponentSelection"
+              :is-saved-custom-component-item="isSavedCustomComponentItem"
+              :deleting-custom-component-id="deletingCustomComponentId"
+              @update:components-query="componentsQuery = $event"
+              @select-component="selectComponent"
+              @delete-saved-custom-component="requestDeleteSavedCustomComponentWithConfirm"
+            />
+            <BuilderComponentForm
+              v-else
+              :active-component-bus-labels="activeComponentBusLabels"
+              :active-component-protocol-labels="activeComponentProtocolLabels"
+              :active-component-system-labels="activeComponentSystemLabels"
+              :active-component-network-labels="activeComponentNetworkLabels"
+              :active-component-component-labels="activeComponentComponentLabels"
+              :active-component-id="activeComponentId"
+              :active-component-schema-path="activeComponentSchemaPath"
+              :active-component-config="activeComponentConfig"
+              :active-component-field-errors="activeComponentFieldErrors"
+              :active-component-custom-config="activeComponentCustomConfig"
+              :active-mode-level="activeModeLevel"
+              :id-registry="idRegistry"
+              :name-registry="nameRegistry"
+              :id-index="idIndex"
+              :gpio-options="gpioOptions"
+              :gpio-usage-index="gpioUsageIndex"
+              :gpio-title="gpioTitle"
+              :active-component-scope-id="activeComponentScopeId"
+              :global-store="globalStore"
+              :display-images="displayImages"
+              :display-fonts="displayFonts"
+              :display-google-fonts="displayGoogleFonts"
+              :assets-base="assetsBase"
+              :should-show-mode-upgrade="shouldShowModeUpgrade('components')"
+              :mode-upgrade-button-label="modeUpgradeButtonLabel"
+              :show-save-custom-component-action="showSaveCustomComponentAction"
+              :can-save-custom-component="canSaveCustomComponent"
+              :is-saving-custom-component="isSavingCustomComponent"
+              :custom-component-action-label="customComponentActionLabel"
+              :custom-component-save-error="customComponentSaveError"
+              @focus-bus="focusRequiredBus"
+              @focus-protocol="focusRequiredProtocol"
+              @focus-system="focusRequiredSystem"
+              @focus-network="focusRequiredNetwork"
+              @update-schema="handleSchemaUpdate"
+              @update-custom-config="handleCustomConfigUpdate"
+              @open-asset-manager="openAssetManager"
+              @open-secrets="openSecretsModal"
+              @mode-upgrade-availability="handleModeUpgradeAvailability"
+              @promote-mode-level="promoteModeLevel"
+              @save-custom-component-template="saveCustomComponentTemplate"
+            />
           </div>
         </div>
           </div>
@@ -1037,33 +492,36 @@
 <script setup>
 import {
   computed,
-  nextTick,
   onBeforeUnmount,
-  onBeforeUpdate,
   onMounted,
   provide,
   ref,
   watch
 } from "vue";
-import hljs from "highlight.js/lib/core";
-import yaml from "highlight.js/lib/languages/yaml";
-import ConfirmModal from "../components/ConfirmModal.vue";
-import FormErrorsModal from "../components/FormErrorsModal.vue";
-import GpioGuideModal from "../components/GpioGuideModal.vue";
-import InstallConsoleModal from "../components/InstallConsoleModal.vue";
-import SecretsModal from "../components/SecretsModal.vue";
-import SchemaRenderer from "../components/SchemaRenderer.vue";
-import AssetManagerModal from "../components/assets/AssetManagerModal.vue";
+import BuilderAutomationTab from "../components/builder/BuilderAutomationTab.vue";
+import BuilderComponentForm from "../components/builder/BuilderComponentForm.vue";
+import BuilderComponentPicker from "../components/builder/BuilderComponentPicker.vue";
+import BuilderCoreTab from "../components/builder/BuilderCoreTab.vue";
+import BuilderBussesTab from "../components/builder/BuilderBussesTab.vue";
+import BuilderModalHost from "../components/builder/BuilderModalHost.vue";
+import BuilderNetworkTab from "../components/builder/BuilderNetworkTab.vue";
+import BuilderPlatformTab from "../components/builder/BuilderPlatformTab.vue";
+import BuilderPreviewPane from "../components/builder/BuilderPreviewPane.vue";
+import BuilderProtocolsTab from "../components/builder/BuilderProtocolsTab.vue";
+import BuilderSystemTab from "../components/builder/BuilderSystemTab.vue";
+import { useBuilderComponentCatalog } from "../composables/builder/useBuilderComponentCatalog";
+import { useBuilderSchemaCatalog } from "../composables/builder/useBuilderSchemaCatalog";
+import { useBuilderValidation } from "../composables/builder/useBuilderValidation";
 import { useInstallConsoleFlow } from "../composables/useInstallConsoleFlow";
 import { loadGpioData, resolveGpioKey } from "../utils/gpioData";
-import { loadComponentSchema, loadSchemaByPath } from "../utils/schemaLoader";
+import { loadSchemaByPath } from "../utils/schemaLoader";
 import {
   buildComponentsYaml,
   buildDisplayAnimationIntervals,
   buildSchemaYaml
 } from "../utils/schemaYaml";
 import { buildGlobalRegistry, isFieldVisible as isSchemaFieldVisible } from "../utils/schemaVisibility";
-import { getRequiredInterfaces } from "../utils/schemaRequirements";
+import { getRequiredDependencies } from "../utils/schemaRequirements";
 import { generateFieldValue, resolveFieldValue, resolveGenerationSpec } from "../utils/schemaAuto";
 import {
   BUILDER_CONFIG_STORAGE_KEY,
@@ -1097,50 +555,22 @@ import {
 } from "../utils/displayImageEncoding";
 import { isDevOffline } from "../utils/devFlags";
 
-hljs.registerLanguage("yaml", yaml);
+// BuilderView is now mainly the orchestration shell for the schema-driven editor.
+// UI-heavy sections, preview logic, catalog flow, schema loading, and validation are
+// delegated to focused components/composables so the view can coordinate them.
 
 const tabs = ["Core", "Platform", "Network", "Protocols", "Busses", "System", "Automation"];
 const activeTab = ref(tabs[0]);
 const splitPreviewEnabled = ref(false);
-const activePreviewTab = ref("core");
-const previewTabList = ref(null);
-const previewTabMeasureButtons = ref([]);
-const previewTabStart = ref(0);
-const previewTabWidths = ref([]);
-const previewTabAvailableWidth = ref(0);
-const lastPreviewTabKeys = ref([]);
-const previewScrollInner = ref(null);
-const hasPreviewScrollbar = ref(false);
-const componentsQuery = ref("");
-const protocolTabPulse = ref(false);
-let protocolTabPulseTimer = null;
-const pendingProtocolPulseEntries = new Map();
-const busTabPulse = ref(false);
-let busTabPulseTimer = null;
-const pendingBusPulseEntries = new Map();
-const copySuccess = ref(false);
-let copyResetTimer = null;
-const activeComponentSlot = ref(null);
-const isComponentPickerOpen = ref(false);
+const pulsingTabs = ref(new Set());
+const tabPulseTimers = new Map();
+const pendingPulseEntries = new Map();
+const config = ref(defaultConfig());
 const confirmOpen = ref(false);
 const pendingRemoveIndex = ref(null);
-const componentSchemas = ref({});
-const componentCatalog = ref({ categories: [] });
-const isComponentCatalogLoading = ref(true);
-const componentCatalogError = ref(null);
-const componentsZipInput = ref(null);
-const isComponentsImporting = ref(false);
-const importSummaryModalOpen = ref(false);
-const importSummaryModalMessage = ref("Import completed.");
-const importSummaryModalRows = ref([]);
 const isSavingCustomComponent = ref(false);
 const customComponentSaveError = ref("");
-const deletingCustomComponentId = ref("");
-const pendingDeleteCustomItem = ref(null);
 const confirmAction = ref(null);
-const isResolvingComponentSelection = ref(false);
-const componentSchemaStatus = ref({});
-const componentSchemaLoadPromises = new Map();
 const modeLevels = ["Simple", "Normal", "Advanced"];
 const nextModeLevelByMode = {
   Simple: "Normal",
@@ -1261,12 +691,7 @@ const buildValueRegistry = (entries, match) => {
           walkFields(nestedValue, field.fields || []);
         }
       }
-      if (
-        field.type === "list" &&
-        Array.isArray(value) &&
-        field.item?.type === "object" &&
-        field.item?.fields
-      ) {
+      if (isObjectArrayLikeField(field, value)) {
         value.forEach((item) => walkFields(item || {}, field.item.fields));
       }
     });
@@ -1358,12 +783,7 @@ const buildIdRefErrors = (entries, idIndex) => {
         walkFields(value || {}, field.fields || [], entry, nextPath);
       }
 
-      if (
-        field.type === "list" &&
-        Array.isArray(value) &&
-        field.item?.type === "object" &&
-        field.item?.fields
-      ) {
+      if (isObjectArrayLikeField(field, value)) {
         value.forEach((item, index) => {
           walkFields(item || {}, field.item.fields, entry, [...nextPath, String(index)]);
         });
@@ -1589,10 +1009,35 @@ const buildValidationErrors = (entries) => {
     const parsed = Number(value);
     return Number.isInteger(parsed);
   };
+  const parseNumberLike = (value) => {
+    if (value === undefined || value === null || value === "") return Number.NaN;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : Number.NaN;
+  };
+  const parseMHzValue = (value) => {
+    const normalized = String(value || "").trim();
+    if (!normalized) return Number.NaN;
+    const match = normalized.match(/^(\d+(?:\.\d+)?)\s*MHz$/i);
+    if (!match) return Number.NaN;
+    return Number(match[1]);
+  };
   const hasTruthyObjectValue = (value) => {
     if (!value || typeof value !== "object" || Array.isArray(value)) return false;
     return Object.values(value).some((item) => item === true || (typeof item === "string" && item.trim()) || typeof item === "number");
   };
+
+  const rootMapEntriesByDomain = new Map();
+  entries.forEach((entry) => {
+    const renderAs = String(entry?.renderAs || "").trim().toLowerCase();
+    const domain = String(entry?.domain || "").trim();
+    if (renderAs !== "root_map" || !domain) return;
+    if (!rootMapEntriesByDomain.has(domain)) {
+      rootMapEntriesByDomain.set(domain, []);
+    }
+    rootMapEntriesByDomain.get(domain).push(entry);
+  });
+  const systemPsramEntry = entries.find((entry) => entry?.componentId === "general/system/psram");
+  const isSystemPsramEnabled = systemPsramEntry?.config?.enabled === true;
 
   const walkFields = (configValue, fields, entry, path = []) => {
     if (!fields?.length) return;
@@ -1605,12 +1050,7 @@ const buildValidationErrors = (entries) => {
       if (field.type === "object") {
         walkFields(value || {}, field.fields || [], entry, nextPath);
       }
-      if (
-        field.type === "list" &&
-        Array.isArray(value) &&
-        field.item?.type === "object" &&
-        field.item?.fields
-      ) {
+      if (isObjectArrayLikeField(field, value)) {
         value.forEach((item, index) => {
           walkFields(item || {}, field.item.fields, entry, [...nextPath, String(index)]);
         });
@@ -1733,7 +1173,66 @@ const buildValidationErrors = (entries) => {
           pushError(entry, ["init_sequence"], "Custom model requires init_sequence.");
         }
       }
+
     }
+
+    if (entry.componentId === "esp32_camera") {
+      const config = entry.config || {};
+      const dataPins = config.data_pins;
+      const frameBufferLocation = String(config.frame_buffer_location || "PSRAM").trim().toUpperCase();
+      const externalClockFrequency = parseMHzValue(config.external_clock?.frequency);
+      const jpegQuality = parseNumberLike(config.jpeg_quality);
+      const frameBufferCount = parseNumberLike(config.frame_buffer_count);
+      const contrast = parseNumberLike(config.contrast);
+      const brightness = parseNumberLike(config.brightness);
+      const saturation = parseNumberLike(config.saturation);
+      const aeLevel = parseNumberLike(config.ae_level);
+      const aecValue = parseNumberLike(config.aec_value);
+      const agcValue = parseNumberLike(config.agc_value);
+
+      if (!Array.isArray(dataPins) || dataPins.filter((value) => value !== undefined && value !== null && String(value).trim() !== "").length !== 8) {
+        pushError(entry, ["data_pins"], "ESP32 Camera requires exactly 8 data pins.");
+      }
+      if (frameBufferLocation === "PSRAM" && !isSystemPsramEnabled) {
+        pushError(entry, ["frame_buffer_location"], "PSRAM frame buffers require System > PSRAM to be enabled.");
+      }
+      if (config.external_clock?.frequency !== undefined && Number.isNaN(externalClockFrequency)) {
+        pushError(entry, ["external_clock", "frequency"], "External clock frequency must use format 8MHz to 20MHz.");
+      } else if (!Number.isNaN(externalClockFrequency) && (externalClockFrequency < 8 || externalClockFrequency > 20)) {
+        pushError(entry, ["external_clock", "frequency"], "External clock frequency must be between 8MHz and 20MHz.");
+      }
+      if (!Number.isNaN(jpegQuality) && jpegQuality !== 0 && (jpegQuality < 6 || jpegQuality > 63)) {
+        pushError(entry, ["jpeg_quality"], "JPEG quality must be 0 or between 6 and 63.");
+      }
+      if (!Number.isNaN(frameBufferCount) && ![1, 2].includes(frameBufferCount)) {
+        pushError(entry, ["frame_buffer_count"], "Frame buffer count must be 1 or 2.");
+      }
+      if (!Number.isNaN(contrast) && (contrast < -2 || contrast > 2)) {
+        pushError(entry, ["contrast"], "Contrast must be between -2 and 2.");
+      }
+      if (!Number.isNaN(brightness) && (brightness < -2 || brightness > 2)) {
+        pushError(entry, ["brightness"], "Brightness must be between -2 and 2.");
+      }
+      if (!Number.isNaN(saturation) && (saturation < -2 || saturation > 2)) {
+        pushError(entry, ["saturation"], "Saturation must be between -2 and 2.");
+      }
+      if (!Number.isNaN(aeLevel) && (aeLevel < -2 || aeLevel > 2)) {
+        pushError(entry, ["ae_level"], "AE level must be between -2 and 2.");
+      }
+      if (!Number.isNaN(aecValue) && (aecValue < 0 || aecValue > 1200)) {
+        pushError(entry, ["aec_value"], "AEC value must be between 0 and 1200.");
+      }
+      if (!Number.isNaN(agcValue) && (agcValue < 0 || agcValue > 30)) {
+        pushError(entry, ["agc_value"], "AGC value must be between 0 and 30.");
+      }
+    }
+  });
+
+  rootMapEntriesByDomain.forEach((domainEntries, domain) => {
+    if (domainEntries.length < 2) return;
+    domainEntries.forEach((entry) => {
+      pushError(entry, [], `Only one root-map component can emit domain '${domain}'.`);
+    });
   });
 
   return errors;
@@ -1762,7 +1261,7 @@ const buildGpioUsageIndex = (components, schemas, extraConfigs = []) => {
       if (field.type === "object") {
         walkFields(value || {}, field.fields || []);
       }
-      if (field.type === "list" && Array.isArray(value)) {
+      if (isArrayLikeSchemaField(field) && Array.isArray(value)) {
         if (field.item?.type === "gpio") {
           value.forEach((item) => addUsage(item));
         } else if (field.item?.type === "object" && field.item?.fields) {
@@ -1820,12 +1319,7 @@ const buildIdIndex = (entries) => {
           walkFields(nestedValue, field.fields || [], entry);
         }
       }
-      if (
-        field.type === "list" &&
-        Array.isArray(value) &&
-        field.item?.type === "object" &&
-        field.item?.fields
-      ) {
+      if (isObjectArrayLikeField(field, value)) {
         value.forEach((item) => walkFields(item || {}, field.item.fields, entry));
       }
     });
@@ -1879,12 +1373,7 @@ const buildDuplicateErrors = (entries, idCounts, nameCounts) => {
         }
       }
 
-      if (
-        field.type === "list" &&
-        Array.isArray(value) &&
-        field.item?.type === "object" &&
-        field.item?.fields
-      ) {
+      if (isObjectArrayLikeField(field, value)) {
         value.forEach((item, index) => {
           walkFields(item || {}, field.item.fields, entry, [...nextPath, String(index)]);
         });
@@ -1900,19 +1389,15 @@ const buildDuplicateErrors = (entries, idCounts, nameCounts) => {
   return errors;
 };
 
-const matchesQuery = (item, query) => {
-  if (!query) return true;
-  const value = query.toLowerCase();
-  return (
-    item.name.toLowerCase().includes(value) || item.id.toLowerCase().includes(value)
-  );
+const resolveComponentRenderAs = (schema) => {
+  const renderAs = typeof schema?.renderAs === "string" ? schema.renderAs.trim().toLowerCase() : "";
+  return renderAs === "root_map" ? "root_map" : "list";
 };
 
-const isComponentAvailable = (item) => item?.available !== false;
-const isSavedCustomComponentItem = (item) => {
-  const id = String(item?.id || "").trim().toLowerCase();
-  return id.startsWith("custom/") && id !== "custom/empty";
-};
+const isArrayLikeSchemaField = (field) => field?.type === "list" || field?.type === "fixed_list";
+
+const isObjectArrayLikeField = (field, value) =>
+  isArrayLikeSchemaField(field) && Array.isArray(value) && field?.item?.type === "object" && field?.item?.fields;
 
 const normalizeSchemaPath = (value) => {
   if (typeof value !== "string") return "";
@@ -1920,39 +1405,54 @@ const normalizeSchemaPath = (value) => {
   return trimmed || "";
 };
 
-const componentCatalogItemsById = computed(() => {
-  const map = new Map();
-  componentCatalog.value?.categories?.forEach((category) => {
-    category.items.forEach((item) => {
-      if (!map.has(item.id)) {
-        map.set(item.id, item);
-      }
-    });
-    category.subcategories.forEach((subcategory) => {
-      subcategory.items.forEach((item) => {
-        if (!map.has(item.id)) {
-          map.set(item.id, item);
-        }
-      });
-    });
-  });
-  return map;
+const {
+  activeComponentSlot,
+  addComponentSlot,
+  catalogSchemaPathById,
+  clearPendingDeleteSavedCustomComponent,
+  componentCatalogError,
+  componentCatalogItemsById,
+  componentLabel,
+  componentsQuery,
+  componentsZipInput,
+  deleteSavedCustomComponent,
+  deletingCustomComponentId,
+  filteredCategories,
+  importSummaryModalMessage,
+  importSummaryModalOpen,
+  importSummaryModalRows,
+  isComponentCatalogLoading,
+  isComponentCatalogReady,
+  isComponentPickerOpen,
+  isComponentsImporting,
+  isResolvingComponentSelection,
+  isSavedCustomComponentItem,
+  openComponentsZipPicker,
+  openComponentViewer,
+  pendingDeleteCustomItem,
+  refreshComponentCatalog,
+  requestDeleteSavedCustomComponent,
+  selectedComponentIds
+} = useBuilderComponentCatalog({
+  config,
+  activeTab,
+  componentIdFromEntry: (entry) => componentIdFromEntry(entry),
+  normalizeSchemaPath,
+  saveConfig: () => saveConfig(),
+  addonFetch: (...args) => addonFetch(...args),
+  isDevOffline,
+  localComponentCatalogUrl: () => localComponentCatalogUrl,
+  customComponentSaveError
 });
 
-const catalogItemById = (componentId) => componentCatalogItemsById.value.get(componentId) || null;
-
-const catalogSchemaPathById = (componentId) =>
-  normalizeSchemaPath(catalogItemById(componentId)?.schemaPath);
-
-const componentIndex = computed(() => {
-  const map = new Map();
-  componentCatalogItemsById.value.forEach((item, itemId) => {
-    map.set(itemId, item.name);
-  });
-  return map;
+const { componentSchemas, componentSchemaStatus, ensureComponentSchema } = useBuilderSchemaCatalog({
+  config,
+  componentIdFromEntry: (entry) => componentIdFromEntry(entry),
+  normalizeSchemaPath,
+  catalogSchemaPathById,
+  isComponentCatalogReady,
+  componentCatalogItemsById
 });
-
-const componentLabel = (id) => (id ? componentIndex.value.get(id) ?? id : "");
 
 const componentEntryLabel = (entry) => {
   const componentId = componentIdFromEntry(entry);
@@ -1971,6 +1471,35 @@ const componentEntryLabel = (entry) => {
       : "";
   return componentLabel(componentId) || fallbackLabel || componentId;
 };
+
+const getRootMapConflictDomain = (componentId, slotToIgnore = -1) => {
+  const schema = componentSchemas.value?.[componentId];
+  if (!schema || resolveComponentRenderAs(schema) !== "root_map") return "";
+  const domain = String(schema.domain || "").trim();
+  if (!domain) return "";
+  const hasConflict = (config.value.components || []).some((entry, index) => {
+    if (index === slotToIgnore) return false;
+    const existingId = componentIdFromEntry(entry);
+    if (!existingId || (existingId === componentId && index === activeComponentSlot.value)) return false;
+    const existingSchema = componentSchemas.value?.[existingId];
+    if (!existingSchema || resolveComponentRenderAs(existingSchema) !== "root_map") return false;
+    return String(existingSchema.domain || "").trim() === domain;
+  });
+  return hasConflict ? domain : "";
+};
+
+const isComponentAvailable = (item) => {
+  if (item?.available === false) return false;
+  const componentId = String(item?.id || "").trim();
+  if (!componentId) return false;
+  return !getRootMapConflictDomain(componentId, activeComponentSlot.value ?? -1);
+};
+
+const componentsHeader = computed(() => {
+  if (activeComponentSlot.value === null) return "Components";
+  const entry = config.value.components[activeComponentSlot.value];
+  return entry ? componentEntryLabel(entry) : "Add";
+});
 
 const projectFilename = computed(() => {
   const coreValue = config.value.esphomeCore || {};
@@ -2015,21 +1544,6 @@ const parseComponentId = (componentId) => {
   const [domain, platform] = componentId.split(separator);
   return { domain: domain || "", platform: platform || "" };
 };
-
-const selectedComponentIds = computed(
-  () =>
-    new Set(
-      config.value.components
-        .map((entry) => componentIdFromEntry(entry))
-        .filter(Boolean)
-    )
-);
-
-const componentsHeader = computed(() => {
-  if (activeComponentSlot.value === null) return "Components";
-  const entry = config.value.components[activeComponentSlot.value];
-  return entry ? componentEntryLabel(entry) : "Add";
-});
 
 const confirmTitle = computed(() =>
   confirmAction.value === "delete-custom" ? "Delete saved component" : "Confirm"
@@ -2191,13 +1705,6 @@ const protocolDefinitions = [
   { key: "mqtt", label: "MQTT", schemaId: "general/protocols/mqtt" },
   { key: "espnow", label: "ESP-NOW", schemaId: "general/protocols/esp-now" }
 ];
-const supportedProtocols = new Set(protocolDefinitions.map((entry) => entry.key));
-const autoManagedProtocolKeys = new Set(["mqtt", "espnow"]);
-const supportedAutoProtocols = new Set(
-  protocolDefinitions
-    .map((entry) => entry.key)
-    .filter((key) => autoManagedProtocolKeys.has(key))
-);
 const activeProtocolKey = ref(protocolDefinitions[0]?.key || "");
 const resolveProtocolEnabled = (key) => {
   const configEntry = protocolsCoreConfig.value?.[key] || {};
@@ -2210,6 +1717,76 @@ const resolveProtocolEnabled = (key) => {
 const enabledProtocolKeys = computed(() =>
   protocolDefinitions.filter((entry) => resolveProtocolEnabled(entry.key)).map((entry) => entry.key)
 );
+const bussesCoreConfig = computed(() => config.value.bussesCore || {});
+const bussesDefinitions = [
+  { key: "i2c", label: "I2C", schemaId: "general/busses/i2c" },
+  { key: "spi", label: "SPI", schemaId: "general/busses/spi" },
+  { key: "uart", label: "UART", schemaId: "general/busses/uart" },
+  { key: "one_wire", label: "1-Wire", schemaId: "general/busses/one_wire" },
+  { key: "i2s", label: "I2S", schemaId: "general/busses/i2s" },
+  { key: "canbus", label: "CAN Bus", schemaId: "general/busses/canbus" }
+];
+const otherDefinitions = [
+  { key: "logger", label: "Logger", schemaId: "general/system/logger" },
+  { key: "status_led", label: "Status LED", schemaId: "general/system/status_led" },
+  { key: "debug", label: "Debug", schemaId: "general/system/debug" },
+  { key: "psram", label: "PSRAM", schemaId: "general/system/psram" }
+];
+const systemConfig = computed(() => config.value.system || {});
+const requirementLabelMap = {
+  api: "API",
+  canbus: "CAN Bus",
+  esp32_ble_tracker: "ESP32 BLE Tracker",
+  espnow: "ESP-NOW",
+  gps: "GPS",
+  i2c: "I2C",
+  i2s: "I2S",
+  i2s_audio: "I2S Audio",
+  mqtt: "MQTT",
+  one_wire: "1-Wire",
+  openthread: "OpenThread",
+  psram: "PSRAM",
+  spi: "SPI",
+  uart: "UART",
+  wifi: "WiFi"
+};
+const formatRequirementLabel = (key) => {
+  if (!key) return "";
+  if (requirementLabelMap[key]) return requirementLabelMap[key];
+  return key
+    .replace(/[_-]+/g, " ")
+    .trim()
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+};
+const getRequirementMetadata = (requirementId) => {
+  const [namespace, targetKey] = String(requirementId || "").split(":", 2);
+  const label = formatRequirementLabel(targetKey);
+  if (!namespace || !targetKey) return null;
+  if (namespace === "bus") return { id: requirementId, namespace, targetKey, tab: "Busses", label };
+  if (namespace === "protocol") return { id: requirementId, namespace, targetKey, tab: "Protocols", label };
+  if (namespace === "system") return { id: requirementId, namespace, targetKey, tab: "System", label };
+  if (namespace === "network") return { id: requirementId, namespace, targetKey, tab: "Network", label };
+  if (namespace === "component") return { id: requirementId, namespace, targetKey, tab: "", label };
+  return { id: requirementId, namespace, targetKey, tab: "", label };
+};
+const getEntryRequiredDependencyIds = (entry, componentId, supported = null) => {
+  if (!entry || !componentId) return new Set();
+  if (!componentSchemas.value?.[componentId]) return new Set();
+  return getRequiredDependencies({
+    components: [entry],
+    componentSchemas: componentSchemas.value,
+    supported
+  });
+};
+const getRequirementDefinitionsForIds = (ids) =>
+  Array.from(ids || [])
+    .map((id) => getRequirementMetadata(id))
+    .filter(Boolean);
+const listRequirementLabels = (definitions) => definitions.map((entry) => entry.label).join("/");
+const getRequirementDefinitionsForTab = (definitions, tab) => definitions.filter((entry) => entry.tab === tab);
 const protocolTabs = computed(() =>
   protocolDefinitions.map((entry) => ({ key: entry.key, label: entry.label }))
 );
@@ -2224,16 +1801,6 @@ const protocolDetailConfig = computed(() => {
   if (!activeProtocolKey.value) return {};
   return protocolsCoreConfig.value?.[activeProtocolKey.value] || {};
 });
-const bussesCoreConfig = computed(() => config.value.bussesCore || {});
-const bussesDefinitions = [
-  { key: "i2c", label: "I2C", schemaId: "general/busses/i2c" },
-  { key: "spi", label: "SPI", schemaId: "general/busses/spi" },
-  { key: "uart", label: "UART", schemaId: "general/busses/uart" },
-  { key: "one_wire", label: "1-Wire", schemaId: "general/busses/one_wire" },
-  { key: "i2s", label: "I2S", schemaId: "general/busses/i2s" },
-  { key: "canbus", label: "CAN Bus", schemaId: "general/busses/canbus" }
-];
-const supportedBusses = new Set(bussesDefinitions.map((entry) => entry.key));
 const activeBussesKey = ref(bussesDefinitions[0]?.key || "");
 const resolveBusEnabled = (key) => {
   const configEntry = bussesCoreConfig.value?.[key] || {};
@@ -2243,46 +1810,52 @@ const resolveBusEnabled = (key) => {
   if (field?.default !== undefined) return Boolean(field.default);
   return false;
 };
+const activeComponentRequirementDefinitions = computed(() => {
+  if (!activeComponentEntry.value) return [];
+  return getRequirementDefinitionsForIds(getEntryRequiredDependencyIds(activeComponentEntry.value, activeComponentId.value));
+});
+const activeComponentRequiredBusDefinitions = computed(() =>
+  getRequirementDefinitionsForTab(activeComponentRequirementDefinitions.value, "Busses")
+);
 const activeComponentRequiredBusses = computed(() => {
-  if (!activeComponentEntry.value) return [];
-  const componentId = activeComponentId.value;
-  if (!componentId || !componentSchemas.value?.[componentId]) return [];
-  return Array.from(
-    getRequiredInterfaces({
-      components: [activeComponentEntry.value],
-      componentSchemas: componentSchemas.value,
-      supported: supportedBusses
-    })
-  );
+  return activeComponentRequiredBusDefinitions.value.map((entry) => entry.targetKey);
 });
-const activeComponentBusLabels = computed(() => {
-  if (!activeComponentRequiredBusses.value.length) return "";
-  const labels = activeComponentRequiredBusses.value.map(
-    (key) => bussesDefinitions.find((entry) => entry.key === key)?.label || key
-  );
-  return labels.join("/");
-});
+const activeComponentBusLabels = computed(() =>
+  listRequirementLabels(activeComponentRequiredBusDefinitions.value)
+);
 const primaryRequiredBusKey = computed(() => activeComponentRequiredBusses.value[0] || "");
+const activeComponentRequiredProtocolDefinitions = computed(() =>
+  getRequirementDefinitionsForTab(activeComponentRequirementDefinitions.value, "Protocols")
+);
 const activeComponentRequiredProtocols = computed(() => {
-  if (!activeComponentEntry.value) return [];
-  const componentId = activeComponentId.value;
-  if (!componentId || !componentSchemas.value?.[componentId]) return [];
-  return Array.from(
-    getRequiredInterfaces({
-      components: [activeComponentEntry.value],
-      componentSchemas: componentSchemas.value,
-      supported: supportedProtocols
-    })
-  );
+  return activeComponentRequiredProtocolDefinitions.value.map((entry) => entry.targetKey);
 });
-const activeComponentProtocolLabels = computed(() => {
-  if (!activeComponentRequiredProtocols.value.length) return "";
-  const labels = activeComponentRequiredProtocols.value.map(
-    (key) => protocolDefinitions.find((entry) => entry.key === key)?.label || key
-  );
-  return labels.join("/");
-});
+const activeComponentProtocolLabels = computed(() =>
+  listRequirementLabels(activeComponentRequiredProtocolDefinitions.value)
+);
 const primaryRequiredProtocolKey = computed(() => activeComponentRequiredProtocols.value[0] || "");
+const activeComponentRequiredSystemDefinitions = computed(() =>
+  getRequirementDefinitionsForTab(activeComponentRequirementDefinitions.value, "System")
+);
+const activeComponentRequiredSystem = computed(() =>
+  activeComponentRequiredSystemDefinitions.value.map((entry) => entry.targetKey)
+);
+const activeComponentSystemLabels = computed(() =>
+  listRequirementLabels(activeComponentRequiredSystemDefinitions.value)
+);
+const primaryRequiredSystemKey = computed(() => activeComponentRequiredSystem.value[0] || "");
+const activeComponentRequiredNetworkDefinitions = computed(() =>
+  getRequirementDefinitionsForTab(activeComponentRequirementDefinitions.value, "Network")
+);
+const activeComponentNetworkLabels = computed(() =>
+  listRequirementLabels(activeComponentRequiredNetworkDefinitions.value)
+);
+const activeComponentRequiredComponentDefinitions = computed(() =>
+  getRequirementDefinitionsForTab(activeComponentRequirementDefinitions.value, "")
+);
+const activeComponentComponentLabels = computed(() =>
+  listRequirementLabels(activeComponentRequiredComponentDefinitions.value)
+);
 
 const focusRequiredBus = () => {
   activeTab.value = "Busses";
@@ -2298,118 +1871,58 @@ const focusRequiredProtocol = () => {
   }
 };
 
-const componentNeedsBus = (entry, componentId) => {
-  if (!entry || !componentId) return false;
-  if (!componentSchemas.value?.[componentId]) return false;
-  const required = getRequiredInterfaces({
-    components: [entry],
-    componentSchemas: componentSchemas.value,
-    supported: supportedBusses
-  });
-  return required.size > 0;
+const getRequirementTabsForEntry = (entry, componentId) => {
+  const definitions = getRequirementDefinitionsForIds(getEntryRequiredDependencyIds(entry, componentId));
+  return Array.from(new Set(definitions.map((definition) => definition.tab).filter(Boolean)));
 };
 
-const componentNeedsProtocol = (entry, componentId) => {
-  if (!entry || !componentId) return false;
-  if (!componentSchemas.value?.[componentId]) return false;
-  const required = getRequiredInterfaces({
-    components: [entry],
-    componentSchemas: componentSchemas.value,
-    supported: supportedProtocols
+const triggerTabPulse = (tab) => {
+  const active = new Set(pulsingTabs.value);
+  const existingTimer = tabPulseTimers.get(tab);
+  if (existingTimer) {
+    clearTimeout(existingTimer);
+    tabPulseTimers.delete(tab);
+  }
+  active.delete(tab);
+  pulsingTabs.value = active;
+  requestAnimationFrame(() => {
+    const next = new Set(pulsingTabs.value);
+    next.add(tab);
+    pulsingTabs.value = next;
+    const timer = setTimeout(() => {
+      const current = new Set(pulsingTabs.value);
+      current.delete(tab);
+      pulsingTabs.value = current;
+      tabPulseTimers.delete(tab);
+    }, 3000);
+    tabPulseTimers.set(tab, timer);
   });
-  return required.size > 0;
 };
 
-const queueProtocolPulseForAddedComponent = (entry, componentId) => {
+const isTabPulsing = (tab) => pulsingTabs.value.has(tab);
+
+const queuePulseForAddedComponent = (entry, componentId) => {
   if (!entry || !componentId) return;
   const schema = componentSchemas.value?.[componentId];
   if (schema === undefined) {
-    const queue = pendingProtocolPulseEntries.get(componentId) || [];
+    const queue = pendingPulseEntries.get(componentId) || [];
     queue.push(entry);
-    pendingProtocolPulseEntries.set(componentId, queue);
+    pendingPulseEntries.set(componentId, queue);
     return;
   }
-  if (componentNeedsProtocol(entry, componentId)) {
-    triggerProtocolTabPulse();
+  getRequirementTabsForEntry(entry, componentId).forEach((tab) => triggerTabPulse(tab));
+};
+
+const focusRequiredSystem = () => {
+  activeTab.value = "System";
+  if (primaryRequiredSystemKey.value) {
+    activeOtherKey.value = primaryRequiredSystemKey.value;
   }
 };
 
-const queueBusPulseForAddedComponent = (entry, componentId) => {
-  if (!entry || !componentId) return;
-  const schema = componentSchemas.value?.[componentId];
-  if (schema === undefined) {
-    const queue = pendingBusPulseEntries.get(componentId) || [];
-    queue.push(entry);
-    pendingBusPulseEntries.set(componentId, queue);
-    return;
-  }
-  if (componentNeedsBus(entry, componentId)) {
-    triggerBusTabPulse();
-  }
+const focusRequiredNetwork = () => {
+  activeTab.value = "Network";
 };
-
-const triggerBusTabPulse = () => {
-  if (busTabPulseTimer) {
-    clearTimeout(busTabPulseTimer);
-    busTabPulseTimer = null;
-  }
-  busTabPulse.value = false;
-  requestAnimationFrame(() => {
-    busTabPulse.value = true;
-    busTabPulseTimer = setTimeout(() => {
-      busTabPulse.value = false;
-      busTabPulseTimer = null;
-    }, 3000);
-  });
-};
-
-const triggerProtocolTabPulse = () => {
-  if (protocolTabPulseTimer) {
-    clearTimeout(protocolTabPulseTimer);
-    protocolTabPulseTimer = null;
-  }
-  protocolTabPulse.value = false;
-  requestAnimationFrame(() => {
-    protocolTabPulse.value = true;
-    protocolTabPulseTimer = setTimeout(() => {
-      protocolTabPulse.value = false;
-      protocolTabPulseTimer = null;
-    }, 3000);
-  });
-};
-const areComponentSchemasReady = computed(() => {
-  const ids = config.value.components
-    .map((entry) => componentIdFromEntry(entry))
-    .filter(Boolean);
-  if (!ids.length) return true;
-  return ids.every((id) => componentSchemas.value[id]);
-});
-const requiredBusses = computed(() => {
-  return getRequiredInterfaces({
-    components: config.value.components,
-    componentSchemas: componentSchemas.value,
-    networkConfig: networkCoreConfig.value,
-    networkSchema: networkDetailSchema.value,
-    protocolsConfig: protocolsCoreConfig.value,
-    enabledProtocols: enabledProtocolKeys.value,
-    protocolsSchemas: protocolsSchemas.value,
-    supported: supportedBusses
-  });
-});
-const requiredBussesList = computed(() => Array.from(requiredBusses.value).sort());
-const requiredProtocols = computed(() => {
-  return getRequiredInterfaces({
-    components: config.value.components,
-    componentSchemas: componentSchemas.value,
-    networkConfig: networkCoreConfig.value,
-    networkSchema: networkDetailSchema.value,
-    protocolsConfig: protocolsCoreConfig.value,
-    enabledProtocols: enabledProtocolKeys.value,
-    protocolsSchemas: protocolsSchemas.value,
-    supported: supportedAutoProtocols
-  });
-});
-const requiredProtocolsList = computed(() => Array.from(requiredProtocols.value).sort());
 const bussesTabs = computed(() =>
   bussesDefinitions.map((entry) => ({ key: entry.key, label: entry.label }))
 );
@@ -2424,12 +1937,6 @@ const bussesDetailConfig = computed(() => {
   if (!activeBussesKey.value) return {};
   return bussesCoreConfig.value?.[activeBussesKey.value] || {};
 });
-const otherDefinitions = [
-  { key: "logger", label: "Logger", schemaId: "general/system/logger" },
-  { key: "status_led", label: "Status LED", schemaId: "general/system/status_led" },
-  { key: "debug", label: "Debug", schemaId: "general/system/debug" }
-];
-const systemConfig = computed(() => config.value.system || {});
 const activeOtherKey = ref(otherDefinitions[0]?.key || "");
 const otherTabs = computed(() =>
   otherDefinitions.map((entry) => ({ key: entry.key, label: entry.label }))
@@ -2504,11 +2011,6 @@ const generatedAutomation = computed(() => ({
     mdiSubstitutions.value
   )
 }));
-const showDisplayAutomationNotice = computed(() =>
-  splitPreviewEnabled.value &&
-  activePreviewTab.value === "display" &&
-  (generatedAutomation.value?.interval || []).length > 0
-);
 
 const embeddedDomainsByComponentDomain = computed(() => {
   const map = new Map();
@@ -2630,7 +2132,8 @@ const schemaEntries = computed(() => {
       componentId,
       config: config || {},
       fields,
-      domain: schema?.domain || ""
+      domain: schema?.domain || "",
+      renderAs: typeof schema?.renderAs === "string" ? schema.renderAs : ""
     });
   };
 
@@ -2702,7 +2205,7 @@ const schemaEntries = computed(() => {
       scopeId: "tab:System",
       label: `system.${entry.key}`,
       componentId: entry.schemaId,
-      config: systemConfig.value || {},
+      config: systemConfig.value?.[entry.key] || {},
       schema: otherSchemas.value?.[entry.key]
     });
   });
@@ -2733,46 +2236,6 @@ const schemaEntries = computed(() => {
 
   return entries;
 });
-
-const idRegistry = computed(() =>
-  buildValueRegistry(schemaEntries.value, (field, value) =>
-    field.type === "id" && typeof value === "string" && value.trim()
-  )
-);
-
-const idIndex = computed(() => buildIdIndex(schemaEntries.value));
-
-const displayImageFiles = computed(() =>
-  displayImages.value
-    .map((item) => item?.file || "")
-    .filter((file) => Boolean(file))
-);
-
-const displayAnimationFiles = computed(() =>
-  displayImageFiles.value.filter((file) => file.toLowerCase().endsWith(".gif"))
-);
-
-const nameRegistry = computed(() =>
-  buildValueRegistry(schemaEntries.value, (field, value) =>
-    field.key === "name" && typeof value === "string" && value.trim()
-  )
-);
-
-const duplicateErrors = computed(() =>
-  buildDuplicateErrors(schemaEntries.value, idRegistry.value, nameRegistry.value)
-);
-
-const idRefErrors = computed(() => buildIdRefErrors(schemaEntries.value, idIndex.value));
-
-const displayElementIdErrors = computed(() =>
-  buildDisplayElementIdErrors(
-    schemaEntries.value,
-    idIndex.value,
-    displayImageFiles.value,
-    displayAnimationFiles.value,
-    mdiIcons.value
-  )
-);
 
 const gpioUsageIndex = computed(() => {
   const transport = networkCoreConfig.value?.transport;
@@ -2813,9 +2276,10 @@ const globalStore = computed(() => {
   pushEntry(platformCoreConfig.value, platformDetailSchema.value?.fields);
   pushEntry(networkCoreConfig.value, networkCoreSchema.value?.fields);
   pushEntry(networkCoreConfig.value, networkDetailSchema.value?.fields);
-  pushEntry(systemConfig.value || {}, otherSchemas.value?.logger?.fields);
-  pushEntry(systemConfig.value || {}, otherSchemas.value?.status_led?.fields);
-  pushEntry(systemConfig.value || {}, otherSchemas.value?.debug?.fields);
+  pushEntry(systemConfig.value?.logger || {}, otherSchemas.value?.logger?.fields);
+  pushEntry(systemConfig.value?.status_led || {}, otherSchemas.value?.status_led?.fields);
+  pushEntry(systemConfig.value?.debug || {}, otherSchemas.value?.debug?.fields);
+  pushEntry(systemConfig.value?.psram || {}, otherSchemas.value?.psram?.fields);
   pushEntry(automationCoreConfig.value || {}, automationSchemas.value?.time?.fields);
   pushEntry(automationCoreConfig.value || {}, automationSchemas.value?.deep_sleep?.fields);
   pushEntry(automationCoreConfig.value || {}, automationSchemas.value?.script?.fields);
@@ -2833,20 +2297,24 @@ const globalStore = computed(() => {
   return buildGlobalRegistry(entries);
 });
 
-const validationErrors = computed(() => buildValidationErrors(schemaEntries.value));
-
-const formErrors = computed(() => [
-  ...duplicateErrors.value,
-  ...idRefErrors.value,
-  ...displayElementIdErrors.value,
-  ...validationErrors.value
-]);
-
-const formErrorScopeIds = computed(
-  () => new Set(formErrors.value.map((entry) => entry.scopeId).filter(Boolean))
-);
-
-const hasTabErrors = (tab) => formErrorScopeIds.value.has(`tab:${tab}`);
+const {
+  formErrors,
+  formErrorScopeIds,
+  hasTabErrors,
+  idIndex,
+  idRegistry,
+  nameRegistry
+} = useBuilderValidation({
+  schemaEntries,
+  displayImages,
+  mdiIcons,
+  buildValueRegistry,
+  buildIdIndex,
+  buildDuplicateErrors,
+  buildIdRefErrors,
+  buildDisplayElementIdErrors,
+  buildValidationErrors
+});
 
 const hasComponentErrors = (index) => formErrorScopeIds.value.has(`component:${index}`);
 
@@ -2884,46 +2352,6 @@ watch(
   }
 );
 
-const openComponentViewer = (index) => {
-  activeComponentSlot.value = index;
-  activeTab.value = "Components";
-  isComponentPickerOpen.value = false;
-};
-
-const addComponentSlot = () => {
-  activeComponentSlot.value = config.value.components.length;
-  activeTab.value = "Components";
-  isComponentPickerOpen.value = true;
-  componentsQuery.value = "";
-};
-
-
-const scrollPreviewTabs = (direction) => {
-  if (direction < 0 && !canScrollLeft.value) return;
-  if (direction > 0 && !canScrollRight.value) return;
-  if (direction > 0) {
-    previewTabStart.value = Math.min(
-      previewTabStart.value + 1,
-      Math.max(0, previewTabs.value.length - 1)
-    );
-    return;
-  }
-  previewTabStart.value = Math.max(0, previewTabStart.value - 1);
-};
-
-const handleSelectBlur = (event) => {
-  event?.target?.blur?.();
-};
-
-const handleBackToDashboard = () => {
-  window.dispatchEvent(
-    new CustomEvent("app:route-switch-request", {
-      detail: { routeName: "dashboard" }
-    })
-  );
-};
-
-
 const selectComponent = async (item) => {
   if (activeComponentSlot.value === null) return;
   if (!isComponentAvailable(item)) return;
@@ -2941,9 +2369,8 @@ const selectComponent = async (item) => {
           ? JSON.parse(JSON.stringify(item.prefillConfig))
           : null;
     const schemaResolution = await ensureComponentSchema(item.id, normalizeSchemaPath(item.schemaPath));
-    if (schemaResolution.status !== "ready") {
-      return;
-    }
+    if (schemaResolution.status !== "ready") return;
+    if (getRootMapConflictDomain(item.id, index)) return;
     const nextEntry = {
       id: item.id,
       config: existingId === item.id ? existing?.config || {} : prefillConfig || {},
@@ -2955,13 +2382,24 @@ const selectComponent = async (item) => {
       config.value.components.splice(index, 1, nextEntry);
     }
     if (isNewComponent) {
-      queueProtocolPulseForAddedComponent(nextEntry, item.id);
-      queueBusPulseForAddedComponent(nextEntry, item.id);
+      queuePulseForAddedComponent(nextEntry, item.id);
     }
     isComponentPickerOpen.value = false;
   } finally {
     isResolvingComponentSelection.value = false;
   }
+};
+
+const handleSelectBlur = (event) => {
+  event?.target?.blur?.();
+};
+
+const handleBackToDashboard = () => {
+  window.dispatchEvent(
+    new CustomEvent("app:route-switch-request", {
+      detail: { routeName: "dashboard" }
+    })
+  );
 };
 
 const requestRemoveComponent = (index) => {
@@ -2972,7 +2410,9 @@ const requestRemoveComponent = (index) => {
 
 const confirmRemove = async () => {
   if (confirmAction.value === "delete-custom") {
+    confirmOpen.value = false;
     await deleteSavedCustomComponent();
+    confirmAction.value = null;
     return;
   }
   if (pendingRemoveIndex.value === null) return;
@@ -2987,127 +2427,48 @@ const confirmRemove = async () => {
 
 const cancelRemove = () => {
   pendingRemoveIndex.value = null;
-  pendingDeleteCustomItem.value = null;
+  clearPendingDeleteSavedCustomComponent();
   confirmAction.value = null;
   confirmOpen.value = false;
 };
 
-
-watch(
-  () => activeTab.value,
-  (value) => {
-    if (value !== "Components") {
-      isComponentPickerOpen.value = false;
-      componentsQuery.value = "";
+function defaultConfig() {
+  return {
+    schemaVersion: 1,
+    isSaved: false,
+    esphomeCore: {},
+    substitutions: {},
+    automation: {},
+    system: {
+      logger: {
+        enabled: true,
+        level: "DEBUG"
+      }
+    },
+    platformCore: {
+      platform: "esp32",
+      variant: "esp32",
+      framework: "esp-idf"
+    },
+    networkCore: {
+      transport: "wifi"
+    },
+    protocolsCore: {},
+    bussesCore: {},
+    device: {
+      friendlyName: "Kitchen Sensor",
+      platform: "esp32",
+      variant: "esp32",
+      framework: "arduino"
+    },
+    components: [],
+    ui: {
+      splitPreview: false,
+      modeLevel: "Simple",
+      deviceHost: ""
     }
-  }
-);
-
-const filteredCategories = computed(() => {
-  const query = componentsQuery.value.trim().toLowerCase();
-  return (componentCatalog.value?.categories || [])
-    .map((category) => {
-      const items = category.items.filter((item) => matchesQuery(item, query));
-      const subcategories = category.subcategories
-        .map((subcategory) => ({
-          ...subcategory,
-          items: subcategory.items.filter((item) => matchesQuery(item, query))
-        }))
-        .filter((subcategory) => subcategory.items.length > 0);
-      return { ...category, items, subcategories };
-    })
-    .filter((category) => category.items.length > 0 || category.subcategories.length > 0);
-});
-
-// Lazy-load schema for a component when first needed.
-const ensureComponentSchema = async (componentId, schemaPath = "") => {
-  if (!componentId) {
-    return { status: "error", schema: null };
-  }
-  if (componentSchemas.value[componentId]) {
-    componentSchemaStatus.value = {
-      ...componentSchemaStatus.value,
-      [componentId]: "ready"
-    };
-    return { status: "ready", schema: componentSchemas.value[componentId] };
-  }
-
-  const existingPromise = componentSchemaLoadPromises.get(componentId);
-  if (existingPromise) {
-    return existingPromise;
-  }
-
-  componentSchemaStatus.value = {
-    ...componentSchemaStatus.value,
-    [componentId]: "loading"
   };
-
-  const loadingPromise = loadComponentSchema(componentId, schemaPath || catalogSchemaPathById(componentId))
-    .then((schema) => {
-      componentSchemas.value = {
-        ...componentSchemas.value,
-        [componentId]: schema
-      };
-      componentSchemaStatus.value = {
-        ...componentSchemaStatus.value,
-        [componentId]: "ready"
-      };
-      return { status: "ready", schema };
-    })
-    .catch(() => {
-      componentSchemas.value = {
-        ...componentSchemas.value,
-        [componentId]: null
-      };
-      componentSchemaStatus.value = {
-        ...componentSchemaStatus.value,
-        [componentId]: "error"
-      };
-      return { status: "error", schema: null };
-    })
-    .finally(() => {
-      componentSchemaLoadPromises.delete(componentId);
-    });
-
-  componentSchemaLoadPromises.set(componentId, loadingPromise);
-  return loadingPromise;
-};
-
-const defaultConfig = () => ({
-  schemaVersion: 1,
-  isSaved: false,
-  esphomeCore: {},
-  substitutions: {},
-  automation: {},
-  system: {
-    logger: {
-      enabled: true,
-      level: "DEBUG"
-    }
-  },
-  platformCore: {
-    platform: "esp32",
-    variant: "esp32",
-    framework: "esp-idf"
-  },
-  networkCore: {
-    transport: "wifi"
-  },
-  protocolsCore: {},
-  bussesCore: {},
-  device: {
-    friendlyName: "Kitchen Sensor",
-    platform: "esp32",
-    variant: "esp32",
-    framework: "arduino"
-  },
-  components: [],
-  ui: {
-    splitPreview: false,
-    modeLevel: "Simple",
-    deviceHost: ""
-  }
-});
+}
 
 const cloneConfigForPersistence = (source) => {
   if (!source || typeof source !== "object") return defaultConfig();
@@ -3195,12 +2556,7 @@ const hasGeneratablePasswordCandidate = (fields, valueMap, globalStore) => {
       return hasGeneratablePasswordCandidate(field.fields || [], nestedValue, globalStore);
     }
 
-    if (
-      field.type === "list" &&
-      Array.isArray(currentValue) &&
-      field.item?.type === "object" &&
-      Array.isArray(field.item?.fields)
-    ) {
+    if (isObjectArrayLikeField(field, currentValue)) {
       return currentValue.some(
         (entry) =>
           entry &&
@@ -3256,12 +2612,7 @@ const materializeGeneratedPasswordsInObject = (valueMap, fields, globalStore) =>
       return;
     }
 
-    if (
-      field.type === "list" &&
-      Array.isArray(currentValue) &&
-      field.item?.type === "object" &&
-      Array.isArray(field.item?.fields)
-    ) {
+    if (isObjectArrayLikeField(field, currentValue)) {
       currentValue.forEach((entry) => {
         if (!entry || typeof entry !== "object" || Array.isArray(entry)) return;
         if (materializeGeneratedPasswordsInObject(entry, field.item.fields, globalStore)) {
@@ -3383,7 +2734,6 @@ const materializeGeneratedPasswordsBySchemas = () => {
   return changed;
 };
 
-const config = ref(defaultConfig());
 const isHydrating = ref(true);
 let isMaterializingGeneratedPasswords = false;
 
@@ -3395,14 +2745,6 @@ const gpioGuideFallbackTitle = computed(() => {
   }
   return "";
 });
-
-watch(
-  () => config.value.components.map((entry) => componentIdFromEntry(entry)),
-  (ids) => {
-    ids.filter(Boolean).forEach((id) => ensureComponentSchema(id));
-  },
-  { immediate: true }
-);
 
 watch(
   () => formErrors.value.length,
@@ -3488,14 +2830,14 @@ const filterConfigBySchema = (sourceValue, fields) => {
       return;
     }
     if (
-      field.type === "list" &&
+      isArrayLikeSchemaField(field) &&
       Array.isArray(value) &&
       (field.item?.extends === "base_actions.json" || field.item?.extends === "base_filters.json")
     ) {
       filtered[field.key] = value;
       return;
     }
-    if (field.type === "list" && Array.isArray(value) && Array.isArray(field.item?.fields)) {
+    if (isArrayLikeSchemaField(field) && Array.isArray(value) && Array.isArray(field.item?.fields)) {
       filtered[field.key] = value.map((item) => {
         if (item && typeof item === "object") {
           return filterConfigBySchema(item, field.item.fields || []);
@@ -3747,7 +3089,8 @@ const otherConfig = systemConfig.value || {};
   const otherEntries = [
     { key: "logger", label: "logger" },
     { key: "status_led", label: "status_led" },
-    { key: "debug", label: "debug" }
+    { key: "debug", label: "debug" },
+    { key: "psram", label: "psram" }
   ];
   otherEntries.forEach((entry) => {
     const schema = otherSchemaMap[entry.key];
@@ -3990,7 +3333,8 @@ const coreBlockKeys = computed(() => {
     "web_server",
     "logger",
     "status_led",
-    "debug"
+    "debug",
+    "psram"
   ]);
   const platformName = platformCoreConfig.value?.platform;
   if (platformName) keys.add(platformName);
@@ -4038,6 +3382,7 @@ const humanizePreviewKey = (key) => {
     i2s: "I2S",
     one_wire: "1-Wire",
     canbus: "CAN Bus",
+    psram: "PSRAM",
     status_led: "Status LED",
     web_server: "Web Server"
   };
@@ -4058,25 +3403,25 @@ const previewTabs = computed(() => {
 
   const coreBlocks = blocks.filter((block) => coreBlockKeys.value.has(block.key));
   if (coreBlocks.length) {
-    tabs.push({ key: "core", label: "Core", blocks: coreBlocks });
+    tabs.push({ key: "core", label: "Core", blocks: coreBlocks, content: buildPreviewText(coreBlocks) });
     coreBlocks.forEach((block) => used.add(block.key));
   }
 
   const automationBlocks = blocks.filter((block) => automationBlockKeys.has(block.key));
   if (automationBlocks.length) {
-    tabs.push({ key: "automation", label: "Automation", blocks: automationBlocks });
+    tabs.push({ key: "automation", label: "Automation", blocks: automationBlocks, content: buildPreviewText(automationBlocks) });
     automationBlocks.forEach((block) => used.add(block.key));
   }
 
   const bussesBlocks = blocks.filter((block) => bussesBlockKeys.value.has(block.key));
   if (bussesBlocks.length) {
-    tabs.push({ key: "busses", label: "Busses", blocks: bussesBlocks });
+    tabs.push({ key: "busses", label: "Busses", blocks: bussesBlocks, content: buildPreviewText(bussesBlocks) });
     bussesBlocks.forEach((block) => used.add(block.key));
   }
 
   const hubsBlocks = blocks.filter((block) => hubDomainsInUse.value.has(block.key));
   if (hubsBlocks.length) {
-    tabs.push({ key: "hubs", label: "Hubs", blocks: hubsBlocks });
+    tabs.push({ key: "hubs", label: "Hubs", blocks: hubsBlocks, content: buildPreviewText(hubsBlocks) });
     hubsBlocks.forEach((block) => used.add(block.key));
   }
 
@@ -4084,13 +3429,13 @@ const previewTabs = computed(() => {
   const displayBlocks = blocks.filter((block) => block.key === "display");
   const combinedDisplayBlocks = [...substitutionsBlocks, ...displayBlocks];
   if (combinedDisplayBlocks.length) {
-    tabs.push({ key: "display", label: "Display", blocks: combinedDisplayBlocks });
+    tabs.push({ key: "display", label: "Display", blocks: combinedDisplayBlocks, content: buildPreviewText(combinedDisplayBlocks) });
     combinedDisplayBlocks.forEach((block) => used.add(block.key));
   }
 
   const customBlocks = customPreviewBlocks.value;
   if (customBlocks.length) {
-    tabs.push({ key: "custom", label: "Custom", blocks: customBlocks });
+    tabs.push({ key: "custom", label: "Custom", blocks: customBlocks, content: buildPreviewText(customBlocks) });
     customPreviewBlockKeys.value.forEach((key) => used.add(key));
     used.add("__root_misc__");
   }
@@ -4098,101 +3443,12 @@ const previewTabs = computed(() => {
   blocks.forEach((block) => {
     if (used.has(block.key)) return;
     const groupedBlocks = blocks.filter((candidate) => candidate.key === block.key);
-    tabs.push({ key: block.key, label: humanizePreviewKey(block.key), blocks: groupedBlocks });
+    tabs.push({ key: block.key, label: humanizePreviewKey(block.key), blocks: groupedBlocks, content: buildPreviewText(groupedBlocks) });
     used.add(block.key);
   });
 
   return tabs;
 });
-
-const hasHubsPreviewTab = computed(() => previewTabs.value.some((tab) => tab.key === "hubs"));
-
-const showHubNotice = computed(() => {
-  if (!splitPreviewEnabled.value) return false;
-  if (activePreviewTab.value === "hubs") return false;
-  if (!hasHubsPreviewTab.value) return false;
-  return componentDomainsUsingHubs.value.has(activePreviewTab.value);
-});
-
-onBeforeUpdate(() => {
-  previewTabMeasureButtons.value = [];
-});
-
-const updatePreviewTabLayout = async () => {
-  await nextTick();
-  const list = previewTabList.value;
-  previewTabAvailableWidth.value = list?.clientWidth || 0;
-  previewTabWidths.value = previewTabMeasureButtons.value.map(
-    (button) => button?.offsetWidth || 0
-  );
-  if (previewTabStart.value >= previewTabs.value.length) {
-    previewTabStart.value = 0;
-  }
-};
-
-const previewTabGap = 4;
-
-const calcStartForEndIndex = (endIndex) => {
-  const widths = previewTabWidths.value;
-  const available = previewTabAvailableWidth.value;
-  if (!widths.length || available <= 0) return Math.max(0, endIndex);
-  let total = 0;
-  let start = endIndex;
-  for (let i = endIndex; i >= 0; i -= 1) {
-    const width = widths[i] || 0;
-    const nextTotal = i === endIndex ? width : total + previewTabGap + width;
-    if (nextTotal > available) break;
-    total = nextTotal;
-    start = i;
-  }
-  return start;
-};
-
-const visiblePreviewTabs = computed(() => {
-  const tabs = previewTabs.value;
-  const widths = previewTabWidths.value;
-  const available = previewTabAvailableWidth.value;
-  if (!tabs.length) return [];
-  let total = 0;
-  const start = Math.min(previewTabStart.value, tabs.length - 1);
-  const visible = [];
-  for (let i = start; i < tabs.length; i += 1) {
-    const width = widths[i] || 0;
-    const nextTotal = visible.length ? total + previewTabGap + width : total + width;
-    if (nextTotal > available) break;
-    total = nextTotal;
-    visible.push(tabs[i]);
-  }
-  return visible;
-});
-
-const lastVisibleTabIndex = computed(() => {
-  if (!visiblePreviewTabs.value.length) return -1;
-  return previewTabStart.value + visiblePreviewTabs.value.length - 1;
-});
-
-const canScrollLeft = computed(() => previewTabStart.value > 0);
-const canScrollRight = computed(() =>
-  lastVisibleTabIndex.value >= 0 && lastVisibleTabIndex.value < previewTabs.value.length - 1
-);
-
-const ensurePreviewTabVisible = (index) => {
-  if (index < previewTabStart.value) {
-    previewTabStart.value = index;
-    return;
-  }
-  if (index > lastVisibleTabIndex.value) {
-    previewTabStart.value = calcStartForEndIndex(index);
-  }
-};
-
-const switchPreviewTab = async (key) => {
-  const index = previewTabs.value.findIndex((tab) => tab.key === key);
-  if (index === -1) return;
-  activePreviewTab.value = key;
-  await updatePreviewTabLayout();
-  ensurePreviewTabVisible(index);
-};
 
 const resolvePreviewTabKeyFromMain = () => {
   if (activeTab.value === "Busses") return "busses";
@@ -4209,129 +3465,12 @@ const resolvePreviewTabKeyFromMain = () => {
   }
   return "core";
 };
-
-const syncPreviewTabToMain = async () => {
-  if (!splitPreviewEnabled.value) return;
-  const targetKey = resolvePreviewTabKeyFromMain();
-  if (!targetKey) return;
-  const index = previewTabs.value.findIndex((tab) => tab.key === targetKey);
-  if (index === -1) return;
-  activePreviewTab.value = previewTabs.value[index].key;
-  await updatePreviewTabLayout();
-  ensurePreviewTabVisible(index);
-};
-
-watch(
-  () => previewTabs.value,
-  async (tabs) => {
-    const keys = tabs.map((tab) => tab.key);
-    const previousKeys = lastPreviewTabKeys.value;
-    const previousSet = new Set(previousKeys);
-    const addedKey = keys.find((key) => !previousSet.has(key));
-    lastPreviewTabKeys.value = keys;
-    if (!splitPreviewEnabled.value) return;
-    if (!previousKeys.length) {
-      await updatePreviewTabLayout();
-      await syncPreviewTabToMain();
-      return;
-    }
-    if (!addedKey) return;
-    if (isHydrating.value) return;
-    if (["busses", "hubs"].includes(addedKey)) return;
-    const addedIndex = keys.indexOf(addedKey);
-    if (addedIndex === -1) return;
-    activePreviewTab.value = addedKey;
-    await updatePreviewTabLayout();
-    previewTabStart.value = calcStartForEndIndex(addedIndex);
-  },
-  { immediate: true }
-);
-
-watch(
-  () => [activeTab.value, activeComponentId.value],
-  () => {
-    syncPreviewTabToMain();
-  }
-);
-
-watch(
-  () => splitPreviewEnabled.value,
-  (enabled) => {
-    if (enabled) {
-      syncPreviewTabToMain();
-    }
-  }
-);
-
-
-const previewContent = computed(() => {
-  if (!splitPreviewEnabled.value) return yamlPreview.value;
-  const selected = previewTabs.value.find((tab) => tab.key === activePreviewTab.value);
-  if (!selected) return "";
-  return buildPreviewText(selected.blocks);
-});
-
-const updatePreviewScrollbar = () => {
-  const el = previewScrollInner.value;
-  if (!el) {
-    hasPreviewScrollbar.value = false;
-    return;
-  }
-  const hasVertical = el.scrollHeight > el.clientHeight + 1;
-  const hasHorizontal = el.scrollWidth > el.clientWidth + 1;
-  hasPreviewScrollbar.value = hasVertical || hasHorizontal;
-};
-
-const copyLabel = computed(() => (copySuccess.value ? "Copied" : "Copy code"));
-
-const handleCopyPreview = async () => {
-  const text = previewContent.value || "";
-  if (!text) return;
-  try {
-    await navigator.clipboard.writeText(text);
-    copySuccess.value = true;
-    if (copyResetTimer) {
-      clearTimeout(copyResetTimer);
-    }
-    copyResetTimer = setTimeout(() => {
-      copySuccess.value = false;
-      copyResetTimer = null;
-    }, 1500);
-  } catch (error) {
-    console.error("Failed to copy preview", error);
-  }
-};
-
-watch(
-  () => [splitPreviewEnabled.value, previewTabs.value],
-  ([enabled, tabs]) => {
-    if (!enabled) return;
-    if (!tabs.length) {
-      activePreviewTab.value = "";
-      return;
-    }
-    const exists = tabs.some((tab) => tab.key === activePreviewTab.value);
-    if (!exists) {
-      activePreviewTab.value = tabs[0].key;
-    }
-    updatePreviewTabLayout();
-  },
-  { immediate: true }
-);
-
-watch(
-  () => [previewContent.value, splitPreviewEnabled.value, activePreviewTab.value],
-  async () => {
-    await nextTick();
-    updatePreviewScrollbar();
-  },
-  { immediate: true }
-);
+const mainPreviewTargetKey = computed(() => resolvePreviewTabKeyFromMain());
+const displayAutomationHasInterval = computed(() => (generatedAutomation.value?.interval || []).length > 0);
+const hubNoticeDomains = computed(() => Array.from(componentDomainsUsingHubs.value));
 
 onMounted(() => {
-  updatePreviewScrollbar();
   initProjectsUpdatedChannel();
-  window.addEventListener("resize", updatePreviewScrollbar);
   window.addEventListener("keydown", handleBuilderKeydown);
   document.addEventListener("visibilitychange", handleBuilderVisibilityChange);
   window.addEventListener("app:builder-export", handleAppExport);
@@ -4341,25 +3480,6 @@ onMounted(() => {
   window.addEventListener("app:builder-save-request", handleBuilderSaveRequest);
   emitCompileState();
   startDeviceStatusPolling();
-});
-
-watch(
-  () => splitPreviewEnabled.value,
-  () => {
-    updatePreviewTabLayout();
-  }
-);
-
-watch(
-  () => previewTabs.value.length,
-  () => {
-    updatePreviewTabLayout();
-  }
-);
-
-const highlightedYaml = computed(() => {
-  const source = previewContent.value || "";
-  return hljs.highlight(source, { language: "yaml" }).value;
 });
 
 
@@ -4432,96 +3552,6 @@ const toApiErrorMessage = (payload, fallback) => {
   const message = typeof payload?.message === "string" ? payload.message.trim() : "";
   if (message) return message;
   return fallback;
-};
-
-const refreshComponentCatalog = async () => {
-  isComponentCatalogLoading.value = true;
-  try {
-    if (isDevOffline) {
-      const localUrl = `${localComponentCatalogUrl}?t=${Date.now()}`;
-      const response = await fetch(localUrl, {
-        cache: "no-store",
-        credentials: "same-origin"
-      });
-      const payload = await response.json().catch(() => null);
-      if (!response.ok || !payload || typeof payload !== "object") {
-        throw new Error(`Component catalog load failed (${response.status})`);
-      }
-      componentCatalog.value = payload;
-      componentCatalogError.value = null;
-      return;
-    }
-    const response = await addonFetch("api/component-catalog");
-    const payload = await response.json().catch(() => null);
-    if (!response.ok || !payload?.catalog || typeof payload.catalog !== "object") {
-      throw new Error(toApiErrorMessage(payload, `Component catalog load failed (${response.status})`));
-    }
-    componentCatalog.value = payload.catalog;
-    componentCatalogError.value = null;
-  } catch (error) {
-    componentCatalogError.value = error;
-    componentCatalog.value = { categories: [] };
-    console.error("Component catalog load failed", error);
-  } finally {
-    isComponentCatalogLoading.value = false;
-  }
-};
-
-const openComponentsZipPicker = () => {
-  if (isComponentsImporting.value) return;
-  componentsZipInput.value?.click();
-};
-
-const handleComponentsZipSelected = async (event) => {
-  const input = event?.target;
-  const file = input?.files?.[0] || null;
-  if (!file) return;
-  customComponentSaveError.value = "";
-  importSummaryModalOpen.value = false;
-  isComponentsImporting.value = true;
-  try {
-    const formData = new FormData();
-    formData.append("file", file);
-    const response = await addonFetch("api/components/import-zip", {
-      method: "POST",
-      body: formData
-    });
-    const payload = await response.json().catch(() => null);
-    if (!response.ok) {
-      throw new Error(toApiErrorMessage(payload, "Components import failed"));
-    }
-    const summary = {
-      imported: Number(payload?.summary?.imported || 0),
-      updated: Number(payload?.summary?.updated || 0),
-      skipped: Number(payload?.summary?.skipped || 0),
-      errors: Array.isArray(payload?.summary?.errors) ? payload.summary.errors : []
-    };
-    const hasWarnings = summary.errors.length > 0 || summary.skipped > 0;
-    const hasChanges = summary.imported > 0 || summary.updated > 0;
-    if (hasWarnings) {
-      importSummaryModalMessage.value = "Import completed with warnings. Please review the notes below.";
-    } else if (hasChanges) {
-      importSummaryModalMessage.value = "Import completed successfully.";
-    } else {
-      importSummaryModalMessage.value = "Import finished. No component changes were detected.";
-    }
-    importSummaryModalRows.value = [
-      {
-        path: "",
-        message: `Added: ${summary.imported}, Updated: ${summary.updated}, Skipped: ${summary.skipped}`
-      },
-      ...summary.errors.map((entry) => ({ path: "Note", message: String(entry) }))
-    ];
-    await refreshComponentCatalog();
-    importSummaryModalOpen.value = true;
-  } catch (error) {
-    customComponentSaveError.value = error instanceof Error ? error.message : "Components import failed";
-  } finally {
-    isComponentsImporting.value = false;
-    if (input) {
-      input.value = "";
-    }
-  }
 };
 
 const deriveVariantStyle = (variant) => {
@@ -6162,41 +5192,12 @@ const saveCustomComponentTemplate = async () => {
   }
 };
 
-const requestDeleteSavedCustomComponent = (item) => {
-  if (!isSavedCustomComponentItem(item)) return;
-  pendingDeleteCustomItem.value = item;
+const requestDeleteSavedCustomComponentWithConfirm = (item) => {
+  requestDeleteSavedCustomComponent(item);
+  if (!pendingDeleteCustomItem.value) return;
   confirmAction.value = "delete-custom";
   confirmOpen.value = true;
 };
-
-const deleteSavedCustomComponent = async () => {
-  const item = pendingDeleteCustomItem.value;
-  if (!isSavedCustomComponentItem(item)) return;
-  const componentId = String(item?.id || "").trim();
-  const key = componentId.split("/").pop() || "";
-  if (!key || deletingCustomComponentId.value) return;
-  confirmOpen.value = false;
-  deletingCustomComponentId.value = componentId;
-  customComponentSaveError.value = "";
-  try {
-    const response = await addonFetch(`api/custom-components/${encodeURIComponent(key)}`, {
-      method: "DELETE"
-    });
-    const payload = await response.json().catch(() => null);
-    if (!response.ok) {
-      throw new Error(toApiErrorMessage(payload, "Failed to delete component"));
-    }
-    await refreshComponentCatalog();
-  } catch (error) {
-    customComponentSaveError.value =
-      error instanceof Error ? error.message : "Failed to delete component";
-  } finally {
-    deletingCustomComponentId.value = "";
-    pendingDeleteCustomItem.value = null;
-    confirmAction.value = null;
-  }
-};
-
 
 watch(
   () => config.value.platformCore?.variant,
@@ -6230,8 +5231,6 @@ watch(
 
 onMounted(async () => {
   loadConfig();
-  window.addEventListener("resize", updatePreviewTabLayout);
-  updatePreviewTabLayout();
   await refreshComponentCatalog();
   try {
     const response = await addonFetch("api/assets/mdi-substitutions");
@@ -6244,9 +5243,6 @@ onMounted(async () => {
           : {};
     } else {
       mdiSubstitutions.value = {};
-      if (response.ok && !contentType.includes("application/json")) {
-        console.warn("MDI substitutions endpoint returned non-JSON response");
-      }
     }
   } catch (error) {
     console.error("MDI substitutions load failed", error);
@@ -6355,10 +5351,6 @@ onMounted(async () => {
       console.error("Network schema load failed", error);
     }
   }
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener("resize", updatePreviewTabLayout);
 });
 
 watch(
@@ -6621,102 +5613,27 @@ watch(
 );
 
 watch(
-  () => requiredBussesList.value,
-  (requiredList) => {
-    if (!areComponentSchemasReady.value) return;
-    if (!config.value.bussesCore || typeof config.value.bussesCore !== "object") {
-      config.value.bussesCore = {};
-    }
-    const requiredSet = new Set(requiredList || []);
-    bussesDefinitions.forEach((entry) => {
-      const shouldEnable = requiredSet.has(entry.key);
-      if (!config.value.bussesCore[entry.key] || typeof config.value.bussesCore[entry.key] !== "object") {
-        config.value.bussesCore[entry.key] = {};
-      }
-      const busConfig = config.value.bussesCore[entry.key];
-      if (shouldEnable && busConfig.enabled !== true) {
-        busConfig.enabled = true;
-        return;
-      }
-      if (!shouldEnable && busConfig.enabled !== false) {
-        busConfig.enabled = false;
-      }
-    });
-  },
-  { immediate: true }
-);
-
-watch(
-  () => requiredProtocolsList.value,
-  (requiredList) => {
-    if (!areComponentSchemasReady.value) return;
-    if (!config.value.protocolsCore || typeof config.value.protocolsCore !== "object") {
-      config.value.protocolsCore = {};
-    }
-    const requiredSet = new Set(requiredList || []);
-    protocolDefinitions.forEach((entry) => {
-      if (!supportedAutoProtocols.has(entry.key)) return;
-      const shouldEnable = requiredSet.has(entry.key);
-      if (
-        !config.value.protocolsCore[entry.key] ||
-        typeof config.value.protocolsCore[entry.key] !== "object"
-      ) {
-        config.value.protocolsCore[entry.key] = {};
-      }
-      const protocolConfig = config.value.protocolsCore[entry.key];
-      if (shouldEnable && protocolConfig.enabled !== true) {
-        protocolConfig.enabled = true;
-        return;
-      }
-      if (!shouldEnable && protocolConfig.enabled !== false) {
-        protocolConfig.enabled = false;
-      }
-    });
-  },
-  { immediate: true }
-);
-
-watch(
   () => componentSchemas.value,
   () => {
-    if (!pendingBusPulseEntries.size && !pendingProtocolPulseEntries.size) return;
+    if (!pendingPulseEntries.size) return;
 
-    Array.from(pendingBusPulseEntries.entries()).forEach(([componentId, queuedEntries]) => {
+    Array.from(pendingPulseEntries.entries()).forEach(([componentId, queuedEntries]) => {
       const schema = componentSchemas.value?.[componentId];
       if (schema === undefined) return;
-      pendingBusPulseEntries.delete(componentId);
+      pendingPulseEntries.delete(componentId);
       if (!schema) return;
-      if ((queuedEntries || []).some((entry) => componentNeedsBus(entry, componentId))) {
-        triggerBusTabPulse();
-      }
-    });
-
-    Array.from(pendingProtocolPulseEntries.entries()).forEach(([componentId, queuedEntries]) => {
-      const schema = componentSchemas.value?.[componentId];
-      if (schema === undefined) return;
-      pendingProtocolPulseEntries.delete(componentId);
-      if (!schema) return;
-      if ((queuedEntries || []).some((entry) => componentNeedsProtocol(entry, componentId))) {
-        triggerProtocolTabPulse();
-      }
+      (queuedEntries || []).forEach((entry) => {
+        getRequirementTabsForEntry(entry, componentId).forEach((tab) => triggerTabPulse(tab));
+      });
     });
   },
   { deep: true }
 );
 
 onBeforeUnmount(() => {
-  pendingProtocolPulseEntries.clear();
-  pendingBusPulseEntries.clear();
-  if (protocolTabPulseTimer) {
-    clearTimeout(protocolTabPulseTimer);
-  }
-  if (busTabPulseTimer) {
-    clearTimeout(busTabPulseTimer);
-  }
-  if (copyResetTimer) {
-    clearTimeout(copyResetTimer);
-  }
-  window.removeEventListener("resize", updatePreviewScrollbar);
+  pendingPulseEntries.clear();
+  Array.from(tabPulseTimers.values()).forEach((timer) => clearTimeout(timer));
+  tabPulseTimers.clear();
   window.removeEventListener("keydown", handleBuilderKeydown);
   document.removeEventListener("visibilitychange", handleBuilderVisibilityChange);
   window.removeEventListener("app:builder-export", handleAppExport);

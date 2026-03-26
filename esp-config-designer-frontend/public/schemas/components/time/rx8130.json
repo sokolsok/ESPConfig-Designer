@@ -2,11 +2,13 @@
   "id": "time.rx8130",
   "domain": "time",
   "platform": "rx8130",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/time/rx8130/",
   "extends": "base_time.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "address",

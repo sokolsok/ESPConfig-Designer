@@ -2,7 +2,6 @@
   "id": "select.lvgl",
   "domain": "select",
   "platform": "lvgl",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/select/lvgl/",
   "extends": "base_select.json",
   "fields": [

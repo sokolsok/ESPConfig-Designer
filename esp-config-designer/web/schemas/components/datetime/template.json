@@ -2,7 +2,6 @@
   "id": "datetime.template",
   "domain": "datetime",
   "platform": "template",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/datetime/template/",
   "extends": "base_datetime.json",
   "fields": [

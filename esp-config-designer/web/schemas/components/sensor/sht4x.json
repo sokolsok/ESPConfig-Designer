@@ -2,10 +2,12 @@
   "id": "sensor.sht4x",
   "domain": "sensor",
   "platform": "sht4x",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/sht4x/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "temperature",

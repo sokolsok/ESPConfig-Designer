@@ -2,11 +2,13 @@
   "id": "sensor.max31856",
   "domain": "sensor",
   "platform": "max31856",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/max31856/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "name",

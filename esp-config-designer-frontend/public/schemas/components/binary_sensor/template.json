@@ -2,7 +2,6 @@
   "id": "binary_sensor.template",
   "domain": "binary_sensor",
   "platform": "template",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/binary_sensor/template/",
   "extends": "base_binary_sensor.json",
   "fields": [

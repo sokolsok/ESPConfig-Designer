@@ -2,7 +2,6 @@
   "id": "platform.bk72xx",
   "domain": "platform",
   "platform": "bk72xx",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/bk72xx/",
   "fields": [
     {

@@ -1,7 +1,6 @@
 {
   "id": "power_supply",
   "domain": "power_supply",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/power_supply/",
   "fields": [
     {

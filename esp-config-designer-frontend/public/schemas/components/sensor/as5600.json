@@ -2,11 +2,13 @@
   "id": "sensor.as5600",
   "domain": "sensor",
   "platform": "as5600",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/as5600/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

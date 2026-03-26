@@ -2,7 +2,6 @@
   "id": "fan.tuya",
   "domain": "fan",
   "platform": "tuya",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/fan/tuya/",
   "extends": "base_fan.json",
   "fields": [

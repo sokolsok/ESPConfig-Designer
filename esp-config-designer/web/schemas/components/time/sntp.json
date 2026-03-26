@@ -2,11 +2,13 @@
   "id": "time.sntp",
   "domain": "time",
   "platform": "sntp",
-  "requires": [
-    "network"
-  ],
   "helpUrl": "https://esphome.io/components/time/sntp/",
   "extends": "base_time.json",
+  "requirements": [
+    {
+      "require": "network:network"
+    }
+  ],
   "fields": [
     {
       "key": "servers",

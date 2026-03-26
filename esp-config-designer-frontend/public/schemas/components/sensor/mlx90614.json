@@ -2,10 +2,12 @@
   "id": "sensor.mlx90614",
   "domain": "sensor",
   "platform": "mlx90614",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/mlx90614/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "ambient",

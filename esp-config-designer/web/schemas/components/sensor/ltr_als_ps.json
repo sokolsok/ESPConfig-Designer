@@ -2,11 +2,13 @@
   "id": "sensor.ltr_als_ps",
   "domain": "sensor",
   "platform": "ltr_als_ps",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/ltr_als_ps/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

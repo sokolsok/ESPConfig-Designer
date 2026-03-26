@@ -2,7 +2,6 @@
   "id": "sensor.lvgl",
   "domain": "sensor",
   "platform": "lvgl",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/lvgl/",
   "extends": "base_sensor.json",
   "fields": [

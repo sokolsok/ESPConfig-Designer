@@ -2,7 +2,6 @@
   "id": "output.bp5758d",
   "domain": "output",
   "platform": "bp5758d",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/output/bp5758d/",
   "extends": "base_output_float.json",
   "embedded": [

@@ -2,7 +2,6 @@
   "id": "button.factory_reset",
   "domain": "button",
   "platform": "factory_reset",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/button/factory_reset/",
   "extends": "base_button.json",
   "fields": []

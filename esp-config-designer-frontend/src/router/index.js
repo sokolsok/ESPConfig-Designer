@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from "vue-router";
-import BuilderView from "../views/BuilderView.vue";
-import DashboardView from "../views/DashboardView.vue";
+
+const BuilderView = () => import("../views/BuilderView.vue");
+const DashboardView = () => import("../views/DashboardView.vue");
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),

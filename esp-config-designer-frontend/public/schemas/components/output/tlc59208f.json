@@ -2,9 +2,6 @@
   "id": "output.tlc59208f",
   "domain": "output",
   "platform": "tlc59208f",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/output/tlc59208f/",
   "extends": "base_output_float.json",
   "embedded": [
@@ -12,6 +9,11 @@
       "key": "hub",
       "domain": "tlc59208f",
       "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:i2c"
     }
   ],
   "fields": [

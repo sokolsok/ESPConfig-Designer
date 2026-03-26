@@ -2,10 +2,12 @@
   "id": "sensor.selec_meter",
   "domain": "sensor",
   "platform": "selec_meter",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/selec_meter/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "total_active_energy",

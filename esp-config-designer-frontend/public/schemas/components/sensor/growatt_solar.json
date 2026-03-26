@@ -2,10 +2,12 @@
   "id": "sensor.growatt_solar",
   "domain": "sensor",
   "platform": "growatt_solar",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/growatt_solar/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "inverter_status",

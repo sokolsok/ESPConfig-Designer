@@ -2,7 +2,6 @@
   "id": "number.modbus_controller",
   "domain": "number",
   "platform": "modbus_controller",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/number/modbus_controller/",
   "extends": "base_number.json",
   "fields": [

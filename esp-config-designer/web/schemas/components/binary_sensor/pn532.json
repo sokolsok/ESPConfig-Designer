@@ -2,15 +2,6 @@
   "id": "binary_sensor.pn532",
   "domain": "binary_sensor",
   "platform": "pn532",
-  "requiresByBus": {
-    "spi": [
-      "spi"
-    ],
-    "i2c": [
-      "i2c"
-    ]
-  },
-  "requires": [],
   "helpUrl": "https://esphome.io/components/binary_sensor/pn532/",
   "extends": "base_binary_sensor.json",
   "embedded": [
@@ -23,6 +14,22 @@
       "key": "hub_i2c",
       "domain": "pn532_i2c",
       "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:spi",
+      "when": {
+        "key": "bus",
+        "value": "spi"
+      }
+    },
+    {
+      "require": "bus:i2c",
+      "when": {
+        "key": "bus",
+        "value": "i2c"
+      }
     }
   ],
   "fields": [

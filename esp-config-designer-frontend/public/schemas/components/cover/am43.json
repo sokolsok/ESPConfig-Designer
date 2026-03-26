@@ -2,7 +2,6 @@
   "id": "cover.am43",
   "domain": "cover",
   "platform": "am43",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/cover/am43/",
   "extends": "base_cover.json",
   "fields": [

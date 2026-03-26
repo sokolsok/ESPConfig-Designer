@@ -2,9 +2,6 @@
   "id": "display.st7789v",
   "domain": "display",
   "platform": "st7789v",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/display/st7789v/",
   "extends": "base_display.json",
   "display_builder": true,
@@ -27,6 +24,11 @@
       "h": 320
     }
   },
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "model",

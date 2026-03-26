@@ -2,10 +2,12 @@
   "id": "sensor.max9611",
   "domain": "sensor",
   "platform": "max9611",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/max9611/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "shunt_resistance",

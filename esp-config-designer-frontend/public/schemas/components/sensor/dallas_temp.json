@@ -2,11 +2,13 @@
   "id": "sensor.dallas_temp",
   "domain": "sensor",
   "platform": "dallas_temp",
-  "requires": [
-    "one_wire"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/dallas_temp/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:one_wire"
+    }
+  ],
   "fields": [
     {
       "key": "name",

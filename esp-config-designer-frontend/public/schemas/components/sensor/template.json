@@ -2,7 +2,6 @@
   "id": "sensor.template",
   "domain": "sensor",
   "platform": "template",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/template/",
   "extends": "base_sensor.json",
   "fields": [

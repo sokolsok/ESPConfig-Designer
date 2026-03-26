@@ -2,10 +2,12 @@
   "id": "sensor.iaqcore",
   "domain": "sensor",
   "platform": "iaqcore",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/iaqcore/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "address",

@@ -2,7 +2,6 @@
   "id": "light.neopixelbus",
   "domain": "light",
   "platform": "neopixelbus",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/light/neopixelbus/",
   "extends": "base_light.json",
   "fields": [

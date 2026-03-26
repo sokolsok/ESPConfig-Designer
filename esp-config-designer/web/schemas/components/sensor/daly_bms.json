@@ -2,10 +2,12 @@
   "id": "sensor.daly_bms",
   "domain": "sensor",
   "platform": "daly_bms",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/daly_bms/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "update_interval",

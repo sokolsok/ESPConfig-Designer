@@ -2,7 +2,6 @@
   "id": "protocols.api",
   "domain": "api",
   "platform": "core",
-  "requires": [],
   "fields": [
     {
       "key": "enabled",

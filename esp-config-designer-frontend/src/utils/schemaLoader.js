@@ -31,9 +31,6 @@ const mergeFieldsKeepFirst = (primaryFields = [], secondaryFields = []) => {
       return;
     }
     if (seen.has(key)) {
-      if (isDev) {
-        console.warn(`[schemaLoader] Duplicate field key \"${key}\" skipped (first wins).`);
-      }
       return;
     }
     seen.add(key);
@@ -42,9 +39,6 @@ const mergeFieldsKeepFirst = (primaryFields = [], secondaryFields = []) => {
 
   return result;
 };
-
-// Convert component id like "sensor.dht" into schema path.
-const componentIdToSchemaPath = (id) => `components/${id.replace(/\./g, "/")}.json`;
 
 // Fetch a schema JSON file from public/schemas.
 const fetchSchemaJson = async (path) => {
@@ -202,11 +196,15 @@ const resolveSchema = async (schema) => {
 // Load a component schema by id and resolve extends.
 export const loadComponentSchema = async (componentId, schemaPath = "") => {
   if (!componentId) return null;
-  const cacheKey = schemaPath ? `${componentId}@@${schemaPath}` : componentId;
+  const normalizedPath = String(schemaPath || "").trim();
+  if (!normalizedPath) {
+    throw new Error(`Missing schema path for component '${componentId}'`);
+  }
+  const cacheKey = `${componentId}@@${normalizedPath}`;
   if (!isDev && componentSchemaCache.has(cacheKey)) {
     return componentSchemaCache.get(cacheKey);
   }
-  const rawSchema = await fetchComponentSchemaJson(schemaPath || componentIdToSchemaPath(componentId));
+  const rawSchema = await fetchComponentSchemaJson(normalizedPath);
   const resolvedSchema = await resolveSchema(rawSchema);
   if (!isDev) {
     componentSchemaCache.set(cacheKey, resolvedSchema);

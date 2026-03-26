@@ -2,7 +2,6 @@
   "id": "light.binary",
   "domain": "light",
   "platform": "binary",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/light/binary/",
   "extends": "base_light.json",
   "fields": [

@@ -2,10 +2,12 @@
   "id": "sensor.honeywellabp2_i2c",
   "domain": "sensor",
   "platform": "honeywellabp2_i2c",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/honeywellabp2_i2c/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "pressure",

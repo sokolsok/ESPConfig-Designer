@@ -2,7 +2,6 @@
   "id": "sensor.ble_rssi",
   "domain": "sensor",
   "platform": "ble_rssi",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/ble_rssi/",
   "extends": "base_sensor.json",
   "embedded": [

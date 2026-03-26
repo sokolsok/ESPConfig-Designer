@@ -2,7 +2,6 @@
   "id": "sensor.gp2y1010au0f",
   "domain": "sensor",
   "platform": "gp2y1010au0f",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/gp2y1010au0f/",
   "extends": "base_sensor.json",
   "fields": [

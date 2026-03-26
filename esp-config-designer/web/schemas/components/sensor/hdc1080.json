@@ -2,10 +2,12 @@
   "id": "sensor.hdc1080",
   "domain": "sensor",
   "platform": "hdc1080",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/hdc1080/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "temperature",

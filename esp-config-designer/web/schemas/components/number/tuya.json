@@ -2,7 +2,6 @@
   "id": "number.tuya",
   "domain": "number",
   "platform": "tuya",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/number/tuya/",
   "extends": "base_number.json",
   "fields": [

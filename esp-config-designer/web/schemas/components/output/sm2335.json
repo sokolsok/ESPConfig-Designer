@@ -2,7 +2,6 @@
   "id": "output.sm2335",
   "domain": "output",
   "platform": "sm2335",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/output/sm2335/",
   "extends": "base_output_float.json",
   "embedded": [

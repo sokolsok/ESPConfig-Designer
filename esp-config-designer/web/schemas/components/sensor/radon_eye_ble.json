@@ -2,7 +2,6 @@
   "id": "sensor.radon_eye_ble",
   "domain": "sensor",
   "platform": "radon_eye_rd200",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/radon_eye_ble/",
   "embedded": [
     {

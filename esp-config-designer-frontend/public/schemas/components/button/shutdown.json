@@ -2,7 +2,6 @@
   "id": "button.shutdown",
   "domain": "button",
   "platform": "shutdown",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/button/shutdown/",
   "extends": "base_button.json",
   "fields": []

@@ -2,11 +2,13 @@
   "id": "audio_dac.es8311",
   "domain": "audio_dac",
   "platform": "es8311",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/audio_dac/es8311/",
   "extends": "base_audio_dac.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "bits_per_sample",

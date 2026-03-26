@@ -2,11 +2,13 @@
   "id": "sensor.mcp9808",
   "domain": "sensor",
   "platform": "mcp9808",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/mcp9808/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

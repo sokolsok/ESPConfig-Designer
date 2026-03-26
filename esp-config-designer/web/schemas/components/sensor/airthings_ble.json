@@ -6,7 +6,6 @@
     "airthings_wave_plus": "airthings_wave_plus",
     "airthings_wave_mini": "airthings_wave_mini"
   },
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/airthings_ble/",
   "embedded": [
     {

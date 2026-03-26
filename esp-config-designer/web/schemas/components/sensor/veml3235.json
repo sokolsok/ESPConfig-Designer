@@ -2,11 +2,13 @@
   "id": "sensor.veml3235",
   "domain": "sensor",
   "platform": "veml3235",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/veml3235/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

@@ -2,11 +2,13 @@
   "id": "sensor.wts01",
   "domain": "sensor",
   "platform": "wts01",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/wts01/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "name",

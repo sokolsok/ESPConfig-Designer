@@ -1,7 +1,6 @@
 {
   "id": "remote_receiver",
   "domain": "remote_receiver",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/remote_receiver/",
   "fields": [
     {

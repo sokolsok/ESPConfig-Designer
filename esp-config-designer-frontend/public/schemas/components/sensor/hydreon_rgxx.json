@@ -2,10 +2,12 @@
   "id": "sensor.hydreon_rgxx",
   "domain": "sensor",
   "platform": "hydreon_rgxx",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/hydreon_rgxx/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "model",

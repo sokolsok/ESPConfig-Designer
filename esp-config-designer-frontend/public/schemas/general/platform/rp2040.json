@@ -2,7 +2,6 @@
   "id": "platform.rp2040",
   "domain": "platform",
   "platform": "rp2040",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/rp2040/",
   "fields": [
     {

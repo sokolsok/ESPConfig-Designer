@@ -2,10 +2,12 @@
   "id": "sensor.grove_gas_mc_v2",
   "domain": "sensor",
   "platform": "grove_gas_mc_v2",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/grove_gas_mc_v2/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "address",

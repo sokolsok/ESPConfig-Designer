@@ -2,7 +2,6 @@
   "id": "light.rgbct",
   "domain": "light",
   "platform": "rgbct",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/light/rgbct/",
   "extends": "base_light.json",
   "fields": [

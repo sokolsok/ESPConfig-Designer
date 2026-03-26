@@ -2,7 +2,6 @@
   "id": "climate.pid",
   "domain": "climate",
   "platform": "pid",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/climate/pid/",
   "extends": "base_climate.json",
   "fields": [

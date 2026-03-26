@@ -2,9 +2,6 @@
   "id": "binary_sensor.rdm6300",
   "domain": "binary_sensor",
   "platform": "rdm6300",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/binary_sensor/rdm6300/",
   "extends": "base_binary_sensor.json",
   "embedded": [
@@ -12,6 +9,11 @@
       "key": "hub",
       "domain": "rdm6300",
       "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
     }
   ],
   "fields": [

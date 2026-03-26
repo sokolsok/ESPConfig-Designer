@@ -2,10 +2,12 @@
   "id": "sensor.kmeteriso",
   "domain": "sensor",
   "platform": "kmeteriso",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/kmeteriso/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "temperature",

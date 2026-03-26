@@ -2,7 +2,6 @@
   "id": "number.homeassistant",
   "domain": "number",
   "platform": "homeassistant",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/number/homeassistant/",
   "extends": "base_number.json",
   "fields": [

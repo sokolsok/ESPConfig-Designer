@@ -2,7 +2,6 @@
   "id": "sensor.mopeka_std_check",
   "domain": "sensor",
   "platform": "mopeka_std_check",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/mopeka_std_check/",
   "embedded": [
     {

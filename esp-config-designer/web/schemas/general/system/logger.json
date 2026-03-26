@@ -2,7 +2,6 @@
   "id": "other.logger",
   "domain": "logger",
   "platform": "core",
-  "requires": [],
   "fields": [
     {
       "key": "enabled",

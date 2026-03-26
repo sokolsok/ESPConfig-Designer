@@ -2,7 +2,6 @@
   "id": "select.modbus_controller",
   "domain": "select",
   "platform": "modbus_controller",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/select/modbus_controller/",
   "extends": "base_select.json",
   "fields": [

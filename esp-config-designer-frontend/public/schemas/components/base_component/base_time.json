@@ -2,7 +2,6 @@
   "id": "base.time",
   "domain": "time",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

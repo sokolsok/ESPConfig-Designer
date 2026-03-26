@@ -1,10 +1,12 @@
 {
   "id": "pipsolar",
   "domain": "pipsolar",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/pipsolar/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "id",

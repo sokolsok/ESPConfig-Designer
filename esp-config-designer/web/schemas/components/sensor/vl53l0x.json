@@ -2,11 +2,13 @@
   "id": "sensor.vl53l0x",
   "domain": "sensor",
   "platform": "vl53l0x",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/vl53l0x/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

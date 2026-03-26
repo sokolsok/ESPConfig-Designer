@@ -2,7 +2,6 @@
   "id": "automation.script",
   "domain": "script",
   "platform": "core",
-  "requires": [],
   "fields": [
     {
       "key": "script",

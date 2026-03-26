@@ -2,7 +2,6 @@
   "id": "protocols.mqtt",
   "domain": "mqtt",
   "platform": "core",
-  "requires": [],
   "fields": [
     {
       "key": "enabled",

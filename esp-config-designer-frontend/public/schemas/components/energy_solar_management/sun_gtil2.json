@@ -1,10 +1,12 @@
 {
   "id": "sun_gtil2",
   "domain": "sun_gtil2",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sun_gtil2/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "id",

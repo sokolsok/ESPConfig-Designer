@@ -2,7 +2,6 @@
   "id": "binary_sensor.ble_presence",
   "domain": "binary_sensor",
   "platform": "ble_presence",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/binary_sensor/ble_presence/",
   "extends": "base_binary_sensor.json",
   "fields": [

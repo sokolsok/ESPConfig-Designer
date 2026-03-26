@@ -2,7 +2,6 @@
   "id": "number.template",
   "domain": "number",
   "platform": "template",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/number/template/",
   "extends": "base_number.json",
   "fields": [

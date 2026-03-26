@@ -2,7 +2,6 @@
   "id": "automation.globals",
   "domain": "globals",
   "platform": "core",
-  "requires": [],
   "fields": [
     {
       "key": "globals",

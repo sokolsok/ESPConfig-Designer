@@ -2,7 +2,6 @@
   "id": "base.datetime",
   "domain": "datetime",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

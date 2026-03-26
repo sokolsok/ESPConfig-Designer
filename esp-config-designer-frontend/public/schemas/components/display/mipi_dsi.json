@@ -2,7 +2,6 @@
   "id": "display.mipi_dsi",
   "domain": "display",
   "platform": "mipi_dsi",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/display/mipi_dsi/",
   "extends": "base_display.json",
   "display_builder": true,

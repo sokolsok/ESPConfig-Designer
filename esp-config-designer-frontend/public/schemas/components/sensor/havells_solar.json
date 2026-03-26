@@ -2,10 +2,12 @@
   "id": "sensor.havells_solar",
   "domain": "sensor",
   "platform": "havells_solar",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/havells_solar/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "phase_a",

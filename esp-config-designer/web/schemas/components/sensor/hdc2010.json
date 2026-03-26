@@ -2,10 +2,12 @@
   "id": "sensor.hdc2010",
   "domain": "sensor",
   "platform": "hdc2010",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/hdc2010/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "temperature",

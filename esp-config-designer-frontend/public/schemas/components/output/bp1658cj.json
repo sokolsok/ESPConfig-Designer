@@ -2,7 +2,6 @@
   "id": "output.bp1658cj",
   "domain": "output",
   "platform": "bp1658cj",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/output/bp1658cj/",
   "extends": "base_output_float.json",
   "embedded": [

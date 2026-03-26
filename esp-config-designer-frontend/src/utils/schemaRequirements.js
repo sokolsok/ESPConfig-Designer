@@ -1,55 +1,56 @@
-// Normalize schema "requires" entries into canonical strings.
-const normalizeRequirement = (value) => {
-  if (!value || typeof value !== "string") return "";
-  const trimmed = value.trim();
-  return trimmed || "";
+import { matchesDependency, resolveDependentValue } from "./schemaVisibility";
+
+const normalizeRequirementId = (value) => {
+  if (typeof value !== "string") return "";
+  const normalized = value.trim();
+  return normalized || "";
 };
 
-// Resolve a value from config, falling back to schema defaults.
-const resolveFieldValue = (configValue, key, schemaFields) => {
-  if (configValue && configValue[key] !== undefined) {
-    return configValue[key];
+const normalizeRequirementRule = (rule) => {
+  if (!rule) return [];
+
+  if (typeof rule === "string") {
+    const requireId = normalizeRequirementId(rule);
+    return requireId ? [{ require: requireId }] : [];
   }
-  const fieldDefinition = schemaFields?.find((field) => field.key === key);
-  if (fieldDefinition && fieldDefinition.default !== undefined) {
-    return fieldDefinition.default;
-  }
-  return undefined;
+
+  if (typeof rule !== "object" || Array.isArray(rule)) return [];
+
+  const requireIds = Array.isArray(rule.require) ? rule.require : [rule.require];
+  const normalizedIds = requireIds.map(normalizeRequirementId).filter(Boolean);
+  if (!normalizedIds.length) return [];
+
+  return normalizedIds.map((requireId) => ({
+    require: requireId,
+    when: rule.when && typeof rule.when === "object" ? rule.when : null
+  }));
 };
 
-// Add required interfaces to the target set, filtered by supported list.
-const addRequires = (requirements, target, supported) => {
-  if (!Array.isArray(requirements)) return;
-  requirements.forEach((req) => {
-    const normalized = normalizeRequirement(req);
-    if (!normalized) return;
-    if (supported && !supported.has(normalized)) return;
-    target.add(normalized);
-  });
+const ruleMatches = (rule, configValue, schemaFields) => {
+  if (!rule?.when) return true;
+  if (!rule.when.key || typeof rule.when.key !== "string") return false;
+  const actual = resolveDependentValue(rule.when.key, configValue, schemaFields || []);
+  return matchesDependency(rule.when, actual);
 };
 
-// Collect requirements from a schema, including by-bus and by-type variants.
+const addRequirementRules = (rules, configValue, schemaFields, target, supported) => {
+  if (!Array.isArray(rules)) return;
+
+  rules
+    .flatMap((rule) => normalizeRequirementRule(rule))
+    .forEach((rule) => {
+      if (!ruleMatches(rule, configValue, schemaFields)) return;
+      if (supported && !supported.has(rule.require)) return;
+      target.add(rule.require);
+    });
+};
+
 const collectFromSchema = (schema, configValue, target, supported) => {
   if (!schema) return;
-  addRequires(schema.requires, target, supported);
-
-  if (schema.requiresByBus) {
-    const busValue = resolveFieldValue(configValue, "bus", schema.fields || []);
-    if (busValue) {
-      addRequires(schema.requiresByBus[busValue], target, supported);
-    }
-  }
-
-  if (schema.requiresByType) {
-    const typeValue = resolveFieldValue(configValue, "type", schema.fields || []);
-    if (typeValue) {
-      addRequires(schema.requiresByType[typeValue], target, supported);
-    }
-  }
+  addRequirementRules(schema.requirements, configValue, schema.fields || [], target, supported);
 };
 
-// Single entry point for required interface computation.
-export const getRequiredInterfaces = ({
+export const getRequiredDependencies = ({
   components = [],
   componentSchemas = {},
   networkConfig = {},

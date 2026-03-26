@@ -2,9 +2,6 @@
   "id": "display.max7219digit",
   "domain": "display",
   "platform": "max7219digit",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/display/max7219digit/",
   "extends": "base_display.json",
   "display_builder": true,
@@ -23,6 +20,11 @@
       "h": 16
     }
   },
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "model",

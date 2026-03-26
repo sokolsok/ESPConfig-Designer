@@ -2,7 +2,6 @@
   "id": "button.restart",
   "domain": "button",
   "platform": "restart",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/button/restart/",
   "extends": "base_button.json",
   "fields": []

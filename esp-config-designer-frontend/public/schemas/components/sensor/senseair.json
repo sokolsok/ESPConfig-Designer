@@ -2,10 +2,12 @@
   "id": "sensor.senseair",
   "domain": "sensor",
   "platform": "senseair",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/senseair/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "update_interval",

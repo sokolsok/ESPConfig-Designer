@@ -2,10 +2,12 @@
   "id": "sensor.tcs34725",
   "domain": "sensor",
   "platform": "tcs34725",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/tcs34725/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "red_channel",

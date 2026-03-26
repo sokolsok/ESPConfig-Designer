@@ -1,10 +1,12 @@
 {
   "id": "cc1101",
   "domain": "cc1101",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/cc1101/",
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "id",

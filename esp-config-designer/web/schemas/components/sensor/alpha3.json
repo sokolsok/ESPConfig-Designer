@@ -2,7 +2,6 @@
   "id": "sensor.alpha3",
   "domain": "sensor",
   "platform": "alpha3",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/alpha3/",
   "embedded": [
     {

@@ -2,7 +2,6 @@
   "id": "switch.nextion",
   "domain": "switch",
   "platform": "nextion",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/switch/nextion/",
   "extends": "base_switch.json",
   "fields": [

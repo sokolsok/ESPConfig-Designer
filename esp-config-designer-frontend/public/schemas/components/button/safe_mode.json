@@ -2,7 +2,6 @@
   "id": "button.safe_mode",
   "domain": "button",
   "platform": "safe_mode",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/button/safe_mode/",
   "extends": "base_button.json",
   "fields": []

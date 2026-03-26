@@ -2,10 +2,12 @@
   "id": "sensor.hlw8032",
   "domain": "sensor",
   "platform": "hlw8032",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/hlw8032/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "current",

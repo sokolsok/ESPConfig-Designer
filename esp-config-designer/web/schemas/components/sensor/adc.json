@@ -2,7 +2,6 @@
   "id": "sensor.adc",
   "domain": "sensor",
   "platform": "adc",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/adc/",
   "extends": "base_sensor.json",
   "fields": [
@@ -25,9 +24,9 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
-	  "default": "0db",
+      "default": "0db",
       "options": [
-		"auto",
+        "auto",
         "0db",
         "2.5db",
         "6db",
@@ -53,7 +52,7 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
-	  "default": "avg",
+      "default": "avg",
       "options": [
         "avg",
         "min",

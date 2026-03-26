@@ -2,9 +2,6 @@
   "id": "display.pcd8544",
   "domain": "display",
   "platform": "pcd8544",
-  "requires": [
-    "spi"
-  ],
   "helpUrl": "https://esphome.io/components/display/pcd8544/",
   "display_builder": true,
   "displayType": "monochrome",
@@ -14,6 +11,11 @@
       "h": 48
     }
   },
+  "requirements": [
+    {
+      "require": "bus:spi"
+    }
+  ],
   "fields": [
     {
       "key": "cs_pin",

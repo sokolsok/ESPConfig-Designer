@@ -2,7 +2,6 @@
   "id": "switch.factory_reset",
   "domain": "switch",
   "platform": "factory_reset",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/switch/factory_reset/",
   "extends": "base_switch.json",
   "fields": []

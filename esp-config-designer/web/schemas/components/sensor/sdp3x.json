@@ -2,11 +2,13 @@
   "id": "sensor.sdp3x",
   "domain": "sensor",
   "platform": "sdp3x",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/sdp3x/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "name",

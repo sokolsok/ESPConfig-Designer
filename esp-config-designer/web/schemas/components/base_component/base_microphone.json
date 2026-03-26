@@ -2,7 +2,6 @@
   "id": "base.microphone",
   "domain": "microphone",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

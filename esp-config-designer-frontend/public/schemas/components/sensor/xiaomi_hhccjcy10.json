@@ -2,7 +2,6 @@
   "id": "sensor.xiaomi_hhccjcy10",
   "domain": "sensor",
   "platform": "xiaomi_hhccjcy10",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/xiaomi_hhccjcy10/",
   "embedded": [
     {

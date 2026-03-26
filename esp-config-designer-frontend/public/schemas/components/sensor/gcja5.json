@@ -2,10 +2,12 @@
   "id": "sensor.gcja5",
   "domain": "sensor",
   "platform": "gcja5",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/gcja5/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "pm_1_0",

@@ -2,7 +2,6 @@
   "id": "sensor.homeassistant",
   "domain": "sensor",
   "platform": "homeassistant",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/homeassistant/",
   "extends": "base_sensor.json",
   "fields": [

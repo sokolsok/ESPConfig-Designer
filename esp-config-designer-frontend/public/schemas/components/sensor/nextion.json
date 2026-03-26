@@ -2,7 +2,6 @@
   "id": "sensor.nextion",
   "domain": "sensor",
   "platform": "nextion",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/sensor/nextion/",
   "extends": "base_sensor.json",
   "fields": [

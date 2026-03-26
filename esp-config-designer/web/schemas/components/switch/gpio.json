@@ -2,7 +2,6 @@
   "id": "switch.gpio",
   "domain": "switch",
   "platform": "gpio",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/switch/gpio/",
   "extends": "base_switch.json",
   "fields": [

@@ -2,9 +2,6 @@
   "id": "output.mcp4728",
   "domain": "output",
   "platform": "mcp4728",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/output/mcp4728/",
   "extends": "base_output_float.json",
   "embedded": [
@@ -12,6 +9,11 @@
       "key": "hub",
       "domain": "mcp4728",
       "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:i2c"
     }
   ],
   "fields": [

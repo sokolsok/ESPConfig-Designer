@@ -2,10 +2,12 @@
   "id": "sensor.pm1006",
   "domain": "sensor",
   "platform": "pm1006",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/pm1006/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "uart_id",

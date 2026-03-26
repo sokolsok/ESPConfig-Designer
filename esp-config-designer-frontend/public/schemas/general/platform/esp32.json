@@ -2,7 +2,6 @@
   "id": "platform.esp32",
   "domain": "platform",
   "platform": "esp32",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/esp32/",
   "fields": [
     {

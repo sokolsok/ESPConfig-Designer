@@ -2,11 +2,13 @@
   "id": "sensor.mqtt_subscribe",
   "domain": "sensor",
   "platform": "mqtt_subscribe",
-  "requires": [
-    "mqtt"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/mqtt_subscribe/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "protocol:mqtt"
+    }
+  ],
   "fields": [
     {
       "key": "name",

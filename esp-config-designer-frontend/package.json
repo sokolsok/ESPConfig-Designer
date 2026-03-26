@@ -1,7 +1,7 @@
 {
-  "name": "mini-saas-yaml",
+  "name": "esp-config-designer-frontend",
   "private": true,
-  "version": "0.0.1",
+  "version": "1.0.14",
   "type": "module",
   "scripts": {
     "generate:actions": "node scripts/generate-action-definitions.js",

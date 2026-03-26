@@ -2,7 +2,6 @@
   "id": "select.template",
   "domain": "select",
   "platform": "template",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/select/template/",
   "extends": "base_select.json",
   "fields": [

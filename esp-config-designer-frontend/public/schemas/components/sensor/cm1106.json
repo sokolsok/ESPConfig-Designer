@@ -2,10 +2,12 @@
   "id": "sensor.cm1106",
   "domain": "sensor",
   "platform": "cm1106",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/cm1106/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "update_interval",

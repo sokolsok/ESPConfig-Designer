@@ -2,7 +2,6 @@
   "id": "switch.modbus_controller",
   "domain": "switch",
   "platform": "modbus_controller",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/switch/modbus_controller/",
   "extends": "base_switch.json",
   "fields": [

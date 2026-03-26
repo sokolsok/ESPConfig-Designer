@@ -2,7 +2,6 @@
   "id": "event.template",
   "domain": "event",
   "platform": "template",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/event/template/",
   "extends": "base_event.json",
   "fields": [

@@ -2,10 +2,12 @@
   "id": "sensor.bme680",
   "domain": "sensor",
   "platform": "bme680",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/sensor/bme680/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "temperature",

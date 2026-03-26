@@ -2,7 +2,6 @@
   "id": "automation.interval",
   "domain": "interval",
   "platform": "core",
-  "requires": [],
   "fields": [
     {
       "key": "interval",

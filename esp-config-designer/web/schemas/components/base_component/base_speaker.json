@@ -2,7 +2,6 @@
   "id": "base.speaker",
   "domain": "speaker",
   "platform": "",
-  "requires": [],
   "type": "object",
   "fields": [
     {

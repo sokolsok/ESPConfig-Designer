@@ -1,10 +1,12 @@
 {
   "id": "rf_bridge",
   "domain": "rf_bridge",
-  "requires": [
-    "uart"
-  ],
   "helpUrl": "https://esphome.io/components/rf_bridge/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
     {
       "key": "id",

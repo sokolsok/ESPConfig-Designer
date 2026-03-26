@@ -2,9 +2,6 @@
   "id": "display.ssd1306_i2c",
   "domain": "display",
   "platform": "ssd1306_i2c",
-  "requires": [
-    "i2c"
-  ],
   "helpUrl": "https://esphome.io/components/display/ssd1306/",
   "display_builder": true,
   "displayType": "monochrome",
@@ -62,6 +59,11 @@
       "h": 64
     }
   },
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
       "key": "model",

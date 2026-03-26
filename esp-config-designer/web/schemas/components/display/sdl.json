@@ -2,7 +2,6 @@
   "id": "display.sdl",
   "domain": "display",
   "platform": "sdl",
-  "requires": [],
   "helpUrl": "https://esphome.io/components/display/sdl/",
   "extends": "base_display.json",
   "display_builder": true,
