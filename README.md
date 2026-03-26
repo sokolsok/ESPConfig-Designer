@@ -40,9 +40,7 @@ Placeholder image should show:
 - online/offline state badges
 - the top action bar
 
-```md
 ![Dashboard screenshot](docs/screenshots/dashboard-overview.png)
-```
 
 ### Builder
 Placeholder image should show:
@@ -52,9 +50,7 @@ Placeholder image should show:
 - YAML preview on the right
 - the top action bar (`Save`, `Validate`, `Install`, `Logs`)
 
-```md
 ![Builder screenshot](docs/screenshots/builder-overview.png)
-```
 
 ### Display Configurator
 Placeholder image should show:
@@ -63,9 +59,7 @@ Placeholder image should show:
 - element inspector / editing panel
 - example text/icon/image/shape elements
 
-```md
 ![Display Configurator screenshot](docs/screenshots/display-configurator.png)
-```
 
 ### Asset Manager
 Placeholder image should show:
@@ -73,9 +67,7 @@ Placeholder image should show:
 - modal with Images / Fonts / Audio tabs
 - upload / rename / delete controls
 
-```md
 ![Asset Manager screenshot](docs/screenshots/asset-manager.png)
-```
 
 ---
 
