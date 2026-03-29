@@ -22,14 +22,20 @@
       "type": "address",
       "required": false,
       "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x21",
       "placeholder": "0x21"
     },
     {
       "key": "measurement_mode",
-      "type": "text",
+      "type": "select",
       "required": false,
       "lvl": "normal",
-      "placeholder": "differential_pressure"
+      "default": "differential_pressure",
+      "options": [
+        "differential_pressure",
+        "mass_flow"
+      ]
     },
     {
       "key": "update_interval",

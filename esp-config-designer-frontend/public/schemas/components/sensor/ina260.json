@@ -14,19 +14,32 @@
       "type": "address",
       "required": false,
       "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x40",
       "placeholder": "0x40"
     },
     {
-      "key": "current",
-      "type": "text",
+      "key": "update_interval",
+      "type": "duration",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "current",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "power",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "bus_voltage",
@@ -35,13 +48,6 @@
       "type": "object",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "60s"
     }
   ]
 }

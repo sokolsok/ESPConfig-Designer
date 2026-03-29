@@ -7,8 +7,16 @@
     {
       "key": "mac_address",
       "type": "text",
+	  "suppressQuotes": true,
       "required": true,
       "lvl": "simple"
+    },
+    {
+      "key": "clear_impedance",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+	  "note": "Only available on MiScale2"
     },
     {
       "key": "weight",
@@ -25,12 +33,6 @@
       "lvl": "simple",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "clear_impedance",
-      "type": "boolean",
-      "required": false,
-      "lvl": "normal"
     }
   ]
 }

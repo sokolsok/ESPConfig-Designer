@@ -1,0 +1,99 @@
+{
+  "id": "busses.modbus",
+  "domain": "modbus",
+  "platform": "core",
+  "fields": [
+    {
+      "key": "enabled",
+      "label": "Enable Modbus",
+      "type": "boolean",
+      "required": false,
+      "lvl": "simple",
+      "default": false,
+      "emitYAML": "never",
+      "helpUrl": "https://esphome.io/components/modbus/"
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "modbus_id",
+      "idDomain": "modbus",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    },
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "uart",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    },
+    {
+      "key": "role",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "client",
+      "options": [
+        "client",
+        "server"
+      ],
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    },
+    {
+      "key": "flow_control_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "send_wait_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "250ms"
+    },
+    {
+      "key": "turnaround_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "placeholder": "100ms"
+    },
+    {
+      "key": "disable_crc",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false,
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      }
+    }
+  ]
+}

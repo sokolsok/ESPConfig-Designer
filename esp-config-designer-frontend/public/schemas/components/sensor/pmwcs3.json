@@ -10,6 +10,22 @@
   ],
   "fields": [
     {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x63",
+      "placeholder": "0x63"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
       "key": "e25",
       "required": false,
       "lvl": "simple",
@@ -40,20 +56,6 @@
       "type": "object",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "address",
-      "type": "address",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "0x63"
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "60s"
     }
   ]
 }

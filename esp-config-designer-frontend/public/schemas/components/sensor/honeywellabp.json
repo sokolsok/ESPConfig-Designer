@@ -10,6 +10,19 @@
   ],
   "fields": [
     {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
       "key": "pressure",
       "type": "object",
       "required": false,
@@ -37,19 +50,6 @@
       "lvl": "simple",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "cs_pin",
-      "type": "gpio",
-      "required": true,
-      "lvl": "simple"
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "60s"
     }
   ]
 }

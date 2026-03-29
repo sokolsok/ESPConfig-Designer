@@ -1,0 +1,46 @@
+{
+  "id": "text_sensor.bme68x_bsec2",
+  "domain": "text_sensor",
+  "platform": "bme68x_bsec2",
+  "helpUrl": "https://esphome.io/components/sensor/bme68x_bsec2/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "bme68x_bsec2_i2c",
+      "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_bme68x_bsec2_i2c.json"
+    },
+    {
+      "key": "bme68x_bsec2_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "bme68x_bsec2_i2c",
+      "allowSelfReference": true,
+      "default": "bme68x_bsec2_hub"
+    },
+    {
+      "key": "iaq_accuracy",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_text_sensor.json",
+      "fields": []
+    }
+  ]
+}

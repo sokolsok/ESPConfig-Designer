@@ -1,0 +1,37 @@
+{
+  "id": "hub.daly_bms",
+  "domain": "daly_bms",
+  "platform": "",
+  "type": "object",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple",
+      "default": "daly_bms_hub",
+      "idDomain": "daly_bms"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "20s"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x80",
+      "placeholder": "0x80"
+    }
+  ]
+}

@@ -3,10 +3,133 @@
   "domain": "sensor",
   "platform": "bme680_bsec",
   "helpUrl": "https://esphome.io/components/sensor/bme680_bsec/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "bme680_bsec",
+      "dedupeBy": "id"
+    }
+  ],
   "requirements": [
     {
       "require": "bus:i2c"
     }
   ],
-  "fields": []
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_bme680_bsec.json"
+    },
+    {
+      "key": "bme680_bsec_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "bme680_bsec",
+      "allowSelfReference": true,
+      "default": "bme680_bsec_hub"
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [
+        {
+          "key": "sample_rate",
+          "type": "select",
+          "required": false,
+          "lvl": "simple",
+          "options": [
+            "lp",
+            "ulp"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "pressure",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [
+        {
+          "key": "sample_rate",
+          "type": "select",
+          "required": false,
+          "lvl": "simple",
+          "options": [
+            "lp",
+            "ulp"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "humidity",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [
+        {
+          "key": "sample_rate",
+          "type": "select",
+          "required": false,
+          "lvl": "simple",
+          "options": [
+            "lp",
+            "ulp"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "gas_resistance",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "iaq",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "iaq_accuracy",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "co2_equivalent",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "breath_voc_equivalent",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    }
+  ]
 }

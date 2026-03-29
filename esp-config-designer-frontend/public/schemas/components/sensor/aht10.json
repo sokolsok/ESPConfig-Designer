@@ -14,26 +14,11 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
+      "default": "AHT10",
       "options": [
         "AHT10",
         "AHT20"
       ]
-    },
-    {
-      "key": "temperature",
-      "type": "object",
-      "required": true,
-      "lvl": "simple",
-      "extends": "base_sensor.json",
-      "fields": []
-    },
-    {
-      "key": "humidity",
-      "type": "object",
-      "required": true,
-      "lvl": "simple",
-      "extends": "base_sensor.json",
-      "fields": []
     },
     {
       "key": "update_interval",
@@ -41,6 +26,22 @@
       "required": false,
       "lvl": "simple",
       "placeholder": "60s"
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "humidity",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     }
   ]
 }

@@ -28,6 +28,10 @@
       "type": "duration",
       "required": false,
       "lvl": "simple",
+      "dependsOn": {
+        "key": "type",
+        "value": "seconds"
+      },
       "default": "60s",
       "placeholder": "60s"
     }

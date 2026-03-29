@@ -25,7 +25,7 @@
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
-      "domain": "sensor",
+      "domain": "output",
       "placeholder": "output_sensor_id"
     },
     {

@@ -18,6 +18,18 @@
       "lvl": "simple"
     },
     {
+      "key": "model",
+      "type": "select",
+      "required": false,
+      "lvl": "simple",
+	  "default": "jsn_sr04t",
+	  "emitYAML": "always",
+      "options": [
+        "jsn_sr04t",
+        "aj_sr04m"
+      ]
+    },
+    {
       "key": "update_interval",
       "type": "duration",
       "required": false,
@@ -28,14 +40,8 @@
       "key": "uart_id",
       "type": "id_ref",
       "required": false,
-      "lvl": "normal",
-      "domain": "sensor"
-    },
-    {
-      "key": "model",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "domain": "uart"
     }
   ]
 }

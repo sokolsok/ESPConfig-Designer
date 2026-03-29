@@ -31,22 +31,24 @@
     },
     {
       "key": "baseline",
-      "type": "text",
+      "type": "number",
       "required": false,
       "lvl": "advanced"
     },
     {
       "key": "temperature",
-      "type": "id",
+      "type": "id_ref",
       "required": false,
       "lvl": "advanced",
+      "domain": "sensor",
       "placeholder": "external_temperature_id"
     },
     {
       "key": "humidity",
-      "type": "id",
+      "type": "id_ref",
       "required": false,
       "lvl": "advanced",
+      "domain": "sensor",
       "placeholder": "external_humidity_id"
     },
     {

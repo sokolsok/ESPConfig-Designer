@@ -21,7 +21,13 @@
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
-      "domain": "sensor"
+      "domain": "uart"
+    },
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple"
     },
     {
       "key": "custom_config",

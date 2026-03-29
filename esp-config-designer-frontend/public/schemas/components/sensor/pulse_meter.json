@@ -27,9 +27,13 @@
     },
     {
       "key": "internal_filter_mode",
-      "type": "duration",
+      "type": "select",
       "required": false,
       "lvl": "normal",
+      "options": [
+        "EDGE",
+        "PULSE"
+      ],
       "placeholder": "EDGE"
     },
     {
@@ -41,9 +45,11 @@
     },
     {
       "key": "total",
-      "type": "number",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
     }
   ]
 }

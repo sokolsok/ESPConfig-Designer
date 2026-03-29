@@ -21,6 +21,7 @@
       "type": "address",
       "required": false,
       "lvl": "simple",
+      "emitYAML": "always",
       "default": "0x40",
       "placeholder": "0x40"
     },
@@ -50,7 +51,7 @@
           "key": "voltage",
           "type": "select",
           "required": false,
-          "lvl": "normal",
+          "lvl": "simple",
           "default": "1100us",
           "options": [
             "140us",
@@ -67,7 +68,7 @@
           "key": "current",
           "type": "select",
           "required": false,
-          "lvl": "normal",
+          "lvl": "simple",
           "default": "1100us",
           "options": [
             "140us",
@@ -104,7 +105,6 @@
       "type": "duration",
       "required": false,
       "lvl": "simple",
-      "default": "60s",
       "placeholder": "60s"
     },
     {

@@ -36,6 +36,13 @@
       "default": "ads1118_hub"
     },
     {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
       "key": "type",
       "type": "select",
       "required": false,
@@ -49,7 +56,7 @@
     {
       "key": "multiplexer",
       "type": "select",
-      "required": false,
+      "required": true,
       "lvl": "simple",
       "default": "A0_GND",
       "options": [
@@ -70,7 +77,7 @@
     {
       "key": "gain",
       "type": "select",
-      "required": false,
+      "required": true,
       "lvl": "simple",
       "default": "6.144",
       "options": [

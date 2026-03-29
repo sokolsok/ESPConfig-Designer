@@ -20,6 +20,7 @@
       "type": "select",
       "required": true,
       "lvl": "simple",
+	  "default": "50Hz",
       "options": [
         "50Hz",
         "60Hz"
@@ -29,7 +30,64 @@
       "key": "meter_constant",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "3200.0"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "spi_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "spi"
+    },
+    {
+      "key": "pl_const",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "1429876"
+    },
+    {
+      "key": "gain_metering",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "7481"
+    },
+    {
+      "key": "gain_voltage",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "26400"
+    },
+    {
+      "key": "gain_ct",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "31251"
+    },
+    {
+      "key": "gain_pga",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "options": [
+        "1X",
+        "4X",
+        "8X",
+        "16X",
+        "24X"
+      ],
+      "placeholder": "1X"
     },
     {
       "key": "voltage",
@@ -41,27 +99,35 @@
     },
     {
       "key": "current",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "power",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "reactive_power",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "power_factor",
-      "type": "number",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "forward_active_energy",
@@ -81,58 +147,11 @@
     },
     {
       "key": "frequency",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "pl_const",
-      "type": "text",
+      "type": "object",
       "required": false,
       "lvl": "normal",
-      "placeholder": "1429876"
-    },
-    {
-      "key": "gain_metering",
-      "type": "text",
-      "required": false,
-      "lvl": "normal",
-      "placeholder": "7481"
-    },
-    {
-      "key": "gain_voltage",
-      "type": "text",
-      "required": false,
-      "lvl": "normal",
-      "placeholder": "26400"
-    },
-    {
-      "key": "gain_ct",
-      "type": "text",
-      "required": false,
-      "lvl": "normal",
-      "placeholder": "31251"
-    },
-    {
-      "key": "gain_pga",
-      "type": "text",
-      "required": false,
-      "lvl": "normal",
-      "placeholder": "1X"
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "60s"
-    },
-    {
-      "key": "spi_id",
-      "type": "id_ref",
-      "required": false,
-      "lvl": "normal",
-      "domain": "sensor"
+      "extends": "base_sensor.json",
+      "fields": []
     }
   ]
 }

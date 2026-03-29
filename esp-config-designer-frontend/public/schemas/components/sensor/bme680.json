@@ -10,6 +10,61 @@
   ],
   "fields": [
     {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x76",
+      "placeholder": "0x76"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "iir_filter",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "OFF",
+      "options": [
+        "OFF",
+        "1x",
+        "3x",
+        "7x",
+        "15x",
+        "31x",
+        "63x",
+        "127x"
+      ]
+    },
+    {
+      "key": "heater",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "temperature",
+          "type": "number",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "320"
+        },
+        {
+          "key": "duration",
+          "type": "duration",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "150ms"
+        }
+      ]
+    },
+    {
       "key": "temperature",
       "type": "object",
       "required": false,
@@ -20,7 +75,7 @@
           "key": "oversampling",
           "type": "select",
           "required": false,
-          "lvl": "normal",
+          "lvl": "simple",
           "default": "16x",
           "options": [
             "NONE",
@@ -44,7 +99,7 @@
           "key": "oversampling",
           "type": "select",
           "required": false,
-          "lvl": "normal",
+          "lvl": "simple",
           "default": "16x",
           "options": [
             "NONE",
@@ -68,7 +123,7 @@
           "key": "oversampling",
           "type": "select",
           "required": false,
-          "lvl": "normal",
+          "lvl": "simple",
           "default": "16x",
           "options": [
             "NONE",
@@ -88,63 +143,6 @@
       "lvl": "simple",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "address",
-      "type": "address",
-      "required": false,
-      "lvl": "simple",
-      "default": "0x76",
-      "placeholder": "0x76"
-    },
-    {
-      "key": "iir_filter",
-      "type": "select",
-      "required": false,
-      "lvl": "normal",
-      "default": "OFF",
-      "options": [
-        "OFF",
-        "1x",
-        "3x",
-        "7x",
-        "15x",
-        "31x",
-        "63x",
-        "127x"
-      ]
-    },
-    {
-      "key": "heater",
-      "type": "object",
-      "required": false,
-      "lvl": "simple",
-      "fields": [
-        {
-          "key": "temperature",
-          "type": "number",
-          "required": false,
-          "lvl": "advanced",
-          "default": 320,
-          "placeholder": "320"
-        },
-        {
-          "key": "duration",
-          "type": "duration",
-          "required": false,
-          "lvl": "advanced",
-          "default": "150ms",
-          "placeholder": "150ms"
-        }
-      ]
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "default": "60s",
-      "placeholder": "60s"
     }
   ]
 }

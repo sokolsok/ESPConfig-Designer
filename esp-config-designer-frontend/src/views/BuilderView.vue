@@ -1724,7 +1724,8 @@ const bussesDefinitions = [
   { key: "uart", label: "UART", schemaId: "general/busses/uart" },
   { key: "one_wire", label: "1-Wire", schemaId: "general/busses/one_wire" },
   { key: "i2s", label: "I2S", schemaId: "general/busses/i2s" },
-  { key: "canbus", label: "CAN Bus", schemaId: "general/busses/canbus" }
+  { key: "canbus", label: "CAN Bus", schemaId: "general/busses/canbus" },
+  { key: "modbus", label: "Modbus", schemaId: "general/busses/modbus" }
 ];
 const otherDefinitions = [
   { key: "logger", label: "Logger", schemaId: "general/system/logger" },
@@ -1742,6 +1743,7 @@ const requirementLabelMap = {
   i2c: "I2C",
   i2s: "I2S",
   i2s_audio: "I2S Audio",
+  modbus: "Modbus",
   mqtt: "MQTT",
   one_wire: "1-Wire",
   openthread: "OpenThread",
@@ -3192,7 +3194,8 @@ const otherConfig = systemConfig.value || {};
     { key: "uart", label: "uart" },
     { key: "one_wire", label: "one_wire" },
     { key: "i2s", label: "i2s" },
-    { key: "canbus", label: "canbus" }
+    { key: "canbus", label: "canbus" },
+    { key: "modbus", label: "modbus" }
   ];
   bussesEntries.forEach((entry) => {
     const definition = bussesDefinitions.find((item) => item.key === entry.key);

@@ -1,0 +1,39 @@
+{
+  "id": "output.emc2101",
+  "domain": "output",
+  "platform": "emc2101",
+  "helpUrl": "https://esphome.io/components/emc2101/",
+  "extends": "base_output_float.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "emc2101",
+      "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_emc2101.json"
+    },
+    {
+      "key": "emc2101_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "emc2101",
+      "allowSelfReference": true,
+      "default": "emc2101_hub"
+    }
+  ]
+}

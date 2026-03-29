@@ -1,29 +1,80 @@
 {
   "id": "sensor.ina2xx",
   "domain": "sensor",
-  "platform": "ina2xx",
+  "platform": "ina2xx_i2c",
+  "platformByBus": {
+    "i2c": "ina2xx_i2c",
+    "spi": "ina2xx_spi"
+  },
   "helpUrl": "https://esphome.io/components/sensor/ina2xx/",
-  "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c",
+      "when": {
+        "key": "bus",
+        "value": "i2c"
+      }
+    },
+    {
+      "require": "bus:spi",
+      "when": {
+        "key": "bus",
+        "value": "spi"
+      }
+    }
+  ],
   "fields": [
     {
-      "key": "name",
-      "placeholder": "Sensor Name",
-      "type": "text",
+      "key": "bus",
+      "type": "select",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "default": "i2c",
+      "options": [
+        "i2c",
+        "spi"
+      ]
     },
     {
       "key": "model",
-      "type": "text",
+      "type": "select",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "optionsBy": "bus",
+      "optionsMap": {
+        "i2c": [
+          "INA228",
+          "INA237",
+          "INA238"
+        ],
+        "spi": [
+          "INA229",
+          "INA239"
+        ]
+      }
     },
     {
       "key": "address",
       "type": "address",
       "required": false,
       "lvl": "simple",
-      "placeholder": "0x40"
+      "emitYAML": "always",
+      "default": "0x40",
+      "placeholder": "0x40",
+      "dependsOn": {
+        "key": "bus",
+        "value": "i2c"
+      }
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "bus",
+        "value": "spi"
+      }
     },
     {
       "key": "shunt_resistance",
@@ -39,10 +90,14 @@
     },
     {
       "key": "adc_range",
-      "type": "text",
+      "type": "select",
       "required": false,
       "lvl": "normal",
-      "placeholder": "0"
+      "default": "0",
+      "options": [
+        "0",
+        "1"
+      ]
     },
     {
       "key": "adc_time",
@@ -52,37 +107,85 @@
       "fields": [
         {
           "key": "bus_voltage",
-          "type": "duration",
+          "type": "select",
           "required": false,
-          "lvl": "normal"
+          "lvl": "simple",
+          "options": [
+            "50us",
+            "84us",
+            "150us",
+            "280us",
+            "540us",
+            "1052us",
+            "2074us",
+            "4120us"
+          ]
         },
         {
           "key": "shunt_voltage",
-          "type": "duration",
+          "type": "select",
           "required": false,
-          "lvl": "normal"
+          "lvl": "normal",
+          "options": [
+            "50us",
+            "84us",
+            "150us",
+            "280us",
+            "540us",
+            "1052us",
+            "2074us",
+            "4120us"
+          ]
         },
         {
           "key": "temperature",
-          "type": "duration",
+          "type": "select",
           "required": false,
-          "lvl": "normal"
+          "lvl": "normal",
+          "options": [
+            "50us",
+            "84us",
+            "150us",
+            "280us",
+            "540us",
+            "1052us",
+            "2074us",
+            "4120us"
+          ]
         }
       ]
     },
     {
       "key": "adc_averaging",
-      "type": "number",
+      "type": "select",
       "required": false,
       "lvl": "normal",
-      "placeholder": "128"
+      "default": "128",
+      "options": [
+        "1",
+        "4",
+        "16",
+        "64",
+        "128",
+        "256",
+        "512",
+        "1024"
+      ]
     },
     {
       "key": "temperature_coefficient",
       "type": "number",
       "required": false,
       "lvl": "normal",
-      "placeholder": "0"
+      "default": 0,
+      "placeholder": "0",
+      "dependsOn": {
+        "key": "model",
+        "values": [
+          "INA228",
+          "INA229"
+        ]
+      }
     },
     {
       "key": "update_interval",
@@ -95,7 +198,108 @@
       "key": "reset_on_boot",
       "type": "boolean",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": true
+    },
+    {
+      "key": "current",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "power",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "shunt_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "bus_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "energy",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "model",
+        "values": [
+          "INA228",
+          "INA229"
+        ]
+      }
+    },
+    {
+      "key": "energy_joules",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "model",
+        "values": [
+          "INA228",
+          "INA229"
+        ]
+      }
+    },
+    {
+      "key": "charge",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "model",
+        "values": [
+          "INA228",
+          "INA229"
+        ]
+      }
+    },
+    {
+      "key": "charge_coulombs",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "model",
+        "values": [
+          "INA228",
+          "INA229"
+        ]
+      }
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "id": "sensor.gl_r01",
   "domain": "sensor",
-  "platform": "gl_r01",
+  "platform": "gl_r01_i2c",
   "helpUrl": "https://esphome.io/components/sensor/gl_r01/",
   "extends": "base_sensor.json",
   "requirements": [
@@ -28,13 +28,16 @@
       "type": "address",
       "required": false,
       "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x74",
       "placeholder": "0x74"
     },
     {
       "key": "i2c_id",
-      "type": "text",
+      "type": "id_ref",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "domain": "i2c"
     }
   ]
 }

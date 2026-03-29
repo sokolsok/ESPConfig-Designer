@@ -62,24 +62,21 @@
       "type": "duration",
       "required": false,
       "lvl": "simple",
-      "default": "60s",
       "placeholder": "60s"
     },
     {
       "key": "current_resistor",
-      "type": "text",
+      "type": "number",
       "required": false,
       "lvl": "normal",
-      "default": "0.001 ohm",
-      "placeholder": "0.001 ohm"
+      "default": 0.001
     },
     {
       "key": "voltage_divider",
       "type": "number",
       "required": false,
       "lvl": "normal",
-      "default": 2351,
-      "placeholder": "2351"
+      "default": 2351
     },
     {
       "key": "model",

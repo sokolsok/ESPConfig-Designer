@@ -13,7 +13,25 @@
       "key": "shunt_resistance",
       "type": "text",
       "required": true,
+	  "suppressQuotes": true,
+	  "placeholder": "0.2 ohm",
       "lvl": "simple"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x70",
+      "placeholder": "0x70"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
     },
     {
       "key": "voltage",
@@ -46,20 +64,6 @@
       "lvl": "simple",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "address",
-      "type": "address",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "0x70"
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "60s"
     }
   ]
 }

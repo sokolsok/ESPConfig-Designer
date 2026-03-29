@@ -36,7 +36,7 @@
       "type": "number",
       "required": true,
       "lvl": "simple",
-      "plaheholder": "4.7kOhm"
+      "placeholder": "4.7kOhm"
     },
     {
       "key": "reference_voltage",

@@ -26,10 +26,10 @@
     },
     {
       "key": "qos",
-      "type": "text",
+      "type": "number",
       "required": false,
       "lvl": "normal",
-      "placeholder": "0"
+      "default": 0
     }
   ]
 }

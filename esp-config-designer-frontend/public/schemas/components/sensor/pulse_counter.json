@@ -28,7 +28,7 @@
         {
           "key": "rising_edge",
           "type": "select",
-          "required": false,
+          "required": true,
           "lvl": "advanced",
           "default": "INCREMENT",
           "options": [
@@ -40,7 +40,7 @@
         {
           "key": "falling_edge",
           "type": "select",
-          "required": false,
+          "required": true,
           "lvl": "advanced",
           "default": "DISABLE",
           "options": [
@@ -71,7 +71,6 @@
       "type": "duration",
       "required": false,
       "lvl": "simple",
-      "default": "60s",
       "placeholder": "60s"
     },
     {

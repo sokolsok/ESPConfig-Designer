@@ -1,0 +1,109 @@
+{
+  "id": "hub.bme68x_bsec2_i2c",
+  "domain": "bme68x_bsec2_i2c",
+  "platform": "",
+  "type": "object",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "bme68x_bsec2_hub",
+      "idDomain": "bme68x_bsec2_i2c"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2c"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x76",
+      "placeholder": "0x76"
+    },
+    {
+      "key": "model",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "options": [
+        "BME680",
+        "BME688"
+      ]
+    },
+    {
+      "key": "algorithm_output",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "classification",
+      "options": [
+        "classification",
+        "regression"
+      ],
+      "dependsOn": {
+        "key": "model",
+        "value": "BME688"
+      }
+    },
+    {
+      "key": "operating_age",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "28d",
+      "options": [
+        "4d",
+        "28d"
+      ]
+    },
+    {
+      "key": "sample_rate",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "LP",
+      "options": [
+        "LP",
+        "ULP"
+      ]
+    },
+    {
+      "key": "supply_voltage",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "3.3V",
+      "options": [
+        "3.3V",
+        "1.8V"
+      ]
+    },
+    {
+      "key": "temperature_offset",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0"
+    },
+    {
+      "key": "state_save_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "6h"
+    }
+  ]
+}

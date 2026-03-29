@@ -10,6 +10,29 @@
   ],
   "fields": [
     {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x76",
+      "placeholder": "0x76"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2c"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
       "key": "temperature",
       "type": "object",
       "required": false,
@@ -36,6 +59,8 @@
           "type": "address",
           "required": false,
           "lvl": "simple",
+          "emitYAML": "always",
+          "default": "0x40",
           "placeholder": "0x40"
         },
         {
@@ -43,31 +68,10 @@
           "type": "id_ref",
           "required": false,
           "lvl": "normal",
-          "domain": "sensor"
+          "domain": "i2c"
         }
       ],
       "extends": "base_sensor.json"
-    },
-    {
-      "key": "address",
-      "type": "address",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "0x40"
-    },
-    {
-      "key": "i2c_id",
-      "type": "id_ref",
-      "required": false,
-      "lvl": "normal",
-      "domain": "sensor"
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "60s"
     }
   ]
 }

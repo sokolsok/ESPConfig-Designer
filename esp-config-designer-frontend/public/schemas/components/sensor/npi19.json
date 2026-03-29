@@ -18,6 +18,22 @@
       "lvl": "simple"
     },
     {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2c"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x28",
+      "placeholder": "0x28"
+    },
+    {
       "key": "raw_pressure",
       "type": "object",
       "required": false,
@@ -32,20 +48,6 @@
       "lvl": "simple",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "i2c_id",
-      "type": "id_ref",
-      "required": false,
-      "lvl": "normal",
-      "domain": "sensor"
-    },
-    {
-      "key": "address",
-      "type": "address",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "0x28"
     }
   ]
 }

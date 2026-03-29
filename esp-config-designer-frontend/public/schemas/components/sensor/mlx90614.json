@@ -25,9 +25,11 @@
       "fields": [
         {
           "key": "emissivity",
-          "type": "text",
+          "type": "number",
           "required": false,
-          "lvl": "normal"
+          "lvl": "simple",
+          "default": 1,
+          "placeholder": "1.0"
         }
       ],
       "extends": "base_sensor.json"

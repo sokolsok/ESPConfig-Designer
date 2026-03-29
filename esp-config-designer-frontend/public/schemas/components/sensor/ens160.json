@@ -99,7 +99,7 @@
       "key": "compensation",
       "type": "object",
       "required": false,
-      "lvl": "simple",
+      "lvl": "advanced",
       "fields": [
         {
           "key": "temperature",

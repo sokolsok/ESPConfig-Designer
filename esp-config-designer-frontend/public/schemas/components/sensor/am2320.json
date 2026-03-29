@@ -10,9 +10,23 @@
   ],
   "fields": [
     {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "i2c"
+    },
+    {
       "key": "temperature",
       "type": "object",
-      "required": true,
+      "required": false,
       "lvl": "simple",
       "extends": "base_sensor.json",
       "fields": []
@@ -20,16 +34,10 @@
     {
       "key": "humidity",
       "type": "object",
-      "required": true,
+      "required": false,
       "lvl": "simple",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple"
     }
   ]
 }

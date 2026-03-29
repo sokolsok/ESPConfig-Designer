@@ -3,6 +3,13 @@
   "domain": "sensor",
   "platform": "bme68x_bsec2",
   "helpUrl": "https://esphome.io/components/sensor/bme68x_bsec2/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "bme68x_bsec2_i2c",
+      "dedupeBy": "id"
+    }
+  ],
   "requirements": [
     {
       "require": "bus:i2c"
@@ -10,66 +17,133 @@
   ],
   "fields": [
     {
-      "key": "address",
-      "type": "address",
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
       "required": false,
       "lvl": "simple",
-      "placeholder": "0x76"
+      "emitYAML": "never",
+      "extends": "hub_bme68x_bsec2_i2c.json"
     },
     {
-      "key": "i2c_id",
+      "key": "bme68x_bsec2_id",
       "type": "id_ref",
-      "required": false,
-      "lvl": "normal",
-      "domain": "sensor"
+      "required": true,
+      "lvl": "simple",
+      "domain": "bme68x_bsec2_i2c",
+      "allowSelfReference": true,
+      "default": "bme68x_bsec2_hub"
     },
     {
-      "key": "model",
-      "type": "text",
+      "key": "id",
+      "type": "id",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple"
     },
     {
-      "key": "algorithm_output",
-      "type": "text",
+      "key": "temperature",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "operating_age",
-      "type": "duration",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "sample_rate",
-      "type": "duration",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "supply_voltage",
-      "type": "select",
-      "required": false,
-      "lvl": "normal",
-      "options": [
-        "3.3V",
-        "1.8V"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [
+        {
+          "key": "sample_rate",
+          "type": "select",
+          "required": false,
+          "lvl": "simple",
+          "options": [
+            "LP",
+            "ULP"
+          ]
+        }
       ]
     },
     {
-      "key": "temperature_offset",
-      "type": "number",
+      "key": "pressure",
+      "type": "object",
       "required": false,
-      "lvl": "normal",
-      "placeholder": "0"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [
+        {
+          "key": "sample_rate",
+          "type": "select",
+          "required": false,
+          "lvl": "simple",
+          "options": [
+            "LP",
+            "ULP"
+          ]
+        }
+      ]
     },
     {
-      "key": "state_save_interval",
-      "type": "duration",
+      "key": "humidity",
+      "type": "object",
       "required": false,
-      "lvl": "normal",
-      "placeholder": "6h"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [
+        {
+          "key": "sample_rate",
+          "type": "select",
+          "required": false,
+          "lvl": "simple",
+          "options": [
+            "LP",
+            "ULP"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "gas_resistance",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "iaq",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "iaq_static",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "iaq_accuracy",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "co2_equivalent",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "breath_voc_equivalent",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     }
   ]
 }

@@ -11,76 +11,44 @@
   "fields": [
     {
       "key": "model",
-      "type": "text",
+      "type": "select",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "options": [
+        "RG_9",
+        "RG_15"
+      ]
     },
     {
       "key": "disable_led",
       "type": "boolean",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "model",
+        "value": "RG_9"
+      }
     },
     {
       "key": "uart_id",
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
-      "domain": "sensor"
-    },
-    {
-      "key": "moisture",
-      "required": false,
-      "lvl": "simple",
-      "type": "object",
-      "extends": "base_sensor.json",
-      "fields": []
-    },
-    {
-      "key": "temperature",
-      "required": false,
-      "lvl": "simple",
-      "type": "object",
-      "extends": "base_sensor.json",
-      "fields": []
+      "domain": "uart"
     },
     {
       "key": "resolution",
-      "type": "text",
+      "type": "select",
       "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "acc",
-      "required": false,
-      "lvl": "simple",
-      "type": "object",
-      "extends": "base_sensor.json",
-      "fields": []
-    },
-    {
-      "key": "event_acc",
-      "required": false,
-      "lvl": "simple",
-      "type": "object",
-      "extends": "base_sensor.json",
-      "fields": []
-    },
-    {
-      "key": "total_acc",
-      "required": false,
-      "lvl": "simple",
-      "type": "object",
-      "extends": "base_sensor.json",
-      "fields": []
-    },
-    {
-      "key": "r_int",
-      "required": false,
-      "lvl": "simple",
-      "type": "object",
-      "extends": "base_sensor.json",
-      "fields": []
+      "lvl": "normal",
+      "options": [
+        "low",
+        "high"
+      ],
+      "dependsOn": {
+        "key": "model",
+        "value": "RG_15"
+      }
     },
     {
       "key": "update_interval",
@@ -88,6 +56,78 @@
       "required": false,
       "lvl": "simple",
       "placeholder": "60s"
+    },
+    {
+      "key": "moisture",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "model",
+        "value": "RG_9"
+      }
+    },
+    {
+      "key": "temperature",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "model",
+        "value": "RG_9"
+      }
+    },
+    {
+      "key": "acc",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "model",
+        "value": "RG_15"
+      }
+    },
+    {
+      "key": "event_acc",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "model",
+        "value": "RG_15"
+      }
+    },
+    {
+      "key": "total_acc",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "model",
+        "value": "RG_15"
+      }
+    },
+    {
+      "key": "r_int",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "dependsOn": {
+        "key": "model",
+        "value": "RG_15"
+      }
     }
   ]
 }

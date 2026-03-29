@@ -38,13 +38,13 @@
     },
     {
       "key": "ambient_pressure_compensation",
-      "type": "text",
+      "type": "number",
       "required": false,
       "lvl": "normal"
     },
     {
       "key": "altitude_compensation",
-      "type": "text",
+      "type": "number",
       "required": false,
       "lvl": "normal"
     },

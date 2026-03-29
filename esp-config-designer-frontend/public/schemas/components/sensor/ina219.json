@@ -14,6 +14,7 @@
       "type": "address",
       "required": false,
       "lvl": "simple",
+      "emitYAML": "always",
       "default": "0x40",
       "placeholder": "0x40"
     },
@@ -40,6 +41,13 @@
       "lvl": "normal",
       "default": "3.2A",
       "placeholder": "3.2A"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
     },
     {
       "key": "current",
@@ -72,14 +80,6 @@
       "lvl": "simple",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "default": "60s",
-      "placeholder": "60s"
     }
   ]
 }

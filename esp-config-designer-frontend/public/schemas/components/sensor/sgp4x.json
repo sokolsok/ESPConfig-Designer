@@ -31,17 +31,19 @@
       "fields": [
         {
           "key": "temperature_source",
-          "type": "text",
-          "required": false,
+          "type": "id_ref",
+          "required": true,
           "lvl": "normal",
-          "placeholder": "25"
+          "domain": "sensor",
+          "placeholder": "temperature_sensor_id"
         },
         {
           "key": "humidity_source",
-          "type": "text",
-          "required": false,
+          "type": "id_ref",
+          "required": true,
           "lvl": "normal",
-          "placeholder": "50"
+          "domain": "sensor",
+          "placeholder": "humidity_sensor_id"
         }
       ]
     },
@@ -72,28 +74,28 @@
             },
             {
               "key": "learning_time_offset_hours",
-              "type": "duration",
+              "type": "number",
               "required": false,
               "lvl": "normal",
-              "placeholder": "12h"
+              "placeholder": "12"
             },
             {
               "key": "learning_time_gain_hours",
-              "type": "duration",
+              "type": "number",
               "required": false,
               "lvl": "normal",
-              "placeholder": "12h"
+              "placeholder": "12"
             },
             {
               "key": "gating_max_duration_minutes",
-              "type": "duration",
+              "type": "number",
               "required": false,
               "lvl": "normal",
-              "placeholder": "720min"
+              "placeholder": "720"
             },
             {
               "key": "std_initial",
-              "type": "text",
+              "type": "number",
               "required": false,
               "lvl": "normal",
               "placeholder": "50"
@@ -131,28 +133,28 @@
             },
             {
               "key": "learning_time_offset_hours",
-              "type": "duration",
+              "type": "number",
               "required": false,
               "lvl": "normal",
-              "placeholder": "12h"
+              "placeholder": "12"
             },
             {
               "key": "learning_time_gain_hours",
-              "type": "duration",
+              "type": "number",
               "required": false,
               "lvl": "normal",
-              "placeholder": "12h"
+              "placeholder": "12"
             },
             {
               "key": "gating_max_duration_minutes",
-              "type": "duration",
+              "type": "number",
               "required": false,
               "lvl": "normal",
-              "placeholder": "720min"
+              "placeholder": "720"
             },
             {
               "key": "std_initial",
-              "type": "text",
+              "type": "number",
               "required": false,
               "lvl": "normal",
               "placeholder": "50"

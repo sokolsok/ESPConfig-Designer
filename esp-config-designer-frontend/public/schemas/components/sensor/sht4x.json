@@ -10,22 +10,6 @@
   ],
   "fields": [
     {
-      "key": "temperature",
-      "type": "object",
-      "required": false,
-      "lvl": "simple",
-      "extends": "base_sensor.json",
-      "fields": []
-    },
-    {
-      "key": "humidity",
-      "type": "object",
-      "required": false,
-      "lvl": "simple",
-      "extends": "base_sensor.json",
-      "fields": []
-    },
-    {
       "key": "precision",
       "type": "select",
       "required": false,
@@ -73,6 +57,7 @@
       "type": "address",
       "required": false,
       "lvl": "simple",
+      "emitYAML": "always",
       "default": "0x44",
       "placeholder": "0x44"
     },
@@ -81,8 +66,23 @@
       "type": "duration",
       "required": false,
       "lvl": "simple",
-      "default": "60s",
       "placeholder": "60s"
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "humidity",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     }
   ]
 }

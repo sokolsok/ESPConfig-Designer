@@ -20,6 +20,7 @@
       "type": "select",
       "required": true,
       "lvl": "simple",
+	  "default": "50Hz",
       "options": [
         "50Hz",
         "60Hz"
@@ -28,8 +29,70 @@
     {
       "key": "id",
       "type": "id",
-      "required": true,
-      "lvl": "simple"
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "frequency",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "peak_current_signed",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "chip_temperature",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "gain_pga",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "options": [
+        "1X",
+        "2X",
+        "4X"
+      ]
+    },
+    {
+      "key": "current_phases",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "3"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "spi_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "spi"
+    },
+    {
+      "key": "enable_gain_calibration",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "enable_offset_calibration",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced"
     },
     {
       "key": "phase_a",
@@ -69,9 +132,11 @@
         },
         {
           "key": "power_factor",
-          "type": "number",
+          "type": "object",
           "required": false,
-          "lvl": "normal"
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
         },
         {
           "key": "phase_angle",
@@ -150,78 +215,241 @@
     },
     {
       "key": "phase_b",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "voltage",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "current",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "power",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "reactive_power",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "apparent_power",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "power_factor",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "phase_angle",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "peak_current",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "harmonic_power",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "gain_voltage",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "7305"
+        },
+        {
+          "key": "gain_ct",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "27961"
+        },
+        {
+          "key": "offset_voltage",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0"
+        },
+        {
+          "key": "offset_current",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0"
+        },
+        {
+          "key": "offset_active_power",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0"
+        },
+        {
+          "key": "offset_reactive_power",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0"
+        },
+        {
+          "key": "forward_active_energy",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "reverse_active_energy",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        }
+      ],
+      "extends": "base_sensor.json"
     },
     {
       "key": "phase_c",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "frequency",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "peak_current_signed",
-      "type": "boolean",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "chip_temperature",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "gain_pga",
-      "type": "select",
+      "type": "object",
       "required": false,
       "lvl": "normal",
-      "options": [
-        "gain_ct",
-        "1X",
-        "2X",
-        "4X"
-      ]
-    },
-    {
-      "key": "current_phases",
-      "type": "number",
-      "required": false,
-      "lvl": "normal",
-      "placeholder": "3"
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "60s"
-    },
-    {
-      "key": "spi_id",
-      "type": "id_ref",
-      "required": false,
-      "lvl": "normal",
-      "domain": "sensor"
-    },
-    {
-      "key": "enable_gain_calibration",
-      "type": "boolean",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "enable_offset_calibration",
-      "type": "boolean",
-      "required": true,
-      "lvl": "simple"
+      "fields": [
+        {
+          "key": "voltage",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "current",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "power",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "reactive_power",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "apparent_power",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "power_factor",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "phase_angle",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "peak_current",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "harmonic_power",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "gain_voltage",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "7305"
+        },
+        {
+          "key": "gain_ct",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "27961"
+        },
+        {
+          "key": "offset_voltage",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0"
+        },
+        {
+          "key": "offset_current",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0"
+        },
+        {
+          "key": "offset_active_power",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0"
+        },
+        {
+          "key": "offset_reactive_power",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0"
+        },
+        {
+          "key": "forward_active_energy",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "reverse_active_energy",
+          "type": "text",
+          "required": false,
+          "lvl": "normal"
+        }
+      ],
+      "extends": "base_sensor.json"
     }
   ]
 }

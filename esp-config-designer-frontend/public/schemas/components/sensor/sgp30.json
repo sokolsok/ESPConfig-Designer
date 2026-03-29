@@ -28,6 +28,7 @@
     {
       "key": "store_baseline",
       "type": "boolean",
+      "default": true,
       "required": false,
       "lvl": "normal"
     },
@@ -59,13 +60,13 @@
       "fields": [
         {
           "key": "eco2_baseline",
-          "type": "text",
+          "type": "number",
           "required": true,
           "lvl": "simple"
         },
         {
           "key": "tvoc_baseline",
-          "type": "text",
+          "type": "number",
           "required": true,
           "lvl": "simple"
         }
@@ -95,15 +96,17 @@
       "fields": [
         {
           "key": "temperature_source",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
+          "type": "id_ref",
+          "required": true,
+          "lvl": "normal",
+          "domain": "sensor"
         },
         {
           "key": "humidity_source",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
+          "type": "id_ref",
+          "required": true,
+          "lvl": "normal",
+          "domain": "sensor"
         }
       ]
     }

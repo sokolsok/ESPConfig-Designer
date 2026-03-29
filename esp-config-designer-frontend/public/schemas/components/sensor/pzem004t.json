@@ -10,26 +10,6 @@
   ],
   "fields": [
     {
-      "key": "current",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "power",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "voltage",
-      "required": false,
-      "lvl": "simple",
-      "type": "object",
-      "extends": "base_sensor.json",
-      "fields": []
-    },
-    {
       "key": "update_interval",
       "type": "duration",
       "required": false,
@@ -41,7 +21,31 @@
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
-      "domain": "sensor"
+      "domain": "uart"
+    },
+    {
+      "key": "current",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "power",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "voltage",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
     }
   ]
 }

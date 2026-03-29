@@ -37,27 +37,34 @@
     },
     {
       "key": "ambient_pressure_compensation",
-      "type": "text",
+      "type": "number",
       "required": false,
       "lvl": "normal"
     },
     {
       "key": "altitude_compensation",
-      "type": "text",
+      "type": "number",
       "required": false,
       "lvl": "normal"
     },
     {
       "key": "measurement_mode",
-      "type": "duration",
+      "type": "select",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "options": [
+        "periodic",
+        "low_power_periodic",
+        "single_shot",
+        "single_shot_rht_only"
+      ]
     },
     {
       "key": "ambient_pressure_compensation_source",
-      "type": "text",
+      "type": "id_ref",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "domain": "sensor"
     },
     {
       "key": "custom_config",
