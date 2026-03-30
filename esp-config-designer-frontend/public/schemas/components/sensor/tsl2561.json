@@ -22,6 +22,7 @@
       "type": "address",
       "required": false,
       "lvl": "simple",
+      "emitYAML": "always",
       "default": "0x39",
       "placeholder": "0x39"
     },
@@ -60,7 +61,6 @@
       "type": "duration",
       "required": false,
       "lvl": "simple",
-      "default": "60s",
       "placeholder": "60s"
     }
   ]

@@ -14,7 +14,8 @@
       "type": "address",
       "required": false,
       "lvl": "simple",
-      "placeholder": "0x61"
+      "emitYAML": "always",
+      "default": "0x61"
     },
     {
       "key": "update_interval",
@@ -25,7 +26,7 @@
     },
     {
       "key": "temperature_offset",
-      "type": "number",
+      "type": "text",
       "required": false,
       "lvl": "normal"
     },

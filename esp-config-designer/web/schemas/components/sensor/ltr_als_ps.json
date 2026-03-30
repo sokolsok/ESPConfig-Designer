@@ -3,7 +3,6 @@
   "domain": "sensor",
   "platform": "ltr_als_ps",
   "helpUrl": "https://esphome.io/components/sensor/ltr_als_ps/",
-  "extends": "base_sensor.json",
   "requirements": [
     {
       "require": "bus:i2c"
@@ -11,35 +10,44 @@
   ],
   "fields": [
     {
-      "key": "name",
-      "placeholder": "Sensor Name",
-      "type": "text",
-      "required": true,
-      "lvl": "simple"
-    },
-    {
       "key": "address",
       "type": "address",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "0x29"
     },
     {
       "key": "type",
-      "type": "text",
+      "type": "select",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": "ALS_PS",
+      "options": [
+        "ALS_PS",
+        "ALS",
+        "PS"
+      ]
     },
     {
       "key": "auto_mode",
-      "type": "duration",
+      "type": "boolean",
       "required": false,
       "lvl": "normal"
     },
     {
       "key": "gain",
-      "type": "text",
+      "type": "select",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "default": "1X",
+      "options": [
+        "1X",
+        "2X",
+        "4X",
+        "8X",
+        "48X",
+        "96X"
+      ]
     },
     {
       "key": "integration_time",
@@ -51,7 +59,9 @@
       "key": "glass_attenuation_factor",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": 1.0,
+      "placeholder": "1.0"
     },
     {
       "key": "update_interval",
@@ -65,24 +75,31 @@
       "type": "duration",
       "required": false,
       "lvl": "normal",
+      "default": "5s",
       "placeholder": "5s"
     },
     {
       "key": "ps_gain",
-      "type": "number",
+      "type": "select",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": "16X",
+      "options": [
+        "16X",
+        "32X",
+        "64X"
+      ]
     },
     {
       "key": "ps_high_threshold",
-      "type": "text",
+      "type": "number",
       "required": false,
       "lvl": "normal",
       "placeholder": "65535"
     },
     {
       "key": "ps_low_threshold",
-      "type": "text",
+      "type": "number",
       "required": false,
       "lvl": "normal",
       "placeholder": "0"
@@ -113,39 +130,51 @@
     },
     {
       "key": "ambient_light",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "infrared_counts",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "full_spectrum_counts",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "actual_gain",
-      "type": "number",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "actual_integration_time",
-      "type": "duration",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "ps_counts",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     }
   ]
 }

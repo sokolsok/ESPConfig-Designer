@@ -1909,6 +1909,7 @@ button.btn-add {
 
 .components-list {
   display: grid;
+  align-content: start;
   gap: 5px;
   flex: 1 1 auto;
   min-height: 0;

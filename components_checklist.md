@@ -155,7 +155,7 @@
 - [x] HTU21D / Si7021 / SHT21 (`sensor/htu21d`)
 - [x] HTU31D (`sensor/htu31d`)
 - [x] Hydreon Rain Sensor (`sensor/hydreon_rgxx`)
-- [x] HYT271 (`sensor/hyt271`) -------------------------------------------
+- [x] HYT271 (`sensor/hyt271`)
 - [x] Internal Temperature (`sensor/internal_temperature`)
 - [x] LM75B (`sensor/lm75b`)
 - [x] LPS22 (`sensor/lps22`)
@@ -187,24 +187,23 @@
 ### Health/Safety
 
 - [ ] Seeed Studio MR60BHA2 mmWave (`seeed_mr60bha2`) - unavailable
-- [ ] Seeed Studio MR60FDA2 mmWave (`seeed_mr60fda2`) - unavailable
 
 ### Light
 
-- [ ] APDS9306 (`sensor/apds9306`)
-- [ ] APDS9960 (`sensor/apds9960`)
-- [ ] AS7341 (`sensor/as7341`)
-- [ ] BH1750 (`sensor/bh1750`)
-- [ ] LTR301 (`sensor/ltr501`)
-- [ ] LTR303 (`sensor/ltr_als_ps`)
-- [ ] LTR390 (`sensor/ltr390`)
-- [ ] MAX44009 (`sensor/max44009`)
-- [ ] OPT3001 (`sensor/opt3001`)
-- [ ] TCS34725 (`sensor/tcs34725`)
-- [ ] TSL2561 (`sensor/tsl2561`)
-- [ ] TSL2591 (`sensor/tsl2591`)
-- [ ] VEML3235 (`sensor/veml3235`)
-- [ ] VEML6030 (`sensor/veml7700`)
+- [x] APDS9306 (`sensor/apds9306`)
+- [x] APDS9960 (`sensor/apds9960`)
+- [x] AS7341 (`sensor/as7341`)
+- [x] BH1750 (`sensor/bh1750`)
+- [x] LTR301 (`sensor/ltr501`)
+- [x] LTR303 (`sensor/ltr_als_ps`)
+- [x] LTR390 (`sensor/ltr390`)
+- [x] MAX44009 (`sensor/max44009`)
+- [x] OPT3001 (`sensor/opt3001`)
+- [x] TCS34725 (`sensor/tcs34725`)
+- [x] TSL2561 (`sensor/tsl2561`)
+- [x] TSL2591 (`sensor/tsl2591`)
+- [x] VEML3235 (`sensor/veml3235`)
+- [x] VEML6030 (`sensor/veml7700`)
 
 ### Magnetic
 

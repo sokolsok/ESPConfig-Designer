@@ -35,10 +35,16 @@
     },
     {
       "key": "conversion_rate",
-      "type": "duration",
+      "type": "select",
       "required": false,
       "lvl": "normal",
-      "placeholder": "27.5ms"
+      "default": "27.5ms",
+      "options": [
+        "27.5ms",
+        "55ms",
+        "110ms",
+        "220ms"
+      ]
     },
     {
       "key": "alert",
@@ -48,37 +54,48 @@
       "fields": [
         {
           "key": "function",
-          "type": "text",
+          "type": "select",
           "required": false,
-          "lvl": "normal",
-          "placeholder": "comparator"
+          "lvl": "simple",
+          "default": "comparator",
+          "options": [
+            "comparator",
+            "interrupt"
+          ]
         },
         {
           "key": "polarity",
-          "type": "text",
+          "type": "select",
           "required": false,
           "lvl": "normal",
-          "placeholder": "active_high"
+          "default": "active_high",
+          "options": [
+            "active_high",
+            "active_low"
+          ]
         },
         {
           "key": "limit_low",
-          "type": "text",
+          "type": "number",
           "required": false,
           "lvl": "normal",
+          "default": -128,
           "placeholder": "-128"
         },
         {
           "key": "limit_high",
-          "type": "text",
+          "type": "number",
           "required": false,
           "lvl": "normal",
+          "default": 127.9375,
           "placeholder": "127.9375"
         },
         {
           "key": "fault_count",
           "type": "number",
-          "required": true,
+          "required": false,
           "lvl": "simple",
+          "default": 1,
           "placeholder": "1"
         }
       ],

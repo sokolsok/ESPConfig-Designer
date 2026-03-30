@@ -1,0 +1,29 @@
+{
+  "id": "seeed_mr60fda2",
+  "domain": "seeed_mr60fda2",
+  "platform": "",
+  "renderAs": "root_map",
+  "helpUrl": "https://esphome.io/components/seeed_mr60fda2/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple",
+      "idDomain": "seeed_mr60fda2",
+      "default": "mr60fda2_radar"
+    },
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "uart"
+    }
+  ]
+}

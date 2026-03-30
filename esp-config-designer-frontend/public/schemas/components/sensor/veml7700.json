@@ -3,7 +3,6 @@
   "domain": "sensor",
   "platform": "veml7700",
   "helpUrl": "https://esphome.io/components/sensor/veml7700/",
-  "extends": "base_sensor.json",
   "requirements": [
     {
       "require": "bus:i2c"
@@ -11,42 +10,63 @@
   ],
   "fields": [
     {
-      "key": "name",
-      "placeholder": "Sensor Name",
-      "type": "text",
-      "required": true,
-      "lvl": "simple"
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x10",
+      "placeholder": "0x10"
     },
     {
       "key": "auto_mode",
-      "type": "duration",
+      "type": "boolean",
       "required": false,
       "lvl": "normal",
-      "placeholder": "True"
+      "default": true
     },
     {
       "key": "integration_time",
-      "type": "duration",
+      "type": "select",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": "100ms",
+      "options": [
+        "25ms",
+        "50ms",
+        "100ms",
+        "200ms",
+        "400ms",
+        "800ms"
+      ]
     },
     {
       "key": "gain",
-      "type": "text",
+      "type": "select",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "default": "1/8x",
+      "options": [
+        "1/8x",
+        "1/4x",
+        "1x",
+        "2x"
+      ]
     },
     {
       "key": "lux_compensation",
       "type": "boolean",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": true
     },
     {
       "key": "glass_attenuation_factor",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": 1.0,
+      "placeholder": "1.0"
     },
     {
       "key": "update_interval",
@@ -57,45 +77,59 @@
     },
     {
       "key": "ambient_light",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "full_spectrum",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "infrared",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "ambient_light_counts",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "full_spectrum_counts",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "actual_gain",
-      "type": "number",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "actual_integration_time",
-      "type": "duration",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     }
   ]
 }

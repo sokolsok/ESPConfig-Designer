@@ -1,0 +1,62 @@
+{
+  "id": "select.seeed_mr60fda2",
+  "domain": "select",
+  "platform": "seeed_mr60fda2",
+  "helpUrl": "https://esphome.io/components/seeed_mr60fda2/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "seeed_mr60fda2",
+      "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Radar hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_seeed_mr60fda2.json"
+    },
+    {
+      "key": "mr60fda2_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "seeed_mr60fda2",
+      "allowSelfReference": true,
+      "default": "mr60fda2_radar"
+    },
+    {
+      "key": "install_height",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_select.json",
+      "fields": []
+    },
+    {
+      "key": "height_threshold",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_select.json",
+      "fields": []
+    },
+    {
+      "key": "sensitivity",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_select.json",
+      "fields": []
+    }
+  ]
+}

@@ -14,6 +14,8 @@
       "type": "address",
       "required": false,
       "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x5D",
       "placeholder": "0x5D"
     },
     {

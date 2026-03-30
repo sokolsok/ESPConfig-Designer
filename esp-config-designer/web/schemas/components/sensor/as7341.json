@@ -10,6 +10,41 @@
   ],
   "fields": [
     {
+      "key": "gain",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "X8",
+      "options": [
+        "X0.5",
+        "X1",
+        "X2",
+        "X4",
+        "X8",
+        "X16",
+        "X32",
+        "X64",
+        "X128",
+        "X256",
+        "X512"
+      ]
+    },
+    {
+      "key": "astep",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 599,
+      "placeholder": "599"
+    },
+    {
+      "key": "atime",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "29"
+    },
+    {
       "key": "f1",
       "required": false,
       "lvl": "simple",
@@ -88,37 +123,6 @@
       "type": "object",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "gain",
-      "type": "select",
-      "required": false,
-      "lvl": "advanced",
-      "options": [
-        "X0.5",
-        "X1",
-        "X2",
-        "X4",
-        "X8",
-        "X16",
-        "X32",
-        "X64",
-        "X128",
-        "X256",
-        "X512"
-      ]
-    },
-    {
-      "key": "astep",
-      "type": "number",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "atime",
-      "type": "duration",
-      "required": false,
-      "lvl": "normal"
     }
   ]
 }

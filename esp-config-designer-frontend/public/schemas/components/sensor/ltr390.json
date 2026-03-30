@@ -10,6 +10,99 @@
   ],
   "fields": [
     {
+      "key": "gain",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "ambient_light",
+          "type": "select",
+          "required": false,
+          "lvl": "simple",
+          "options": [
+            "X1",
+            "X3",
+            "X6",
+            "X9",
+            "X18"
+          ]
+        },
+        {
+          "key": "uv",
+          "type": "select",
+          "required": false,
+          "lvl": "normal",
+          "options": [
+            "X1",
+            "X3",
+            "X6",
+            "X9",
+            "X18"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "resolution",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "ambient_light",
+          "type": "select",
+          "required": false,
+          "lvl": "simple",
+          "options": [
+            "20BIT",
+            "19BIT",
+            "18BIT",
+            "17BIT",
+            "16BIT",
+            "13BIT"
+          ]
+        },
+        {
+          "key": "uv",
+          "type": "select",
+          "required": false,
+          "lvl": "normal",
+          "options": [
+            "20BIT",
+            "19BIT",
+            "18BIT",
+            "17BIT",
+            "16BIT",
+            "13BIT"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "window_correction_factor",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1.0"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x53",
+      "placeholder": "0x53"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
       "key": "uv_index",
       "required": false,
       "lvl": "simple",
@@ -40,37 +133,6 @@
       "type": "object",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "gain",
-      "type": "text",
-      "required": false,
-      "lvl": "advanced"
-    },
-    {
-      "key": "resolution",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "window_correction_factor",
-      "type": "number",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "address",
-      "type": "address",
-      "required": false,
-      "lvl": "simple"
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "60s"
     }
   ]
 }

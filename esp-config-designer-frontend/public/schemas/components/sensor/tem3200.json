@@ -11,13 +11,6 @@
   ],
   "fields": [
     {
-      "key": "name",
-      "placeholder": "Sensor Name",
-      "type": "text",
-      "required": true,
-      "lvl": "simple"
-    },
-    {
       "key": "i2c_id",
       "type": "id_ref",
       "required": false,

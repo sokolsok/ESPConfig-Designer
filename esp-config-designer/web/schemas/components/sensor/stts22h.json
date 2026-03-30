@@ -26,12 +26,17 @@
     },
     {
       "key": "address",
-      "type": "address",
+      "type": "select",
       "required": false,
       "lvl": "simple",
       "emitYAML": "always",
       "default": "0x3C",
-      "placeholder": "0x3C"
+      "options": [
+        "0x38",
+        "0x3C",
+        "0x3E",
+        "0x3F"
+      ]
     },
     {
       "key": "update_interval",

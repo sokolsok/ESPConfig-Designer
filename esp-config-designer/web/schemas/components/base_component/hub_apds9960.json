@@ -1,0 +1,126 @@
+{
+  "id": "hub.apds9960",
+  "domain": "apds9960",
+  "platform": "",
+  "type": "object",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "apds9960_hub",
+      "idDomain": "apds9960"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2c"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x39",
+      "placeholder": "0x39"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "led_drive",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "100mA",
+      "options": [
+        "100mA",
+        "50mA",
+        "25mA",
+        "12.5mA"
+      ]
+    },
+    {
+      "key": "proximity_gain",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "4x",
+      "options": [
+        "1x",
+        "2x",
+        "4x",
+        "8x"
+      ]
+    },
+    {
+      "key": "ambient_light_gain",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "4x",
+      "options": [
+        "1x",
+        "4x",
+        "16x",
+        "64x"
+      ]
+    },
+    {
+      "key": "gesture_led_drive",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "100mA",
+      "options": [
+        "100mA",
+        "50mA",
+        "25mA",
+        "12.5mA"
+      ]
+    },
+    {
+      "key": "gesture_gain",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "4x",
+      "options": [
+        "1x",
+        "2x",
+        "4x",
+        "8x"
+      ]
+    },
+    {
+      "key": "gesture_wait_time",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "2.8ms",
+      "options": [
+        "0ms",
+        "2.8ms",
+        "5.6ms",
+        "8.4ms",
+        "14ms",
+        "22.4ms",
+        "30.8ms",
+        "39.2ms"
+      ]
+    }
+  ]
+}

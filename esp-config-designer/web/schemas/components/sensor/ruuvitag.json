@@ -28,6 +28,7 @@
       "key": "mac_address",
       "type": "text",
       "required": true,
+	  "placeholder": "XX:XX:XX:XX:XX:XX",
       "lvl": "simple"
     },
     {

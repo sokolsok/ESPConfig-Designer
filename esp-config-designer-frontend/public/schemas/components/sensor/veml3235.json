@@ -22,6 +22,7 @@
       "type": "select",
       "required": false,
       "lvl": "advanced",
+      "default": "1x",
       "options": [
         "1x",
         "2x",
@@ -33,6 +34,7 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
+      "default": "1x",
       "options": [
         "1x",
         "2x"
@@ -40,27 +42,40 @@
     },
     {
       "key": "integration_time",
-      "type": "duration",
+      "type": "select",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": "50ms",
+      "options": [
+        "50ms",
+        "100ms",
+        "200ms",
+        "400ms",
+        "800ms"
+      ]
     },
     {
       "key": "auto_gain",
       "type": "boolean",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": true
     },
     {
       "key": "auto_gain_threshold_high",
-      "type": "duration",
+      "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": 90,
+      "placeholder": "90"
     },
     {
       "key": "auto_gain_threshold_low",
-      "type": "duration",
+      "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": 20,
+      "placeholder": "20"
     }
   ]
 }

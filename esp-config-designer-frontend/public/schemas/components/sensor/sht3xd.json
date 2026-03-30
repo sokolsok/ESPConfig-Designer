@@ -11,12 +11,15 @@
   "fields": [
     {
       "key": "address",
-      "type": "address",
+      "type": "select",
       "required": false,
       "lvl": "simple",
       "emitYAML": "always",
       "default": "0x44",
-      "placeholder": "0x44"
+      "options": [
+        "0x44",
+        "0x45"
+      ]
     },
     {
       "key": "update_interval",

@@ -1264,18 +1264,11 @@
           "slug": "health-safety",
           "items": [
             {
-              "name": "Seeed Studio MR60BHA2 mmWave",
-              "path": "components/seeed_mr60bha2",
-              "id": "seeed_mr60bha2",
-              "available": false,
-              "schemaPath": ""
-            },
-            {
-              "name": "Seeed Studio MR60FDA2 mmWave",
-              "path": "components/seeed_mr60fda2",
-              "id": "seeed_mr60fda2",
-              "available": false,
-              "schemaPath": ""
+              "name": "Seeed Studio MR60BHA2 Sensors",
+              "path": "components/sensor/seeed_mr60bha2",
+              "id": "sensor/seeed_mr60bha2",
+              "available": true,
+              "schemaPath": "components/sensor/seeed_mr60bha2.json"
             }
           ]
         },
@@ -2154,6 +2147,20 @@
               "schemaPath": "components/binary_sensor/hydreon_rgxx.json"
             },
             {
+              "name": "Seeed Studio MR60FDA2 Binary Sensors",
+              "path": "components/binary_sensor/seeed_mr60fda2",
+              "id": "binary_sensor/seeed_mr60fda2",
+              "available": true,
+              "schemaPath": "components/binary_sensor/seeed_mr60fda2.json"
+            },
+            {
+              "name": "Seeed Studio MR60BHA2 Target",
+              "path": "components/binary_sensor/seeed_mr60bha2",
+              "id": "binary_sensor/seeed_mr60bha2",
+              "available": true,
+              "schemaPath": "components/binary_sensor/seeed_mr60bha2.json"
+            },
+            {
               "name": "Modbus Binary Sensor",
               "path": "components/binary_sensor/modbus_controller",
               "id": "binary_sensor/modbus_controller",
@@ -2335,6 +2342,13 @@
           "id": "button/wake_on_lan",
           "available": true,
           "schemaPath": "components/button/wake_on_lan.json"
+        },
+        {
+          "name": "Seeed Studio MR60FDA2 Buttons",
+          "path": "components/button/seeed_mr60fda2",
+          "id": "button/seeed_mr60fda2",
+          "available": true,
+          "schemaPath": "components/button/seeed_mr60fda2.json"
         }
       ],
       "subcategories": []
@@ -3476,6 +3490,13 @@
           "id": "select/tuya",
           "available": true,
           "schemaPath": "components/select/tuya.json"
+        },
+        {
+          "name": "Seeed Studio MR60FDA2 Selects",
+          "path": "components/select/seeed_mr60fda2",
+          "id": "select/seeed_mr60fda2",
+          "available": true,
+          "schemaPath": "components/select/seeed_mr60fda2.json"
         }
       ],
       "subcategories": []
@@ -4077,6 +4098,8 @@
     "binary_sensor/gpio",
     "binary_sensor/homeassistant",
     "binary_sensor/hydreon_rgxx",
+    "binary_sensor/seeed_mr60fda2",
+    "binary_sensor/seeed_mr60bha2",
     "binary_sensor/lvgl",
     "binary_sensor/modbus_controller",
     "binary_sensor/mpr121",
@@ -4103,6 +4126,7 @@
     "button/shutdown",
     "button/template",
     "button/uart",
+    "button/seeed_mr60fda2",
     "button/wake_on_lan",
     "camera/camera_encoder",
     "canbus",
@@ -4329,14 +4353,14 @@
     "safe_mode",
     "script",
     "seeed_mr24hpc1",
-    "seeed_mr60bha2",
-    "seeed_mr60fda2",
     "select",
+    "select/seeed_mr60fda2",
     "select/lvgl",
     "select/modbus_controller",
     "select/template",
     "select/tuya",
     "sensor",
+    "sensor/seeed_mr60bha2",
     "sensor/a01nyub",
     "sensor/a02yyuw",
     "sensor/absolute_humidity",

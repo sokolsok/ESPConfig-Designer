@@ -10,6 +10,59 @@
   ],
   "fields": [
     {
+      "key": "gain",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "1x",
+      "options": [
+        "1x",
+        "4x",
+        "16x",
+        "60x"
+      ]
+    },
+    {
+      "key": "integration_time",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "auto",
+      "options": [
+        "auto",
+        "2.4ms",
+        "24ms",
+        "50ms",
+        "101ms",
+        "154ms",
+        "700ms"
+      ]
+    },
+    {
+      "key": "glass_attenuation_factor",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 1.0,
+      "placeholder": "1.0"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x29",
+      "placeholder": "0x29"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
       "key": "red_channel",
       "required": false,
       "lvl": "simple",
@@ -43,47 +96,19 @@
     },
     {
       "key": "illuminance",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "color_temperature",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "gain",
-      "type": "duration",
-      "required": false,
-      "lvl": "advanced"
-    },
-    {
-      "key": "integration_time",
-      "type": "duration",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "glass_attenuation_factor",
-      "type": "number",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "address",
-      "type": "address",
+      "type": "object",
       "required": false,
       "lvl": "simple",
-      "placeholder": "0x29"
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "60s"
+      "extends": "base_sensor.json",
+      "fields": []
     }
   ]
 }

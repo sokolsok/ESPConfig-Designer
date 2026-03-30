@@ -1,0 +1,28 @@
+{
+  "id": "hub.seeed_mr60bha2",
+  "domain": "seeed_mr60bha2",
+  "platform": "",
+  "type": "object",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "mr60bha2_radar",
+      "idDomain": "seeed_mr60bha2"
+    },
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "uart"
+    }
+  ]
+}

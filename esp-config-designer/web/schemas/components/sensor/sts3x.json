@@ -22,6 +22,8 @@
       "type": "address",
       "required": false,
       "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x4A",
       "placeholder": "0x4A"
     },
     {
