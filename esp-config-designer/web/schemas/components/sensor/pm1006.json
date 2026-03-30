@@ -14,7 +14,7 @@
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
-      "domain": "sensor"
+      "domain": "uart"
     },
     {
       "key": "update_interval",

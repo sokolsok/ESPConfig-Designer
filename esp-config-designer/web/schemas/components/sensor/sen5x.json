@@ -30,14 +30,14 @@
       "fields": [
         {
           "key": "offset",
-          "type": "text",
+          "type": "number",
           "required": false,
           "lvl": "normal",
           "placeholder": "0"
         },
         {
           "key": "normalized_offset_slope",
-          "type": "text",
+          "type": "number",
           "required": false,
           "lvl": "normal",
           "placeholder": "0"
@@ -131,45 +131,47 @@
       "fields": [
         {
           "key": "algorithm_tuning",
-          "type": "text",
+          "type": "object",
           "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "index_offset",
-          "type": "number",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "learning_time_offset_hours",
-          "type": "duration",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "learning_time_gain_hours",
-          "type": "duration",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "gating_max_duration_minutes",
-          "type": "duration",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "std_initial",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "gain_factor",
-          "type": "number",
-          "required": false,
-          "lvl": "normal"
+          "lvl": "normal",
+          "fields": [
+            {
+              "key": "index_offset",
+              "type": "number",
+              "required": false,
+              "lvl": "normal"
+            },
+            {
+              "key": "learning_time_offset_hours",
+              "type": "number",
+              "required": false,
+              "lvl": "normal"
+            },
+            {
+              "key": "learning_time_gain_hours",
+              "type": "number",
+              "required": false,
+              "lvl": "normal"
+            },
+            {
+              "key": "gating_max_duration_minutes",
+              "type": "number",
+              "required": false,
+              "lvl": "normal"
+            },
+            {
+              "key": "std_initial",
+              "type": "number",
+              "required": false,
+              "lvl": "normal"
+            },
+            {
+              "key": "gain_factor",
+              "type": "number",
+              "required": false,
+              "lvl": "normal"
+            }
+          ]
         }
       ],
       "extends": "base_sensor.json"
@@ -182,45 +184,47 @@
       "fields": [
         {
           "key": "algorithm_tuning",
-          "type": "text",
+          "type": "object",
           "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "index_offset",
-          "type": "number",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "learning_time_offset_hours",
-          "type": "duration",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "learning_time_gain_hours",
-          "type": "duration",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "gating_max_duration_minutes",
-          "type": "duration",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "std_initial",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "gain_factor",
-          "type": "number",
-          "required": false,
-          "lvl": "normal"
+          "lvl": "normal",
+          "fields": [
+            {
+              "key": "index_offset",
+              "type": "number",
+              "required": false,
+              "lvl": "normal"
+            },
+            {
+              "key": "learning_time_offset_hours",
+              "type": "number",
+              "required": false,
+              "lvl": "normal"
+            },
+            {
+              "key": "learning_time_gain_hours",
+              "type": "number",
+              "required": false,
+              "lvl": "normal"
+            },
+            {
+              "key": "gating_max_duration_minutes",
+              "type": "number",
+              "required": false,
+              "lvl": "normal"
+            },
+            {
+              "key": "std_initial",
+              "type": "number",
+              "required": false,
+              "lvl": "normal"
+            },
+            {
+              "key": "gain_factor",
+              "type": "number",
+              "required": false,
+              "lvl": "normal"
+            }
+          ]
         }
       ],
       "extends": "base_sensor.json"

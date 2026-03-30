@@ -1,0 +1,42 @@
+{
+  "id": "hub.teleinfo",
+  "domain": "teleinfo",
+  "platform": "",
+  "type": "object",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "teleinfo_hub",
+      "idDomain": "teleinfo"
+    },
+    {
+      "key": "historical_mode",
+      "type": "boolean",
+      "required": false,
+      "lvl": "simple",
+      "default": false
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "uart"
+    }
+  ]
+}

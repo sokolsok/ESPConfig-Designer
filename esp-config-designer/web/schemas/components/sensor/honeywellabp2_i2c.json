@@ -10,6 +10,13 @@
   ],
   "fields": [
     {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
       "key": "pressure",
       "type": "object",
       "required": false,
@@ -29,9 +36,13 @@
         },
         {
           "key": "transfer_function",
-          "type": "text",
+          "type": "select",
           "required": true,
-          "lvl": "simple"
+          "lvl": "simple",
+          "options": [
+            "A",
+            "B"
+          ]
         }
       ],
       "extends": "base_sensor.json"
@@ -43,13 +54,6 @@
       "lvl": "simple",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "60s"
     }
   ]
 }

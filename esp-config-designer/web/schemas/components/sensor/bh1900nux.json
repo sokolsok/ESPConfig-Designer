@@ -21,8 +21,9 @@
       "key": "address",
       "type": "address",
       "required": false,
+	  "emitYAML": "always",
       "lvl": "simple",
-      "placeholder": "0x48"
+      "default": "0x48"
     },
     {
       "key": "update_interval",
@@ -30,6 +31,13 @@
       "required": false,
       "lvl": "simple",
       "placeholder": "60s"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "i2c"
     }
   ]
 }

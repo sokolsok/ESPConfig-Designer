@@ -52,9 +52,7 @@
         "4.2V",
         "4.5V",
         "External",
-        "Ext",
-        "AV",
-        "AVDD"
+        "Ext"
       ]
     },
     {
@@ -73,7 +71,7 @@
     },
     {
       "key": "offset_calibration",
-      "type": "text",
+      "type": "number",
       "required": false,
       "lvl": "normal",
       "placeholder": "0"

@@ -14,21 +14,29 @@
     },
     {
       "key": "temperature",
-      "type": "text",
+      "type": "id_ref",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "domain": "sensor"
     },
     {
       "key": "humidity",
-      "type": "text",
+      "type": "id_ref",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "domain": "sensor"
     },
     {
       "key": "equation",
-      "type": "text",
+      "type": "select",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": "Wobus",
+      "options": [
+        "Buck",
+        "Tetens",
+        "Wobus"
+      ]
     }
   ]
 }

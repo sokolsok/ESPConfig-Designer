@@ -28,7 +28,8 @@
       "key": "mac_address",
       "type": "text",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "XX:XX:XX:XX:XX:XX"
     },
     {
       "key": "temperature",

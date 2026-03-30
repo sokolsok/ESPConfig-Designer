@@ -21,8 +21,8 @@
       "key": "uart_id",
       "type": "id_ref",
       "required": false,
-      "lvl": "normal",
-      "domain": "sensor"
+      "lvl": "simple",
+      "domain": "uart"
     }
   ]
 }

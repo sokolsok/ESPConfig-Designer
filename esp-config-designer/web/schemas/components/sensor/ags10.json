@@ -44,7 +44,7 @@
     {
       "key": "tvoc",
       "type": "object",
-      "required": true,
+      "required": false,
       "lvl": "simple",
       "extends": "base_sensor.json",
       "fields": []

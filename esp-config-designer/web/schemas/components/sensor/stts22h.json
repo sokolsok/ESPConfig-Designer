@@ -28,7 +28,10 @@
       "key": "address",
       "type": "address",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x3C",
+      "placeholder": "0x3C"
     },
     {
       "key": "update_interval",

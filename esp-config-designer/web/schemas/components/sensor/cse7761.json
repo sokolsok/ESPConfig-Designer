@@ -19,27 +19,35 @@
     },
     {
       "key": "current_1",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "current_2",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "active_power_1",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "active_power_2",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "update_interval",
@@ -53,7 +61,7 @@
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
-      "domain": "sensor"
+      "domain": "uart"
     }
   ]
 }

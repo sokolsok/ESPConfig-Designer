@@ -10,47 +10,12 @@
   ],
   "fields": [
     {
-      "key": "name",
-      "placeholder": "Sensor Name",
-      "type": "text",
-      "required": true,
-      "lvl": "simple"
-    },
-    {
-      "key": "temperature",
-      "type": "object",
-      "required": false,
-      "lvl": "simple",
-      "fields": [
-        {
-          "key": "oversampling",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        }
-      ],
-      "extends": "base_sensor.json"
-    },
-    {
-      "key": "pressure",
-      "type": "object",
-      "required": false,
-      "lvl": "simple",
-      "fields": [
-        {
-          "key": "oversampling",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        }
-      ],
-      "extends": "base_sensor.json"
-    },
-    {
       "key": "address",
       "type": "address",
       "required": false,
       "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x70",
       "placeholder": "0x70"
     },
     {
@@ -58,6 +23,7 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
+      "default": "OFF",
       "options": [
         "OFF",
         "2x",
@@ -73,6 +39,58 @@
       "required": false,
       "lvl": "simple",
       "placeholder": "60s"
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "oversampling",
+          "type": "select",
+          "required": false,
+          "lvl": "simple",
+          "default": "8x",
+          "options": [
+            "NONE",
+            "1x",
+            "2x",
+            "4x",
+            "8x",
+            "16x",
+            "32x",
+            "64x"
+          ]
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "pressure",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "oversampling",
+          "type": "select",
+          "required": false,
+          "lvl": "simple",
+          "default": "8x",
+          "options": [
+            "NONE",
+            "1x",
+            "2x",
+            "4x",
+            "8x",
+            "16x",
+            "32x",
+            "64x"
+          ]
+        }
+      ],
+      "extends": "base_sensor.json"
     }
   ]
 }

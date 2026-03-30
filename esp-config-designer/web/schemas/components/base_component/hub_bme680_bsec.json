@@ -1,0 +1,84 @@
+{
+  "id": "hub.bme680_bsec",
+  "domain": "bme680_bsec",
+  "platform": "",
+  "type": "object",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "bme680_bsec_hub",
+      "idDomain": "bme680_bsec"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2c"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x76",
+      "placeholder": "0x76"
+    },
+    {
+      "key": "temperature_offset",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0"
+    },
+    {
+      "key": "iaq_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "static",
+      "options": [
+        "static",
+        "mobile"
+      ]
+    },
+    {
+      "key": "supply_voltage",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "3.3V",
+      "options": [
+        "3.3V",
+        "1.8V"
+      ]
+    },
+    {
+      "key": "sample_rate",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "lp",
+      "options": [
+        "lp",
+        "ulp"
+      ]
+    },
+    {
+      "key": "state_save_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "6h"
+    }
+  ]
+}

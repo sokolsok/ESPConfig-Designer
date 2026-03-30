@@ -660,7 +660,7 @@
               "name": "DSMR",
               "path": "components/sensor/dsmr",
               "id": "sensor/dsmr",
-              "available": true,
+              "available": false,
               "schemaPath": "components/sensor/dsmr.json"
             },
             {
@@ -692,35 +692,7 @@
               "schemaPath": "components/sensor/ina226.json"
             },
             {
-              "name": "INA228",
-              "path": "components/sensor/ina2xx",
-              "id": "sensor/ina2xx",
-              "available": true,
-              "schemaPath": "components/sensor/ina2xx.json"
-            },
-            {
-              "name": "INA229",
-              "path": "components/sensor/ina2xx",
-              "id": "sensor/ina2xx",
-              "available": true,
-              "schemaPath": "components/sensor/ina2xx.json"
-            },
-            {
-              "name": "INA237",
-              "path": "components/sensor/ina2xx",
-              "id": "sensor/ina2xx",
-              "available": true,
-              "schemaPath": "components/sensor/ina2xx.json"
-            },
-            {
-              "name": "INA238",
-              "path": "components/sensor/ina2xx",
-              "id": "sensor/ina2xx",
-              "available": true,
-              "schemaPath": "components/sensor/ina2xx.json"
-            },
-            {
-              "name": "INA239",
+              "name": "INA2XX",
               "path": "components/sensor/ina2xx",
               "id": "sensor/ina2xx",
               "available": true,
@@ -944,10 +916,10 @@
             },
             {
               "name": "EMC2101",
-              "path": "components/emc2101",
-              "id": "emc2101",
-              "available": false,
-              "schemaPath": ""
+              "path": "components/sensor/emc2101",
+              "id": "sensor/emc2101",
+              "available": true,
+              "schemaPath": "components/sensor/emc2101.json"
             },
             {
               "name": "ENS160",
@@ -3304,10 +3276,10 @@
         },
         {
           "name": "EMC2101",
-          "path": "components/emc2101",
-          "id": "emc2101",
-          "available": false,
-          "schemaPath": ""
+          "path": "components/output/emc2101",
+          "id": "output/emc2101",
+          "available": true,
+          "schemaPath": "components/output/emc2101.json"
         },
         {
           "name": "ESP32 DAC",

@@ -5,9 +5,16 @@
   "helpUrl": "https://esphome.io/components/sensor/dht12/",
   "fields": [
     {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
       "key": "temperature",
       "type": "object",
-      "required": true,
+      "required": false,
       "lvl": "simple",
       "extends": "base_sensor.json",
       "fields": []
@@ -15,17 +22,10 @@
     {
       "key": "humidity",
       "type": "object",
-      "required": true,
+      "required": false,
       "lvl": "simple",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "60s"
     }
   ]
 }

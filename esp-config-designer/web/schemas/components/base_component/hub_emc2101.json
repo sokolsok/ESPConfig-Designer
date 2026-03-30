@@ -1,0 +1,115 @@
+{
+  "id": "hub.emc2101",
+  "domain": "emc2101",
+  "platform": "",
+  "type": "object",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "emc2101_hub",
+      "idDomain": "emc2101"
+    },
+    {
+      "key": "mode",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "pwm",
+      "emitYAML": "never",
+      "options": [
+        "pwm",
+        "dac"
+      ]
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x4C",
+      "placeholder": "0x4C"
+    },
+    {
+      "key": "inverted",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2c"
+    },
+    {
+      "key": "pwm",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "mode",
+        "value": "pwm"
+      },
+      "fields": [
+        {
+          "key": "resolution",
+          "type": "number",
+          "required": false,
+          "lvl": "simple",
+          "default": 23,
+          "placeholder": "23"
+        },
+        {
+          "key": "divider",
+          "type": "number",
+          "required": false,
+          "lvl": "normal",
+          "default": 1,
+          "placeholder": "1"
+        }
+      ]
+    },
+    {
+      "key": "dac",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "mode",
+        "value": "dac"
+      },
+      "fields": [
+        {
+          "key": "conversion_rate",
+          "type": "select",
+          "required": false,
+          "lvl": "simple",
+          "default": "16",
+          "options": [
+            "1/16",
+            "1/8",
+            "1/4",
+            "1/2",
+            "1",
+            "2",
+            "4",
+            "8",
+            "16",
+            "32"
+          ]
+        }
+      ]
+    }
+  ]
+}

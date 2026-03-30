@@ -14,7 +14,7 @@
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
-      "domain": "sensor"
+      "domain": "uart"
     },
     {
       "key": "legacy_mode",
@@ -140,17 +140,10 @@
     },
     {
       "key": "energy_reference",
-      "type": "select",
+      "type": "number",
       "required": false,
       "lvl": "normal",
-      "options": [
-        "6120.6267056536",
-        "voltage_reference",
-        "current_reference",
-        "If",
-        "power_reference",
-        "energy_reference"
-      ]
+      "placeholder": "6120.6267056536"
     }
   ]
 }

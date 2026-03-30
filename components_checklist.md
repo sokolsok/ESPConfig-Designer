@@ -144,7 +144,7 @@
 - [x] DHT (`sensor/dht`)
 - [x] DHT12 (`sensor/dht12`)
 - [x] DPS310 (`sensor/dps310`)
-- [x] EMC2101 (`emc2101`) - unavailable
+- [ ] EMC2101 (`emc2101`) - unavailable
 - [x] ENS210 (`sensor/ens210`)
 - [x] HDC1080 (`sensor/hdc1080`)
 - [x] HDC2010 (`sensor/hdc2010`)
@@ -155,7 +155,7 @@
 - [x] HTU21D / Si7021 / SHT21 (`sensor/htu21d`)
 - [x] HTU31D (`sensor/htu31d`)
 - [x] Hydreon Rain Sensor (`sensor/hydreon_rgxx`)
-- [x] HYT271 (`sensor/hyt271`)
+- [x] HYT271 (`sensor/hyt271`) -------------------------------------------
 - [x] Internal Temperature (`sensor/internal_temperature`)
 - [x] LM75B (`sensor/lm75b`)
 - [x] LPS22 (`sensor/lps22`)

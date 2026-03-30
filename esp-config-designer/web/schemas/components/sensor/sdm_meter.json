@@ -10,6 +10,22 @@
   ],
   "fields": [
     {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "1",
+      "placeholder": "1"
+    },
+    {
       "key": "phase_a",
       "type": "object",
       "required": false,
@@ -17,60 +33,189 @@
       "fields": [
         {
           "key": "current",
-          "type": "text",
+          "type": "object",
           "required": false,
-          "lvl": "normal"
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
         },
         {
           "key": "voltage",
-          "type": "text",
+          "type": "object",
           "required": false,
-          "lvl": "normal"
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
         },
         {
           "key": "active_power",
-          "type": "text",
+          "type": "object",
           "required": false,
-          "lvl": "normal"
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
         },
         {
           "key": "power_factor",
-          "type": "number",
+          "type": "object",
           "required": false,
-          "lvl": "normal"
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
         },
         {
           "key": "apparent_power",
-          "type": "text",
+          "type": "object",
           "required": false,
-          "lvl": "normal"
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
         },
         {
           "key": "reactive_power",
-          "type": "text",
+          "type": "object",
           "required": false,
-          "lvl": "normal"
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
         },
         {
           "key": "phase_angle",
-          "type": "text",
+          "type": "object",
           "required": false,
-          "lvl": "normal"
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
         }
-      ],
-      "extends": "base_sensor.json"
+      ]
     },
     {
       "key": "phase_b",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "current",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "voltage",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "active_power",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "power_factor",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "apparent_power",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "reactive_power",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "phase_angle",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        }
+      ]
     },
     {
       "key": "phase_c",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "current",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "voltage",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "active_power",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "power_factor",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "apparent_power",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "reactive_power",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "phase_angle",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        }
+      ]
     },
     {
       "key": "frequency",
@@ -119,20 +264,6 @@
       "type": "object",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "60s"
-    },
-    {
-      "key": "address",
-      "type": "address",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "1"
     }
   ]
 }

@@ -14,7 +14,8 @@
       "type": "address",
       "required": false,
       "lvl": "simple",
-      "placeholder": "0x40"
+	  "emitYAML": "always",
+      "default": "0x40"
     },
     {
       "key": "update_interval",

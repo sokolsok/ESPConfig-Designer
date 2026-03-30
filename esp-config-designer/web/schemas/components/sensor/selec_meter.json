@@ -10,6 +10,22 @@
   ],
   "fields": [
     {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "1",
+      "placeholder": "1"
+    },
+    {
       "key": "total_active_energy",
       "required": false,
       "lvl": "simple",
@@ -67,21 +83,27 @@
     },
     {
       "key": "active_power",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "reactive_power",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "apparent_power",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "voltage",
@@ -93,9 +115,11 @@
     },
     {
       "key": "current",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "power_factor",
@@ -115,35 +139,27 @@
     },
     {
       "key": "maximum_demand_active_power",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "maximum_demand_reactive_power",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "maximum_demand_apparent_power",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "60s"
-    },
-    {
-      "key": "address",
-      "type": "address",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "1"
+      "lvl": "normal",
+      "extends": "base_sensor.json",
+      "fields": []
     }
   ]
 }

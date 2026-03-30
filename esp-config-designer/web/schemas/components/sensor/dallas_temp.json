@@ -25,24 +25,30 @@
       "placeholder": "0x0000000000000000"
     },
     {
-      "key": "index",
-      "type": "number",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "resolution",
-      "type": "number",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
       "key": "update_interval",
       "type": "duration",
       "required": false,
       "lvl": "simple",
-      "default": "60s",
       "placeholder": "60s"
+    },
+    {
+      "key": "index",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0"
+    },
+    {
+      "key": "resolution",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "options": [
+        9,
+        10,
+        11,
+        12
+      ]
     },
     {
       "key": "one_wire_id",

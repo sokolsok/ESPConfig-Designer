@@ -28,7 +28,10 @@
       "key": "address",
       "type": "address",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x48",
+      "placeholder": "0x48"
     }
   ]
 }

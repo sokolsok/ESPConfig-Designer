@@ -35,16 +35,20 @@
     },
     {
       "key": "samples",
-      "type": "duration",
+      "type": "number",
       "required": false,
       "lvl": "normal",
       "placeholder": "4000"
     },
     {
       "key": "pga_gain",
-      "type": "number",
+      "type": "select",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "options": [
+        "10X",
+        "50X"
+      ]
     },
     {
       "key": "current_gain",
@@ -61,14 +65,14 @@
     },
     {
       "key": "phase_offset",
-      "type": "duration",
+      "type": "number",
       "required": false,
       "lvl": "normal",
       "placeholder": "0"
     },
     {
       "key": "pulse_energy",
-      "type": "text",
+      "type": "number",
       "required": false,
       "lvl": "normal"
     },

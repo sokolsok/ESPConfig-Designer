@@ -35,13 +35,15 @@
       "key": "long_range",
       "type": "boolean",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple"
     },
     {
       "key": "address",
       "type": "address",
       "required": false,
       "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x29",
       "placeholder": "0x29"
     },
     {

@@ -10,6 +10,19 @@
   ],
   "fields": [
     {
+      "key": "k_value",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
       "key": "temperature",
       "required": false,
       "lvl": "simple",
@@ -27,7 +40,7 @@
           "key": "oversampling",
           "type": "select",
           "required": false,
-          "lvl": "normal",
+          "lvl": "simple",
           "options": [
             "256x",
             "512x",
@@ -41,19 +54,6 @@
         }
       ],
       "extends": "base_sensor.json"
-    },
-    {
-      "key": "k_value",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "60s"
     }
   ]
 }

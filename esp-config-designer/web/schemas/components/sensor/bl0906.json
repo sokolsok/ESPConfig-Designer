@@ -3,206 +3,12 @@
   "domain": "sensor",
   "platform": "bl0906",
   "helpUrl": "https://esphome.io/components/sensor/bl0906/",
-  "extends": "base_sensor.json",
   "requirements": [
     {
       "require": "bus:uart"
     }
   ],
   "fields": [
-    {
-      "key": "name",
-      "placeholder": "Sensor Name",
-      "type": "text",
-      "required": true,
-      "lvl": "simple"
-    },
-    {
-      "key": "frequency",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "temperature",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "voltage",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "channel_1",
-      "type": "object",
-      "required": false,
-      "lvl": "simple",
-      "fields": [
-        {
-          "key": "current",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "power",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "energy",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        }
-      ]
-    },
-    {
-      "key": "channel_2",
-      "type": "object",
-      "required": false,
-      "lvl": "simple",
-      "fields": [
-        {
-          "key": "current",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "power",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "energy",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        }
-      ]
-    },
-    {
-      "key": "channel_3",
-      "type": "object",
-      "required": false,
-      "lvl": "simple",
-      "fields": [
-        {
-          "key": "current",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "power",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "energy",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        }
-      ]
-    },
-    {
-      "key": "channel_4",
-      "type": "object",
-      "required": false,
-      "lvl": "simple",
-      "fields": [
-        {
-          "key": "current",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "power",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "energy",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        }
-      ]
-    },
-    {
-      "key": "channel_5",
-      "type": "object",
-      "required": false,
-      "lvl": "simple",
-      "fields": [
-        {
-          "key": "current",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "power",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "energy",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        }
-      ]
-    },
-    {
-      "key": "channel_6",
-      "type": "object",
-      "required": false,
-      "lvl": "simple",
-      "fields": [
-        {
-          "key": "current",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "power",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "energy",
-          "type": "text",
-          "required": false,
-          "lvl": "normal"
-        }
-      ]
-    },
-    {
-      "key": "total_energy",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "total_power",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
     {
       "key": "update_interval",
       "type": "duration",
@@ -215,7 +21,239 @@
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
-      "domain": "sensor"
+      "domain": "uart"
+    },
+    {
+      "key": "total_energy",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "total_power",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "frequency",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "channel_1",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "current",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "power",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "energy",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        }
+      ]
+    },
+    {
+      "key": "channel_2",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "current",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "power",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "energy",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        }
+      ]
+    },
+    {
+      "key": "channel_3",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "current",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "power",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "energy",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        }
+      ]
+    },
+    {
+      "key": "channel_4",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "current",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "power",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "energy",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        }
+      ]
+    },
+    {
+      "key": "channel_5",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "current",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "power",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "energy",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        }
+      ]
+    },
+    {
+      "key": "channel_6",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "current",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "power",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "energy",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        }
+      ]
     }
   ]
 }

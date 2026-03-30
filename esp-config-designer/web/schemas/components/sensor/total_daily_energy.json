@@ -14,9 +14,10 @@
     },
     {
       "key": "power_id",
-      "type": "duration",
+      "type": "id_ref",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "domain": "sensor"
     },
     {
       "key": "restore",

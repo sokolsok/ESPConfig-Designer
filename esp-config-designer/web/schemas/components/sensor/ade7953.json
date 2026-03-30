@@ -1,23 +1,84 @@
 {
   "id": "sensor.ade7953",
   "domain": "sensor",
-  "platform": "ade7953",
+  "platform": "ade7953_i2c",
+  "platformByBus": {
+    "i2c": "ade7953_i2c",
+    "spi": "ade7953_spi"
+  },
   "helpUrl": "https://esphome.io/components/sensor/ade7953/",
-  "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:i2c",
+      "when": {
+        "key": "bus",
+        "value": "i2c"
+      }
+    },
+    {
+      "require": "bus:spi",
+      "when": {
+        "key": "bus",
+        "value": "spi"
+      }
+    }
+  ],
   "fields": [
     {
-      "key": "name",
-      "placeholder": "Sensor Name",
-      "type": "text",
+      "key": "bus",
+      "type": "select",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "default": "i2c",
+      "options": [
+        "i2c",
+        "spi"
+      ]
     },
     {
       "key": "address",
       "type": "address",
       "required": false,
       "lvl": "simple",
-      "placeholder": "0x38"
+      "emitYAML": "always",
+      "default": "0x38",
+      "placeholder": "0x38",
+      "dependsOn": {
+        "key": "bus",
+        "value": "i2c"
+      }
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2c",
+      "dependsOn": {
+        "key": "bus",
+        "value": "i2c"
+      }
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "bus",
+        "value": "spi"
+      }
+    },
+    {
+      "key": "spi_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "spi",
+      "dependsOn": {
+        "key": "bus",
+        "value": "spi"
+      }
     },
     {
       "key": "irq_pin",
@@ -26,82 +87,114 @@
       "lvl": "normal"
     },
     {
-      "key": "voltage",
-      "type": "text",
+      "key": "update_interval",
+      "type": "duration",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "frequency",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "current_a",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "current_b",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "power_factor_a",
-      "type": "number",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "power_factor_b",
-      "type": "number",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "apparent_power_a",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "apparent_power_b",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "active_power_a",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "active_power_b",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "reactive_power_a",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "reactive_power_b",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "voltage_pga_gain",
       "type": "select",
       "required": false,
       "lvl": "normal",
+      "default": "1x",
       "options": [
         "1x",
         "2x",
@@ -116,6 +209,7 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
+      "default": "1x",
       "options": [
         "1x",
         "2x",
@@ -130,6 +224,7 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
+      "default": "1x",
       "options": [
         "1x",
         "2x",
@@ -140,9 +235,10 @@
     },
     {
       "key": "voltage_gain",
-      "type": "number",
+      "type": "text",
       "required": false,
       "lvl": "normal",
+      "default": "0x400000",
       "placeholder": "0x400000"
     },
     {
@@ -150,6 +246,7 @@
       "type": "text",
       "required": false,
       "lvl": "normal",
+      "default": "0x400000",
       "placeholder": "0x400000"
     },
     {
@@ -157,6 +254,7 @@
       "type": "text",
       "required": false,
       "lvl": "normal",
+      "default": "0x400000",
       "placeholder": "0x400000"
     },
     {
@@ -164,6 +262,7 @@
       "type": "text",
       "required": false,
       "lvl": "normal",
+      "default": "0x400000",
       "placeholder": "0x400000"
     },
     {
@@ -171,20 +270,15 @@
       "type": "text",
       "required": false,
       "lvl": "normal",
+      "default": "0x400000",
       "placeholder": "0x400000"
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "60s"
     },
     {
       "key": "use_accumulated_energy_registers",
       "type": "boolean",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": false
     }
   ]
 }

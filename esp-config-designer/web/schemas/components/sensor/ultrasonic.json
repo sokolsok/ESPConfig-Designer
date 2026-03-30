@@ -33,7 +33,7 @@
     },
     {
       "key": "timeout",
-      "type": "duration",
+      "type": "number",
       "required": false,
       "lvl": "advanced"
     },

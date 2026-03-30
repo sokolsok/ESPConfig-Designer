@@ -14,7 +14,16 @@
       "type": "address",
       "required": false,
       "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x40",
       "placeholder": "0x40"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
     },
     {
       "key": "channel_1",
@@ -26,54 +35,136 @@
           "key": "shunt_resistance",
           "type": "number",
           "required": false,
-          "lvl": "normal",
+          "lvl": "simple",
           "placeholder": "0.1 ohm"
         },
         {
           "key": "current",
-          "type": "text",
+          "type": "object",
           "required": false,
-          "lvl": "normal"
+          "lvl": "simple",
+          "extends": "base_sensor.json",
+          "fields": []
         },
         {
           "key": "power",
-          "type": "text",
+          "type": "object",
           "required": false,
-          "lvl": "normal"
+          "lvl": "simple",
+          "extends": "base_sensor.json",
+          "fields": []
         },
         {
           "key": "bus_voltage",
-          "type": "text",
+          "type": "object",
           "required": false,
-          "lvl": "normal"
+          "lvl": "simple",
+          "extends": "base_sensor.json",
+          "fields": []
         },
         {
           "key": "shunt_voltage",
-          "type": "text",
+          "type": "object",
           "required": false,
-          "lvl": "normal"
+          "lvl": "simple",
+          "extends": "base_sensor.json",
+          "fields": []
         }
-      ],
-      "extends": "base_sensor.json"
+      ]
     },
     {
       "key": "channel_2",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "shunt_resistance",
+          "type": "number",
+          "required": false,
+          "lvl": "simple",
+          "placeholder": "0.1 ohm"
+        },
+        {
+          "key": "current",
+          "type": "object",
+          "required": false,
+          "lvl": "simple",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "power",
+          "type": "object",
+          "required": false,
+          "lvl": "simple",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "bus_voltage",
+          "type": "object",
+          "required": false,
+          "lvl": "simple",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "shunt_voltage",
+          "type": "object",
+          "required": false,
+          "lvl": "simple",
+          "extends": "base_sensor.json",
+          "fields": []
+        }
+      ]
     },
     {
       "key": "channel_3",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
+      "type": "object",
       "required": false,
       "lvl": "simple",
-      "placeholder": "60s"
+      "fields": [
+        {
+          "key": "shunt_resistance",
+          "type": "number",
+          "required": false,
+          "lvl": "simple",
+          "placeholder": "0.1 ohm"
+        },
+        {
+          "key": "current",
+          "type": "object",
+          "required": false,
+          "lvl": "simple",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "power",
+          "type": "object",
+          "required": false,
+          "lvl": "simple",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "bus_voltage",
+          "type": "object",
+          "required": false,
+          "lvl": "simple",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "shunt_voltage",
+          "type": "object",
+          "required": false,
+          "lvl": "simple",
+          "extends": "base_sensor.json",
+          "fields": []
+        }
+      ]
     }
   ]
 }

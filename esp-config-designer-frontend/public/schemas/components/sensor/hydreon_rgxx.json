@@ -14,6 +14,8 @@
       "type": "select",
       "required": true,
       "lvl": "simple",
+	  "default": "RG_9",
+	  "emitYAML": "always",
       "options": [
         "RG_9",
         "RG_15"

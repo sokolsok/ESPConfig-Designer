@@ -1,25 +1,71 @@
 {
   "id": "sensor.bmp3xx",
   "domain": "sensor",
-  "platform": "bmp3xx",
+  "platform": "bmp3xx_i2c",
+  "platformByBus": {
+    "i2c": "bmp3xx_i2c",
+    "spi": "bmp3xx_spi"
+  },
   "helpUrl": "https://esphome.io/components/sensor/bmp3xx/",
   "fields": [
     {
-      "key": "name",
-      "placeholder": "Sensor Name",
-      "type": "text",
+      "key": "bus",
+      "type": "select",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "default": "i2c",
+      "options": [
+        "i2c",
+        "spi"
+      ]
     },
     {
       "key": "address",
-      "type": "select",
+      "type": "address",
       "required": false,
       "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x77",
+      "placeholder": "0x77",
+      "dependsOn": {
+        "key": "bus",
+        "value": "i2c"
+      }
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "bus",
+        "value": "spi"
+      },
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "iir_filter",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "OFF",
       "options": [
-        "0x77",
-        "0x76"
+        "OFF",
+        "2x",
+        "4x",
+        "8x",
+        "16x",
+        "32x",
+        "64x",
+        "128x"
       ]
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
     },
     {
       "key": "temperature",
@@ -29,9 +75,18 @@
       "fields": [
         {
           "key": "oversampling",
-          "type": "text",
+          "type": "select",
           "required": false,
-          "lvl": "normal"
+          "lvl": "simple",
+          "default": "2x",
+          "options": [
+            "NONE",
+            "2x",
+            "4x",
+            "8x",
+            "16x",
+            "32x"
+          ]
         }
       ],
       "extends": "base_sensor.json"
@@ -44,34 +99,21 @@
       "fields": [
         {
           "key": "oversampling",
-          "type": "text",
+          "type": "select",
           "required": false,
-          "lvl": "normal"
+          "lvl": "simple",
+          "default": "16x",
+          "options": [
+            "NONE",
+            "2x",
+            "4x",
+            "8x",
+            "16x",
+            "32x"
+          ]
         }
       ],
       "extends": "base_sensor.json"
-    },
-    {
-      "key": "iir_filter",
-      "type": "select",
-      "required": false,
-      "lvl": "normal",
-      "options": [
-        "OFF",
-        "2x",
-        "4x",
-        "16x",
-        "32",
-        "64x",
-        "128x"
-      ]
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "60s"
     }
   ]
 }

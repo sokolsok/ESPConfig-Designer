@@ -10,6 +10,20 @@
   ],
   "fields": [
     {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2c"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x40"
+    },
+    {
       "key": "update_interval",
       "type": "duration",
       "required": false,

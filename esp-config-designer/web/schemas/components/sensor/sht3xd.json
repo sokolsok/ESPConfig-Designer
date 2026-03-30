@@ -10,6 +10,29 @@
   ],
   "fields": [
     {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x44",
+      "placeholder": "0x44"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "heater_enabled",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
       "key": "temperature",
       "type": "object",
       "required": false,
@@ -24,29 +47,6 @@
       "lvl": "simple",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "address",
-      "type": "address",
-      "required": false,
-      "lvl": "simple",
-      "default": "0x44",
-      "placeholder": "0x44"
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "default": "60s",
-      "placeholder": "60s"
-    },
-    {
-      "key": "heater_enabled",
-      "type": "boolean",
-      "required": false,
-      "lvl": "advanced",
-      "default": false
     }
   ]
 }

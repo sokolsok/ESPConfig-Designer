@@ -28,7 +28,7 @@
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
-      "domain": "sensor"
+      "domain": "i2c"
     },
     {
       "key": "custom_config",

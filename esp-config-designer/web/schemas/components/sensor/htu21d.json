@@ -10,6 +10,39 @@
   ],
   "fields": [
     {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2c"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0x40"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "model",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "HTU21D",
+      "options": [
+        "HTU21D",
+        "SI7021",
+        "SHT21"
+      ]
+    },
+    {
       "key": "temperature",
       "type": "object",
       "required": false,
@@ -32,19 +65,6 @@
       "lvl": "simple",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "60s"
-    },
-    {
-      "key": "model",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
     }
   ]
 }
