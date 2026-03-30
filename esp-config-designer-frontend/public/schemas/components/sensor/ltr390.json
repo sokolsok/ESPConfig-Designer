@@ -102,7 +102,13 @@
       "lvl": "simple",
       "placeholder": "60s"
     },
-    {
+        {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+{
       "key": "uv_index",
       "required": false,
       "lvl": "simple",

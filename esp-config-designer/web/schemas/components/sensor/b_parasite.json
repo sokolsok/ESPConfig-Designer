@@ -31,7 +31,13 @@
       "lvl": "simple",
       "placeholder": "XX:XX:XX:XX:XX:XX"
     },
-    {
+        {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+{
       "key": "temperature",
       "required": false,
       "lvl": "simple",

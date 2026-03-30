@@ -44,7 +44,8 @@
               "path": "components/sensor/homeassistant",
               "id": "sensor/homeassistant",
               "available": true,
-              "schemaPath": "components/sensor/homeassistant.json"
+              "schemaPath": "components/sensor/homeassistant.json",
+              "catalogKey": "sensor/homeassistant/home_assistant"
             },
             {
               "name": "MQTT Subscribe",
@@ -796,13 +797,6 @@
               "schemaPath": "components/sensor/aht10.json"
             },
             {
-              "name": "AirThings BLE",
-              "path": "components/sensor/airthings_ble",
-              "id": "sensor/airthings_ble",
-              "available": true,
-              "schemaPath": "components/sensor/airthings_ble.json"
-            },
-            {
               "name": "AM2315C",
               "path": "components/sensor/am2315c",
               "id": "sensor/am2315c",
@@ -922,25 +916,11 @@
               "schemaPath": "components/sensor/emc2101.json"
             },
             {
-              "name": "ENS160",
-              "path": "components/sensor/ens160",
-              "id": "sensor/ens160",
-              "available": true,
-              "schemaPath": "components/sensor/ens160.json"
-            },
-            {
               "name": "ENS210",
               "path": "components/sensor/ens210",
               "id": "sensor/ens210",
               "available": true,
               "schemaPath": "components/sensor/ens210.json"
-            },
-            {
-              "name": "HC8",
-              "path": "components/sensor/hc8",
-              "id": "sensor/hc8",
-              "available": true,
-              "schemaPath": "components/sensor/hc8.json"
             },
             {
               "name": "HDC1080",
@@ -955,13 +935,6 @@
               "id": "sensor/hdc2010",
               "available": true,
               "schemaPath": "components/sensor/hdc2010.json"
-            },
-            {
-              "name": "HHCCJCY10 (MiFlora Pink)",
-              "path": "components/sensor/xiaomi_hhccjcy10",
-              "id": "sensor/xiaomi_hhccjcy10",
-              "available": true,
-              "schemaPath": "components/sensor/xiaomi_hhccjcy10.json"
             },
             {
               "name": "Honeywell ABP",
@@ -1020,13 +993,6 @@
               "schemaPath": "components/sensor/hyt271.json"
             },
             {
-              "name": "Inkbird IBS-TH1 Mini",
-              "path": "components/sensor/inkbird_ibsth1_mini",
-              "id": "sensor/inkbird_ibsth1_mini",
-              "available": true,
-              "schemaPath": "components/sensor/inkbird_ibsth1_mini.json"
-            },
-            {
               "name": "Internal Temperature",
               "path": "components/sensor/internal_temperature",
               "id": "sensor/internal_temperature",
@@ -1053,13 +1019,6 @@
               "id": "sensor/mcp9808",
               "available": true,
               "schemaPath": "components/sensor/mcp9808.json"
-            },
-            {
-              "name": "MH-Z19",
-              "path": "components/sensor/mhz19",
-              "id": "sensor/mhz19",
-              "available": true,
-              "schemaPath": "components/sensor/mhz19.json"
             },
             {
               "name": "MLX90614",
@@ -1118,46 +1077,11 @@
               "schemaPath": "components/sensor/qmp6988.json"
             },
             {
-              "name": "RadonEye BLE",
-              "path": "components/sensor/radon_eye_ble",
-              "id": "sensor/radon_eye_ble",
-              "available": true,
-              "schemaPath": "components/sensor/radon_eye_ble.json"
-            },
-            {
-              "name": "RuuviTag",
-              "path": "components/sensor/ruuvitag",
-              "id": "sensor/ruuvitag",
-              "available": true,
-              "schemaPath": "components/sensor/ruuvitag.json"
-            },
-            {
-              "name": "SCD30",
-              "path": "components/sensor/scd30",
-              "id": "sensor/scd30",
-              "available": true,
-              "schemaPath": "components/sensor/scd30.json"
-            },
-            {
-              "name": "SCD4X",
-              "path": "components/sensor/scd4x",
-              "id": "sensor/scd4x",
-              "available": true,
-              "schemaPath": "components/sensor/scd4x.json"
-            },
-            {
               "name": "SDP3x / SDP800 Series",
               "path": "components/sensor/sdp3x",
               "id": "sensor/sdp3x",
               "available": true,
               "schemaPath": "components/sensor/sdp3x.json"
-            },
-            {
-              "name": "SFA30",
-              "path": "components/sensor/sfa30",
-              "id": "sensor/sfa30",
-              "available": true,
-              "schemaPath": "components/sensor/sfa30.json"
             },
             {
               "name": "SHT3X-D",
@@ -1277,13 +1201,6 @@
           "slug": "light",
           "items": [
             {
-              "name": "AM43",
-              "path": "components/sensor/am43",
-              "id": "sensor/am43",
-              "available": true,
-              "schemaPath": "components/sensor/am43.json"
-            },
-            {
               "name": "APDS9306",
               "path": "components/sensor/apds9306",
               "id": "sensor/apds9306",
@@ -1313,6 +1230,15 @@
             },
             {
               "name": "LTR301",
+              "catalogKey": "sensor/ltr501/ltr301",
+              "path": "components/sensor/ltr501",
+              "id": "sensor/ltr501",
+              "available": true,
+              "schemaPath": "components/sensor/ltr501.json"
+            },
+            {
+              "name": "LTR501",
+              "catalogKey": "sensor/ltr501/ltr501",
               "path": "components/sensor/ltr501",
               "id": "sensor/ltr501",
               "available": true,
@@ -1320,6 +1246,7 @@
             },
             {
               "name": "LTR303",
+              "catalogKey": "sensor/ltr_als_ps/ltr303",
               "path": "components/sensor/ltr_als_ps",
               "id": "sensor/ltr_als_ps",
               "available": true,
@@ -1327,6 +1254,7 @@
             },
             {
               "name": "LTR329",
+              "catalogKey": "sensor/ltr_als_ps/ltr329",
               "path": "components/sensor/ltr_als_ps",
               "id": "sensor/ltr_als_ps",
               "available": true,
@@ -1340,14 +1268,8 @@
               "schemaPath": "components/sensor/ltr390.json"
             },
             {
-              "name": "LTR501",
-              "path": "components/sensor/ltr501",
-              "id": "sensor/ltr501",
-              "available": true,
-              "schemaPath": "components/sensor/ltr501.json"
-            },
-            {
               "name": "LTR553",
+              "catalogKey": "sensor/ltr_als_ps/ltr553",
               "path": "components/sensor/ltr_als_ps",
               "id": "sensor/ltr_als_ps",
               "available": true,
@@ -1355,6 +1277,7 @@
             },
             {
               "name": "LTR556",
+              "catalogKey": "sensor/ltr_als_ps/ltr556",
               "path": "components/sensor/ltr_als_ps",
               "id": "sensor/ltr_als_ps",
               "available": true,
@@ -1362,6 +1285,7 @@
             },
             {
               "name": "LTR558",
+              "catalogKey": "sensor/ltr501/ltr558",
               "path": "components/sensor/ltr501",
               "id": "sensor/ltr501",
               "available": true,
@@ -1369,6 +1293,7 @@
             },
             {
               "name": "LTR559",
+              "catalogKey": "sensor/ltr_als_ps/ltr559",
               "path": "components/sensor/ltr_als_ps",
               "id": "sensor/ltr_als_ps",
               "available": true,
@@ -1376,6 +1301,7 @@
             },
             {
               "name": "LTR659",
+              "catalogKey": "sensor/ltr_als_ps/ltr659",
               "path": "components/sensor/ltr_als_ps",
               "id": "sensor/ltr_als_ps",
               "available": true,
@@ -1425,6 +1351,7 @@
             },
             {
               "name": "VEML6030",
+              "catalogKey": "sensor/veml7700/veml6030",
               "path": "components/sensor/veml7700",
               "id": "sensor/veml7700",
               "available": true,
@@ -1432,6 +1359,7 @@
             },
             {
               "name": "VEML7700",
+              "catalogKey": "sensor/veml7700/veml7700",
               "path": "components/sensor/veml7700",
               "id": "sensor/veml7700",
               "available": true,
@@ -1497,13 +1425,6 @@
               "id": "sensor/as3935",
               "available": true,
               "schemaPath": "components/sensor/as3935.json"
-            },
-            {
-              "name": "b-parasite",
-              "path": "components/sensor/b_parasite",
-              "id": "sensor/b_parasite",
-              "available": true,
-              "schemaPath": "components/sensor/b_parasite.json"
             },
             {
               "name": "Binary Sensor Map",
@@ -1646,13 +1567,6 @@
               "schemaPath": "components/sensor/rotary_encoder.json"
             },
             {
-              "name": "SMT100",
-              "path": "components/sensor/smt100",
-              "id": "sensor/smt100",
-              "available": true,
-              "schemaPath": "components/sensor/smt100.json"
-            },
-            {
               "name": "Sound Level",
               "path": "components/sensor/sound_level",
               "id": "sensor/sound_level",
@@ -1700,13 +1614,6 @@
           "title": "Motion",
           "slug": "motion",
           "items": [
-            {
-              "name": "APDS9960",
-              "path": "components/sensor/apds9960",
-              "id": "sensor/apds9960",
-              "available": true,
-              "schemaPath": "components/sensor/apds9960.json"
-            },
             {
               "name": "BMI160",
               "path": "components/sensor/bmi160",
@@ -1761,21 +1668,16 @@
               "path": "components/sensor/msa3xx",
               "id": "sensor/msa3xx",
               "available": true,
-              "schemaPath": "components/sensor/msa3xx.json"
+              "schemaPath": "components/sensor/msa3xx.json",
+              "catalogKey": "sensor/msa3xx/msa301"
             },
             {
               "name": "MSA311",
               "path": "components/sensor/msa3xx",
               "id": "sensor/msa3xx",
               "available": true,
-              "schemaPath": "components/sensor/msa3xx.json"
-            },
-            {
-              "name": "RuuviTag",
-              "path": "components/sensor/ruuvitag",
-              "id": "sensor/ruuvitag",
-              "available": true,
-              "schemaPath": "components/sensor/ruuvitag.json"
+              "schemaPath": "components/sensor/msa3xx.json",
+              "catalogKey": "sensor/msa3xx/msa311"
             },
             {
               "name": "Seeed Studio MR24HPC1 mmWave",
@@ -1884,7 +1786,8 @@
               "path": "components/binary_sensor/homeassistant",
               "id": "binary_sensor/homeassistant",
               "available": true,
-              "schemaPath": "components/binary_sensor/homeassistant.json"
+              "schemaPath": "components/binary_sensor/homeassistant.json",
+              "catalogKey": "binary_sensor/homeassistant/home_assistant"
             },
             {
               "name": "Status",
@@ -2083,41 +1986,6 @@
               "id": "dfrobot_sen0395",
               "available": false,
               "schemaPath": ""
-            },
-            {
-              "name": "LD2410",
-              "path": "components/sensor/ld2410",
-              "id": "sensor/ld2410",
-              "available": true,
-              "schemaPath": "components/sensor/ld2410.json"
-            },
-            {
-              "name": "LD2412",
-              "path": "components/sensor/ld2412",
-              "id": "sensor/ld2412",
-              "available": true,
-              "schemaPath": "components/sensor/ld2412.json"
-            },
-            {
-              "name": "LD2420",
-              "path": "components/sensor/ld2420",
-              "id": "sensor/ld2420",
-              "available": true,
-              "schemaPath": "components/sensor/ld2420.json"
-            },
-            {
-              "name": "LD2450",
-              "path": "components/sensor/ld2450",
-              "id": "sensor/ld2450",
-              "available": true,
-              "schemaPath": "components/sensor/ld2450.json"
-            },
-            {
-              "name": "Seeed Studio MR24HPC1 mmWave",
-              "path": "components/seeed_mr24hpc1",
-              "id": "seeed_mr24hpc1",
-              "available": false,
-              "schemaPath": ""
             }
           ]
         },
@@ -2172,7 +2040,8 @@
               "path": "components/pipsolar",
               "id": "pipsolar",
               "available": true,
-              "schemaPath": "components/energy_solar_management/pipsolar.json"
+              "schemaPath": "components/energy_solar_management/pipsolar.json",
+              "catalogKey": "pipsolar/pipsolar_compatible_pv_inverter"
             },
             {
               "name": "Pylontech Batteries",
@@ -2189,25 +2058,11 @@
               "schemaPath": "components/binary_sensor/qwiic_pir.json"
             },
             {
-              "name": "Resol VBus",
-              "path": "components/vbus",
-              "id": "vbus",
-              "available": true,
-              "schemaPath": "components/energy_solar_management/vbus.json"
-            },
-            {
               "name": "Tuya Binary Sensor",
               "path": "components/binary_sensor/tuya",
               "id": "binary_sensor/tuya",
               "available": true,
               "schemaPath": "components/binary_sensor/tuya.json"
-            },
-            {
-              "name": "WireGuard",
-              "path": "components/wireguard",
-              "id": "wireguard",
-              "available": false,
-              "schemaPath": ""
             }
           ]
         }
@@ -2658,13 +2513,13 @@
           "available": true,
           "schemaPath": "components/display/ssd1327.json"
         },
-            {
-              "name": "SSD1331",
-              "path": "components/display/ssd1331",
-              "id": "display/ssd1331",
-              "available": true,
-              "schemaPath": "components/display/ssd1331.json"
-            },
+        {
+          "name": "SSD1331",
+          "path": "components/display/ssd1331",
+          "id": "display/ssd1331",
+          "available": true,
+          "schemaPath": "components/display/ssd1331.json"
+        },
         {
           "name": "SSD1351",
           "path": "components/display/ssd1351",
@@ -2715,20 +2570,6 @@
           "schemaPath": "components/display/tm1621.json"
         },
         {
-          "name": "TM1637",
-          "path": "components/display/tm1637",
-          "id": "display/tm1637",
-          "available": true,
-          "schemaPath": "components/display/tm1637.json"
-        },
-        {
-          "name": "TM1638",
-          "path": "components/display/tm1638",
-          "id": "display/tm1638",
-          "available": true,
-          "schemaPath": "components/display/tm1638.json"
-        },
-        {
           "name": "TM1651 Battery Display",
           "path": "components/tm1651",
           "id": "tm1651",
@@ -2771,13 +2612,6 @@
           "schemaPath": "components/electromechanical/grove_tb6612fng.json"
         },
         {
-          "name": "Matrix Keypad",
-          "path": "components/matrix_keypad",
-          "id": "matrix_keypad",
-          "available": false,
-          "schemaPath": ""
-        },
-        {
           "name": "RTTTL Buzzer",
           "path": "components/rtttl",
           "id": "rtttl",
@@ -2806,25 +2640,12 @@
       "slug": "energy-solar-management-components",
       "items": [
         {
-          "name": "Growatt Solar",
-          "path": "components/sensor/growatt_solar",
-          "id": "sensor/growatt_solar",
-          "available": true,
-          "schemaPath": "components/sensor/growatt_solar.json"
-        },
-        {
-          "name": "Havells Solar",
-          "path": "components/sensor/havells_solar",
-          "id": "sensor/havells_solar",
-          "available": true,
-          "schemaPath": "components/sensor/havells_solar.json"
-        },
-        {
           "name": "PipSolar-compatible PV Inverter",
           "path": "components/pipsolar",
           "id": "pipsolar",
           "available": true,
-          "schemaPath": "components/energy_solar_management/pipsolar.json"
+          "schemaPath": "components/energy_solar_management/pipsolar.json",
+          "catalogKey": "pipsolar/pipsolar_compatible_pv_inverter_2"
         },
         {
           "name": "Power Supply",
@@ -2832,13 +2653,6 @@
           "id": "power_supply",
           "available": true,
           "schemaPath": "components/energy_solar_management/power_supply.json"
-        },
-        {
-          "name": "Resol VBus",
-          "path": "components/vbus",
-          "id": "vbus",
-          "available": true,
-          "schemaPath": "components/energy_solar_management/vbus.json"
         },
         {
           "name": "SML",
@@ -2922,7 +2736,8 @@
           "path": "components/binary_sensor/homeassistant",
           "id": "binary_sensor/homeassistant",
           "available": true,
-          "schemaPath": "components/binary_sensor/homeassistant.json"
+          "schemaPath": "components/binary_sensor/homeassistant.json",
+          "catalogKey": "binary_sensor/homeassistant/binary_sensor"
         },
         {
           "name": "Bluetooth Proxy",
@@ -2943,28 +2758,32 @@
           "path": "components/number/homeassistant",
           "id": "number/homeassistant",
           "available": true,
-          "schemaPath": "components/number/homeassistant.json"
+          "schemaPath": "components/number/homeassistant.json",
+          "catalogKey": "number/homeassistant/number"
         },
         {
           "name": "Sensor",
           "path": "components/sensor/homeassistant",
           "id": "sensor/homeassistant",
           "available": true,
-          "schemaPath": "components/sensor/homeassistant.json"
+          "schemaPath": "components/sensor/homeassistant.json",
+          "catalogKey": "sensor/homeassistant/sensor"
         },
         {
           "name": "HA Switch",
           "path": "components/switch/homeassistant",
           "id": "switch/homeassistant",
           "available": true,
-          "schemaPath": "components/switch/homeassistant.json"
+          "schemaPath": "components/switch/homeassistant.json",
+          "catalogKey": "switch/homeassistant/ha_switch"
         },
         {
           "name": "Text Sensor",
           "path": "components/text_sensor/homeassistant",
           "id": "text_sensor/homeassistant",
           "available": true,
-          "schemaPath": "components/text_sensor/homeassistant.json"
+          "schemaPath": "components/text_sensor/homeassistant.json",
+          "catalogKey": "text_sensor/homeassistant/text_sensor"
         },
         {
           "name": "Voice Assistant",
@@ -3216,7 +3035,8 @@
           "path": "components/number/homeassistant",
           "id": "number/homeassistant",
           "available": true,
-          "schemaPath": "components/number/homeassistant.json"
+          "schemaPath": "components/number/homeassistant.json",
+          "catalogKey": "number/homeassistant/home_assistant"
         },
         {
           "name": "LVGL widget Number",
@@ -3636,7 +3456,8 @@
           "path": "components/switch/homeassistant",
           "id": "switch/homeassistant",
           "available": true,
-          "schemaPath": "components/switch/homeassistant.json"
+          "schemaPath": "components/switch/homeassistant.json",
+          "catalogKey": "switch/homeassistant/home_assistant"
         }
       ],
       "subcategories": []
@@ -3692,7 +3513,8 @@
           "path": "components/text_sensor/homeassistant",
           "id": "text_sensor/homeassistant",
           "available": true,
-          "schemaPath": "components/text_sensor/homeassistant.json"
+          "schemaPath": "components/text_sensor/homeassistant.json",
+          "catalogKey": "text_sensor/homeassistant/home_assistant"
         },
         {
           "name": "LibreTiny",
@@ -3756,13 +3578,6 @@
           "id": "text_sensor/wifi_info",
           "available": true,
           "schemaPath": "components/text_sensor/wifi_info.json"
-        },
-        {
-          "name": "WireGuard",
-          "path": "components/wireguard",
-          "id": "wireguard",
-          "available": false,
-          "schemaPath": ""
         },
         {
           "name": "WL-134 Pet Tag Sensor",
@@ -3884,20 +3699,6 @@
           "schemaPath": "components/touchscreen/ft63x6.json"
         },
         {
-          "name": "GT911",
-          "path": "components/touchscreen/gt911",
-          "id": "touchscreen/gt911",
-          "available": true,
-          "schemaPath": "components/touchscreen/gt911.json"
-        },
-        {
-          "name": "TT21100",
-          "path": "components/touchscreen/tt21100",
-          "id": "touchscreen/tt21100",
-          "available": true,
-          "schemaPath": "components/touchscreen/tt21100.json"
-        },
-        {
           "name": "XPT2046",
           "path": "components/touchscreen/xpt2046",
           "id": "touchscreen/xpt2046",
@@ -3931,13 +3732,6 @@
           "id": "cc1101",
           "available": true,
           "schemaPath": "components/wireless_communication/cc1101.json"
-        },
-        {
-          "name": "IR Remote Climate",
-          "path": "components/climate/climate_ir",
-          "id": "climate/climate_ir",
-          "available": true,
-          "schemaPath": "components/climate/climate_ir.json"
         },
         {
           "name": "Remote Receiver",

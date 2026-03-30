@@ -1,4 +1,4 @@
-# ESPConfig Designer
+# ESPConfig Designer v.1.0.19
 
 ESPConfig Designer is a Home Assistant ingress add-on for building, organizing, validating, compiling, and deploying ESPHome configurations through a schema-driven visual editor.
 

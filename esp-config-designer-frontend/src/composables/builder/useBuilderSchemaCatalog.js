@@ -8,8 +8,10 @@ import { loadComponentSchema } from "../../utils/schemaLoader";
 export const useBuilderSchemaCatalog = ({
   config,
   componentIdFromEntry,
+  componentCatalogKeyFromEntry,
   normalizeSchemaPath,
   catalogSchemaPathById,
+  catalogSchemaPathForEntry,
   isComponentCatalogReady,
   componentCatalogItemsById
 }) => {
@@ -86,7 +88,8 @@ export const useBuilderSchemaCatalog = ({
     );
     await Promise.all(
       ids.map(async (id) => {
-        const schemaPath = catalogSchemaPathById(id);
+        const entry = config.value.components.find((candidate) => componentIdFromEntry(candidate) === id) || null;
+        const schemaPath = catalogSchemaPathForEntry(entry) || catalogSchemaPathById(id);
         if (!schemaPath) {
           componentSchemas.value = {
             ...componentSchemas.value,
@@ -107,7 +110,9 @@ export const useBuilderSchemaCatalog = ({
     () => [
       isComponentCatalogReady.value,
       Array.from(componentCatalogItemsById.value.keys()).join("|"),
-      config.value.components.map((entry) => componentIdFromEntry(entry)).join("|")
+      config.value.components
+        .map((entry) => `${componentIdFromEntry(entry)}::${componentCatalogKeyFromEntry(entry)}`)
+        .join("|")
     ],
     async ([catalogReady]) => {
       if (!catalogReady) return;

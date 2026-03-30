@@ -20,6 +20,7 @@ export const useBuilderComponentCatalog = ({
   config,
   activeTab,
   componentIdFromEntry,
+  componentCatalogKeyFromEntry,
   normalizeSchemaPath,
   saveConfig,
   addonFetch,
@@ -63,9 +64,51 @@ export const useBuilderComponentCatalog = ({
     return map;
   });
 
+  const catalogItemKey = (item) => {
+    const direct = typeof item?.catalogKey === "string" ? item.catalogKey.trim() : "";
+    if (direct) return direct;
+    const path = typeof item?.path === "string" ? item.path.trim() : "";
+    if (path) return path;
+    return typeof item?.id === "string" ? item.id.trim() : "";
+  };
+
+  const componentCatalogItemsByKey = computed(() => {
+    const map = new Map();
+    componentCatalog.value?.categories?.forEach((category) => {
+      category.items.forEach((item) => {
+        const key = catalogItemKey(item);
+        if (key && !map.has(key)) {
+          map.set(key, item);
+        }
+      });
+      category.subcategories.forEach((subcategory) => {
+        subcategory.items.forEach((item) => {
+          const key = catalogItemKey(item);
+          if (key && !map.has(key)) {
+            map.set(key, item);
+          }
+        });
+      });
+    });
+    return map;
+  });
+
   const catalogItemById = (componentId) => componentCatalogItemsById.value.get(componentId) || null;
 
+  const catalogItemByKey = (catalogKey) => componentCatalogItemsByKey.value.get(catalogKey) || null;
+
+  const catalogItemByEntry = (entry) => {
+    const catalogKey = componentCatalogKeyFromEntry(entry);
+    if (catalogKey) {
+      const item = catalogItemByKey(catalogKey);
+      if (item) return item;
+    }
+    return catalogItemById(componentIdFromEntry(entry));
+  };
+
   const catalogSchemaPathById = (componentId) => normalizeSchemaPath(catalogItemById(componentId)?.schemaPath);
+
+  const catalogSchemaPathForEntry = (entry) => normalizeSchemaPath(catalogItemByEntry(entry)?.schemaPath);
 
   const isComponentCatalogReady = computed(
     () => !isComponentCatalogLoading.value && !componentCatalogError.value
@@ -79,13 +122,30 @@ export const useBuilderComponentCatalog = ({
     return map;
   });
 
+  const componentCatalogLabelIndex = computed(() => {
+    const map = new Map();
+    componentCatalogItemsByKey.value.forEach((item, itemKey) => {
+      map.set(itemKey, item.name);
+    });
+    return map;
+  });
+
   const componentLabel = (id) => (id ? componentIndex.value.get(id) ?? id : "");
 
-  const selectedComponentIds = computed(
+  const componentCatalogLabel = (entry) => {
+    const catalogKey = componentCatalogKeyFromEntry(entry);
+    if (catalogKey && componentCatalogLabelIndex.value.has(catalogKey)) {
+      return componentCatalogLabelIndex.value.get(catalogKey) || "";
+    }
+    const componentId = componentIdFromEntry(entry);
+    return componentLabel(componentId);
+  };
+
+  const selectedComponentKeys = computed(
     () =>
       new Set(
         config.value.components
-          .map((entry) => componentIdFromEntry(entry))
+          .map((entry) => componentCatalogKeyFromEntry(entry))
           .filter(Boolean)
       )
   );
@@ -271,9 +331,12 @@ export const useBuilderComponentCatalog = ({
     activeComponentSlot,
     addComponentSlot,
     catalogSchemaPathById,
+    catalogSchemaPathForEntry,
     clearPendingDeleteSavedCustomComponent,
     componentCatalogError,
+    componentCatalogItemsByKey,
     componentCatalogItemsById,
+    componentCatalogLabel,
     componentLabel,
     componentsQuery,
     componentsZipInput,
@@ -294,6 +357,6 @@ export const useBuilderComponentCatalog = ({
     pendingDeleteCustomItem,
     refreshComponentCatalog,
     requestDeleteSavedCustomComponent,
-    selectedComponentIds
+    selectedComponentKeys
   };
 };

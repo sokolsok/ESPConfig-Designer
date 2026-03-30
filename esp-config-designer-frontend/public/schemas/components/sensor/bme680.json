@@ -64,7 +64,13 @@
         }
       ]
     },
-    {
+        {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+{
       "key": "temperature",
       "type": "object",
       "required": false,

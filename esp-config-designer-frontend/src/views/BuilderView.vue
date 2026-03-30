@@ -423,7 +423,7 @@
               :components-query="componentsQuery"
               :component-catalog-error="componentCatalogError"
               :filtered-categories="filteredCategories"
-              :selected-component-ids="selectedComponentIds"
+              :selected-component-keys="selectedComponentKeys"
               :is-component-available="isComponentAvailable"
               :is-resolving-component-selection="isResolvingComponentSelection"
               :is-saved-custom-component-item="isSavedCustomComponentItem"
@@ -1409,9 +1409,11 @@ const {
   activeComponentSlot,
   addComponentSlot,
   catalogSchemaPathById,
+  catalogSchemaPathForEntry,
   clearPendingDeleteSavedCustomComponent,
   componentCatalogError,
   componentCatalogItemsById,
+  componentCatalogLabel,
   componentLabel,
   componentsQuery,
   componentsZipInput,
@@ -1432,11 +1434,12 @@ const {
   pendingDeleteCustomItem,
   refreshComponentCatalog,
   requestDeleteSavedCustomComponent,
-  selectedComponentIds
+  selectedComponentKeys
 } = useBuilderComponentCatalog({
   config,
   activeTab,
   componentIdFromEntry: (entry) => componentIdFromEntry(entry),
+  componentCatalogKeyFromEntry: (entry) => componentCatalogKeyFromEntry(entry),
   normalizeSchemaPath,
   saveConfig: () => saveConfig(),
   addonFetch: (...args) => addonFetch(...args),
@@ -1448,8 +1451,10 @@ const {
 const { componentSchemas, componentSchemaStatus, ensureComponentSchema } = useBuilderSchemaCatalog({
   config,
   componentIdFromEntry: (entry) => componentIdFromEntry(entry),
+  componentCatalogKeyFromEntry: (entry) => componentCatalogKeyFromEntry(entry),
   normalizeSchemaPath,
   catalogSchemaPathById,
+  catalogSchemaPathForEntry,
   isComponentCatalogReady,
   componentCatalogItemsById
 });
@@ -1469,7 +1474,7 @@ const componentEntryLabel = (entry) => {
     typeof schema?.defaultLabel === "string" && schema.defaultLabel.trim()
       ? schema.defaultLabel.trim()
       : "";
-  return componentLabel(componentId) || fallbackLabel || componentId;
+  return componentCatalogLabel(entry) || fallbackLabel || componentLabel(componentId) || componentId;
 };
 
 const getRootMapConflictDomain = (componentId, slotToIgnore = -1) => {
@@ -1537,6 +1542,12 @@ const projectSummaryPlatform = computed(() => {
 
 const componentIdFromEntry = (entry) =>
   typeof entry === "string" ? entry : entry?.id || "";
+
+const componentCatalogKeyFromEntry = (entry) => {
+  if (!entry || typeof entry !== "object") return componentIdFromEntry(entry);
+  const key = typeof entry.catalogKey === "string" ? entry.catalogKey.trim() : "";
+  return key || componentIdFromEntry(entry);
+};
 
 const parseComponentId = (componentId) => {
   if (!componentId) return { domain: "", platform: "" };
@@ -1613,7 +1624,9 @@ const activeComponentId = computed(() => componentIdFromEntry(activeComponentEnt
 const activeComponentScopeId = computed(() =>
   activeComponentSlot.value === null ? "" : `component:${activeComponentSlot.value}`
 );
-const activeComponentSchemaPath = computed(() => catalogSchemaPathById(activeComponentId.value));
+const activeComponentSchemaPath = computed(
+  () => catalogSchemaPathForEntry(activeComponentEntry.value) || catalogSchemaPathById(activeComponentId.value)
+);
 
 const activeComponentConfig = computed(() => activeComponentEntry.value?.config || {});
 const activeComponentCustomConfig = computed(
@@ -2364,6 +2377,7 @@ const selectComponent = async (item) => {
     const isNewComponent = index >= config.value.components.length;
     const existing = config.value.components[index];
     const existingId = componentIdFromEntry(existing);
+    const selectedCatalogKey = String(item?.catalogKey || item?.path || item?.id || "").trim();
     const prefillConfig =
       existingId === item.id
         ? null
@@ -2375,6 +2389,7 @@ const selectComponent = async (item) => {
     if (getRootMapConflictDomain(item.id, index)) return;
     const nextEntry = {
       id: item.id,
+      catalogKey: selectedCatalogKey,
       config: existingId === item.id ? existing?.config || {} : prefillConfig || {},
       customConfig: existingId === item.id ? existing?.customConfig || "" : ""
     };
@@ -4809,9 +4824,10 @@ const normalizeComponentEntry = (entry) => {
   if (entry && typeof entry === "object") {
     const id = typeof entry.id === "string" ? entry.id : "";
     if (!id) return null;
+    const catalogKey = typeof entry.catalogKey === "string" ? entry.catalogKey : "";
     const config = entry.config && typeof entry.config === "object" ? entry.config : {};
     const customConfig = typeof entry.customConfig === "string" ? entry.customConfig : "";
-    return { id, config, customConfig };
+    return { id, catalogKey, config, customConfig };
   }
 
   return null;

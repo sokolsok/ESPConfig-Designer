@@ -23,7 +23,13 @@
       "lvl": "simple",
       "domain": "i2c"
     },
-    {
+        {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+{
       "key": "temperature",
       "required": false,
       "lvl": "simple",

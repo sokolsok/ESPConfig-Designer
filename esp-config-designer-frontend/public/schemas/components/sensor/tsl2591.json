@@ -83,7 +83,13 @@
       "default": 7.7,
       "placeholder": "7.7"
     },
-    {
+        {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+{
       "key": "full_spectrum",
       "type": "object",
       "required": false,

@@ -94,7 +94,13 @@
       "required": false,
       "lvl": "advanced"
     },
-    {
+        {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+{
       "key": "phase_a",
       "type": "object",
       "required": false,

@@ -3,6 +3,7 @@
   "domain": "sensor",
   "platform": "apds9960",
   "helpUrl": "https://esphome.io/components/sensor/apds9960/",
+  "extends": "base_sensor.json",
   "embedded": [
     {
       "key": "hub",
@@ -39,6 +40,7 @@
       "type": "select",
       "required": true,
       "lvl": "simple",
+      "default": "PROXIMITY",
       "options": [
         "CLEAR",
         "RED",
@@ -46,13 +48,6 @@
         "BLUE",
         "PROXIMITY"
       ]
-    },
-    {
-      "key": "name",
-      "placeholder": "Sensor Name",
-      "type": "text",
-      "required": true,
-      "lvl": "simple"
     }
   ]
 }

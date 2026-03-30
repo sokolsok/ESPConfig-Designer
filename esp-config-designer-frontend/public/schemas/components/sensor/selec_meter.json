@@ -25,7 +25,13 @@
       "default": "1",
       "placeholder": "1"
     },
-    {
+        {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+{
       "key": "total_active_energy",
       "required": false,
       "lvl": "simple",

@@ -34,7 +34,13 @@
       "lvl": "normal",
       "domain": "modbus"
     },
-    {
+        {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+{
       "key": "current",
       "type": "object",
       "required": false,

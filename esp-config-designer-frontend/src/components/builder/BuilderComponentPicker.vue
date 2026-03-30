@@ -27,7 +27,7 @@
               <button
                 type="button"
                 class="component-item"
-                :class="{ selected: selectedComponentIds.has(item.id), unavailable: !isComponentAvailable(item) }"
+                :class="{ selected: selectedComponentKeys.has(item.catalogKey || item.path || item.id), unavailable: !isComponentAvailable(item) }"
                 :disabled="!isComponentAvailable(item) || isResolvingComponentSelection"
                 :title="!isComponentAvailable(item) ? 'Component not available' : ''"
                 @click="emit('select-component', item)"
@@ -62,7 +62,7 @@
                 <button
                   class="component-item"
                   type="button"
-                  :class="{ selected: selectedComponentIds.has(item.id), unavailable: !isComponentAvailable(item) }"
+                  :class="{ selected: selectedComponentKeys.has(item.catalogKey || item.path || item.id), unavailable: !isComponentAvailable(item) }"
                   :disabled="!isComponentAvailable(item) || isResolvingComponentSelection"
                   :title="!isComponentAvailable(item) ? 'Component not available' : ''"
                   @click="emit('select-component', item)"
@@ -94,7 +94,7 @@ defineProps({
   componentsQuery: { type: String, default: "" },
   componentCatalogError: { type: [Object, String], default: null },
   filteredCategories: { type: Array, default: () => [] },
-  selectedComponentIds: { type: Object, required: true },
+  selectedComponentKeys: { type: Object, required: true },
   isComponentAvailable: { type: Function, required: true },
   isResolvingComponentSelection: { type: Boolean, default: false },
   isSavedCustomComponentItem: { type: Function, required: true },

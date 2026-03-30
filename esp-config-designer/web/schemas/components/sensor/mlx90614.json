@@ -9,7 +9,13 @@
     }
   ],
   "fields": [
-    {
+        {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+{
       "key": "ambient",
       "required": false,
       "lvl": "simple",
