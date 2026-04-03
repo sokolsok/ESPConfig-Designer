@@ -310,10 +310,12 @@ const sharedHubBindings = computed(() => {
         : "";
     const emitAsValue =
       typeof definition?.emitAs === "string" ? definition.emitAs.trim().toLowerCase() : "list";
+    const singleton = Boolean(definition?.singleton);
 
     if (!sourceKey || !domain) return;
-    if (emitAsValue !== "list") return;
-    if (dedupeBy !== "id") return;
+    const supportsListSharedHub = emitAsValue === "list" && dedupeBy === "id";
+    const supportsSingletonMapSharedHub = emitAsValue === "map" && singleton;
+    if (!supportsListSharedHub && !supportsSingletonMapSharedHub) return;
 
     const sourceField = byKey.get(sourceKey);
     if (!sourceField || sourceField.type !== "object") return;

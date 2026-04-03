@@ -3,7 +3,6 @@
   "domain": "sensor",
   "platform": "qmc5883l",
   "helpUrl": "https://esphome.io/components/sensor/qmc5883l/",
-  "extends": "base_sensor.json",
   "requirements": [
     {
       "require": "bus:i2c"
@@ -11,60 +10,13 @@
   ],
   "fields": [
     {
-      "key": "name",
-      "placeholder": "Sensor Name",
-      "type": "text",
-      "required": true,
-      "lvl": "simple"
-    },
-    {
       "key": "address",
       "type": "address",
       "required": false,
       "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x0D",
       "placeholder": "0x0D"
-    },
-    {
-      "key": "field_strength_x",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "field_strength_y",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "field_strength_z",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "heading",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "temperature",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "range",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "oversampling",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
     },
     {
       "key": "update_interval",
@@ -77,13 +29,91 @@
       "key": "drdy_pin",
       "type": "gpio",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "data_rate",
-      "type": "text",
+      "type": "select",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+	  "default": "200Hz",
+      "options": [
+        "200Hz",
+        "100Hz",
+        "50Hz",
+        "10Hz"
+      ]
+    },
+    {
+      "key": "range",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+	  "default": "200uT",
+      "options": [
+        "200uT",
+        "800uT"
+      ]
+    },
+    {
+      "key": "oversampling",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+	  "default": "512x",
+      "options": [
+        "512x",
+        "256x",
+        "128x",
+        "64x"
+      ]
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "field_strength_x",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "field_strength_y",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "field_strength_z",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "heading",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     }
   ]
 }

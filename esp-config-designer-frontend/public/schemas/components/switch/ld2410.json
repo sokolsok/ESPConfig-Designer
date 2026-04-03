@@ -1,0 +1,48 @@
+{
+  "id": "switch.ld2410",
+  "domain": "switch",
+  "platform": "ld2410",
+  "helpUrl": "https://esphome.io/components/sensor/ld2410/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "ld2410",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Radar hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_ld2410.json"
+    },
+    {
+      "key": "ld2410_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "ld2410",
+      "allowSelfReference": true,
+      "default": "ld2410_radar"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    { "key": "engineering_mode", "type": "object", "required": false, "lvl": "simple", "extends": "base_switch.json", "fields": [] },
+    { "key": "bluetooth", "type": "object", "required": false, "lvl": "simple", "extends": "base_switch.json", "fields": [] }
+  ]
+}

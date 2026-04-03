@@ -1,0 +1,92 @@
+{
+  "id": "switch.micronova",
+  "domain": "switch",
+  "platform": "micronova",
+  "helpUrl": "https://esphome.io/components/micronova/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "micronova",
+      "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Micronova hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_micronova.json"
+    },
+    {
+      "key": "micronova_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "micronova",
+      "allowSelfReference": true,
+      "default": "micronova_hub"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "stove",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_switch.json",
+      "fields": [
+        {
+          "key": "update_interval",
+          "type": "duration",
+          "required": false,
+          "lvl": "simple",
+          "placeholder": "60s"
+        },
+        {
+          "key": "memory_location",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "0x00",
+          "suppressQuotes": true
+        },
+        {
+          "key": "memory_address",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "0x00",
+          "suppressQuotes": true
+        },
+        {
+          "key": "memory_data_on",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "0x00",
+          "suppressQuotes": true
+        },
+        {
+          "key": "memory_data_off",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "0x00",
+          "suppressQuotes": true
+        }
+      ]
+    }
+  ]
+}

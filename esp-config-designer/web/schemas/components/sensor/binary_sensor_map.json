@@ -17,6 +17,7 @@
       "type": "select",
       "required": true,
       "lvl": "simple",
+	  "default": "BAYESIAN",
       "options": [
         "BAYESIAN",
         "GROUP",
@@ -25,58 +26,78 @@
     },
     {
       "key": "channels",
-      "type": "object",
+      "type": "list",
       "required": true,
       "lvl": "simple",
-      "fields": [
-        {
-          "key": "binary_sensor",
-          "type": "id_ref",
-          "required": true,
-          "lvl": "simple",
-          "domain": "sensor"
-        },
-        {
-          "key": "value",
-          "type": "text",
-          "required": true,
-          "lvl": "simple"
-        }
-      ]
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "GROUP",
+          "SUM"
+        ]
+      },
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "binary_sensor",
+            "type": "id_ref",
+            "required": true,
+            "lvl": "simple",
+            "domain": "binary_sensor"
+          },
+          {
+            "key": "value",
+            "type": "number",
+            "required": true,
+            "lvl": "simple"
+          }
+        ]
+      }
     },
     {
       "key": "prior",
       "type": "number",
-      "required": true,
-      "lvl": "simple"
+      "required": false,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "type",
+        "value": "BAYESIAN"
+      }
     },
     {
       "key": "observations",
-      "type": "object",
+      "type": "list",
       "required": true,
       "lvl": "simple",
-      "fields": [
-        {
-          "key": "binary_sensor",
-          "type": "id_ref",
-          "required": true,
-          "lvl": "simple",
-          "domain": "sensor"
-        },
-        {
-          "key": "prob_given_true",
-          "type": "boolean",
-          "required": true,
-          "lvl": "simple"
-        },
-        {
-          "key": "prob_given_false",
-          "type": "boolean",
-          "required": true,
-          "lvl": "simple"
-        }
-      ],
-      "extends": "base_sensor.json"
+      "dependsOn": {
+        "key": "type",
+        "value": "BAYESIAN"
+      },
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "binary_sensor",
+            "type": "id_ref",
+            "required": true,
+            "lvl": "simple",
+            "domain": "binary_sensor"
+          },
+          {
+            "key": "prob_given_true",
+            "type": "number",
+            "required": true,
+            "lvl": "simple"
+          },
+          {
+            "key": "prob_given_false",
+            "type": "number",
+            "required": true,
+            "lvl": "simple"
+          }
+        ]
+      }
     }
   ]
 }

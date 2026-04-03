@@ -10,11 +10,17 @@
   ],
   "fields": [
     {
-      "key": "name",
-      "placeholder": "Sensor Name",
-      "type": "text",
-      "required": true,
-      "lvl": "simple"
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     },
     {
       "key": "field_strength_x",
@@ -39,13 +45,6 @@
       "lvl": "simple",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "60s"
     }
   ]
 }

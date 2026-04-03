@@ -14,6 +14,8 @@
       "type": "address",
       "required": false,
       "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x3C",
       "placeholder": "0x3C"
     },
     {
@@ -24,11 +26,39 @@
       "placeholder": "60s"
     },
     {
+      "key": "id",
+      "placeholder": "example_sensor_id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
       "key": "temperature_sensor",
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
-      "domain": "sensor"
+      "domain": "sensor",
+	  "placeholder": "temperature_sensor_id"
+    },
+    {
+      "key": "temperature_compensation",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "21.0"
+    },
+    {
+      "key": "temperature_coefficient",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0.019"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     },
     {
       "key": "ec",
@@ -45,20 +75,6 @@
       "type": "object",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "temperature_compensation",
-      "type": "number",
-      "required": false,
-      "lvl": "normal",
-      "placeholder": "21.0"
-    },
-    {
-      "key": "temperature_coefficient",
-      "type": "number",
-      "required": false,
-      "lvl": "normal",
-      "placeholder": "0.019"
     }
   ]
 }

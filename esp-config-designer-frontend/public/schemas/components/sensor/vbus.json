@@ -1,0 +1,311 @@
+{
+  "id": "sensor.vbus",
+  "domain": "sensor",
+  "platform": "vbus",
+  "helpUrl": "https://esphome.io/components/vbus/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "vbus",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "VBus hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_vbus.json"
+    },
+    {
+      "key": "vbus_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "vbus",
+      "allowSelfReference": true,
+      "emitYAML": "never",
+      "default": "vbus_hub"
+    },
+    {
+      "key": "model",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "set_global": "vbus_sensor_model",
+	  "default": "deltasol_bs_plus",
+      "options": [
+        "deltasol_bs_plus",
+        "deltasol_bs_2009",
+        "deltasol_bs2",
+        "deltasol_c",
+        "deltasol_cs2",
+        "deltasol_cs_plus",
+        "custom"
+      ]
+    },
+    {
+      "key": "temperature_1",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "temperature_2",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "temperature_3",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "temperature_4",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "temperature_5",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "vbus_sensor_model",
+        "value": "deltasol_cs_plus"
+      }
+    },
+    {
+      "key": "pump_speed_1",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "vbus_sensor_model",
+        "value": [
+          "deltasol_bs_plus",
+          "deltasol_bs_2009",
+          "deltasol_bs2",
+          "deltasol_c",
+          "deltasol_cs_plus"
+        ]
+      }
+    },
+    {
+      "key": "pump_speed_2",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "vbus_sensor_model",
+        "value": [
+          "deltasol_bs_plus",
+          "deltasol_bs_2009",
+          "deltasol_bs2",
+          "deltasol_c",
+          "deltasol_cs_plus"
+        ]
+      }
+    },
+    {
+      "key": "pump_speed",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "vbus_sensor_model",
+        "value": "deltasol_cs2"
+      }
+    },
+    {
+      "key": "operating_hours_1",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "vbus_sensor_model",
+        "value": [
+          "deltasol_bs_plus",
+          "deltasol_bs_2009",
+          "deltasol_bs2",
+          "deltasol_c",
+          "deltasol_cs_plus"
+        ]
+      }
+    },
+    {
+      "key": "operating_hours_2",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "vbus_sensor_model",
+        "value": [
+          "deltasol_bs_plus",
+          "deltasol_bs_2009",
+          "deltasol_bs2",
+          "deltasol_c",
+          "deltasol_cs_plus"
+        ]
+      }
+    },
+    {
+      "key": "operating_hours",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "vbus_sensor_model",
+        "value": "deltasol_cs2"
+      }
+    },
+    {
+      "key": "heat_quantity",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "time",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "vbus_sensor_model",
+        "value": [
+          "deltasol_bs_plus",
+          "deltasol_bs_2009",
+          "deltasol_c",
+          "deltasol_cs_plus"
+        ]
+      }
+    },
+    {
+      "key": "version",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "vbus_sensor_model",
+        "value": [
+          "deltasol_bs_plus",
+          "deltasol_bs_2009",
+          "deltasol_bs2",
+          "deltasol_cs2",
+          "deltasol_cs_plus"
+        ]
+      }
+    },
+    {
+      "key": "flow_rate",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "vbus_sensor_model",
+        "value": "deltasol_cs_plus"
+      }
+    },
+    {
+      "key": "dest",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0x10",
+      "suppressQuotes": true,
+      "globalDependsOn": {
+        "key": "vbus_sensor_model",
+        "value": "custom"
+      }
+    },
+    {
+      "key": "source",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0x1234",
+      "suppressQuotes": true,
+      "globalDependsOn": {
+        "key": "vbus_sensor_model",
+        "value": "custom"
+      }
+    },
+    {
+      "key": "command",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0x100",
+      "suppressQuotes": true,
+      "globalDependsOn": {
+        "key": "vbus_sensor_model",
+        "value": "custom"
+      }
+    },
+    {
+      "key": "sensors",
+      "type": "list",
+      "required": false,
+      "lvl": "simple",
+      "globalDependsOn": {
+        "key": "vbus_sensor_model",
+        "value": "custom"
+      },
+      "item": {
+        "type": "object",
+        "extends": "base_sensor.json",
+        "fields": [
+          {
+            "key": "lambda",
+            "type": "lambda",
+            "required": true,
+            "lvl": "simple"
+          }
+        ]
+      }
+    }
+  ]
+}

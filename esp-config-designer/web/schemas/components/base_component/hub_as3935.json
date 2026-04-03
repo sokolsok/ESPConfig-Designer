@@ -1,0 +1,224 @@
+{
+  "id": "hub.as3935",
+  "domain": "as3935",
+  "platform": "as3935_i2c",
+  "platformByBus": {
+    "i2c": "as3935_i2c",
+    "spi": "as3935_spi"
+  },
+  "type": "object",
+  "requirements": [
+    {
+      "require": "bus:i2c",
+      "when": {
+        "key": "bus",
+        "value": "i2c"
+      }
+    },
+    {
+      "require": "bus:spi",
+      "when": {
+        "key": "bus",
+        "value": "spi"
+      }
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "as3935_hub",
+      "idDomain": "as3935"
+    },
+    {
+      "key": "bus",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "i2c",
+      "options": [
+        "i2c",
+        "spi"
+      ]
+    },
+    {
+      "key": "irq_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x03",
+      "placeholder": "0x03",
+      "dependsOn": {
+        "key": "bus",
+        "value": "i2c"
+      }
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "bus",
+        "value": "spi"
+      }
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2c",
+      "dependsOn": {
+        "key": "bus",
+        "value": "i2c"
+      }
+    },
+    {
+      "key": "spi_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "spi",
+      "dependsOn": {
+        "key": "bus",
+        "value": "spi"
+      }
+    },
+    {
+      "key": "data_rate",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1MHz",
+      "dependsOn": {
+        "key": "bus",
+        "value": "spi"
+      }
+    },
+    {
+      "key": "spi_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "MODE0",
+      "options": [
+        "MODE0",
+        "MODE1",
+        "MODE2",
+        "MODE3"
+      ],
+      "dependsOn": {
+        "key": "bus",
+        "value": "spi"
+      }
+    },
+    {
+      "key": "release_device",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false,
+      "dependsOn": {
+        "key": "bus",
+        "value": "spi"
+      }
+    },
+    {
+      "key": "indoor",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    },
+    {
+      "key": "noise_level",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 2,
+      "placeholder": "2"
+    },
+    {
+      "key": "watchdog_threshold",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 2,
+      "placeholder": "2"
+    },
+    {
+      "key": "spike_rejection",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 2,
+      "placeholder": "2"
+    },
+    {
+      "key": "lightning_threshold",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "1",
+      "options": [
+        "1",
+        "5",
+        "9",
+        "16"
+      ]
+    },
+    {
+      "key": "mask_disturber",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "div_ratio",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "0",
+      "options": [
+        "0",
+        "16",
+        "32",
+        "64",
+        "128"
+      ]
+    },
+    {
+      "key": "capacitance",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 0,
+      "placeholder": "0"
+    },
+    {
+      "key": "tune_antenna",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "calibration",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": true
+    }
+  ]
+}

@@ -1,0 +1,255 @@
+{
+  "id": "binary_sensor.vbus",
+  "domain": "binary_sensor",
+  "platform": "vbus",
+  "helpUrl": "https://esphome.io/components/vbus/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "vbus",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "VBus hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_vbus.json"
+    },
+    {
+      "key": "vbus_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "vbus",
+      "allowSelfReference": true,
+      "emitYAML": "never",
+      "default": "vbus_hub"
+    },
+    {
+      "key": "model",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "set_global": "vbus_binary_sensor_model",
+      "options": [
+        "deltasol_bs_plus",
+        "deltasol_bs_2009",
+        "deltasol_bs2",
+        "deltasol_c",
+        "deltasol_cs2",
+        "deltasol_cs_plus",
+        "custom"
+      ]
+    },
+    {
+      "key": "relay1",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "vbus_binary_sensor_model",
+        "value": "deltasol_bs_plus"
+      }
+    },
+    {
+      "key": "relay2",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "vbus_binary_sensor_model",
+        "value": "deltasol_bs_plus"
+      }
+    },
+    {
+      "key": "sensor1_error",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "sensor2_error",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "sensor3_error",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "sensor4_error",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "collector_max",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "vbus_binary_sensor_model",
+        "value": "deltasol_bs_plus"
+      }
+    },
+    {
+      "key": "collector_min",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "vbus_binary_sensor_model",
+        "value": "deltasol_bs_plus"
+      }
+    },
+    {
+      "key": "collector_frost",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "vbus_binary_sensor_model",
+        "value": "deltasol_bs_plus"
+      }
+    },
+    {
+      "key": "tube_collector",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "vbus_binary_sensor_model",
+        "value": "deltasol_bs_plus"
+      }
+    },
+    {
+      "key": "recooling",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "vbus_binary_sensor_model",
+        "value": "deltasol_bs_plus"
+      }
+    },
+    {
+      "key": "hqm",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "vbus_binary_sensor_model",
+        "value": "deltasol_bs_plus"
+      }
+    },
+    {
+      "key": "frost_protection_active",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": [],
+      "globalDependsOn": {
+        "key": "vbus_binary_sensor_model",
+        "value": "deltasol_bs_2009"
+      }
+    },
+    {
+      "key": "dest",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0x10",
+      "suppressQuotes": true,
+      "globalDependsOn": {
+        "key": "vbus_binary_sensor_model",
+        "value": "custom"
+      }
+    },
+    {
+      "key": "source",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0x4221",
+      "suppressQuotes": true,
+      "globalDependsOn": {
+        "key": "vbus_binary_sensor_model",
+        "value": "custom"
+      }
+    },
+    {
+      "key": "command",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0x100",
+      "suppressQuotes": true,
+      "globalDependsOn": {
+        "key": "vbus_binary_sensor_model",
+        "value": "custom"
+      }
+    },
+    {
+      "key": "binary_sensors",
+      "type": "list",
+      "required": false,
+      "lvl": "simple",
+      "globalDependsOn": {
+        "key": "vbus_binary_sensor_model",
+        "value": "custom"
+      },
+      "item": {
+        "type": "object",
+        "extends": "base_binary_sensor.json",
+        "fields": [
+          {
+            "key": "lambda",
+            "type": "lambda",
+            "required": true,
+            "lvl": "simple"
+          }
+        ]
+      }
+    }
+  ]
+}

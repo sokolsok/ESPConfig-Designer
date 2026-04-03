@@ -1,0 +1,28 @@
+{
+  "id": "hub.ld2412",
+  "domain": "ld2412",
+  "platform": "",
+  "type": "object",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "ld2412_radar",
+      "idDomain": "ld2412"
+    },
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "uart"
+    }
+  ]
+}

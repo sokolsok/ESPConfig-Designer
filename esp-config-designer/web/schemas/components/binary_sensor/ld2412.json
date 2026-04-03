@@ -1,0 +1,50 @@
+{
+  "id": "binary_sensor.ld2412",
+  "domain": "binary_sensor",
+  "platform": "ld2412",
+  "helpUrl": "https://esphome.io/components/sensor/ld2412/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "ld2412",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Radar hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_ld2412.json"
+    },
+    {
+      "key": "ld2412_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "ld2412",
+      "allowSelfReference": true,
+      "default": "ld2412_radar"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    { "key": "has_target", "type": "object", "required": false, "lvl": "simple", "extends": "base_binary_sensor.json", "fields": [] },
+    { "key": "has_moving_target", "type": "object", "required": false, "lvl": "simple", "extends": "base_binary_sensor.json", "fields": [] },
+    { "key": "has_still_target", "type": "object", "required": false, "lvl": "simple", "extends": "base_binary_sensor.json", "fields": [] },
+    { "key": "dynamic_background_correction_status", "type": "object", "required": false, "lvl": "simple", "extends": "base_binary_sensor.json", "fields": [] }
+  ]
+}

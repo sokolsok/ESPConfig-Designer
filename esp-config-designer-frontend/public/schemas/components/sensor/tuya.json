@@ -16,6 +16,7 @@
       "key": "sensor_datapoint",
       "type": "number",
       "required": true,
+	  "placeholder": "5",
       "lvl": "simple"
     }
   ]

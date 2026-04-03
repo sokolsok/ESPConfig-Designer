@@ -3,7 +3,15 @@
   "domain": "sensor",
   "platform": "ld2420",
   "helpUrl": "https://esphome.io/components/sensor/ld2420/",
-  "extends": "base_sensor.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "ld2420",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
   "requirements": [
     {
       "require": "bus:uart"
@@ -11,11 +19,37 @@
   ],
   "fields": [
     {
-      "key": "name",
-      "placeholder": "Sensor Name",
-      "type": "text",
+      "key": "hub",
+      "label": "Radar hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_ld2420.json"
+    },
+    {
+      "key": "ld2420_id",
+      "type": "id_ref",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "domain": "ld2420",
+      "allowSelfReference": true,
+      "emitYAML": "never",
+      "default": "ld2420_radar"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "moving_distance",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     }
   ]
 }

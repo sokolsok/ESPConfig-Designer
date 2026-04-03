@@ -14,14 +14,15 @@
       "key": "name",
       "placeholder": "Sensor Name",
       "type": "text",
-      "required": true,
+      "required": false,
       "lvl": "simple"
     },
     {
       "key": "cs_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "update_interval",
@@ -32,24 +33,38 @@
     },
     {
       "key": "mains_filter",
-      "type": "text",
+      "type": "select",
       "required": false,
       "lvl": "normal",
-      "placeholder": "60 Hz"
+      "default": "60 Hz",
+      "options": [
+        "50 Hz",
+        "60 Hz"
+      ]
     },
     {
       "key": "thermocouple_type",
-      "type": "text",
+      "type": "select",
       "required": false,
       "lvl": "normal",
-      "placeholder": "K"
+      "default": "K",
+      "options": [
+        "B",
+        "E",
+        "J",
+        "K",
+        "N",
+        "R",
+        "S",
+        "T"
+      ]
     },
     {
       "key": "spi_id",
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
-      "domain": "sensor"
+      "domain": "spi"
     }
   ]
 }

@@ -5,21 +5,60 @@
   "helpUrl": "https://esphome.io/components/sensor/growatt_solar/",
   "requirements": [
     {
-      "require": "bus:uart"
+      "require": [
+        "bus:uart",
+        "bus:modbus"
+      ]
     }
   ],
   "fields": [
     {
-      "key": "inverter_status",
-      "type": "text",
+      "key": "protocol_version",
+      "type": "select",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "default": "RTU",
+      "options": [
+        "RTU",
+        "RTU2"
+      ]
     },
     {
-      "key": "protocol_version",
-      "type": "text",
+      "key": "update_interval",
+      "type": "duration",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "placeholder": "10s"
+    },
+    {
+      "key": "address",
+      "type": "number",
+      "required": false,
+      "emitYAML": "always",
+      "lvl": "simple",
+      "default": 1,
+      "placeholder": "1"
+    },
+    {
+      "key": "modbus_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "modbus"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "inverter_status",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "phase_a",
@@ -29,36 +68,93 @@
       "fields": [
         {
           "key": "current",
-          "type": "text",
+          "type": "object",
           "required": false,
-          "lvl": "normal"
+          "lvl": "simple",
+          "extends": "base_sensor.json",
+          "fields": []
         },
         {
           "key": "voltage",
-          "type": "text",
+          "type": "object",
           "required": false,
-          "lvl": "normal"
+          "lvl": "simple",
+          "extends": "base_sensor.json",
+          "fields": []
         },
         {
           "key": "active_power",
-          "type": "text",
+          "type": "object",
           "required": false,
-          "lvl": "normal"
+          "lvl": "simple",
+          "extends": "base_sensor.json",
+          "fields": []
         }
-      ],
-      "extends": "base_sensor.json"
+      ]
     },
     {
       "key": "phase_b",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "current",
+          "type": "object",
+          "required": false,
+          "lvl": "simple",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "voltage",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "active_power",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        }
+      ]
     },
     {
       "key": "phase_c",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "current",
+          "type": "object",
+          "required": false,
+          "lvl": "simple",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "voltage",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "active_power",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        }
+      ]
     },
     {
       "key": "pv1",
@@ -68,42 +164,77 @@
       "fields": [
         {
           "key": "current",
-          "type": "text",
+          "type": "object",
           "required": false,
-          "lvl": "normal"
+          "lvl": "simple",
+          "extends": "base_sensor.json",
+          "fields": []
         },
         {
           "key": "voltage",
-          "type": "text",
+          "type": "object",
           "required": false,
-          "lvl": "normal"
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
         },
         {
           "key": "active_power",
-          "type": "text",
+          "type": "object",
           "required": false,
-          "lvl": "normal"
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
         }
-      ],
-      "extends": "base_sensor.json"
+      ]
     },
     {
       "key": "pv2",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "current",
+          "type": "object",
+          "required": false,
+          "lvl": "simple",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "voltage",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        },
+        {
+          "key": "active_power",
+          "type": "object",
+          "required": false,
+          "lvl": "normal",
+          "extends": "base_sensor.json",
+          "fields": []
+        }
+      ]
     },
     {
       "key": "active_power",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "pv_active_power",
-      "type": "text",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
       "key": "frequency",
@@ -136,20 +267,6 @@
       "type": "object",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "10s"
-    },
-    {
-      "key": "address",
-      "type": "address",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "1"
     }
   ]
 }

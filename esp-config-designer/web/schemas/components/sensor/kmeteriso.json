@@ -10,6 +10,26 @@
   ],
   "fields": [
     {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "i2c"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "5s"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
       "key": "temperature",
       "type": "object",
       "required": false,
@@ -24,13 +44,6 @@
       "lvl": "simple",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "5s"
     }
   ]
 }

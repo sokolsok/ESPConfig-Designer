@@ -22,6 +22,7 @@
       "type": "select",
       "required": true,
       "lvl": "simple",
+	  "default": "1005",
       "options": [
         "1005",
         "1015"
@@ -32,7 +33,8 @@
       "type": "address",
       "required": false,
       "lvl": "simple",
-      "placeholder": "0x28"
+	  "emitYAML": "always",
+      "default": "0x28"
     },
     {
       "key": "update_interval",

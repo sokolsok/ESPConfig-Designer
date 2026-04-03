@@ -1,0 +1,141 @@
+{
+  "id": "hub.as5600",
+  "domain": "as5600",
+  "platform": "",
+  "type": "object",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "as5600_hub",
+      "idDomain": "as5600"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2c"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x36",
+      "placeholder": "0x36"
+    },
+    {
+      "key": "dir_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "direction",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "clockwise",
+      "options": [
+        "clockwise",
+        "counterclockwise"
+      ]
+    },
+    {
+      "key": "start_position",
+      "type": "text",
+      "required": false,
+	  "suppressQuotes": true,
+      "lvl": "normal",
+      "placeholder": "0deg"
+    },
+    {
+      "key": "end_position",
+      "type": "text",
+      "required": false,
+	  "suppressQuotes": true,
+      "lvl": "normal",
+      "placeholder": "360deg"
+    },
+    {
+      "key": "range",
+      "type": "text",
+      "required": false,
+	  "suppressQuotes": true,
+      "lvl": "normal",
+      "placeholder": "180deg"
+    },
+    {
+      "key": "hysteresis",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "none",
+      "options": [
+        "none",
+        "lsb1",
+        "lsb2",
+        "lsb3"
+      ]
+    },
+    {
+      "key": "power_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "nominal",
+      "options": [
+        "nominal",
+        "low1",
+        "low2",
+        "low3"
+      ]
+    },
+    {
+      "key": "watchdog",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "slow_filter",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "16x",
+      "options": [
+        "16x",
+        "8x",
+        "4x",
+        "2x"
+      ]
+    },
+    {
+      "key": "fast_filter",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "none",
+      "options": [
+        "none",
+        "lsb6",
+        "lsb7",
+        "lsb9",
+        "lsb18",
+        "lsb21",
+        "lsb24",
+        "lsb10"
+      ]
+    }
+  ]
+}

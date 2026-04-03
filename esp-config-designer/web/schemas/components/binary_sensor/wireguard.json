@@ -1,0 +1,52 @@
+{
+  "id": "binary_sensor.wireguard",
+  "domain": "binary_sensor",
+  "platform": "wireguard",
+  "helpUrl": "https://esphome.io/components/wireguard/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "wireguard",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "WireGuard hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_wireguard.json"
+    },
+    {
+      "key": "wireguard_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "wireguard",
+      "allowSelfReference": true,
+      "emitYAML": "never",
+      "default": "wireguard_hub"
+    },
+    {
+      "key": "status",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "enabled",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    }
+  ]
+}

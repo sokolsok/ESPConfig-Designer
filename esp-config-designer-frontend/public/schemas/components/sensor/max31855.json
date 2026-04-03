@@ -3,6 +3,7 @@
   "domain": "sensor",
   "platform": "max31855",
   "helpUrl": "https://esphome.io/components/sensor/max31855/",
+  "extends": "base_sensor.json",
   "requirements": [
     {
       "require": "bus:spi"
@@ -10,10 +11,18 @@
   ],
   "fields": [
     {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
       "key": "cs_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "update_interval",
@@ -23,19 +32,19 @@
       "placeholder": "60s"
     },
     {
+      "key": "spi_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "spi"
+    },
+    {
       "key": "reference_temperature",
       "required": false,
       "lvl": "simple",
       "type": "object",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "spi_id",
-      "type": "id_ref",
-      "required": false,
-      "lvl": "normal",
-      "domain": "sensor"
     }
   ]
 }

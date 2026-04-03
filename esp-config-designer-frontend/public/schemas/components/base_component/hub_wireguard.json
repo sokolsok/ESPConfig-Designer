@@ -1,0 +1,123 @@
+{
+  "id": "hub.wireguard",
+  "domain": "wireguard",
+  "platform": "",
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "wireguard_hub",
+      "idDomain": "wireguard"
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "10.0.0.2",
+      "note": "WireGuard requires a synchronized time source. Avoid Home Assistant time if HA is reachable only through the VPN."
+    },
+    {
+      "key": "netmask",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "default": "255.255.255.255",
+      "placeholder": "255.255.255.255"
+    },
+    {
+      "key": "private_key",
+      "type": "password",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "!secret wg_privkey",
+      "settings": {
+        "format": "base64_44",
+        "generator": {
+          "mode": "base64",
+          "onEmpty": true,
+          "bytes": 32
+        }
+      }
+    },
+    {
+      "key": "peer_endpoint",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "wg.server.example"
+    },
+    {
+      "key": "peer_port",
+      "type": "number",
+      "required": false,
+      "lvl": "simple",
+      "default": 51820,
+      "placeholder": "51820"
+    },
+    {
+      "key": "peer_public_key",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "!secret wg_peer_public_key"
+    },
+    {
+      "key": "peer_preshared_key",
+      "type": "password",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "!secret wg_preshared_key",
+      "settings": {
+        "format": "base64_44",
+        "generator": {
+          "mode": "base64",
+          "onEmpty": true,
+          "bytes": 32
+        }
+      }
+    },
+    {
+      "key": "peer_persistent_keepalive",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "25s"
+    },
+    {
+      "key": "peer_allowed_ips",
+      "type": "list",
+      "required": false,
+      "lvl": "normal",
+      "item": {
+        "type": "text"
+      },
+      "note": "If omitted, any host is allowed. The device address/32 is always added automatically."
+    },
+    {
+      "key": "reboot_timeout",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "15min"
+    },
+    {
+      "key": "require_connection_to_proceed",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "10s",
+      "placeholder": "10s"
+    }
+  ]
+}

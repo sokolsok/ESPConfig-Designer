@@ -21,14 +21,17 @@
       "key": "address",
       "type": "address",
       "required": false,
+	  "emitYAML": "always",
       "lvl": "simple",
-      "placeholder": "0x4A"
+      "default": "0x4A"
     },
     {
       "key": "mode",
       "type": "select",
       "required": false,
       "lvl": "normal",
+	  "default": "auto",
+	  "emitYAML": "always",
       "options": [
         "auto",
         "low_power",

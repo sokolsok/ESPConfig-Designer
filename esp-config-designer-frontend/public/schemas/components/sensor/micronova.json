@@ -1,0 +1,179 @@
+{
+  "id": "sensor.micronova",
+  "domain": "sensor",
+  "platform": "micronova",
+  "helpUrl": "https://esphome.io/components/micronova/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "micronova",
+      "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Micronova hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_micronova.json"
+    },
+    {
+      "key": "micronova_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "micronova",
+      "allowSelfReference": true,
+      "default": "micronova_hub"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "room_temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [
+        {
+          "key": "update_interval",
+          "type": "duration",
+          "required": false,
+          "lvl": "simple",
+          "placeholder": "60s"
+        }
+      ]
+    },
+    {
+      "key": "fumes_temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [
+        {
+          "key": "update_interval",
+          "type": "duration",
+          "required": false,
+          "lvl": "simple",
+          "placeholder": "60s"
+        }
+      ]
+    },
+    {
+      "key": "stove_power",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [
+        {
+          "key": "update_interval",
+          "type": "duration",
+          "required": false,
+          "lvl": "simple",
+          "placeholder": "60s"
+        }
+      ]
+    },
+    {
+      "key": "fan_speed",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [
+        {
+          "key": "fan_rpm_offset",
+          "type": "number",
+          "required": false,
+          "lvl": "simple",
+          "default": 0
+        },
+        {
+          "key": "update_interval",
+          "type": "duration",
+          "required": false,
+          "lvl": "simple",
+          "placeholder": "60s"
+        }
+      ]
+    },
+    {
+      "key": "water_temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [
+        {
+          "key": "update_interval",
+          "type": "duration",
+          "required": false,
+          "lvl": "simple",
+          "placeholder": "60s"
+        }
+      ]
+    },
+    {
+      "key": "water_pressure",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [
+        {
+          "key": "update_interval",
+          "type": "duration",
+          "required": false,
+          "lvl": "simple",
+          "placeholder": "60s"
+        }
+      ]
+    },
+    {
+      "key": "memory_address_sensor",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": [
+        {
+          "key": "memory_location",
+          "type": "text",
+          "required": true,
+          "lvl": "simple",
+          "placeholder": "0x20",
+          "suppressQuotes": true
+        },
+        {
+          "key": "memory_address",
+          "type": "text",
+          "required": true,
+          "lvl": "simple",
+          "placeholder": "0x7d",
+          "suppressQuotes": true
+        },
+        {
+          "key": "update_interval",
+          "type": "duration",
+          "required": false,
+          "lvl": "simple",
+          "placeholder": "60s"
+        }
+      ]
+    }
+  ]
+}

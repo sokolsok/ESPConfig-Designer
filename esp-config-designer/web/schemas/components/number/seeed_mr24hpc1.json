@@ -1,0 +1,54 @@
+{
+  "id": "number.seeed_mr24hpc1",
+  "domain": "number",
+  "platform": "seeed_mr24hpc1",
+  "helpUrl": "https://esphome.io/components/seeed_mr24hpc1/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "seeed_mr24hpc1",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Radar hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_seeed_mr24hpc1.json"
+    },
+    {
+      "key": "mr24hpc1_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "seeed_mr24hpc1",
+      "allowSelfReference": true,
+      "emitYAML": "never",
+      "default": "mr24hpc1_radar"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    { "key": "sensitivity", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "custom_mode", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "existence_threshold", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "motion_threshold", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "motion_trigger", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "motion_to_rest", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "custom_unman_time", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] }
+  ]
+}

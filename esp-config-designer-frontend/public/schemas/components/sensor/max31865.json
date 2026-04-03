@@ -14,14 +14,15 @@
       "key": "name",
       "placeholder": "Sensor Name",
       "type": "text",
-      "required": true,
+      "required": false,
       "lvl": "simple"
     },
     {
       "key": "cs_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "update_interval",
@@ -34,34 +35,45 @@
       "key": "reference_resistance",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "430Ω"
     },
     {
       "key": "rtd_nominal_resistance",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "100Ω"
     },
     {
       "key": "mains_filter",
-      "type": "text",
+      "type": "select",
       "required": false,
       "lvl": "normal",
-      "placeholder": "60 Hz"
+      "default": "60 Hz",
+      "options": [
+        "50 Hz",
+        "60 Hz"
+      ]
     },
     {
       "key": "rtd_wires",
-      "type": "number",
+      "type": "select",
       "required": false,
       "lvl": "normal",
-      "placeholder": "4"
+      "default": "4",
+      "options": [
+        "2",
+        "3",
+        "4"
+      ]
     },
     {
       "key": "spi_id",
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
-      "domain": "sensor"
+      "domain": "spi"
     }
   ]
 }

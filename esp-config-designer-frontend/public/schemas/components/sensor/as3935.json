@@ -3,83 +3,53 @@
   "domain": "sensor",
   "platform": "as3935",
   "helpUrl": "https://esphome.io/components/sensor/as3935/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "as3935",
+      "dedupeBy": "id"
+    }
+  ],
   "fields": [
     {
-      "key": "cs_pin",
-      "type": "gpio",
+      "key": "hub",
+      "label": "Sensor hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_as3935.json"
+    },
+    {
+      "key": "as3935_id",
+      "type": "id_ref",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "domain": "as3935",
+      "allowSelfReference": true,
+      "default": "as3935_hub"
     },
     {
-      "key": "irq_pin",
-      "type": "gpio",
-      "required": true,
-      "lvl": "simple"
-    },
-    {
-      "key": "indoor",
-      "type": "boolean",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "noise_level",
-      "type": "text",
-      "required": false,
-      "lvl": "normal",
-      "placeholder": "2"
-    },
-    {
-      "key": "spike_rejection",
-      "type": "boolean",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "lightning_threshold",
-      "type": "duration",
-      "required": false,
-      "lvl": "normal",
-      "placeholder": "1"
-    },
-    {
-      "key": "mask_disturber",
-      "type": "boolean",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "div_ratio",
-      "type": "number",
-      "required": false,
-      "lvl": "normal",
-      "placeholder": "0"
-    },
-    {
-      "key": "capacitance",
-      "type": "number",
-      "required": false,
-      "lvl": "normal",
-      "placeholder": "0"
-    },
-    {
-      "key": "watchdog_threshold",
-      "type": "text",
-      "required": false,
-      "lvl": "normal",
-      "placeholder": "2"
-    },
-    {
-      "key": "tune_antenna",
-      "type": "boolean",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "calibration",
-      "type": "boolean",
+      "key": "custom_config",
+      "type": "raw_yaml",
       "required": false,
       "lvl": "advanced"
+    },
+    {
+      "key": "distance",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "lightning_energy",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     }
   ]
 }

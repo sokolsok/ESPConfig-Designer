@@ -1,0 +1,50 @@
+{
+  "id": "button.ld2412",
+  "domain": "button",
+  "platform": "ld2412",
+  "helpUrl": "https://esphome.io/components/sensor/ld2412/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "ld2412",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Radar hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_ld2412.json"
+    },
+    {
+      "key": "ld2412_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "ld2412",
+      "allowSelfReference": true,
+      "default": "ld2412_radar"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    { "key": "factory_reset", "type": "object", "required": false, "lvl": "simple", "extends": "base_button.json", "fields": [] },
+    { "key": "restart", "type": "object", "required": false, "lvl": "simple", "extends": "base_button.json", "fields": [] },
+    { "key": "query_params", "type": "object", "required": false, "lvl": "simple", "extends": "base_button.json", "fields": [] },
+    { "key": "start_dynamic_background_correction", "type": "object", "required": false, "lvl": "simple", "extends": "base_button.json", "fields": [] }
+  ]
+}

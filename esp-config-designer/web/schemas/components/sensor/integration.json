@@ -14,21 +14,31 @@
     },
     {
       "key": "sensor",
-      "type": "duration",
+      "type": "id_ref",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "domain": "sensor"
     },
     {
       "key": "time_unit",
-      "type": "duration",
+      "type": "select",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "default": "min",
+      "options": [
+        "ms",
+        "s",
+        "min",
+        "h",
+        "d"
+      ]
     },
     {
       "key": "integration_method",
       "type": "select",
       "required": false,
       "lvl": "normal",
+      "default": "trapezoid",
       "options": [
         "trapezoid",
         "left",

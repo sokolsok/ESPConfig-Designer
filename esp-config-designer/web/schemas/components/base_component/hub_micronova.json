@@ -1,0 +1,34 @@
+{
+  "id": "hub.micronova",
+  "domain": "micronova",
+  "platform": "",
+  "type": "object",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "micronova_hub",
+      "idDomain": "micronova"
+    },
+    {
+      "key": "enable_rx_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "uart"
+    }
+  ]
+}

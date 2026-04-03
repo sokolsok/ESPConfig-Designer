@@ -20,6 +20,7 @@
           "type": "select",
           "required": false,
           "lvl": "simple",
+		  "default": "X18",
           "options": [
             "X1",
             "X3",
@@ -33,6 +34,7 @@
           "type": "select",
           "required": false,
           "lvl": "normal",
+		  "default": "X18",
           "options": [
             "X1",
             "X3",
@@ -54,6 +56,7 @@
           "type": "select",
           "required": false,
           "lvl": "simple",
+		  "default": "20BIT",
           "options": [
             "20BIT",
             "19BIT",
@@ -68,6 +71,7 @@
           "type": "select",
           "required": false,
           "lvl": "normal",
+		  "default": "20BIT",
           "options": [
             "20BIT",
             "19BIT",

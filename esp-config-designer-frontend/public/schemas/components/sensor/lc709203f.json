@@ -3,19 +3,59 @@
   "domain": "sensor",
   "platform": "lc709203f",
   "helpUrl": "https://esphome.io/components/sensor/lc709203f/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
   "fields": [
     {
-      "key": "size",
-      "type": "text",
+      "key": "i2c_id",
+      "type": "id_ref",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "domain": "i2c"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x0B",
+      "placeholder": "0x0B"
+    },
+    {
+      "key": "size",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 500,
+      "placeholder": "500"
     },
     {
       "key": "voltage",
-      "type": "text",
+      "type": "select",
       "required": false,
       "lvl": "normal",
-      "placeholder": "3.7"
+      "default": "3.7",
+      "options": [
+        "3.7",
+        "3.8"
+      ]
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     },
     {
       "key": "battery_voltage",
@@ -41,19 +81,13 @@
       "fields": [
         {
           "key": "b_constant",
-          "type": "text",
+          "type": "number",
           "required": true,
-          "lvl": "simple"
+          "lvl": "simple",
+          "placeholder": "3950"
         }
       ],
       "extends": "base_sensor.json"
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "60s"
     }
   ]
 }

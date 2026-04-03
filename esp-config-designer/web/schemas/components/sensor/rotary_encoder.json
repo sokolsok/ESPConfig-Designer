@@ -35,6 +35,7 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
+	  "default": "1",
       "options": [
         "1",
         "2",
@@ -45,12 +46,14 @@
       "key": "min_value",
       "type": "number",
       "required": false,
+	  "placeholder": "0",
       "lvl": "normal"
     },
     {
       "key": "max_value",
       "type": "number",
       "required": false,
+	  "placeholder": "100",
       "lvl": "normal"
     },
     {
@@ -64,6 +67,7 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
+	  "default": "RESTORE_DEFAULT_ZERO",
       "options": [
         "RESTORE_DEFAULT_ZERO",
         "ALWAYS_ZERO"

@@ -9,7 +9,8 @@
       "type": "text",
 	  "suppressQuotes": true,
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "XX:XX:XX:XX:XX:XX"
     },
     {
       "key": "clear_impedance",

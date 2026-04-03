@@ -4,6 +4,13 @@
   "platform": "as5600",
   "helpUrl": "https://esphome.io/components/sensor/as5600/",
   "extends": "base_sensor.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "as5600",
+      "dedupeBy": "id"
+    }
+  ],
   "requirements": [
     {
       "require": "bus:i2c"
@@ -11,109 +18,72 @@
   ],
   "fields": [
     {
-      "key": "name",
-      "placeholder": "Sensor Name",
-      "type": "text",
+      "key": "hub",
+      "label": "Sensor hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_as5600.json"
+    },
+    {
+      "key": "as5600_id",
+      "type": "id_ref",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "domain": "as5600",
+      "allowSelfReference": true,
+      "default": "as5600_hub"
     },
     {
-      "key": "dir_pin",
-      "type": "gpio",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "direction",
+      "key": "out_of_range_mode",
       "type": "select",
       "required": false,
       "lvl": "normal",
+      "default": "min_max",
       "options": [
-        "clockwise",
-        "counterclockwise"
+        "min_max",
+        "nan"
       ]
     },
     {
-      "key": "start_position",
-      "type": "text",
+      "key": "update_interval",
+      "type": "duration",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "placeholder": "60s"
     },
     {
-      "key": "end_position",
-      "type": "text",
+      "key": "raw_position",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
-      "key": "range",
-      "type": "text",
+      "key": "gain",
+      "type": "object",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
-      "key": "hysteresis",
-      "type": "select",
+      "key": "magnitude",
+      "type": "object",
       "required": false,
-      "lvl": "normal",
-      "options": [
-        "none",
-        "lsb1",
-        "lsb2",
-        "lsb3"
-      ]
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     },
     {
-      "key": "power_mode",
-      "type": "select",
+      "key": "status",
+      "type": "object",
       "required": false,
-      "lvl": "normal",
-      "options": [
-        "nominal",
-        "low1",
-        "low2",
-        "low3"
-      ]
-    },
-    {
-      "key": "watchdog",
-      "type": "boolean",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "slow_filter",
-      "type": "select",
-      "required": false,
-      "lvl": "normal",
-      "options": [
-        "16x",
-        "8x",
-        "4x",
-        "2x"
-      ]
-    },
-    {
-      "key": "fast_filter",
-      "type": "select",
-      "required": false,
-      "lvl": "normal",
-      "options": [
-        "none",
-        "lsb6",
-        "lsb7",
-        "lsb9",
-        "lsb18",
-        "lsb21",
-        "lsb24",
-        "lsb10"
-      ]
-    },
-    {
-      "key": "address",
-      "type": "address",
-      "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     }
   ]
 }

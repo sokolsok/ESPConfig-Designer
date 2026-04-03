@@ -10,81 +10,18 @@
   ],
   "fields": [
     {
-      "key": "name",
-      "placeholder": "Sensor Name",
-      "type": "text",
-      "required": true,
+      "key": "id",
+      "type": "id",
+      "required": false,
       "lvl": "simple"
-    },
-    {
-      "key": "x_axis",
-      "type": "object",
-      "required": false,
-      "lvl": "simple",
-      "fields": [
-        {
-          "key": "resolution",
-          "type": "text",
-          "required": false,
-          "lvl": "normal",
-          "placeholder": "DIV_4"
-        }
-      ],
-      "extends": "base_sensor.json"
-    },
-    {
-      "key": "y_axis",
-      "type": "object",
-      "required": false,
-      "lvl": "simple",
-      "fields": [
-        {
-          "key": "resolution",
-          "type": "text",
-          "required": false,
-          "lvl": "normal",
-          "placeholder": "DIV_4"
-        }
-      ],
-      "extends": "base_sensor.json"
-    },
-    {
-      "key": "z_axis",
-      "type": "object",
-      "required": false,
-      "lvl": "simple",
-      "fields": [
-        {
-          "key": "resolution",
-          "type": "text",
-          "required": false,
-          "lvl": "normal",
-          "placeholder": "DIV_4"
-        }
-      ],
-      "extends": "base_sensor.json"
-    },
-    {
-      "key": "temperature",
-      "type": "object",
-      "required": false,
-      "lvl": "simple",
-      "fields": [
-        {
-          "key": "oversampling",
-          "type": "text",
-          "required": false,
-          "lvl": "normal",
-          "placeholder": "0"
-        }
-      ],
-      "extends": "base_sensor.json"
     },
     {
       "key": "drdy_pin",
       "type": "gpio",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+	  "placeholder": "GPIOXX"
+	  
     },
     {
       "key": "gain",
@@ -104,17 +41,33 @@
     },
     {
       "key": "oversampling",
-      "type": "text",
+      "type": "select",
       "required": false,
       "lvl": "normal",
-      "placeholder": "0"
+	  "default": "3",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ]
     },
     {
       "key": "filter",
-      "type": "text",
+      "type": "select",
       "required": false,
       "lvl": "normal",
-      "placeholder": "6"
+	  "default": "6",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+		"7"
+      ]
     },
     {
       "key": "temperature_compensation",
@@ -124,10 +77,14 @@
     },
     {
       "key": "hallconf",
-      "type": "text",
+      "type": "select",
       "required": false,
       "lvl": "normal",
-      "placeholder": "0xC"
+      "default": "0xC",
+      "options": [
+        "0xC",
+        "0x0"
+      ]
     },
     {
       "key": "update_interval",
@@ -141,6 +98,8 @@
       "type": "address",
       "required": false,
       "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x0C",
       "placeholder": "0x0C"
     },
     {
@@ -148,7 +107,95 @@
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
-      "domain": "sensor"
+      "domain": "i2c"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "x_axis",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "resolution",
+          "type": "select",
+          "required": false,
+          "lvl": "simple",
+          "default": "DIV_4",
+          "options": [
+            "DIV_8",
+            "DIV_4",
+            "DIV_2",
+            "DIV_1"
+          ]
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "y_axis",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "resolution",
+          "type": "select",
+          "required": false,
+          "lvl": "simple",
+          "default": "DIV_4",
+          "options": [
+            "DIV_8",
+            "DIV_4",
+            "DIV_2",
+            "DIV_1"
+          ]
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "z_axis",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "resolution",
+          "type": "select",
+          "required": false,
+          "lvl": "simple",
+          "default": "DIV_4",
+          "options": [
+            "DIV_8",
+            "DIV_4",
+            "DIV_2",
+            "DIV_1"
+          ]
+        }
+      ],
+      "extends": "base_sensor.json"
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "oversampling",
+          "type": "number",
+          "required": false,
+          "lvl": "simple",
+          "placeholder": "0"
+        }
+      ],
+      "extends": "base_sensor.json"
     }
   ]
 }

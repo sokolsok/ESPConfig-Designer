@@ -3,7 +3,6 @@
   "domain": "sensor",
   "platform": "mpu6050",
   "helpUrl": "https://esphome.io/components/sensor/mpu6050/",
-  "extends": "base_sensor.json",
   "requirements": [
     {
       "require": "bus:i2c"
@@ -11,60 +10,19 @@
   ],
   "fields": [
     {
-      "key": "name",
-      "placeholder": "Sensor Name",
-      "type": "text",
-      "required": true,
-      "lvl": "simple"
-    },
-    {
       "key": "address",
       "type": "address",
       "required": false,
       "lvl": "simple",
-      "placeholder": "0x68"
+	  "emitYAML": "always",
+      "default": "0x68"
     },
     {
-      "key": "accel_x",
-      "type": "text",
+      "key": "id",
+      "type": "id",
       "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "accel_y",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "accel_z",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "gyro_x",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "gyro_y",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "gyro_z",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "temperature",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "idDomain": "mpu6050"
     },
     {
       "key": "update_interval",
@@ -72,6 +30,19 @@
       "required": false,
       "lvl": "simple",
       "placeholder": "60s"
-    }
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    { "key": "accel_x", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "accel_y", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "accel_z", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "gyro_x", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "gyro_y", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "gyro_z", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "temperature", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] }
   ]
 }

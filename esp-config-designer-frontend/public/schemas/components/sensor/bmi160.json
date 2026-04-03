@@ -3,7 +3,6 @@
   "domain": "sensor",
   "platform": "bmi160",
   "helpUrl": "https://esphome.io/components/sensor/bmi160/",
-  "extends": "base_sensor.json",
   "requirements": [
     {
       "require": "bus:i2c"
@@ -11,60 +10,23 @@
   ],
   "fields": [
     {
-      "key": "name",
-      "placeholder": "Sensor Name",
-      "type": "text",
-      "required": true,
-      "lvl": "simple"
-    },
-    {
       "key": "address",
-      "type": "address",
+      "type": "select",
       "required": false,
       "lvl": "simple",
-      "placeholder": "0x68"
+      "default": "0x68",
+      "emitYAML": "always",
+      "options": [
+        "0x68",
+        "0x69"
+      ]
     },
     {
-      "key": "acceleration_x",
-      "type": "text",
+      "key": "id",
+      "type": "id",
       "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "acceleration_y",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "acceleration_z",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "gyroscope_x",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "gyroscope_y",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "gyroscope_z",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "temperature",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "idDomain": "bmi160"
     },
     {
       "key": "update_interval",
@@ -72,6 +34,68 @@
       "required": false,
       "lvl": "simple",
       "placeholder": "60s"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "acceleration_x",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "acceleration_y",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "acceleration_z",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "gyroscope_x",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "gyroscope_y",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "gyroscope_z",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     }
   ]
 }

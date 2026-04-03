@@ -1,0 +1,64 @@
+{
+  "id": "number.ld2412",
+  "domain": "number",
+  "platform": "ld2412",
+  "helpUrl": "https://esphome.io/components/sensor/ld2412/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "ld2412",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Radar hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_ld2412.json"
+    },
+    {
+      "key": "ld2412_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "ld2412",
+      "allowSelfReference": true,
+      "default": "ld2412_radar"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    { "key": "timeout", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "min_distance_gate", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "max_distance_gate", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "light_threshold", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "gate_0", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_1", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_2", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_3", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_4", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_5", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_6", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_7", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_8", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_9", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_10", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_11", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_12", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_13", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] }
+  ]
+}

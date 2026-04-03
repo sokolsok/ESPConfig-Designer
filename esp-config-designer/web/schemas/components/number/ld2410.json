@@ -1,0 +1,59 @@
+{
+  "id": "number.ld2410",
+  "domain": "number",
+  "platform": "ld2410",
+  "helpUrl": "https://esphome.io/components/sensor/ld2410/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "ld2410",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Radar hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_ld2410.json"
+    },
+    {
+      "key": "ld2410_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "ld2410",
+      "allowSelfReference": true,
+      "default": "ld2410_radar"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    { "key": "timeout", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "light_threshold", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "max_move_distance_gate", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "max_still_distance_gate", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "g0", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "g1", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "g2", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "g3", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "g4", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "g5", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "g6", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "g7", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "g8", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] }
+  ]
+}

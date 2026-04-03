@@ -5,26 +5,26 @@
   "helpUrl": "https://esphome.io/components/sensor/tx20/",
   "fields": [
     {
+      "key": "pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
       "key": "wind_speed",
       "type": "object",
-      "required": true,
+      "required": false,
       "lvl": "simple",
       "extends": "base_sensor.json",
       "fields": []
     },
     {
       "key": "wind_direction_degrees",
-      "required": true,
+      "required": false,
       "lvl": "simple",
       "type": "object",
       "extends": "base_sensor.json",
       "fields": []
-    },
-    {
-      "key": "pin",
-      "type": "gpio",
-      "required": true,
-      "lvl": "simple"
     }
   ]
 }

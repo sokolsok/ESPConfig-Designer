@@ -1,0 +1,54 @@
+{
+  "id": "sensor.seeed_mr24hpc1",
+  "domain": "sensor",
+  "platform": "seeed_mr24hpc1",
+  "helpUrl": "https://esphome.io/components/seeed_mr24hpc1/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "seeed_mr24hpc1",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Radar hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_seeed_mr24hpc1.json"
+    },
+    {
+      "key": "mr24hpc1_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "seeed_mr24hpc1",
+      "allowSelfReference": true,
+      "emitYAML": "never",
+      "default": "mr24hpc1_radar"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    { "key": "custom_presence_of_detection", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "movement_signs", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "custom_motion_distance", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "custom_spatial_static_value", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "custom_spatial_motion_value", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "custom_motion_speed", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "custom_mode_num", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] }
+  ]
+}

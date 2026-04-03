@@ -14,7 +14,24 @@
       "type": "address",
       "required": false,
       "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x3f",
       "placeholder": "0x3f"
+    },
+    {
+      "key": "id",
+      "placeholder": "example_sensor_id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "temperature_sensor",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "sensor",
+	  "placeholder": "temperature_sensor_id"
     },
     {
       "key": "update_interval",
@@ -22,13 +39,6 @@
       "required": false,
       "lvl": "simple",
       "placeholder": "60s"
-    },
-    {
-      "key": "temperature_sensor",
-      "type": "id_ref",
-      "required": false,
-      "lvl": "normal",
-      "domain": "sensor"
     },
     {
       "key": "ph",

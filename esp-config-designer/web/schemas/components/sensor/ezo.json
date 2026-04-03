@@ -21,13 +21,15 @@
       "key": "address",
       "type": "address",
       "required": true,
+	  "placeholder": "0xAA",
       "lvl": "simple"
     },
     {
       "key": "update_interval",
-      "type": "yaml",
+      "type": "duration",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "60s"
     },
     {
       "key": "on_led",

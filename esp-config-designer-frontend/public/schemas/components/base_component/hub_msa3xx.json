@@ -1,0 +1,139 @@
+{
+  "id": "hub.msa3xx",
+  "domain": "msa3xx",
+  "platform": "",
+  "type": "object",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "msa3xx_hub",
+      "idDomain": "msa3xx"
+    },
+    {
+      "key": "type",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "msa301",
+      "options": [
+        "msa301",
+        "msa311"
+      ]
+    },
+    {
+      "key": "range",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "2G",
+      "options": [
+        "2G",
+        "4G",
+        "8G",
+        "16G"
+      ]
+    },
+    {
+      "key": "resolution",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "14",
+      "dependsOn": {
+        "key": "type",
+        "value": "msa301"
+      },
+      "options": [
+        "8",
+        "10",
+        "12",
+        "14"
+      ]
+    },
+    {
+      "key": "resolution",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "12",
+      "note": "MSA311 supports only 12-bit resolution.",
+      "dependsOn": {
+        "key": "type",
+        "value": "msa311"
+      },
+      "options": [
+        "12"
+      ]
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "10s"
+    },
+    {
+      "key": "calibration",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        { "key": "offset_x", "type": "number", "required": false, "lvl": "normal", "placeholder": "0" },
+        { "key": "offset_y", "type": "number", "required": false, "lvl": "normal", "placeholder": "0" },
+        { "key": "offset_z", "type": "number", "required": false, "lvl": "normal", "placeholder": "0" }
+      ]
+    },
+    {
+      "key": "transform",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        { "key": "mirror_x", "type": "boolean", "required": false, "lvl": "normal" },
+        { "key": "mirror_y", "type": "boolean", "required": false, "lvl": "normal" },
+        { "key": "mirror_z", "type": "boolean", "required": false, "lvl": "normal" },
+        { "key": "swap_xy", "type": "boolean", "required": false, "lvl": "normal" }
+      ]
+    },
+    {
+      "key": "on_tap",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": { "type": "object", "fields": [], "extends": "base_actions.json" },
+      "wrapThen": true
+    },
+    {
+      "key": "on_double_tap",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": { "type": "object", "fields": [], "extends": "base_actions.json" },
+      "wrapThen": true
+    },
+    {
+      "key": "on_active",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": { "type": "object", "fields": [], "extends": "base_actions.json" },
+      "wrapThen": true
+    },
+    {
+      "key": "on_orientation",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": { "type": "object", "fields": [], "extends": "base_actions.json" },
+      "wrapThen": true
+    }
+  ]
+}

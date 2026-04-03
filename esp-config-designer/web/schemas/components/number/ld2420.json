@@ -1,0 +1,71 @@
+{
+  "id": "number.ld2420",
+  "domain": "number",
+  "platform": "ld2420",
+  "helpUrl": "https://esphome.io/components/sensor/ld2420/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "ld2420",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Radar hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_ld2420.json"
+    },
+    {
+      "key": "ld2420_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "ld2420",
+      "allowSelfReference": true,
+      "emitYAML": "never",
+      "default": "ld2420_radar"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    { "key": "presence_timeout", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "min_gate_distance", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "max_gate_distance", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "gate_select", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "still_threshold", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "move_threshold", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "gate_move_sensitivity", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "gate_still_sensitivity", "type": "object", "required": false, "lvl": "simple", "extends": "base_number.json", "fields": [] },
+    { "key": "gate_0", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_1", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_2", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_3", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_4", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_5", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_6", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_7", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_8", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_9", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_10", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_11", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_12", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_13", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_14", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] },
+    { "key": "gate_15", "type": "object", "required": false, "lvl": "normal", "fields": [ { "key": "still_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] }, { "key": "move_threshold", "type": "object", "required": false, "lvl": "normal", "extends": "base_number.json", "fields": [] } ] }
+  ]
+}

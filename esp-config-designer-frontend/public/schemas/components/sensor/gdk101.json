@@ -3,10 +3,74 @@
   "domain": "sensor",
   "platform": "gdk101",
   "helpUrl": "https://esphome.io/components/sensor/gdk101/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "gdk101",
+      "dedupeBy": "id"
+    }
+  ],
   "requirements": [
     {
       "require": "bus:i2c"
     }
   ],
-  "fields": []
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Sensor hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_gdk101.json"
+    },
+    {
+      "key": "gdk101_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "gdk101",
+      "allowSelfReference": true,
+      "default": "gdk101_hub"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "radiation_dose_per_1m",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "radiation_dose_per_10m",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "status",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "measurement_duration",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    }
+  ]
 }

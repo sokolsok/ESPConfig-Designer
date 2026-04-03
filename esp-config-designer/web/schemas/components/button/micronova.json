@@ -1,0 +1,77 @@
+{
+  "id": "button.micronova",
+  "domain": "button",
+  "platform": "micronova",
+  "helpUrl": "https://esphome.io/components/micronova/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "micronova",
+      "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Micronova hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_micronova.json"
+    },
+    {
+      "key": "micronova_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "micronova",
+      "allowSelfReference": true,
+      "default": "micronova_hub"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "custom_button",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_button.json",
+      "fields": [
+        {
+          "key": "memory_location",
+          "type": "text",
+          "required": true,
+          "lvl": "simple",
+          "placeholder": "0x20",
+          "suppressQuotes": true
+        },
+        {
+          "key": "memory_address",
+          "type": "text",
+          "required": true,
+          "lvl": "simple",
+          "placeholder": "0x7d",
+          "suppressQuotes": true
+        },
+        {
+          "key": "memory_data",
+          "type": "text",
+          "required": true,
+          "lvl": "simple",
+          "placeholder": "0x08",
+          "suppressQuotes": true
+        }
+      ]
+    }
+  ]
+}

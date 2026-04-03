@@ -1,0 +1,51 @@
+{
+  "id": "select.seeed_mr24hpc1",
+  "domain": "select",
+  "platform": "seeed_mr24hpc1",
+  "helpUrl": "https://esphome.io/components/seeed_mr24hpc1/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "seeed_mr24hpc1",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Radar hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_seeed_mr24hpc1.json"
+    },
+    {
+      "key": "mr24hpc1_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "seeed_mr24hpc1",
+      "allowSelfReference": true,
+      "emitYAML": "never",
+      "default": "mr24hpc1_radar"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    { "key": "scene_mode", "type": "object", "required": false, "lvl": "simple", "extends": "base_select.json", "fields": [] },
+    { "key": "unman_time", "type": "object", "required": false, "lvl": "simple", "extends": "base_select.json", "fields": [] },
+    { "key": "existence_boundary", "type": "object", "required": false, "lvl": "simple", "extends": "base_select.json", "fields": [] },
+    { "key": "motion_boundary", "type": "object", "required": false, "lvl": "simple", "extends": "base_select.json", "fields": [] }
+  ]
+}

@@ -3,7 +3,13 @@
   "domain": "sensor",
   "platform": "msa3xx",
   "helpUrl": "https://esphome.io/components/sensor/msa3xx/",
-  "extends": "base_sensor.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "msa3xx",
+      "dedupeBy": "id"
+    }
+  ],
   "requirements": [
     {
       "require": "bus:i2c"
@@ -11,105 +17,52 @@
   ],
   "fields": [
     {
-      "key": "name",
-      "placeholder": "Sensor Name",
-      "type": "text",
-      "required": true,
-      "lvl": "simple"
-    },
-    {
-      "key": "type",
-      "type": "text",
-      "required": true,
-      "lvl": "simple"
-    },
-    {
-      "key": "update_interval",
-      "type": "duration",
-      "required": false,
-      "lvl": "simple",
-      "placeholder": "10s"
-    },
-    {
-      "key": "range",
-      "type": "select",
-      "required": false,
-      "lvl": "normal",
-      "options": [
-        "2G",
-        "4G",
-        "8G",
-        "16G",
-        "-2g",
-        "2g"
-      ]
-    },
-    {
-      "key": "resolution",
-      "type": "text",
-      "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "calibration",
+      "key": "hub",
+      "label": "Accelerometer hub",
       "type": "object",
       "required": false,
       "lvl": "simple",
-      "fields": [
-        {
-          "key": "offset_x",
-          "type": "number",
-          "required": false,
-          "lvl": "normal",
-          "placeholder": "0"
-        },
-        {
-          "key": "offset_y",
-          "type": "number",
-          "required": false,
-          "lvl": "normal",
-          "placeholder": "0"
-        },
-        {
-          "key": "offset_z",
-          "type": "number",
-          "required": false,
-          "lvl": "normal",
-          "placeholder": "0"
-        }
-      ]
+      "emitYAML": "never",
+      "extends": "hub_msa3xx.json"
     },
     {
-      "key": "transform",
+      "key": "msa3xx_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "msa3xx",
+      "allowSelfReference": true,
+      "default": "msa3xx_hub"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "acceleration_x",
       "type": "object",
       "required": false,
       "lvl": "simple",
-      "fields": [
-        {
-          "key": "mirror_x",
-          "type": "boolean",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "mirror_y",
-          "type": "boolean",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "mirror_z",
-          "type": "boolean",
-          "required": false,
-          "lvl": "normal"
-        },
-        {
-          "key": "swap_xy",
-          "type": "boolean",
-          "required": false,
-          "lvl": "normal"
-        }
-      ]
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "acceleration_y",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "acceleration_z",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
     }
   ]
 }

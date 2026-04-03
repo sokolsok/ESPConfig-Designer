@@ -1504,13 +1504,6 @@
               "schemaPath": "components/sensor/lc709203f.json"
             },
             {
-              "name": "LVGL widget",
-              "path": "components/sensor/lvgl",
-              "id": "sensor/lvgl",
-              "available": true,
-              "schemaPath": "components/sensor/lvgl.json"
-            },
-            {
               "name": "M5Stack Unit 8 Angle",
               "path": "components/sensor/m5stack_8angle",
               "id": "sensor/m5stack_8angle",
@@ -1526,24 +1519,10 @@
             },
             {
               "name": "MicroNova pellet stove",
-              "path": "components/micronova",
-              "id": "micronova",
-              "available": false,
-              "schemaPath": ""
-            },
-            {
-              "name": "Modbus Sensor",
-              "path": "components/sensor/modbus_controller",
-              "id": "sensor/modbus_controller",
+              "path": "components/sensor/micronova",
+              "id": "sensor/micronova",
               "available": true,
-              "schemaPath": "components/sensor/modbus_controller.json"
-            },
-            {
-              "name": "Nextion",
-              "path": "components/sensor/nextion",
-              "id": "sensor/nextion",
-              "available": true,
-              "schemaPath": "components/sensor/nextion.json"
+              "schemaPath": "components/sensor/micronova.json"
             },
             {
               "name": "Person Sensor (SEN21231)",
@@ -1553,11 +1532,11 @@
               "schemaPath": "components/sensor/sen21231.json"
             },
             {
-              "name": "Resol VBus",
-              "path": "components/vbus",
-              "id": "vbus",
+              "name": "VBus Sensor",
+              "path": "components/sensor/vbus",
+              "id": "sensor/vbus",
               "available": true,
-              "schemaPath": "components/energy_solar_management/vbus.json"
+              "schemaPath": "components/sensor/vbus.json"
             },
             {
               "name": "Rotary Encoder",
@@ -1602,11 +1581,11 @@
               "schemaPath": "components/sensor/ufire_ise.json"
             },
             {
-              "name": "WireGuard",
-              "path": "components/wireguard",
-              "id": "wireguard",
-              "available": false,
-              "schemaPath": ""
+              "name": "WireGuard Sensor",
+              "path": "components/sensor/wireguard",
+              "id": "sensor/wireguard",
+              "available": true,
+              "schemaPath": "components/sensor/wireguard.json"
             }
           ]
         },
@@ -1680,11 +1659,11 @@
               "catalogKey": "sensor/msa3xx/msa311"
             },
             {
-              "name": "Seeed Studio MR24HPC1 mmWave",
-              "path": "components/seeed_mr24hpc1",
-              "id": "seeed_mr24hpc1",
-              "available": false,
-              "schemaPath": ""
+              "name": "MR24HPC1 mmWave",
+              "path": "components/sensor/seeed_mr24hpc1",
+              "id": "sensor/seeed_mr24hpc1",
+              "available": true,
+              "schemaPath": "components/sensor/seeed_mr24hpc1.json"
             }
           ]
         },
@@ -1954,6 +1933,20 @@
               "schemaPath": "components/binary_sensor/nextion.json"
             },
             {
+              "name": "VBus Binary Sensor",
+              "path": "components/binary_sensor/vbus",
+              "id": "binary_sensor/vbus",
+              "available": true,
+              "schemaPath": "components/binary_sensor/vbus.json"
+            },
+            {
+              "name": "WireGuard Binary Sensor",
+              "path": "components/binary_sensor/wireguard",
+              "id": "binary_sensor/wireguard",
+              "available": true,
+              "schemaPath": "components/binary_sensor/wireguard.json"
+            },
+            {
               "name": "TT21100",
               "path": "components/touchscreen/tt21100",
               "id": "touchscreen/tt21100",
@@ -1986,6 +1979,48 @@
               "id": "dfrobot_sen0395",
               "available": false,
               "schemaPath": ""
+            },
+            {
+              "name": "LD2410 Binary Sensor",
+              "path": "components/binary_sensor/ld2410",
+              "id": "binary_sensor/ld2410",
+              "available": true,
+              "schemaPath": "components/binary_sensor/ld2410.json"
+            },
+            {
+              "name": "LD2412 Binary Sensor",
+              "path": "components/binary_sensor/ld2412",
+              "id": "binary_sensor/ld2412",
+              "available": true,
+              "schemaPath": "components/binary_sensor/ld2412.json"
+            },
+            {
+              "name": "LD2420 Binary Sensor",
+              "path": "components/binary_sensor/ld2420",
+              "id": "binary_sensor/ld2420",
+              "available": true,
+              "schemaPath": "components/binary_sensor/ld2420.json"
+            },
+            {
+              "name": "LD2450 Binary Sensor",
+              "path": "components/binary_sensor/ld2450",
+              "id": "binary_sensor/ld2450",
+              "available": true,
+              "schemaPath": "components/binary_sensor/ld2450.json"
+            },
+            {
+              "name": "MSA3xx Binary Sensor",
+              "path": "components/binary_sensor/msa3xx",
+              "id": "binary_sensor/msa3xx",
+              "available": true,
+              "schemaPath": "components/binary_sensor/msa3xx.json"
+            },
+            {
+              "name": "MR24HPC1 Binary Sensor",
+              "path": "components/binary_sensor/seeed_mr24hpc1",
+              "id": "binary_sensor/seeed_mr24hpc1",
+              "available": true,
+              "schemaPath": "components/binary_sensor/seeed_mr24hpc1.json"
             }
           ]
         },
@@ -2197,6 +2232,48 @@
           "id": "button/wake_on_lan",
           "available": true,
           "schemaPath": "components/button/wake_on_lan.json"
+        },
+        {
+          "name": "LD2410 Button",
+          "path": "components/button/ld2410",
+          "id": "button/ld2410",
+          "available": true,
+          "schemaPath": "components/button/ld2410.json"
+        },
+        {
+          "name": "LD2412 Button",
+          "path": "components/button/ld2412",
+          "id": "button/ld2412",
+          "available": true,
+          "schemaPath": "components/button/ld2412.json"
+        },
+        {
+          "name": "LD2420 Button",
+          "path": "components/button/ld2420",
+          "id": "button/ld2420",
+          "available": true,
+          "schemaPath": "components/button/ld2420.json"
+        },
+        {
+          "name": "LD2450 Button",
+          "path": "components/button/ld2450",
+          "id": "button/ld2450",
+          "available": true,
+          "schemaPath": "components/button/ld2450.json"
+        },
+        {
+          "name": "MR24HPC1 Button",
+          "path": "components/button/seeed_mr24hpc1",
+          "id": "button/seeed_mr24hpc1",
+          "available": true,
+          "schemaPath": "components/button/seeed_mr24hpc1.json"
+        },
+        {
+          "name": "MicroNova Button",
+          "path": "components/button/micronova",
+          "id": "button/micronova",
+          "available": true,
+          "schemaPath": "components/button/micronova.json"
         },
         {
           "name": "Seeed Studio MR60FDA2 Buttons",
@@ -3053,6 +3130,48 @@
           "schemaPath": "components/number/modbus_controller.json"
         },
         {
+          "name": "LD2410 Number",
+          "path": "components/number/ld2410",
+          "id": "number/ld2410",
+          "available": true,
+          "schemaPath": "components/number/ld2410.json"
+        },
+        {
+          "name": "LD2412 Number",
+          "path": "components/number/ld2412",
+          "id": "number/ld2412",
+          "available": true,
+          "schemaPath": "components/number/ld2412.json"
+        },
+        {
+          "name": "LD2420 Number",
+          "path": "components/number/ld2420",
+          "id": "number/ld2420",
+          "available": true,
+          "schemaPath": "components/number/ld2420.json"
+        },
+        {
+          "name": "LD2450 Number",
+          "path": "components/number/ld2450",
+          "id": "number/ld2450",
+          "available": true,
+          "schemaPath": "components/number/ld2450.json"
+        },
+        {
+          "name": "MR24HPC1 Number",
+          "path": "components/number/seeed_mr24hpc1",
+          "id": "number/seeed_mr24hpc1",
+          "available": true,
+          "schemaPath": "components/number/seeed_mr24hpc1.json"
+        },
+        {
+          "name": "MicroNova Number",
+          "path": "components/number/micronova",
+          "id": "number/micronova",
+          "available": true,
+          "schemaPath": "components/number/micronova.json"
+        },
+        {
           "name": "Tuya Number",
           "path": "components/number/tuya",
           "id": "number/tuya",
@@ -3312,6 +3431,41 @@
           "schemaPath": "components/select/tuya.json"
         },
         {
+          "name": "LD2410 Select",
+          "path": "components/select/ld2410",
+          "id": "select/ld2410",
+          "available": true,
+          "schemaPath": "components/select/ld2410.json"
+        },
+        {
+          "name": "LD2412 Select",
+          "path": "components/select/ld2412",
+          "id": "select/ld2412",
+          "available": true,
+          "schemaPath": "components/select/ld2412.json"
+        },
+        {
+          "name": "LD2420 Select",
+          "path": "components/select/ld2420",
+          "id": "select/ld2420",
+          "available": true,
+          "schemaPath": "components/select/ld2420.json"
+        },
+        {
+          "name": "LD2450 Select",
+          "path": "components/select/ld2450",
+          "id": "select/ld2450",
+          "available": true,
+          "schemaPath": "components/select/ld2450.json"
+        },
+        {
+          "name": "MR24HPC1 Select",
+          "path": "components/select/seeed_mr24hpc1",
+          "id": "select/seeed_mr24hpc1",
+          "available": true,
+          "schemaPath": "components/select/seeed_mr24hpc1.json"
+        },
+        {
           "name": "Seeed Studio MR60FDA2 Selects",
           "path": "components/select/seeed_mr60fda2",
           "id": "select/seeed_mr60fda2",
@@ -3458,6 +3612,41 @@
           "available": true,
           "schemaPath": "components/switch/homeassistant.json",
           "catalogKey": "switch/homeassistant/home_assistant"
+        },
+        {
+          "name": "LD2410 Switch",
+          "path": "components/switch/ld2410",
+          "id": "switch/ld2410",
+          "available": true,
+          "schemaPath": "components/switch/ld2410.json"
+        },
+        {
+          "name": "LD2412 Switch",
+          "path": "components/switch/ld2412",
+          "id": "switch/ld2412",
+          "available": true,
+          "schemaPath": "components/switch/ld2412.json"
+        },
+        {
+          "name": "LD2450 Switch",
+          "path": "components/switch/ld2450",
+          "id": "switch/ld2450",
+          "available": true,
+          "schemaPath": "components/switch/ld2450.json"
+        },
+        {
+          "name": "MR24HPC1 Switch",
+          "path": "components/switch/seeed_mr24hpc1",
+          "id": "switch/seeed_mr24hpc1",
+          "available": true,
+          "schemaPath": "components/switch/seeed_mr24hpc1.json"
+        },
+        {
+          "name": "MicroNova Switch",
+          "path": "components/switch/micronova",
+          "id": "switch/micronova",
+          "available": true,
+          "schemaPath": "components/switch/micronova.json"
         }
       ],
       "subcategories": []
@@ -3538,6 +3727,55 @@
           "schemaPath": "components/text_sensor/modbus_controller.json"
         },
         {
+          "name": "LD2410 Text Sensor",
+          "path": "components/text_sensor/ld2410",
+          "id": "text_sensor/ld2410",
+          "available": true,
+          "schemaPath": "components/text_sensor/ld2410.json"
+        },
+        {
+          "name": "LD2412 Text Sensor",
+          "path": "components/text_sensor/ld2412",
+          "id": "text_sensor/ld2412",
+          "available": true,
+          "schemaPath": "components/text_sensor/ld2412.json"
+        },
+        {
+          "name": "LD2420 Text Sensor",
+          "path": "components/text_sensor/ld2420",
+          "id": "text_sensor/ld2420",
+          "available": true,
+          "schemaPath": "components/text_sensor/ld2420.json"
+        },
+        {
+          "name": "LD2450 Text Sensor",
+          "path": "components/text_sensor/ld2450",
+          "id": "text_sensor/ld2450",
+          "available": true,
+          "schemaPath": "components/text_sensor/ld2450.json"
+        },
+        {
+          "name": "MSA3xx Text Sensor",
+          "path": "components/text_sensor/msa3xx",
+          "id": "text_sensor/msa3xx",
+          "available": true,
+          "schemaPath": "components/text_sensor/msa3xx.json"
+        },
+        {
+          "name": "MR24HPC1 Text Sensor",
+          "path": "components/text_sensor/seeed_mr24hpc1",
+          "id": "text_sensor/seeed_mr24hpc1",
+          "available": true,
+          "schemaPath": "components/text_sensor/seeed_mr24hpc1.json"
+        },
+        {
+          "name": "MicroNova Text Sensor",
+          "path": "components/text_sensor/micronova",
+          "id": "text_sensor/micronova",
+          "available": true,
+          "schemaPath": "components/text_sensor/micronova.json"
+        },
+        {
           "name": "MQTT Subscribe Text",
           "path": "components/text_sensor/mqtt_subscribe",
           "id": "text_sensor/mqtt_subscribe",
@@ -3557,6 +3795,13 @@
           "id": "text_sensor/openthread_info",
           "available": true,
           "schemaPath": "components/text_sensor/openthread_info.json"
+        },
+        {
+          "name": "WireGuard Text Sensor",
+          "path": "components/text_sensor/wireguard",
+          "id": "text_sensor/wireguard",
+          "available": true,
+          "schemaPath": "components/text_sensor/wireguard.json"
         },
         {
           "name": "Tuya Text Sensor",
@@ -3892,8 +4137,16 @@
     "binary_sensor/gpio",
     "binary_sensor/homeassistant",
     "binary_sensor/hydreon_rgxx",
+    "binary_sensor/ld2410",
+    "binary_sensor/ld2412",
+    "binary_sensor/ld2420",
+    "binary_sensor/ld2450",
+    "binary_sensor/msa3xx",
+    "binary_sensor/seeed_mr24hpc1",
     "binary_sensor/seeed_mr60fda2",
     "binary_sensor/seeed_mr60bha2",
+    "binary_sensor/vbus",
+    "binary_sensor/wireguard",
     "binary_sensor/lvgl",
     "binary_sensor/modbus_controller",
     "binary_sensor/mpr121",
@@ -3918,6 +4171,12 @@
     "button/restart",
     "button/safe_mode",
     "button/shutdown",
+    "button/ld2410",
+    "button/ld2412",
+    "button/ld2420",
+    "button/ld2450",
+    "button/seeed_mr24hpc1",
+    "button/micronova",
     "button/template",
     "button/uart",
     "button/seeed_mr60fda2",
@@ -4073,7 +4332,6 @@
     "media_player/i2s_audio",
     "media_player/speaker",
     "micro_wake_word",
-    "micronova",
     "microphone",
     "microphone/i2s_audio",
     "modbus_controller",
@@ -4082,7 +4340,13 @@
     "nrf52",
     "number",
     "number/homeassistant",
+    "number/ld2410",
+    "number/ld2412",
+    "number/ld2420",
+    "number/ld2450",
+    "number/seeed_mr24hpc1",
     "number/lvgl",
+    "number/micronova",
     "number/modbus_controller",
     "number/template",
     "number/tuya",
@@ -4146,8 +4410,13 @@
     "rtttl",
     "safe_mode",
     "script",
-    "seeed_mr24hpc1",
+    "sensor/seeed_mr24hpc1",
     "select",
+    "select/ld2410",
+    "select/ld2412",
+    "select/ld2420",
+    "select/ld2450",
+    "select/seeed_mr24hpc1",
     "select/seeed_mr60fda2",
     "select/lvgl",
     "select/modbus_controller",
@@ -4155,6 +4424,9 @@
     "select/tuya",
     "sensor",
     "sensor/seeed_mr60bha2",
+    "sensor/micronova",
+    "sensor/wireguard",
+    "sensor/vbus",
     "sensor/a01nyub",
     "sensor/a02yyuw",
     "sensor/absolute_humidity",
@@ -4395,7 +4667,12 @@
     "switch/gpio",
     "switch/hbridge",
     "switch/homeassistant",
+    "switch/ld2410",
+    "switch/ld2412",
+    "switch/ld2450",
     "switch/lvgl",
+    "switch/micronova",
+    "switch/seeed_mr24hpc1",
     "switch/modbus_controller",
     "switch/nextion",
     "switch/output",
@@ -4420,10 +4697,18 @@
     "text_sensor/homeassistant",
     "text_sensor/libretiny",
     "text_sensor/lvgl",
+    "text_sensor/ld2410",
+    "text_sensor/ld2412",
+    "text_sensor/ld2420",
+    "text_sensor/ld2450",
+    "text_sensor/msa3xx",
+    "text_sensor/micronova",
+    "text_sensor/seeed_mr24hpc1",
     "text_sensor/modbus_controller",
     "text_sensor/mqtt_subscribe",
     "text_sensor/nextion",
     "text_sensor/openthread_info",
+    "text_sensor/wireguard",
     "text_sensor/template",
     "text_sensor/tuya",
     "text_sensor/version",
@@ -4462,13 +4747,11 @@
     "usb_uart",
     "valve",
     "valve/template",
-    "vbus",
     "voice_assistant",
     "web_server",
     "weikai",
     "wiegand",
     "wifi",
-    "wireguard",
     "xl9535",
     "xxtea",
     "zwave_proxy"

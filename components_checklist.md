@@ -207,67 +207,69 @@
 
 ### Magnetic
 
-- [ ] AS5600 (`sensor/as5600`)
-- [ ] HMC5883L (`sensor/hmc5883l`)
-- [ ] MLX90393 (`sensor/mlx90393`)
-- [ ] MMC5603 (`sensor/mmc5603`)
-- [ ] MMC5983 (`sensor/mmc5983`)
-- [ ] QMC5883L (`sensor/qmc5883l`)
+- [x] AS5600 (`sensor/as5600`)
+- [x] HMC5883L (`sensor/hmc5883l`)
+- [x] MLX90393 (`sensor/mlx90393`)
+- [x] MMC5603 (`sensor/mmc5603`)
+- [x] MMC5983 (`sensor/mmc5983`)
+- [x] QMC5883L (`sensor/qmc5883l`)
 
 ### Miscellaneous
 
-- [ ] AS3935 (`sensor/as3935`)
-- [ ] Binary Sensor Map (`sensor/binary_sensor_map`)
-- [ ] Combination (`sensor/combination`)
-- [ ] Duty Time (`sensor/duty_time`)
-- [ ] EZO sensor circuits (`sensor/ezo`)
-- [ ] FS3000 (`sensor/fs3000`)
-- [ ] GDK101 (`sensor/gdk101`)
-- [ ] Growatt Solar (`sensor/growatt_solar`)
-- [ ] Havells Solar (`sensor/havells_solar`)
-- [ ] Integration (`sensor/integration`)
-- [ ] Kuntze pool sensor (`sensor/kuntze`)
-- [ ] LC709203F (`sensor/lc709203f`)
+- [x] AS3935 (`sensor/as3935`)
+- [x] Binary Sensor Map (`sensor/binary_sensor_map`)
+- [x] Combination (`sensor/combination`)
+- [x] Duty Time (`sensor/duty_time`)
+- [x] EZO sensor circuits (`sensor/ezo`)
+- [x] FS3000 (`sensor/fs3000`)
+- [x] GDK101 (`sensor/gdk101`)
+- [x] Growatt Solar (`sensor/growatt_solar`)
+- [x] Havells Solar (`sensor/havells_solar`)
+- [x] Integration (`sensor/integration`)
+- [x] Kuntze pool sensor (`sensor/kuntze`)
+- [x] LC709203F (`sensor/lc709203f`)
 - [ ] LVGL widget (`sensor/lvgl`)
-- [ ] M5Stack Unit 8 Angle (`sensor/m5stack_8angle`)
-- [ ] MAX17043 (`sensor/max17043`)
-- [ ] MicroNova pellet stove (`micronova`) - unavailable
-- [ ] Modbus Sensor (`sensor/modbus_controller`)
-- [ ] Nextion (`sensor/nextion`)
-- [ ] Person Sensor (SEN21231) (`sensor/sen21231`)
-- [ ] Resol VBus (`vbus`)
-- [ ] Rotary Encoder (`sensor/rotary_encoder`)
-- [ ] Sound Level (`sensor/sound_level`)
-- [ ] Tuya Sensor (`sensor/tuya`)
-- [ ] TX20 (`sensor/tx20`)
-- [ ] uFire EC sensor (`sensor/ufire_ec`)
-- [ ] uFire ISE sensor (`sensor/ufire_ise`)
-- [ ] WireGuard (`wireguard`) - unavailable
+- [x] M5Stack Unit 8 Angle (`sensor/m5stack_8angle`)
+- [x] MAX17043 (`sensor/max17043`)
+- [x] MicroNova pellet stove (`sensor/micronova`)
+- [x] Modbus Sensor (`sensor/modbus_controller`)
+- [x] Nextion (`sensor/nextion`)
+- [x] Person Sensor (SEN21231) (`sensor/sen21231`)
+- [x] Resol VBus (`vbus`)
+- [x] VBus Sensor (`sensor/vbus`)
+- [x] Rotary Encoder (`sensor/rotary_encoder`)
+- [x] Sound Level (`sensor/sound_level`)
+- [x] Tuya Sensor (`sensor/tuya`)
+- [x] TX20 (`sensor/tx20`)
+- [x] uFire EC sensor (`sensor/ufire_ec`)
+- [x] uFire ISE sensor (`sensor/ufire_ise`)
+- [x] WireGuard (`wireguard`)
+- [x] WireGuard Sensor (`sensor/wireguard`)
 
 ### Motion
 
-- [ ] BMI160 (`sensor/bmi160`)
-- [ ] LD2410 (`sensor/ld2410`)
-- [ ] LD2412 (`sensor/ld2412`)
-- [ ] LD2420 (`sensor/ld2420`)
-- [ ] LD2450 (`sensor/ld2450`)
-- [ ] MPU6050 (`sensor/mpu6050`)
-- [ ] MPU6886 (`sensor/mpu6886`)
-- [ ] MSA301 (`sensor/msa3xx`)
-- [ ] Seeed Studio MR24HPC1 mmWave (`seeed_mr24hpc1`) - unavailable
+- [x] BMI160 (`sensor/bmi160`)
+- [x] LD2410 (`sensor/ld2410`)
+- [x] LD2412 (`sensor/ld2412`)
+- [x] LD2420 (`sensor/ld2420`)
+- [x] LD2450 (`sensor/ld2450`)
+- [x] MPU6050 (`sensor/mpu6050`)
+- [x] MPU6886 (`sensor/mpu6886`)
+- [x] MSA301 (`sensor/msa3xx`)
+- [x] Seeed Studio MR24HPC1 mmWave (`sensor/seeed_mr24hpc1`)
 
 ### Thermocouple
 
-- [ ] KMeterISO (`sensor/kmeteriso`)
-- [ ] MAX31855 (`sensor/max31855`)
-- [ ] MAX31856 (`sensor/max31856`)
-- [ ] MAX31865 (`sensor/max31865`)
-- [ ] MAX6675 (`sensor/max6675`)
-- [ ] MCP9600 (`sensor/mcp9600`)
+- [x] KMeterISO (`sensor/kmeteriso`)
+- [x] MAX31855 (`sensor/max31855`)
+- [x] MAX31856 (`sensor/max31856`)
+- [x] MAX31865 (`sensor/max31865`)
+- [x] MAX6675 (`sensor/max6675`)
+- [x] MCP9600 (`sensor/mcp9600`)
 
 ### Weight
 
-- [ ] HX711 (`sensor/hx711`)
+- [x] HX711 (`sensor/hx711`)
 - [x] Xiaomi Miscale (`sensor/xiaomi_miscale`)
 
 ## Binary Sensor Components
@@ -316,6 +318,11 @@
 
 - [ ] AT581X (`at581x`) - unavailable
 - [ ] DFRobot mmWave Radar (`dfrobot_sen0395`) - unavailable
+- [x] LD2410 Binary Sensor (`binary_sensor/ld2410`)
+- [x] LD2412 Binary Sensor (`binary_sensor/ld2412`)
+- [x] LD2420 Binary Sensor (`binary_sensor/ld2420`)
+- [x] LD2450 Binary Sensor (`binary_sensor/ld2450`)
+- [x] MSA3xx Binary Sensor (`binary_sensor/msa3xx`)
 
 ### Miscellaneous
 
@@ -327,6 +334,8 @@
 - [ ] Pylontech Batteries (`pylontech`) - unavailable
 - [ ] Qwiic PIR Motion (`binary_sensor/qwiic_pir`)
 - [ ] Tuya Binary Sensor (`binary_sensor/tuya`)
+- [x] VBus Binary Sensor (`binary_sensor/vbus`)
+- [x] WireGuard Binary Sensor (`binary_sensor/wireguard`)
 
 ## Alarm Control Panel Components
 
@@ -354,6 +363,12 @@
 - [ ] Shutdown Button (`button/shutdown`)
 - [ ] UART Button (`button/uart`)
 - [ ] Wake-on-LAN (`button/wake_on_lan`)
+- [x] LD2410 Button (`button/ld2410`)
+- [x] LD2412 Button (`button/ld2412`)
+- [x] LD2420 Button (`button/ld2420`)
+- [x] LD2450 Button (`button/ld2450`)
+- [x] Seeed Studio MR24HPC1 Button (`button/seeed_mr24hpc1`)
+- [x] MicroNova Button (`button/micronova`)
 
 ## Climate Components
 
@@ -497,6 +512,12 @@
 
 - [ ] Template Number (`number/template`)
 - [ ] LVGL widget Number (`number/lvgl`)
+- [x] LD2410 Number (`number/ld2410`)
+- [x] LD2412 Number (`number/ld2412`)
+- [x] LD2420 Number (`number/ld2420`)
+- [x] LD2450 Number (`number/ld2450`)
+- [x] Seeed Studio MR24HPC1 Number (`number/seeed_mr24hpc1`)
+- [x] MicroNova Number (`number/micronova`)
 - [ ] Modbus Number (`number/modbus_controller`)
 - [ ] Tuya Number (`number/tuya`)
 
@@ -536,6 +557,11 @@
 
 - [ ] Template Select (`select/template`)
 - [ ] LVGL widget Select (`select/lvgl`)
+- [x] LD2410 Select (`select/ld2410`)
+- [x] LD2412 Select (`select/ld2412`)
+- [x] LD2420 Select (`select/ld2420`)
+- [x] LD2450 Select (`select/ld2450`)
+- [x] Seeed Studio MR24HPC1 Select (`select/seeed_mr24hpc1`)
 - [ ] Modbus Select (`select/modbus_controller`)
 - [ ] Tuya Select (`select/tuya`)
 
@@ -554,6 +580,10 @@
 - [ ] GPIO Switch (`switch/gpio`)
 - [ ] H-bridge Switch (`switch/hbridge`)
 - [ ] LVGL Widget (`switch/lvgl`)
+- [x] LD2410 Switch (`switch/ld2410`)
+- [x] LD2412 Switch (`switch/ld2412`)
+- [x] LD2450 Switch (`switch/ld2450`)
+- [x] Seeed Studio MR24HPC1 Switch (`switch/seeed_mr24hpc1`)
 - [ ] Modbus Switch (`switch/modbus_controller`)
 - [ ] Nextion Switch (`switch/nextion`)
 - [ ] Restart Switch (`switch/restart`)
@@ -561,6 +591,7 @@
 - [ ] Shutdown Switch (`switch/shutdown`)
 - [ ] Tuya Switch (`switch/tuya`)
 - [ ] UART Switch (`switch/uart`)
+- [x] MicroNova Switch (`switch/micronova`)
 
 ## Text Components
 
@@ -574,10 +605,18 @@
 - [ ] Ethernet Info (`text_sensor/ethernet_info`)
 - [ ] LibreTiny (`text_sensor/libretiny`)
 - [ ] LVGL textarea Text Sensor (`text_sensor/lvgl`)
+- [x] LD2410 Text Sensor (`text_sensor/ld2410`)
+- [x] LD2412 Text Sensor (`text_sensor/ld2412`)
+- [x] LD2420 Text Sensor (`text_sensor/ld2420`)
+- [x] LD2450 Text Sensor (`text_sensor/ld2450`)
+- [x] MSA3xx Text Sensor (`text_sensor/msa3xx`)
+- [x] Seeed Studio MR24HPC1 Text Sensor (`text_sensor/seeed_mr24hpc1`)
+- [x] MicroNova Text Sensor (`text_sensor/micronova`)
 - [ ] Modbus Text Sensor (`text_sensor/modbus_controller`)
 - [ ] MQTT Subscribe Text (`text_sensor/mqtt_subscribe`)
 - [ ] Nextion Text Sensor (`text_sensor/nextion`)
 - [ ] OpenThread Info (`text_sensor/openthread_info`)
+- [x] WireGuard Text Sensor (`text_sensor/wireguard`)
 - [ ] Tuya Text Sensor (`text_sensor/tuya`)
 - [ ] Version (`text_sensor/version`)
 - [ ] WiFi Info (`text_sensor/wifi_info`)

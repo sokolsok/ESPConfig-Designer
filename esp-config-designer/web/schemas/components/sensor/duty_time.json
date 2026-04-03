@@ -3,26 +3,21 @@
   "domain": "sensor",
   "platform": "duty_time",
   "helpUrl": "https://esphome.io/components/sensor/duty_time/",
+  "extends": "base_sensor.json",
   "fields": [
     {
       "key": "sensor",
-      "type": "duration",
+      "type": "id_ref",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "domain": "binary_sensor",
+	  "placeholder": "binary_sensor_id"
     },
     {
       "key": "lambda",
       "type": "lambda",
       "required": false,
       "lvl": "normal"
-    },
-    {
-      "key": "last_time",
-      "required": false,
-      "lvl": "simple",
-      "type": "object",
-      "extends": "base_sensor.json",
-      "fields": []
     },
     {
       "key": "restore",
@@ -36,6 +31,14 @@
       "required": false,
       "lvl": "simple",
       "placeholder": "60s"
+    },
+    {
+      "key": "last_time",
+      "required": false,
+      "lvl": "simple",
+      "type": "object",
+      "extends": "base_sensor.json",
+      "fields": []
     }
   ]
 }

@@ -6,15 +6,17 @@
   "fields": [
     {
       "key": "microphone",
-      "type": "text",
+      "type": "id_ref",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "domain": "microphone"
     },
     {
       "key": "measurement_duration",
       "type": "duration",
       "required": false,
       "lvl": "normal",
+      "default": "1000ms",
       "placeholder": "1000ms"
     },
     {

@@ -1,0 +1,37 @@
+{
+  "id": "hub.m5stack_8angle",
+  "domain": "m5stack_8angle",
+  "platform": "",
+  "type": "object",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "m5stack_8angle_hub",
+      "idDomain": "m5stack_8angle"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2c"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "0x43",
+      "placeholder": "0x43"
+    }
+  ]
+}
