@@ -1,0 +1,97 @@
+{
+  "id": "base.binary_sensor_filters",
+  "type": "filter-catalog",
+  "description": "Binary sensor filter catalog for list-based filter pickers.",
+  "filters": [
+    {
+      "id": "invert",
+      "label": "Invert",
+      "description": "Invert the binary state.",
+      "style": "object",
+      "fields": []
+    },
+    {
+      "id": "delayed_on",
+      "label": "Delayed On",
+      "description": "Delay publishing ON until the state stays ON for the given time.",
+      "style": "scalar",
+      "valueType": "duration",
+      "fields": [
+        { "key": "value", "type": "duration", "required": true }
+      ]
+    },
+    {
+      "id": "delayed_off",
+      "label": "Delayed Off",
+      "description": "Delay publishing OFF until the state stays OFF for the given time.",
+      "style": "scalar",
+      "valueType": "duration",
+      "fields": [
+        { "key": "value", "type": "duration", "required": true }
+      ]
+    },
+    {
+      "id": "delayed_on_off",
+      "label": "Delayed On/Off",
+      "description": "Delay both ON and OFF transitions. Use one duration for both or provide separate times.",
+      "style": "scalar_or_object",
+      "valueType": "duration",
+      "fields": [
+        { "key": "time_on", "type": "duration", "required": false },
+        { "key": "time_off", "type": "duration", "required": false }
+      ]
+    },
+    {
+      "id": "autorepeat",
+      "label": "Auto Repeat",
+      "description": "Repeat ON/OFF pulses while the source remains active.",
+      "style": "list",
+      "valueKey": "timings",
+      "fields": [
+        {
+          "key": "timings",
+          "type": "list",
+          "required": true,
+          "item": {
+            "type": "object",
+            "fields": [
+              { "key": "delay", "type": "duration", "required": false },
+              { "key": "time_off", "type": "duration", "required": false },
+              { "key": "time_on", "type": "duration", "required": false }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "lambda",
+      "label": "Lambda",
+      "description": "Return true, false, or {} from a custom lambda.",
+      "style": "scalar",
+      "valueType": "lambda",
+      "fields": [
+        { "key": "value", "type": "lambda", "required": true }
+      ]
+    },
+    {
+      "id": "settle",
+      "label": "Settle",
+      "description": "Publish the new state immediately, then ignore changes until the settle period passes.",
+      "style": "scalar",
+      "valueType": "duration",
+      "fields": [
+        { "key": "value", "type": "duration", "required": true }
+      ]
+    },
+    {
+      "id": "timeout",
+      "label": "Timeout",
+      "description": "Reset the binary sensor after the given timeout.",
+      "style": "scalar",
+      "valueType": "duration",
+      "fields": [
+        { "key": "value", "type": "duration", "required": true }
+      ]
+    }
+  ]
+}

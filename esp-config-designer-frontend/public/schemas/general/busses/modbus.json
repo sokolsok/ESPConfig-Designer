@@ -28,7 +28,7 @@
     {
       "key": "uart_id",
       "type": "id_ref",
-      "required": false,
+      "required": true,
       "lvl": "simple",
       "domain": "uart",
       "dependsOn": {

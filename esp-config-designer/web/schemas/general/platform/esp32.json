@@ -9,6 +9,7 @@
       "type": "select",
       "required": false,
       "lvl": "simple",
+      "set_global": "esp32_variant",
       "emitYAML": "always",
       "default": "esp32",
       "options": [

@@ -59,11 +59,15 @@
     },
     {
       "key": "filters",
-      "type": "yaml",
+      "type": "list",
       "required": false,
       "lvl": "advanced",
-      "placeholder": "- invert:\n- delayed_on: 50ms",
-      "helpUrl": "https://esphome.io/components/binary_sensor/#binary-sensor-filters"
+      "helpUrl": "https://esphome.io/components/binary_sensor/#binary-sensor-filters",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_binary_sensor_filters.json"
+      }
     },
     {
       "key": "on_press",
@@ -155,6 +159,12 @@
         "extends": "base_actions.json"
       },
       "wrapThen": true
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

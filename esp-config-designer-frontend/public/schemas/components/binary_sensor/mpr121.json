@@ -40,8 +40,7 @@
       "required": false,
       "lvl": "simple",
       "domain": "mpr121",
-      "allowSelfReference": true,
-      "default": "mpr121_hub_id"
+      "allowSelfReference": true
     },
     {
       "key": "channel",

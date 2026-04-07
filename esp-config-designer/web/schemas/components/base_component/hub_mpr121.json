@@ -19,11 +19,11 @@
     },
     {
       "key": "address",
-      "type": "text",
+      "type": "address",
       "required": false,
       "lvl": "normal",
-      "suppressQuotes": true,
       "default": "0x5A",
+      "emitYAML": "always",
       "placeholder": "0x5A"
     },
     {

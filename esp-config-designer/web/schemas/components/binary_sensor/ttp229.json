@@ -12,12 +12,16 @@
     {
       "key": "hub_bsf",
       "domain": "ttp229_bsf",
-      "dedupeBy": "id"
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
     },
     {
       "key": "hub_lsf",
       "domain": "ttp229_lsf",
-      "dedupeBy": "id"
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
     }
   ],
   "fields": [
@@ -62,10 +66,11 @@
     {
       "key": "ttp229_id",
       "type": "id_ref",
-      "required": false,
+      "required": true,
       "lvl": "simple",
       "domain": "ttp229",
       "allowSelfReference": true,
+      "emitYAML": "never",
       "default": "ttp229_component"
     },
     {

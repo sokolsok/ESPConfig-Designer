@@ -215,7 +215,8 @@ const renderFilterEntries = (filters, indent, lines) => {
       const listKey = entry.valueKey || "values";
       const listValue = config[listKey] || [];
       lines.push(`${" ".repeat(indent)}- ${entry.type}:`);
-      renderYamlArray(listValue, { type: "text" }, indent + 4, lines, config);
+      const listField = Array.isArray(entry.fields) ? entry.fields.find((field) => field?.key === listKey) : null;
+      renderYamlArray(listValue, listField?.item || { type: "text" }, indent + 4, lines, config);
       return;
     }
     lines.push(`${" ".repeat(indent)}- ${entry.type}:`);

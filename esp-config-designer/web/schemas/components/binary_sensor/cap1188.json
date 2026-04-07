@@ -33,8 +33,7 @@
       "required": false,
       "lvl": "simple",
       "domain": "cap1188",
-      "allowSelfReference": true,
-      "default": "cap1188_component"
+      "allowSelfReference": true
     },
     {
       "key": "channel",

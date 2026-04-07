@@ -17,7 +17,7 @@
       "key": "baud_rate",
       "type": "number",
       "required": true,
-      "lvl": "normal",
+      "lvl": "simple",
       "dependsOn": {
         "key": "enabled",
         "value": true
@@ -28,7 +28,7 @@
       "key": "tx_pin",
       "type": "gpio",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "dependsOn": {
         "key": "enabled",
         "value": true
@@ -39,7 +39,7 @@
       "key": "rx_pin",
       "type": "gpio",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "dependsOn": {
         "key": "enabled",
         "value": true

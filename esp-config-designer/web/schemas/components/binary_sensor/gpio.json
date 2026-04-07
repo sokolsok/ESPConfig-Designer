@@ -10,7 +10,7 @@
       "type": "gpio",
       "required": true,
       "lvl": "simple",
-      "helpUrl": "https://esphome.io/guides/configuration-types#pin-schema"
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "name",

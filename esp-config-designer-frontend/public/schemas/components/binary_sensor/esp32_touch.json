@@ -8,7 +8,9 @@
     {
       "key": "hub",
       "domain": "esp32_touch",
-      "dedupeBy": "id"
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
     }
   ],
   "fields": [
@@ -19,15 +21,24 @@
       "required": false,
       "lvl": "simple",
       "emitYAML": "never",
-      "extends": "hub_esp32_touch.json",
-      "helpUrl": "https://esphome.io/components/binary_sensor/esp32_touch/"
+      "extends": "hub_esp32_touch.json"
+    },
+    {
+      "key": "esp32_touch_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "esp32_touch",
+      "allowSelfReference": true,
+      "emitYAML": "never"
     },
     {
       "key": "pin",
       "type": "gpio",
       "required": true,
       "lvl": "simple",
-      "helpUrl": "https://esphome.io/guides/configuration-types#pin-schema"
+      "placeholder": "GPIOXX",
+      "note": "Use a touch-capable pin for the active ESP32 variant: ESP32 GPIO4/0/2/15/13/12/14/27/33/32, ESP32-S2/S3 GPIO1-14, ESP32-P4 GPIO2-15."
     },
     {
       "key": "threshold",
@@ -39,7 +50,8 @@
       "key": "wakeup_threshold",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "note": "Used for deep sleep wake-up threshold configuration."
     }
   ]
 }

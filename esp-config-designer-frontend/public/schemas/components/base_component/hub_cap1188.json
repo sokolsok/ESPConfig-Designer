@@ -19,23 +19,33 @@
     },
     {
       "key": "address",
-      "type": "text",
+      "type": "address",
       "required": false,
       "lvl": "normal",
-      "default": "0x29"
+      "default": "0x29",
+      "emitYAML": "always",
+      "placeholder": "0x29"
     },
     {
       "key": "reset_pin",
       "type": "gpio",
       "required": false,
       "lvl": "normal",
-      "helpUrl": "https://esphome.io/guides/configuration-types#pin-schema"
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "touch_threshold",
-      "type": "number",
+      "type": "select",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": "0x20",
+      "options": [
+        "0x01",
+        "0x20",
+        "0x40",
+        "0x80"
+      ],
+      "note": "0x01 max sensitivity, 0x20 default, 0x40 medium, 0x80 minimum sensitivity."
     },
     {
       "key": "allow_multiple_touches",

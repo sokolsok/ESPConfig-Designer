@@ -6,7 +6,7 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
 
 const componentSchemaCache = new Map();
 const rawSchemaCache = new Map();
-const filterCatalogCache = { data: null, promise: null };
+const filterCatalogCache = new Map();
 const actionCatalogCache = { data: null, promise: null };
 const conditionCatalogCache = { data: null, promise: null };
 const actionDefinitionCache = new Map();
@@ -121,7 +121,7 @@ const fetchPublicJson = async (path) => {
 };
 
 const isCatalogExtends = (value) =>
-  value === "base_actions.json" || value === "base_filters.json" || value === "base_conditions.json";
+  value === "base_actions.json" || value === "base_filters.json" || value === "base_binary_sensor_filters.json" || value === "base_conditions.json";
 
 // Resolve field-level extends and nested fields.
 const resolveSchemaField = async (field) => {
@@ -218,20 +218,29 @@ export const loadSchemaByPath = async (path) => {
   return resolveSchema(rawSchema);
 };
 
-// Load filter catalog from base_filters.json.
-export const loadFilterCatalog = async () => {
-  if (filterCatalogCache.data) return filterCatalogCache.data;
-  if (filterCatalogCache.promise) return filterCatalogCache.promise;
-  filterCatalogCache.promise = fetchSchemaJson("components/base_component/base_filters.json")
-    .then((data) => {
-      const filters = Array.isArray(data?.filters) ? data.filters : [];
-      filterCatalogCache.data = filters;
-      return filters;
-    })
-    .finally(() => {
-      filterCatalogCache.promise = null;
-    });
-  return filterCatalogCache.promise;
+// Load filter catalog from a filter catalog schema.
+export const loadFilterCatalog = async (catalogName = "base_filters.json") => {
+  const cacheKey = String(catalogName || "base_filters.json");
+  const existing = filterCatalogCache.get(cacheKey);
+  if (existing?.data) return existing.data;
+  if (existing?.promise) return existing.promise;
+  const next = {
+    data: null,
+    promise: fetchSchemaJson(`components/base_component/${cacheKey}`)
+      .then((data) => {
+        const filters = Array.isArray(data?.filters) ? data.filters : [];
+        filterCatalogCache.set(cacheKey, { data: filters, promise: null });
+        return filters;
+      })
+      .finally(() => {
+        const current = filterCatalogCache.get(cacheKey);
+        if (current && !current.data) {
+          filterCatalogCache.set(cacheKey, { data: null, promise: null });
+        }
+      })
+  };
+  filterCatalogCache.set(cacheKey, next);
+  return next.promise;
 };
 
 // Load action catalog from base_actions.json.

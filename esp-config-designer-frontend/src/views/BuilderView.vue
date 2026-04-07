@@ -2207,7 +2207,7 @@ const schemaEntries = computed(() => {
 
   bussesDefinitions.forEach((entry) => {
     pushEntry({
-      scopeId: "tab:Busses",
+      scopeId: `tab:Busses:${entry.key}`,
       label: `busses.${entry.key}`,
       componentId: entry.schemaId,
       config: bussesCoreConfig.value?.[entry.key] || {},
@@ -2849,7 +2849,7 @@ const filterConfigBySchema = (sourceValue, fields) => {
     if (
       isArrayLikeSchemaField(field) &&
       Array.isArray(value) &&
-      (field.item?.extends === "base_actions.json" || field.item?.extends === "base_filters.json")
+      (field.item?.extends === "base_actions.json" || field.item?.extends === "base_filters.json" || field.item?.extends === "base_binary_sensor_filters.json")
     ) {
       filtered[field.key] = value;
       return;

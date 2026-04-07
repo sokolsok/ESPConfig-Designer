@@ -68,7 +68,15 @@ export const useBuilderValidation = ({
     () => new Set(formErrors.value.map((entry) => entry.scopeId).filter(Boolean))
   );
 
-  const hasTabErrors = (tab) => formErrorScopeIds.value.has(`tab:${tab}`);
+  const hasTabErrors = (tab) => {
+    const prefix = `tab:${tab}`;
+    for (const scopeId of formErrorScopeIds.value) {
+      if (scopeId === prefix || scopeId.startsWith(`${prefix}:`)) {
+        return true;
+      }
+    }
+    return false;
+  };
 
   return {
     displayElementIdErrors,

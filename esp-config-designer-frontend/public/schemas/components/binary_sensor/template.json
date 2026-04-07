@@ -6,18 +6,42 @@
   "extends": "base_binary_sensor.json",
   "fields": [
     {
+      "key": "name",
+      "placeholder": "Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "state_source",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "lambda",
+      "options": [
+        "lambda",
+        "condition"
+      ]
+    },
+    {
       "key": "lambda",
       "type": "lambda",
       "required": false,
       "lvl": "simple",
-      "note": "Use either lambda or condition"
+      "dependsOn": {
+        "key": "state_source",
+        "value": "lambda"
+      }
     },
     {
       "key": "condition",
       "type": "yaml",
       "required": false,
       "lvl": "simple",
-      "note": "Use either condition or lambda"
+      "dependsOn": {
+        "key": "state_source",
+        "value": "condition"
+      }
     }
   ]
 }

@@ -285,10 +285,10 @@
 
 ### Capacitive Touch
 
-- [ ] CAP1188 Capacitive Touch Sensor (`binary_sensor/cap1188`)
-- [ ] ESP32 Touch Pad (`binary_sensor/esp32_touch`)
-- [ ] MPR121 Capacitive Touch Sensor (`binary_sensor/mpr121`)
-- [ ] TTP229 (`binary_sensor/ttp229`)
+- [x] CAP1188 Capacitive Touch Sensor (`binary_sensor/cap1188`)
+- [x] ESP32 Touch Pad (`binary_sensor/esp32_touch`)
+- [x] MPR121 Capacitive Touch Sensor (`binary_sensor/mpr121`)
+- [x] TTP229 (`binary_sensor/ttp229`)
 
 ### Mechanical
 

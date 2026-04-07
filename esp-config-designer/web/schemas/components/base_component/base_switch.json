@@ -6,33 +6,40 @@
   "fields": [
     {
       "key": "id",
-      "type": "text",
-      "required": false
+      "placeholder": "example_switch_id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal"
     },
     {
       "key": "name",
       "type": "text",
-      "required": false
+      "required": false,
+      "lvl": "simple"
     },
     {
       "key": "icon",
       "type": "icon",
-      "required": false
+      "required": false,
+      "lvl": "normal"
     },
     {
       "key": "inverted",
       "type": "boolean",
-      "required": false
+      "required": false,
+      "lvl": "normal"
     },
     {
       "key": "internal",
       "type": "boolean",
-      "required": false
+      "required": false,
+      "lvl": "normal"
     },
     {
       "key": "restore_mode",
       "type": "select",
       "required": false,
+      "lvl": "normal",
       "options": [
         "RESTORE_DEFAULT_OFF",
         "RESTORE_DEFAULT_ON",
@@ -47,6 +54,7 @@
       "key": "on_turn_on",
       "type": "list",
       "required": false,
+      "lvl": "advanced",
       "item": {
         "type": "object",
         "fields": [],
@@ -58,6 +66,7 @@
       "key": "on_turn_off",
       "type": "list",
       "required": false,
+      "lvl": "advanced",
       "item": {
         "type": "object",
         "fields": [],
@@ -69,6 +78,7 @@
       "key": "on_state",
       "type": "list",
       "required": false,
+      "lvl": "advanced",
       "item": {
         "type": "object",
         "fields": [],
@@ -79,17 +89,26 @@
     {
       "key": "disabled_by_default",
       "type": "boolean",
-      "required": false
+      "required": false,
+      "lvl": "advanced"
     },
     {
       "key": "entity_category",
       "type": "text",
-      "required": false
+      "required": false,
+      "lvl": "advanced"
     },
     {
       "key": "device_class",
       "type": "text",
-      "required": false
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

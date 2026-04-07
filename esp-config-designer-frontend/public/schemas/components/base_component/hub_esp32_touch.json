@@ -7,7 +7,7 @@
     {
       "key": "id",
       "type": "id",
-      "required": true,
+      "required": false,
       "lvl": "simple",
       "default": "esp32_touch_hub",
       "idDomain": "esp32_touch"
@@ -16,27 +16,38 @@
       "key": "setup_mode",
       "type": "boolean",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": false
     },
     {
       "key": "sleep_duration",
       "type": "duration",
       "required": false,
       "lvl": "normal",
-      "default": "27ms"
+      "default": "27ms",
+      "note": "For ESP32-S2, ESP32-S3, and ESP32-P4 the default 27ms may be too high. Docs suggest starting around 0.5ms."
     },
     {
       "key": "measurement_duration",
       "type": "duration",
       "required": false,
       "lvl": "normal",
-      "default": "8ms"
+      "default": "8ms",
+      "note": "For ESP32-S2, ESP32-S3, and ESP32-P4 the default 8ms may be too high. Docs suggest starting around 0.25ms."
     },
     {
       "key": "low_voltage_reference",
       "type": "select",
       "required": false,
       "lvl": "advanced",
+      "globalDependsOn": {
+        "key": "esp32_variant",
+        "value": [
+          "esp32",
+          "esp32s2",
+          "esp32s3"
+        ]
+      },
       "default": "0.5V",
       "options": [
         "0.5V",
@@ -50,6 +61,14 @@
       "type": "select",
       "required": false,
       "lvl": "advanced",
+      "globalDependsOn": {
+        "key": "esp32_variant",
+        "value": [
+          "esp32",
+          "esp32s2",
+          "esp32s3"
+        ]
+      },
       "default": "2.7V",
       "options": [
         "2.4V",
@@ -63,6 +82,10 @@
       "type": "select",
       "required": false,
       "lvl": "advanced",
+      "globalDependsOn": {
+        "key": "esp32_variant",
+        "value": "esp32"
+      },
       "default": "0V",
       "options": [
         "1.5V",
@@ -75,64 +98,209 @@
       "key": "iir_filter",
       "type": "duration",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "globalDependsOn": {
+        "key": "esp32_variant",
+        "value": "esp32"
+      }
     },
     {
       "key": "filter_mode",
-      "type": "text",
+      "type": "select",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "globalDependsOn": {
+        "key": "esp32_variant",
+        "value": [
+          "esp32s2",
+          "esp32s3"
+        ]
+      },
+      "options": [
+        "IIR_4",
+        "IIR_8",
+        "IIR_16",
+        "IIR_32",
+        "IIR_64",
+        "IIR_128",
+        "IIR_256",
+        "JITTER"
+      ],
+      "note": "If one field in the filter group is set, all filter group fields should be set."
+    },
+    {
+      "key": "filter_mode",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "globalDependsOn": {
+        "key": "esp32_variant",
+        "value": "esp32p4"
+      },
+      "options": [
+        "IIR_4",
+        "IIR_8",
+        "IIR_16",
+        "IIR_32",
+        "IIR_64",
+        "IIR_128",
+        "JITTER"
+      ],
+      "note": "If one field in the filter group is set, all filter group fields should be set."
     },
     {
       "key": "debounce_count",
       "type": "number",
       "required": false,
       "lvl": "advanced",
-      "placeholder": "0-7"
+      "globalDependsOn": {
+        "key": "esp32_variant",
+        "value": [
+          "esp32s2",
+          "esp32s3",
+          "esp32p4"
+        ]
+      },
+      "placeholder": "0-7",
+      "note": "Valid range: 0-7. If one field in the filter group is set, all filter group fields should be set."
     },
     {
       "key": "noise_threshold",
       "type": "number",
       "required": false,
       "lvl": "advanced",
-      "placeholder": "0-3"
+      "globalDependsOn": {
+        "key": "esp32_variant",
+        "value": [
+          "esp32s2",
+          "esp32s3",
+          "esp32p4"
+        ]
+      },
+      "placeholder": "0-3",
+      "note": "Valid range: 0-3. If one field in the filter group is set, all filter group fields should be set."
     },
     {
       "key": "jitter_step",
       "type": "number",
       "required": false,
       "lvl": "advanced",
-      "placeholder": "0-15"
+      "globalDependsOn": {
+        "key": "esp32_variant",
+        "value": [
+          "esp32s2",
+          "esp32s3",
+          "esp32p4"
+        ]
+      },
+      "placeholder": "0-15",
+      "note": "Valid range: 0-15. If one field in the filter group is set, all filter group fields should be set."
     },
     {
       "key": "smooth_mode",
-      "type": "text",
+      "type": "select",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "globalDependsOn": {
+        "key": "esp32_variant",
+        "value": [
+          "esp32s2",
+          "esp32s3",
+          "esp32p4"
+        ]
+      },
+      "options": [
+        "OFF",
+        "IIR_2",
+        "IIR_4",
+        "IIR_8"
+      ],
+      "note": "If one field in the filter group is set, all filter group fields should be set."
     },
     {
       "key": "denoise_grade",
-      "type": "text",
+      "type": "select",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "globalDependsOn": {
+        "key": "esp32_variant",
+        "value": [
+          "esp32s2",
+          "esp32s3"
+        ]
+      },
+      "options": [
+        "BIT12",
+        "BIT10",
+        "BIT8",
+        "BIT4"
+      ],
+      "note": "If one field in the denoise group is set, all denoise group fields should be set."
     },
     {
       "key": "denoise_cap_level",
-      "type": "text",
+      "type": "select",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "globalDependsOn": {
+        "key": "esp32_variant",
+        "value": [
+          "esp32s2",
+          "esp32s3"
+        ]
+      },
+      "options": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4",
+        "L5",
+        "L6",
+        "L7"
+      ],
+      "note": "If one field in the denoise group is set, all denoise group fields should be set."
     },
     {
       "key": "waterproof_guard_ring",
-      "type": "number",
+      "type": "gpio",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "globalDependsOn": {
+        "key": "esp32_variant",
+        "value": [
+          "esp32s2",
+          "esp32s3",
+          "esp32p4"
+        ]
+      },
+      "helpUrl": "https://esphome.io/guides/configuration-types#pin-schema",
+      "note": "Use a touch-capable pin for the active ESP32 variant. If one field in the waterproof group is set, all waterproof group fields should be set."
     },
     {
       "key": "waterproof_shield_driver",
-      "type": "text",
+      "type": "select",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "globalDependsOn": {
+        "key": "esp32_variant",
+        "value": [
+          "esp32s2",
+          "esp32s3",
+          "esp32p4"
+        ]
+      },
+      "options": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4",
+        "L5",
+        "L6",
+        "L7"
+      ],
+      "note": "If one field in the waterproof group is set, all waterproof group fields should be set."
     }
   ]
 }

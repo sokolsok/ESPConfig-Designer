@@ -220,7 +220,7 @@ const isBooleanListItem = computed(() => listItemType.value === 'boolean');
 const isSelectListItem = computed(() => listItemType.value === 'select');
 const isGpioListItem = computed(() => listItemType.value === 'gpio');
 const listInputType = computed(() => (listItemType.value === 'number' ? 'number' : 'text'));
-const isFilterListField = computed(() => props.field.type === 'list' && props.field.item?.extends === 'base_filters.json');
+const isFilterListField = computed(() => props.field.type === 'list' && ['base_filters.json', 'base_binary_sensor_filters.json'].includes(props.field.item?.extends));
 const isActionListField = computed(() => props.field.type === 'list' && props.field.item?.extends === 'base_actions.json');
 const isConditionListField = computed(() => props.field.type === 'list' && props.field.item?.extends === 'base_conditions.json');
 const isCatalogListField = computed(() => isFilterListField.value || isActionListField.value || isConditionListField.value);
@@ -325,7 +325,14 @@ const catalogItems = computed(() => {
 const catalogSections = computed(() => isConditionListField.value ? buildConditionSections(catalogItems.value) : isActionListField.value ? buildActionSections(catalogItems.value) : []);
 const useCatalogSections = computed(() => isActionListField.value || isConditionListField.value);
 const catalogPickerTitle = computed(() => isFilterListField.value ? 'Choose filter' : isConditionListField.value ? 'Choose condition' : 'Choose action');
-const catalogHelpUrl = computed(() => isFilterListField.value ? 'https://esphome.io/components/sensor/#sensor-filters' : isConditionListField.value ? 'https://esphome.io/automations/actions/#conditions' : 'https://esphome.io/automations/actions/');
+const catalogHelpUrl = computed(() => {
+  if (isFilterListField.value) {
+    return props.field.item?.extends === 'base_binary_sensor_filters.json'
+      ? 'https://esphome.io/components/binary_sensor/#binary-sensor-filters'
+      : 'https://esphome.io/components/sensor/#sensor-filters';
+  }
+  return isConditionListField.value ? 'https://esphome.io/automations/actions/#conditions' : 'https://esphome.io/automations/actions/';
+});
 const catalogDocLabel = computed(() => isFilterListField.value ? 'Filter documentation' : isConditionListField.value ? 'Condition documentation' : 'Action documentation');
 const catalogSearchPlaceholder = computed(() => isFilterListField.value ? 'Search filters' : isConditionListField.value ? 'Search conditions' : 'Search actions');
 const catalogEmptyLabel = computed(() => isFilterListField.value ? 'No filters to show.' : isConditionListField.value ? 'No conditions to show.' : 'No actions to show.');
@@ -334,7 +341,7 @@ const ensureCatalogLoaded = async () => {
   if (!isCatalogListField.value || catalogData.value.length || catalogLoading.value) return;
   catalogLoading.value = true;
   try {
-    catalogData.value = isFilterListField.value ? await loadFilterCatalog() : isConditionListField.value ? await loadConditionCatalog() : await loadActionCatalog();
+    catalogData.value = isFilterListField.value ? await loadFilterCatalog(props.field.item?.extends) : isConditionListField.value ? await loadConditionCatalog() : await loadActionCatalog();
   } finally {
     catalogLoading.value = false;
   }
@@ -454,7 +461,12 @@ const entryFields = (entry) => {
 };
 const entryDocLink = (entry) => {
   if (!entry?.type) return '';
-  if (isFilterListField.value) return `https://esphome.io/components/sensor/#${entry.type}`;
+  if (isFilterListField.value) {
+    const base = props.field.item?.extends === 'base_binary_sensor_filters.json'
+      ? 'https://esphome.io/components/binary_sensor/'
+      : 'https://esphome.io/components/sensor/';
+    return `${base}#${entry.type}`;
+  }
   if (entry?.helpUrl) return entry.helpUrl;
   const def = entryDefinition(entry);
   return def?.helpUrl || '';
