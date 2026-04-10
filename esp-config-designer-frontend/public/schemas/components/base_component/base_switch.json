@@ -20,6 +20,7 @@
     {
       "key": "icon",
       "type": "icon",
+	  "placeholder": "mdi:cat",
       "required": false,
       "lvl": "normal"
     },

@@ -9,8 +9,8 @@
       "type": "id",
       "required": true,
       "lvl": "simple",
-      "default": "ttp229_component",
-      "idDomain": "ttp229"
+      "default": "ttp229_lsf_component",
+      "idDomain": "ttp229_lsf"
     }
   ]
 }

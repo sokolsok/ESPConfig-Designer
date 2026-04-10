@@ -4,6 +4,11 @@
   "platform": "modbus_controller",
   "helpUrl": "https://esphome.io/components/output/modbus_controller/",
   "extends": "base_output.json",
+  "requirements": [
+    {
+      "require": "bus:modbus"
+    }
+  ],
   "fields": [
     {
       "key": "modbus_controller_id",

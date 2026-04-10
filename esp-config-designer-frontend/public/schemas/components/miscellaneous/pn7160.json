@@ -1,0 +1,45 @@
+{
+  "id": "pn7160",
+  "domain": "pn7160",
+  "domainBy": "bus",
+  "domainMap": {
+    "i2c": "pn7160_i2c",
+    "spi": "pn7160_spi"
+  },
+  "platform": "",
+  "renderAs": "root_map",
+  "helpUrl": "https://esphome.io/components/pn7160/",
+  "extends": "hub_pn7160.json",
+  "requirements": [
+    {
+      "require": "bus:i2c",
+      "when": {
+        "key": "bus",
+        "value": "i2c"
+      }
+    },
+    {
+      "require": "bus:spi",
+      "when": {
+        "key": "bus",
+        "value": "spi"
+      }
+    }
+  ],
+  "fields": [
+    {
+      "key": "bus",
+      "label": "Transport",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "set_global": "pn7160_bus",
+      "default": "i2c",
+      "emitYAML": "never",
+      "options": [
+        "i2c",
+        "spi"
+      ]
+    }
+  ]
+}

@@ -148,9 +148,15 @@ Use:
 Use:
 
 - `bus`
-- `platformByBus`
+- `platformByBus` for list-style components whose emitted `platform:` changes by transport
+- or `domainBy` + `domainMap` for root/root-helper components whose emitted root YAML key changes by transport
 - conditional `requirements`
-- transport-specific child objects behind `dependsOn`
+- transport-specific fields behind `dependsOn` or `globalDependsOn`
+
+Transport variant rule of thumb:
+
+- if the docs shape is still `domain:` -> `- platform: ...`, prefer `platformByBus`
+- if the docs shape changes the root key itself (for example `pn532_spi:` vs `pn532_i2c:`), prefer a single logical schema with `domainBy` + `domainMap`
 
 ### Pattern E: component with a root singleton YAML section
 
@@ -198,6 +204,8 @@ Minimal shape:
 - `domain` -> YAML top-level domain
 - `platform` -> default platform name for list-style components
 - `platformByBus` -> transport-dependent platform selection
+- `domainBy` -> config key used to choose emitted root YAML domain dynamically
+- `domainMap` -> mapping from `domainBy` value to emitted root YAML domain
 - `helpUrl` -> documentation URL for the schema or component
 - `extends` -> schema inheritance from another schema file
 - `requirements` -> dependency rules used by Builder warnings/focus/pulse
@@ -242,6 +250,73 @@ Rules:
 - this is different from `embedded.emitAs: "map"`
 
 Use `renderAs: "root_map"` only when the ESPHome YAML contract itself is a root singleton object.
+
+### Transport-aware root maps
+
+Some root components still emit a singleton map, but the root YAML key depends on transport.
+
+Example shape:
+
+```json
+{
+  "id": "pn7160",
+  "domain": "pn7160",
+  "domainBy": "bus",
+  "domainMap": {
+    "i2c": "pn7160_i2c",
+    "spi": "pn7160_spi"
+  },
+  "renderAs": "root_map"
+}
+```
+
+Generated YAML:
+
+```yaml
+pn7160_i2c:
+  irq_pin: GPIO8
+  ven_pin: GPIO9
+```
+
+or:
+
+```yaml
+pn7160_spi:
+  cs_pin: GPIO7
+  irq_pin: GPIO8
+  ven_pin: GPIO9
+```
+
+Rules:
+
+- `domain` stays the logical schema domain
+- `domainBy` reads a normal config field such as `bus`
+- `domainMap` chooses the real emitted root key
+- the selector field itself should usually use `emitYAML: "never"`
+
+## 7b. `renderAs: "root_list"`
+
+Use this for root components whose docs emit a top-level YAML list without `platform:`.
+
+Example:
+
+```json
+{
+  "id": "wiegand",
+  "domain": "wiegand",
+  "renderAs": "root_list"
+}
+```
+
+Generated YAML:
+
+```yaml
+wiegand:
+  - d0: GPIO4
+    d1: GPIO5
+```
+
+Use `root_list` only when the ESPHome docs themselves show a top-level list for the root domain.
 
 ---
 
@@ -345,6 +420,9 @@ Examples:
 
 - `key` -> source field key (must point to an `object` field)
 - `domain` -> target YAML domain
+- `logicalDomain` -> logical helper domain used by Builder shared-hub UI and `id_ref`
+- `domainBy` -> config key used to choose emitted embedded domain dynamically
+- `domainMap` -> mapping from `domainBy` value to emitted embedded domain
 - `emitAs` -> `list` or `map`
 - `dedupeBy` -> deduplicate list emissions by this field
 - `singleton` -> only one map emission for the domain
@@ -356,10 +434,12 @@ Examples:
 
 1. the source field must exist and be an `object`
 2. the source field must be visible
-3. the payload comes from config, then `defaultPayload`, then `{}` if `alwaysEmit`
-4. if the payload is empty and `alwaysEmit` is not set, nothing is emitted
-5. `dedupeBy` applies only to list emission
-6. `singleton` and `merge` apply only to map emission
+3. Builder shared-hub UI uses `logicalDomain` when present, otherwise `domain`
+4. YAML emission uses `domainMap[config[domainBy]]` when available, otherwise `domain`
+5. the payload comes from config, then `defaultPayload`, then `{}` if `alwaysEmit`
+6. if the payload is empty and `alwaysEmit` is not set, nothing is emitted
+7. `dedupeBy` applies only to list emission
+8. `singleton` and `merge` apply only to map emission
 
 ### Important modeling rule
 
@@ -371,8 +451,8 @@ Do not mix `emitAs: "list"` and `emitAs: "map"` for the same YAML domain.
 
 When a component emits a shared helper through:
 
-- `embedded.emitAs: "list"`
-- plus `dedupeBy: "id"`
+- `embedded.emitAs: "list"` plus `dedupeBy: "id"`
+- or `embedded.emitAs: "map"` plus `singleton: true`
 
 Builder automatically provides a shared-hub selector flow.
 
@@ -391,6 +471,7 @@ Schema author rules:
 
 - the helper object should usually use `emitYAML: "never"`
 - the reference field should usually be an `id_ref` with the proper domain
+- for transport-aware helpers, prefer one logical `id_ref` domain and let `embedded.domainMap` choose the emitted YAML key
 - duplicate IDs are validation errors; there is no automatic overwrite/merge of conflicting hub IDs
 
 ---
@@ -533,6 +614,7 @@ Examples:
 - `object`
 - `list`
 - `fixed_list`
+- `generated_list`
 
 ---
 
@@ -631,6 +713,79 @@ Rules:
 - `fixed_list` currently supports primitive item types only
 - if you need a fixed group of nested objects, use `object`, not `fixed_list`
 
+## 17. `generated_list`
+
+Use `type: "generated_list"` when the runtime data model must remain a normal YAML list, but the Builder UI should generate exactly `N` entries from a count control shown in the section header.
+
+This is the schema-driven answer for cases like:
+
+- `matrix_keypad.rows`
+- `matrix_keypad.columns`
+- future repeated pin/object sections where Add/Remove controls are worse UX than a count-driven layout
+
+Important behavior:
+
+- runtime config is still stored as a normal array
+- YAML emission is the same as a normal `list`
+- the count control is UI-only; it is not emitted to YAML
+- the generated item schema comes from normal `item` definition
+
+Example: generated object list rendered inline
+
+```json
+{
+  "key": "rows",
+  "type": "generated_list",
+  "required": true,
+  "lvl": "simple",
+  "count": {
+    "label": "Rows",
+    "type": "number",
+    "required": true,
+    "default": 4,
+    "min": 0
+  },
+  "item": {
+    "type": "object",
+    "uiInlineSingleField": true,
+    "fields": [
+      {
+        "key": "pin",
+        "type": "gpio",
+        "required": true,
+        "lvl": "simple"
+      }
+    ]
+  }
+}
+```
+
+Generated runtime data:
+
+```json
+[
+  { "pin": "GPIO4" },
+  { "pin": "GPIO5" }
+]
+```
+
+Generated YAML:
+
+```yaml
+rows:
+  - pin: GPIO4
+  - pin: GPIO5
+```
+
+Rules:
+
+- prefer `generated_list` over inventing numbered keys like `pin_0`, `pin_1`
+- the `item` contract is the same as for `list`
+- if `item.type === "object"` and `item.uiInlineSingleField === true` with exactly one child field, Builder renders a compact ESP32 Camera-like row layout
+- if `item.type === "object"` with multiple child fields, Builder renders one nested object group per generated entry
+- if `item.type` is primitive, Builder renders one primitive field per generated entry
+- because the YAML data stays a normal array, `generated_list` should be treated as a UI/rendering variant of `list`, not a separate YAML contract
+
 ### `yamlStyle: "flow"`
 
 This renders arrays inline where supported:
@@ -641,7 +796,7 @@ data_pins: [GPIO32, GPIO33, GPIO34, GPIO35, GPIO36, GPIO37, GPIO38, GPIO39]
 
 ---
 
-## 17. `id` and `id_ref`
+## 18. `id` and `id_ref`
 
 ### `id`
 
@@ -677,7 +832,7 @@ Validation behavior:
 
 ---
 
-## 18. `templatable`
+## 19. `templatable`
 
 Shared schema fields can be marked `templatable: true`.
 
@@ -705,7 +860,7 @@ Behavior:
 
 ---
 
-## 19. `emitKey: "inline"`
+## 20. `emitKey: "inline"`
 
 Use this only for nested list/object structures that must inline their content without an extra wrapper key.
 
@@ -719,7 +874,7 @@ Do not use `emitKey: "inline"` unless the target YAML contract explicitly needs 
 
 ---
 
-## 20. Password, slug, and SSID helpers
+## 21. Password, slug, and SSID helpers
 
 ### `password`
 
@@ -747,7 +902,7 @@ These are frontend runtime helpers, not YAML-only shortcuts.
 
 ---
 
-## 21. Selects and dynamic options
+## 22. Selects and dynamic options
 
 ### Static select
 
@@ -787,7 +942,7 @@ Choose the simplest option source that matches the real runtime need.
 
 ---
 
-## 22. Field visibility
+## 23. Field visibility
 
 Builder hides fields based on dependency rules.
 
@@ -814,7 +969,7 @@ Use sparingly; local dependencies are easier to reason about.
 
 ---
 
-## 23. YAML emission rules in practice
+## 24. YAML emission rules in practice
 
 ### Primitive field
 

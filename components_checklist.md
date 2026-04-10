@@ -235,6 +235,7 @@
 - [x] Modbus Sensor (`sensor/modbus_controller`)
 - [x] Nextion (`sensor/nextion`)
 - [x] Person Sensor (SEN21231) (`sensor/sen21231`)
+- [x] PipSolar Sensor (`sensor/pipsolar`)
 - [x] Resol VBus (`vbus`)
 - [x] VBus Sensor (`sensor/vbus`)
 - [x] Rotary Encoder (`sensor/rotary_encoder`)
@@ -288,36 +289,42 @@
 - [x] CAP1188 Capacitive Touch Sensor (`binary_sensor/cap1188`)
 - [x] ESP32 Touch Pad (`binary_sensor/esp32_touch`)
 - [x] MPR121 Capacitive Touch Sensor (`binary_sensor/mpr121`)
-- [x] TTP229 (`binary_sensor/ttp229`)
+- [x] TTP229 BSF (`binary_sensor/ttp229_bsf`)
+- [x] TTP229 LSF (`binary_sensor/ttp229_lsf`)
 
 ### Mechanical
 
-- [ ] Matrix Keypad (`matrix_keypad`) - unavailable
+- [x] Matrix Keypad (`matrix_keypad`)
+- [x] Matrix Keypad Binary Sensor (`binary_sensor/matrix_keypad`)
 - [ ] TM1637 (`display/tm1637`)
 - [ ] TM1638 (`display/tm1638`)
 
 ### NFC/RFID
 
-- [ ] NFC Tag (`binary_sensor/nfc`)
-- [ ] PN532 (`binary_sensor/pn532`)
-- [ ] PN7150 (`pn7150`) - unavailable
-- [ ] PN716X (`pn7160`) - unavailable
-- [ ] RC522 (`binary_sensor/rc522`)
-- [ ] RDM6300 (`binary_sensor/rdm6300`)
-- [ ] Wiegand Reader (`wiegand`) - unavailable
+- [x] NFC Tag (`binary_sensor/nfc`)
+- [x] PN532 (`binary_sensor/pn532`)
+- [x] PN7150 (`pn7150_i2c`)
+- [x] PN7160 I2C (`pn7160_i2c`)
+- [x] PN7160 SPI (`pn7160_spi`)
+- [x] RC522 (`binary_sensor/rc522`)
+- [x] RDM6300 (`binary_sensor/rdm6300`)
+- [x] Wiegand Reader (`wiegand`)
 
 ### Touchscreen
 
 - [ ] FT5X06 (`touchscreen/ft5x06`)
 - [ ] GT911 (`touchscreen/gt911`)
+- [x] GT911 Buttons (`binary_sensor/gt911`)
 - [ ] Nextion Binary Sensor (`binary_sensor/nextion`)
 - [ ] TT21100 (`touchscreen/tt21100`)
+- [x] TT21100 Buttons (`binary_sensor/tt21100`)
 - [ ] LVGL widget (`binary_sensor/lvgl`)
 
 ### Presence Detection
 
-- [ ] AT581X (`at581x`) - unavailable
-- [ ] DFRobot mmWave Radar (`dfrobot_sen0395`) - unavailable
+- [x] AT581X (`at581x`)
+- [x] DFRobot mmWave Radar (`dfrobot_sen0395`)
+- [x] DFRobot mmWave Radar Binary Sensor (`binary_sensor/dfrobot_sen0395`)
 - [x] LD2410 Binary Sensor (`binary_sensor/ld2410`)
 - [x] LD2412 Binary Sensor (`binary_sensor/ld2412`)
 - [x] LD2420 Binary Sensor (`binary_sensor/ld2420`)
@@ -326,14 +333,15 @@
 
 ### Miscellaneous
 
-- [ ] Analog Threshold (`binary_sensor/analog_threshold`)
-- [ ] ESP32 BLE Presence (`binary_sensor/ble_presence`)
-- [ ] Hydreon Rain Sensor Binary Sensor (`binary_sensor/hydreon_rgxx`)
-- [ ] Modbus Binary Sensor (`binary_sensor/modbus_controller`)
-- [ ] PipSolar - compatible PV Inverter (`pipsolar`)
-- [ ] Pylontech Batteries (`pylontech`) - unavailable
-- [ ] Qwiic PIR Motion (`binary_sensor/qwiic_pir`)
-- [ ] Tuya Binary Sensor (`binary_sensor/tuya`)
+- [x] Analog Threshold (`binary_sensor/analog_threshold`)
+- [x] ESP32 BLE Presence (`binary_sensor/ble_presence`)
+- [x] Hydreon Rain Sensor Binary Sensor (`binary_sensor/hydreon_rgxx`)
+- [x] Modbus Binary Sensor (`binary_sensor/modbus_controller`)
+- [x] PipSolar Binary Sensor (`binary_sensor/pipsolar`)
+- [x] Pylontech Sensor (`sensor/pylontech`)
+- [x] Pylontech Text Sensor (`text_sensor/pylontech`)
+- [x] Qwiic PIR Motion (`binary_sensor/qwiic_pir`)
+- [x] Tuya Binary Sensor (`binary_sensor/tuya`)
 - [x] VBus Binary Sensor (`binary_sensor/vbus`)
 - [x] WireGuard Binary Sensor (`binary_sensor/wireguard`)
 
@@ -542,6 +550,7 @@
 - [ ] Modbus Output (`output/modbus_controller`)
 - [ ] MY9231/MY9291 (`output/my9231`)
 - [ ] PCA9685 (`output/pca9685`)
+- [x] PipSolar Output (`output/pipsolar`)
 - [ ] Sigma-Delta Output (`output/sigma_delta_output`)
 - [ ] Slow PWM (`output/slow_pwm`)
 - [ ] SM16716 (`output/sm16716`)
@@ -584,6 +593,7 @@
 - [x] LD2412 Switch (`switch/ld2412`)
 - [x] LD2450 Switch (`switch/ld2450`)
 - [x] Seeed Studio MR24HPC1 Switch (`switch/seeed_mr24hpc1`)
+- [x] PipSolar Switch (`switch/pipsolar`)
 - [ ] Modbus Switch (`switch/modbus_controller`)
 - [ ] Nextion Switch (`switch/nextion`)
 - [ ] Restart Switch (`switch/restart`)
@@ -612,6 +622,7 @@
 - [x] MSA3xx Text Sensor (`text_sensor/msa3xx`)
 - [x] Seeed Studio MR24HPC1 Text Sensor (`text_sensor/seeed_mr24hpc1`)
 - [x] MicroNova Text Sensor (`text_sensor/micronova`)
+- [x] PipSolar Text Sensor (`text_sensor/pipsolar`)
 - [ ] Modbus Text Sensor (`text_sensor/modbus_controller`)
 - [ ] MQTT Subscribe Text (`text_sensor/mqtt_subscribe`)
 - [ ] Nextion Text Sensor (`text_sensor/nextion`)
@@ -669,5 +680,4 @@
 - [ ] Sprinkler (`sprinkler`) - unavailable
 - [ ] Status LED (`status_led`) - unavailable
 - [ ] Sun (`sun`) - unavailable
-- [ ] Tuya MCU (`tuya`) - unavailable
 - [ ] Z-Wave Proxy (`zwave_proxy`) - unavailable

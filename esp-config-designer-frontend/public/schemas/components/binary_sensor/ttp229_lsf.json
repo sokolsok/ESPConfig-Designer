@@ -1,0 +1,44 @@
+{
+  "id": "binary_sensor.ttp229_lsf",
+  "domain": "binary_sensor",
+  "platform": "ttp229_lsf",
+  "helpUrl": "https://esphome.io/components/binary_sensor/ttp229/",
+  "extends": "base_binary_sensor.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "ttp229_lsf",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Hub settings",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_ttp229_lsf.json"
+    },
+    {
+      "key": "ttp229_lsf_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "ttp229_lsf",
+      "allowSelfReference": true,
+      "emitYAML": "never",
+      "default": "ttp229_lsf_component"
+    },
+    {
+      "key": "channel",
+      "type": "number",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "0"
+    }
+  ]
+}

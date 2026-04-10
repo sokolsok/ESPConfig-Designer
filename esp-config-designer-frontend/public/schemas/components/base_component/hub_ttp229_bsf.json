@@ -9,22 +9,22 @@
       "type": "id",
       "required": true,
       "lvl": "simple",
-      "default": "ttp229_component",
-      "idDomain": "ttp229"
+      "default": "ttp229_bsf_component",
+      "idDomain": "ttp229_bsf"
     },
     {
       "key": "sdo_pin",
       "type": "gpio",
       "required": true,
       "lvl": "simple",
-      "helpUrl": "https://esphome.io/guides/configuration-types#pin-schema"
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "scl_pin",
       "type": "gpio",
       "required": true,
       "lvl": "simple",
-      "helpUrl": "https://esphome.io/guides/configuration-types#pin-schema"
+	  "placeholder": "GPIOXX"
     }
   ]
 }

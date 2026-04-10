@@ -30,12 +30,11 @@
     {
       "key": "ld2420_id",
       "type": "id_ref",
-      "required": true,
+      "required": false,
       "lvl": "simple",
       "domain": "ld2420",
       "allowSelfReference": true,
-      "emitYAML": "never",
-      "default": "ld2420_radar"
+      "emitYAML": "never"
     },
     {
       "key": "custom_config",

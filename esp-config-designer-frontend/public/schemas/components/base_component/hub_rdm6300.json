@@ -14,7 +14,8 @@
       "type": "id",
       "required": true,
       "lvl": "simple",
-      "default": "rdm6300_component"
+      "default": "rdm6300_component",
+      "idDomain": "rdm6300"
     },
     {
       "key": "uart_id",

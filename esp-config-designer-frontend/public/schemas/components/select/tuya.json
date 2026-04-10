@@ -4,7 +4,43 @@
   "platform": "tuya",
   "helpUrl": "https://esphome.io/components/select/tuya/",
   "extends": "base_select.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "tuya",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "component:tuya"
+    },
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
+    {
+      "key": "hub",
+      "label": "Tuya hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_tuya.json"
+    },
+    {
+      "key": "tuya_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "tuya",
+      "allowSelfReference": true,
+      "emitYAML": "never",
+      "default": "tuya_hub"
+    },
     {
       "key": "enum_datapoint",
       "type": "number",

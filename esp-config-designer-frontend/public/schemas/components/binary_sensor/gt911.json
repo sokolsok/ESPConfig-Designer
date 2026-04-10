@@ -1,0 +1,25 @@
+{
+  "id": "binary_sensor.gt911",
+  "domain": "binary_sensor",
+  "platform": "gt911",
+  "helpUrl": "https://esphome.io/components/touchscreen/gt911/",
+  "extends": "base_binary_sensor.json",
+  "fields": [
+    {
+      "key": "gt911_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "touchscreen",
+      "placeholder": "touchscreen_id"
+    },
+    {
+      "key": "index",
+      "type": "number",
+      "required": false,
+      "lvl": "simple",
+      "default": 0,
+      "placeholder": "0"
+    }
+  ]
+}

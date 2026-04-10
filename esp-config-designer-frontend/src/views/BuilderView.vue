@@ -1394,7 +1394,7 @@ const resolveComponentRenderAs = (schema) => {
   return renderAs === "root_map" ? "root_map" : "list";
 };
 
-const isArrayLikeSchemaField = (field) => field?.type === "list" || field?.type === "fixed_list";
+const isArrayLikeSchemaField = (field) => field?.type === "list" || field?.type === "fixed_list" || field?.type === "generated_list";
 
 const isObjectArrayLikeField = (field, value) =>
   isArrayLikeSchemaField(field) && Array.isArray(value) && field?.item?.type === "object" && field?.item?.fields;
@@ -2052,7 +2052,18 @@ const embeddedDomainsByComponentDomain = computed(() => {
 
     embedded.forEach((definition) => {
       const key = typeof definition?.key === "string" ? definition.key.trim() : "";
-      const domain = typeof definition?.domain === "string" ? definition.domain.trim() : "";
+      const fallbackDomain = typeof definition?.domain === "string" ? definition.domain.trim() : "";
+      const domainBy = typeof definition?.domainBy === "string" ? definition.domainBy.trim() : "";
+      const domainMap =
+        definition?.domainMap && typeof definition.domainMap === "object" && !Array.isArray(definition.domainMap)
+          ? definition.domainMap
+          : null;
+      const mappedDomainValue = domainBy ? componentConfig?.[domainBy] : undefined;
+      const mappedDomain =
+        domainMap && mappedDomainValue !== undefined && domainMap[String(mappedDomainValue)]
+          ? String(domainMap[String(mappedDomainValue)]).trim()
+          : "";
+      const domain = mappedDomain || fallbackDomain;
       if (!key || !domain) return;
 
       const sourceField = fieldByKey.get(key);
@@ -3477,7 +3488,20 @@ const resolvePreviewTabKeyFromMain = () => {
     if (schema?.renderStrategy === "verbatim_root") {
       return "custom";
     }
-    const { domain } = parseComponentId(componentId);
+    const entryConfig = activeComponentEntry.value?.config && typeof activeComponentEntry.value.config === "object"
+      ? activeComponentEntry.value.config
+      : {};
+    const fallbackDomain = String(schema?.domain || parseComponentId(componentId).domain || "").trim();
+    const domainBy = typeof schema?.domainBy === "string" ? schema.domainBy.trim() : "";
+    const domainMap = schema?.domainMap && typeof schema.domainMap === "object" && !Array.isArray(schema.domainMap)
+      ? schema.domainMap
+      : null;
+    const mappedDomainValue = domainBy ? entryConfig?.[domainBy] : undefined;
+    const mappedDomain =
+      domainMap && mappedDomainValue !== undefined && domainMap[String(mappedDomainValue)]
+        ? String(domainMap[String(mappedDomainValue)]).trim()
+        : "";
+    const domain = mappedDomain || fallbackDomain;
     if (!domain) return "";
     return domain === "display" ? "display" : domain;
   }

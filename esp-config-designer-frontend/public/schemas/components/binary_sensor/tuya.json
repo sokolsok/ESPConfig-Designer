@@ -4,12 +4,57 @@
   "platform": "tuya",
   "helpUrl": "https://esphome.io/components/binary_sensor/tuya/",
   "extends": "base_binary_sensor.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "tuya",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "component:tuya"
+    },
+    {
+      "require": "bus:uart"
+    }
+  ],
   "fields": [
+    {
+      "key": "hub",
+      "label": "Tuya hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_tuya.json"
+    },
+    {
+      "key": "tuya_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "tuya",
+      "allowSelfReference": true,
+      "emitYAML": "never",
+      "default": "tuya_hub"
+    },
+    {
+      "key": "name",
+      "placeholder": "Binary Sensor Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
     {
       "key": "sensor_datapoint",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "default": "1",
+	  "emitYAML": "alvays"
     }
   ]
 }

@@ -3,5 +3,64 @@
   "domain": "esp32_ble_tracker",
   "platform": "",
   "type": "object",
-  "fields": []
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "esp32_ble_tracker_hub",
+      "idDomain": "esp32_ble_tracker"
+    },
+    {
+      "key": "software_coexistence",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": true
+    },
+    {
+      "key": "scan_parameters",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "interval",
+          "type": "duration",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "320ms"
+        },
+        {
+          "key": "window",
+          "type": "duration",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "30ms"
+        },
+        {
+          "key": "duration",
+          "type": "duration",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "5min"
+        },
+        {
+          "key": "active",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal",
+          "default": true
+        },
+        {
+          "key": "continuous",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal",
+          "default": true
+        }
+      ]
+    }
+  ]
 }

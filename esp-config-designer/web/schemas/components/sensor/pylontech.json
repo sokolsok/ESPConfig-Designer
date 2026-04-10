@@ -1,0 +1,126 @@
+{
+  "id": "sensor.pylontech",
+  "domain": "sensor",
+  "platform": "pylontech",
+  "helpUrl": "https://esphome.io/components/pylontech/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "pylontech",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Battery hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_pylontech.json"
+    },
+    {
+      "key": "pylontech_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "pylontech",
+      "allowSelfReference": true,
+      "default": "pylontech_component"
+    },
+    {
+      "key": "battery",
+      "type": "number",
+      "required": true,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": "1"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "current",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "coulomb",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "temperature_low",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "temperature_high",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "voltage_low",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "voltage_high",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "mos_temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    }
+  ]
+}

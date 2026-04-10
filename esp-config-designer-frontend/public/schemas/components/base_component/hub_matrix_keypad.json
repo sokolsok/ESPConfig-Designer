@@ -1,0 +1,103 @@
+{
+  "id": "hub.matrix_keypad",
+  "domain": "matrix_keypad",
+  "platform": "",
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "matrix_keypad_hub",
+      "idDomain": "matrix_keypad"
+    },
+    {
+      "key": "rows",
+      "type": "generated_list",
+      "required": true,
+      "lvl": "simple",
+      "count": {
+        "label": "Rows",
+        "type": "number",
+        "required": true,
+        "default": 4,
+        "min": 0
+      },
+      "item": {
+        "type": "object",
+        "uiInlineSingleField": true,
+        "fields": [
+          {
+            "key": "pin",
+            "type": "gpio",
+            "required": false,
+            "lvl": "simple",
+            "label": "pin",
+			"placeholder": "GPIOXX"
+          }
+        ]
+      }
+    },
+    {
+      "key": "columns",
+      "type": "generated_list",
+      "required": true,
+      "lvl": "simple",
+      "count": {
+        "label": "Columns",
+        "type": "number",
+        "required": true,
+        "default": 4,
+        "min": 0
+      },
+      "item": {
+        "type": "object",
+        "uiInlineSingleField": true,
+        "fields": [
+          {
+            "key": "pin",
+            "type": "gpio",
+            "required": false,
+            "lvl": "simple",
+            "label": "pin",
+			"placeholder": "GPIOXX"
+          }
+        ]
+      }
+    },
+    {
+      "key": "keys",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "123A456B789C*0#D"
+    },
+    {
+      "key": "has_diodes",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "has_pulldowns",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "on_key",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

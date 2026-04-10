@@ -986,6 +986,20 @@
               "schemaPath": "components/sensor/hydreon_rgxx.json"
             },
             {
+              "name": "Pylontech Sensor",
+              "path": "components/sensor/pylontech",
+              "id": "sensor/pylontech",
+              "available": true,
+              "schemaPath": "components/sensor/pylontech.json"
+            },
+            {
+              "name": "PipSolar Sensor",
+              "path": "components/sensor/pipsolar",
+              "id": "sensor/pipsolar",
+              "available": true,
+              "schemaPath": "components/sensor/pipsolar.json"
+            },
+            {
               "name": "HYT271",
               "path": "components/sensor/hyt271",
               "id": "sensor/hyt271",
@@ -1817,11 +1831,18 @@
               "schemaPath": "components/binary_sensor/mpr121.json"
             },
             {
-              "name": "TTP229",
-              "path": "components/binary_sensor/ttp229",
-              "id": "binary_sensor/ttp229",
+              "name": "TTP229 BSF",
+              "path": "components/binary_sensor/ttp229_bsf",
+              "id": "binary_sensor/ttp229_bsf",
               "available": true,
-              "schemaPath": "components/binary_sensor/ttp229.json"
+              "schemaPath": "components/binary_sensor/ttp229_bsf.json"
+            },
+            {
+              "name": "TTP229 LSF",
+              "path": "components/binary_sensor/ttp229_lsf",
+              "id": "binary_sensor/ttp229_lsf",
+              "available": true,
+              "schemaPath": "components/binary_sensor/ttp229_lsf.json"
             }
           ]
         },
@@ -1833,22 +1854,8 @@
               "name": "Matrix Keypad",
               "path": "components/matrix_keypad",
               "id": "matrix_keypad",
-              "available": false,
-              "schemaPath": ""
-            },
-            {
-              "name": "TM1637",
-              "path": "components/display/tm1637",
-              "id": "display/tm1637",
               "available": true,
-              "schemaPath": "components/display/tm1637.json"
-            },
-            {
-              "name": "TM1638",
-              "path": "components/display/tm1638",
-              "id": "display/tm1638",
-              "available": true,
-              "schemaPath": "components/display/tm1638.json"
+              "schemaPath": "components/binary_sensor/matrix_keypad.json"
             }
           ]
         },
@@ -1872,17 +1879,17 @@
             },
             {
               "name": "PN7150",
-              "path": "components/pn7150",
-              "id": "pn7150",
-              "available": false,
-              "schemaPath": ""
+              "path": "components/pn7150_i2c",
+              "id": "pn7150_i2c",
+              "available": true,
+              "schemaPath": "components/miscellaneous/pn7150_i2c.json"
             },
             {
-              "name": "PN716X",
+              "name": "PN7160",
               "path": "components/pn7160",
               "id": "pn7160",
-              "available": false,
-              "schemaPath": ""
+              "available": true,
+              "schemaPath": "components/miscellaneous/pn7160.json"
             },
             {
               "name": "RC522",
@@ -1902,8 +1909,8 @@
               "name": "Wiegand Reader",
               "path": "components/wiegand",
               "id": "wiegand",
-              "available": false,
-              "schemaPath": ""
+              "available": true,
+              "schemaPath": "components/miscellaneous/wiegand.json"
             }
           ]
         },
@@ -1924,6 +1931,13 @@
               "id": "touchscreen/gt911",
               "available": true,
               "schemaPath": "components/touchscreen/gt911.json"
+            },
+            {
+              "name": "GT911 Buttons",
+              "path": "components/binary_sensor/gt911",
+              "id": "binary_sensor/gt911",
+              "available": true,
+              "schemaPath": "components/binary_sensor/gt911.json"
             },
             {
               "name": "Nextion Binary Sensor",
@@ -1954,6 +1968,13 @@
               "schemaPath": "components/touchscreen/tt21100.json"
             },
             {
+              "name": "TT21100 Buttons",
+              "path": "components/binary_sensor/tt21100",
+              "id": "binary_sensor/tt21100",
+              "available": true,
+              "schemaPath": "components/binary_sensor/tt21100.json"
+            },
+            {
               "name": "LVGL widget",
               "path": "components/binary_sensor/lvgl",
               "id": "binary_sensor/lvgl",
@@ -1967,18 +1988,25 @@
           "slug": "presence-detection",
           "items": [
             {
-              "name": "AT581X",
-              "path": "components/at581x",
-              "id": "at581x",
-              "available": false,
-              "schemaPath": ""
+              "name": "DFRobot mmWave Radar Switch",
+              "path": "components/switch/dfrobot_sen0395",
+              "id": "switch/dfrobot_sen0395",
+              "available": true,
+              "schemaPath": "components/switch/dfrobot_sen0395.json"
             },
             {
-              "name": "DFRobot mmWave Radar",
-              "path": "components/dfrobot_sen0395",
-              "id": "dfrobot_sen0395",
-              "available": false,
-              "schemaPath": ""
+              "name": "DFRobot mmWave Radar Binary Sensor",
+              "path": "components/binary_sensor/dfrobot_sen0395",
+              "id": "binary_sensor/dfrobot_sen0395",
+              "available": true,
+              "schemaPath": "components/binary_sensor/dfrobot_sen0395.json"
+            },
+            {
+              "name": "AT581X Switch",
+              "path": "components/switch/at581x",
+              "id": "switch/at581x",
+              "available": true,
+              "schemaPath": "components/switch/at581x.json"
             },
             {
               "name": "LD2410 Binary Sensor",
@@ -2071,19 +2099,25 @@
               "schemaPath": "components/binary_sensor/modbus_controller.json"
             },
             {
-              "name": "PipSolar - compatible PV Inverter",
-              "path": "components/pipsolar",
-              "id": "pipsolar",
+              "name": "PipSolar Binary Sensor",
+              "path": "components/binary_sensor/pipsolar",
+              "id": "binary_sensor/pipsolar",
               "available": true,
-              "schemaPath": "components/energy_solar_management/pipsolar.json",
-              "catalogKey": "pipsolar/pipsolar_compatible_pv_inverter"
+              "schemaPath": "components/binary_sensor/pipsolar.json"
             },
             {
-              "name": "Pylontech Batteries",
-              "path": "components/pylontech",
-              "id": "pylontech",
-              "available": false,
-              "schemaPath": ""
+              "name": "Pylontech Sensor",
+              "path": "components/sensor/pylontech",
+              "id": "sensor/pylontech",
+              "available": true,
+              "schemaPath": "components/sensor/pylontech.json"
+            },
+            {
+              "name": "Pylontech Text Sensor",
+              "path": "components/text_sensor/pylontech",
+              "id": "text_sensor/pylontech",
+              "available": true,
+              "schemaPath": "components/text_sensor/pylontech.json"
             },
             {
               "name": "Qwiic PIR Motion",
@@ -2647,6 +2681,20 @@
           "schemaPath": "components/display/tm1621.json"
         },
         {
+          "name": "TM1637",
+          "path": "components/display/tm1637",
+          "id": "display/tm1637",
+          "available": true,
+          "schemaPath": "components/display/tm1637.json"
+        },
+        {
+          "name": "TM1638",
+          "path": "components/display/tm1638",
+          "id": "display/tm1638",
+          "available": true,
+          "schemaPath": "components/display/tm1638.json"
+        },
+        {
           "name": "TM1651 Battery Display",
           "path": "components/tm1651",
           "id": "tm1651",
@@ -2716,14 +2764,6 @@
       "title": "Energy/Solar Management Components",
       "slug": "energy-solar-management-components",
       "items": [
-        {
-          "name": "PipSolar-compatible PV Inverter",
-          "path": "components/pipsolar",
-          "id": "pipsolar",
-          "available": true,
-          "schemaPath": "components/energy_solar_management/pipsolar.json",
-          "catalogKey": "pipsolar/pipsolar_compatible_pv_inverter_2"
-        },
         {
           "name": "Power Supply",
           "path": "components/power_supply",
@@ -3326,6 +3366,13 @@
           "schemaPath": "components/output/pca9685.json"
         },
         {
+          "name": "PipSolar Output",
+          "path": "components/output/pipsolar",
+          "id": "output/pipsolar",
+          "available": true,
+          "schemaPath": "components/output/pipsolar.json"
+        },
+        {
           "name": "Sigma-Delta Output",
           "path": "components/output/sigma_delta_output",
           "id": "output/sigma_delta_output",
@@ -3642,6 +3689,27 @@
           "schemaPath": "components/switch/seeed_mr24hpc1.json"
         },
         {
+          "name": "PipSolar Switch",
+          "path": "components/switch/pipsolar",
+          "id": "switch/pipsolar",
+          "available": true,
+          "schemaPath": "components/switch/pipsolar.json"
+        },
+        {
+          "name": "AT581X Switch",
+          "path": "components/switch/at581x",
+          "id": "switch/at581x",
+          "available": true,
+          "schemaPath": "components/switch/at581x.json"
+        },
+        {
+          "name": "DFRobot mmWave Radar Switch",
+          "path": "components/switch/dfrobot_sen0395",
+          "id": "switch/dfrobot_sen0395",
+          "available": true,
+          "schemaPath": "components/switch/dfrobot_sen0395.json"
+        },
+        {
           "name": "MicroNova Switch",
           "path": "components/switch/micronova",
           "id": "switch/micronova",
@@ -3767,6 +3835,20 @@
           "id": "text_sensor/seeed_mr24hpc1",
           "available": true,
           "schemaPath": "components/text_sensor/seeed_mr24hpc1.json"
+        },
+        {
+          "name": "Pylontech Text Sensor",
+          "path": "components/text_sensor/pylontech",
+          "id": "text_sensor/pylontech",
+          "available": true,
+          "schemaPath": "components/text_sensor/pylontech.json"
+        },
+        {
+          "name": "PipSolar Text Sensor",
+          "path": "components/text_sensor/pipsolar",
+          "id": "text_sensor/pipsolar",
+          "available": true,
+          "schemaPath": "components/text_sensor/pipsolar.json"
         },
         {
           "name": "MicroNova Text Sensor",
@@ -3944,6 +4026,34 @@
           "schemaPath": "components/touchscreen/ft63x6.json"
         },
         {
+          "name": "GT911",
+          "path": "components/touchscreen/gt911",
+          "id": "touchscreen/gt911",
+          "available": true,
+          "schemaPath": "components/touchscreen/gt911.json"
+        },
+        {
+          "name": "GT911 Buttons",
+          "path": "components/binary_sensor/gt911",
+          "id": "binary_sensor/gt911",
+          "available": true,
+          "schemaPath": "components/binary_sensor/gt911.json"
+        },
+        {
+          "name": "TT21100",
+          "path": "components/touchscreen/tt21100",
+          "id": "touchscreen/tt21100",
+          "available": true,
+          "schemaPath": "components/touchscreen/tt21100.json"
+        },
+        {
+          "name": "TT21100 Buttons",
+          "path": "components/binary_sensor/tt21100",
+          "id": "binary_sensor/tt21100",
+          "available": true,
+          "schemaPath": "components/binary_sensor/tt21100.json"
+        },
+        {
           "name": "XPT2046",
           "path": "components/touchscreen/xpt2046",
           "id": "touchscreen/xpt2046",
@@ -4098,13 +4208,6 @@
           "schemaPath": ""
         },
         {
-          "name": "Tuya MCU",
-          "path": "components/tuya",
-          "id": "tuya",
-          "available": false,
-          "schemaPath": ""
-        },
-        {
           "name": "Z-Wave Proxy",
           "path": "components/zwave_proxy",
           "id": "zwave_proxy",
@@ -4120,7 +4223,6 @@
     "alarm_control_panel/template",
     "animation",
     "api",
-    "at581x",
     "audio_adc",
     "audio_adc/es7210",
     "audio_adc/es7243e",
@@ -4133,15 +4235,20 @@
     "binary_sensor/analog_threshold",
     "binary_sensor/ble_presence",
     "binary_sensor/cap1188",
+    "binary_sensor/dfrobot_sen0395",
     "binary_sensor/esp32_touch",
     "binary_sensor/gpio",
+    "binary_sensor/gt911",
+    "binary_sensor/tt21100",
     "binary_sensor/homeassistant",
     "binary_sensor/hydreon_rgxx",
     "binary_sensor/ld2410",
     "binary_sensor/ld2412",
     "binary_sensor/ld2420",
     "binary_sensor/ld2450",
+    "binary_sensor/pipsolar",
     "binary_sensor/msa3xx",
+    "binary_sensor/matrix_keypad",
     "binary_sensor/seeed_mr24hpc1",
     "binary_sensor/seeed_mr60fda2",
     "binary_sensor/seeed_mr60bha2",
@@ -4160,7 +4267,8 @@
     "binary_sensor/status",
     "binary_sensor/switch",
     "binary_sensor/template",
-    "binary_sensor/ttp229",
+    "binary_sensor/ttp229_bsf",
+    "binary_sensor/ttp229_lsf",
     "binary_sensor/tuya",
     "ble_client",
     "ble_nus",
@@ -4215,7 +4323,6 @@
     "deep_sleep",
     "demo",
     "dfplayer",
-    "dfrobot_sen0395",
     "display",
     "display/addressable_light",
     "display/epaper_spi",
@@ -4256,7 +4363,6 @@
     "esp32",
     "esp32_ble_beacon",
     "esp32_ble_server",
-    "esp32_ble_tracker",
     "esp32_camera",
     "esp32_camera_web_server",
     "esp32_hosted",
@@ -4378,6 +4484,7 @@
     "output/modbus_controller",
     "output/my9231",
     "output/pca9685",
+    "output/pipsolar",
     "output/sigma_delta_output",
     "output/slow_pwm",
     "output/sm16716",
@@ -4395,13 +4502,11 @@
     "pca9554",
     "pcf8574",
     "pi4ioe5v6408",
-    "pipsolar",
-    "pn7150",
+    "pn7150_i2c",
     "pn7160",
     "power_supply",
     "prometheus",
     "psram",
-    "pylontech",
     "qr_code",
     "remote_receiver",
     "remote_transmitter",
@@ -4558,6 +4663,7 @@
     "sensor/mlx90614",
     "sensor/mmc5603",
     "sensor/mmc5983",
+    "sensor/pipsolar",
     "sensor/modbus_controller",
     "sensor/mopeka_pro_check",
     "sensor/mopeka_std_check",
@@ -4627,6 +4733,7 @@
     "sensor/total_daily_energy",
     "sensor/tsl2561",
     "sensor/tsl2591",
+    "sensor/pylontech",
     "sensor/tuya",
     "sensor/tx20",
     "sensor/ufire_ec",
@@ -4667,11 +4774,14 @@
     "switch/gpio",
     "switch/hbridge",
     "switch/homeassistant",
+    "switch/at581x",
+    "switch/dfrobot_sen0395",
     "switch/ld2410",
     "switch/ld2412",
     "switch/ld2450",
     "switch/lvgl",
     "switch/micronova",
+    "switch/pipsolar",
     "switch/seeed_mr24hpc1",
     "switch/modbus_controller",
     "switch/nextion",
@@ -4708,8 +4818,10 @@
     "text_sensor/mqtt_subscribe",
     "text_sensor/nextion",
     "text_sensor/openthread_info",
+    "text_sensor/pipsolar",
     "text_sensor/wireguard",
     "text_sensor/template",
+    "text_sensor/pylontech",
     "text_sensor/tuya",
     "text_sensor/version",
     "text_sensor/wifi_info",
@@ -4736,7 +4848,6 @@
     "touchscreen/gt911",
     "touchscreen/tt21100",
     "touchscreen/xpt2046",
-    "tuya",
     "uart",
     "udp",
     "update",

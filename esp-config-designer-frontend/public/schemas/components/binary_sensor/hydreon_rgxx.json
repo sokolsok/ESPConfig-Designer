@@ -7,10 +7,16 @@
     {
       "key": "hydreon_rgxx_id",
       "type": "id_ref",
-      "required": false,
+      "required": true,
       "lvl": "normal",
       "domain": "sensor",
       "placeholder": "hydreon_sensor_id"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     },
     {
       "key": "too_cold",

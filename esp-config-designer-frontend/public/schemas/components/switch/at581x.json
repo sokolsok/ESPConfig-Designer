@@ -1,0 +1,40 @@
+{
+  "id": "switch.at581x",
+  "domain": "switch",
+  "platform": "at581x",
+  "helpUrl": "https://esphome.io/components/at581x/",
+  "extends": "base_switch.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "at581x",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "AT581X hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_at581x.json"
+    },
+    {
+      "key": "at581x_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "at581x",
+      "placeholder": "at581x_id"
+    }
+  ]
+}

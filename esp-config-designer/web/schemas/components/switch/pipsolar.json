@@ -1,0 +1,100 @@
+{
+  "id": "switch.pipsolar",
+  "domain": "switch",
+  "platform": "pipsolar",
+  "helpUrl": "https://esphome.io/components/pipsolar/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "pipsolar",
+      "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Inverter hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_pipsolar.json"
+    },
+    {
+      "key": "pipsolar_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "pipsolar",
+      "allowSelfReference": true,
+      "default": "pipsolar_hub"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "output_source_priority_utility",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_switch.json",
+      "fields": []
+    },
+    {
+      "key": "output_source_priority_solar",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_switch.json",
+      "fields": []
+    },
+    {
+      "key": "output_source_priority_battery",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_switch.json",
+      "fields": []
+    },
+    {
+      "key": "output_source_priority_hybrid",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_switch.json",
+      "fields": []
+    },
+    {
+      "key": "input_voltage_range",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_switch.json",
+      "fields": []
+    },
+    {
+      "key": "pv_ok_condition_for_parallel",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_switch.json",
+      "fields": []
+    },
+    {
+      "key": "pv_power_balance",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_switch.json",
+      "fields": []
+    }
+  ]
+}

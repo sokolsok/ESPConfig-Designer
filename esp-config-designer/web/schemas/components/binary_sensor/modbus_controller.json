@@ -4,6 +4,11 @@
   "platform": "modbus_controller",
   "helpUrl": "https://esphome.io/components/binary_sensor/modbus_controller/",
   "extends": "base_binary_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:modbus"
+    }
+  ],
   "fields": [
     {
       "key": "modbus_controller_id",
@@ -18,6 +23,7 @@
       "type": "select",
       "required": true,
       "lvl": "simple",
+	  "default": "coil",
       "options": [
         "coil",
         "discrete_input",
@@ -43,7 +49,8 @@
       "key": "skip_updates",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+	  "placeholder": "3"
     },
     {
       "key": "register_count",
@@ -56,7 +63,8 @@
       "key": "response_size",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+	  "placeholder": "2"
     },
     {
       "key": "force_new_range",

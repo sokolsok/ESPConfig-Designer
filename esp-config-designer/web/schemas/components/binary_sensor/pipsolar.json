@@ -1,0 +1,492 @@
+{
+  "id": "binary_sensor.pipsolar",
+  "domain": "binary_sensor",
+  "platform": "pipsolar",
+  "helpUrl": "https://esphome.io/components/pipsolar/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "pipsolar",
+      "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Inverter hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_pipsolar.json"
+    },
+    {
+      "key": "pipsolar_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "pipsolar",
+      "allowSelfReference": true,
+      "default": "pipsolar_hub"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "add_sbu_priority_version",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "configuration_status",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "scc_firmware_version",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "load_status",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "battery_voltage_to_steady_while_charging",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "charging_status",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "scc_charging_status",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "ac_charging_status",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "charging_to_floating_mode",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "switch_on",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "dustproof_installed",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "silence_buzzer_open_buzzer",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "overload_bypass_function",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "lcd_escape_to_default",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "overload_restart_function",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "over_temperature_restart_function",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "backlight_on",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "alarm_on_when_primary_source_interrupt",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "fault_code_record",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "power_saving",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "warnings_present",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "faults_present",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "warning_power_loss",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "fault_inverter_fault",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "fault_bus_over",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "fault_bus_under",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "fault_bus_soft_fail",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "warning_line_fail",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "fault_opvshort",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "fault_inverter_voltage_too_low",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "fault_inverter_voltage_too_high",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "warning_over_temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "warning_fan_lock",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "warning_battery_voltage_high",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "warning_battery_low_alarm",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "warning_battery_under_shutdown",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "warning_battery_derating",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "warning_over_load",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "warning_eeprom_failed",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "fault_inverter_over_current",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "fault_inverter_soft_failed",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "fault_self_test_failed",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "fault_op_dc_voltage_over",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "fault_battery_open",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "fault_current_sensor_failed",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "fault_battery_short",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "warning_power_limit",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "warning_pv_voltage_high",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "fault_mppt_overload",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "warning_mppt_overload",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "warning_battery_too_low_to_charge",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "fault_dc_dc_over_current",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "fault_code",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "warning_low_pv_energy",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "warning_high_ac_input_during_bus_soft_start",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "warning_battery_equalization",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    }
+  ]
+}

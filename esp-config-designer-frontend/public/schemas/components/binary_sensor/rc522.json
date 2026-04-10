@@ -6,14 +6,16 @@
   "extends": "base_binary_sensor.json",
   "embedded": [
     {
-      "key": "hub_spi",
-      "domain": "rc522_spi",
-      "dedupeBy": "id"
-    },
-    {
-      "key": "hub_i2c",
-      "domain": "rc522_i2c",
-      "dedupeBy": "id"
+      "key": "hub",
+      "logicalDomain": "rc522",
+      "domainBy": "bus",
+      "domainMap": {
+        "spi": "rc522_spi",
+        "i2c": "rc522_i2c"
+      },
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
     }
   ],
   "requirements": [
@@ -37,8 +39,10 @@
       "key": "bus",
       "label": "Transport",
       "type": "select",
+	  "emitYAML": "never",
       "required": true,
       "lvl": "simple",
+      "set_global": "rc522_bus",
       "default": "spi",
       "options": [
         "spi",
@@ -46,30 +50,23 @@
       ]
     },
     {
-      "key": "hub_spi",
+      "key": "hub",
       "label": "Hub settings",
       "type": "object",
       "required": false,
       "lvl": "simple",
       "emitYAML": "never",
-      "extends": "hub_rc522_spi.json",
-      "dependsOn": {
-        "key": "bus",
-        "value": "spi"
-      }
+      "extends": "hub_rc522.json"
     },
     {
-      "key": "hub_i2c",
-      "label": "Hub settings",
-      "type": "object",
-      "required": false,
+      "key": "rc522_id",
+      "type": "id_ref",
+      "required": true,
       "lvl": "simple",
       "emitYAML": "never",
-      "extends": "hub_rc522_i2c.json",
-      "dependsOn": {
-        "key": "bus",
-        "value": "i2c"
-      }
+      "domain": "rc522",
+      "allowSelfReference": true,
+      "default": "rc522_component"
     },
     {
       "key": "uid",

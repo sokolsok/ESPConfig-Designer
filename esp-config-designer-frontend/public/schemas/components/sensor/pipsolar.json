@@ -1,0 +1,396 @@
+{
+  "id": "sensor.pipsolar",
+  "domain": "sensor",
+  "platform": "pipsolar",
+  "helpUrl": "https://esphome.io/components/pipsolar/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "pipsolar",
+      "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Inverter hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_pipsolar.json"
+    },
+    {
+      "key": "pipsolar_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "pipsolar",
+      "allowSelfReference": true,
+      "default": "pipsolar_hub"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "grid_rating_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "grid_rating_current",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "ac_output_rating_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "ac_output_rating_frequency",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "ac_output_rating_current",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "ac_output_rating_apparent_power",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "ac_output_rating_active_power",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "battery_rating_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "battery_recharge_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "battery_under_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "battery_bulk_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "battery_float_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "battery_type",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "current_max_ac_charging_current",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "current_max_charging_current",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "input_voltage_range",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "output_source_priority",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "charger_source_priority",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "parallel_max_num",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "machine_type",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "topology",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "output_mode",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "battery_redischarge_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "pv_ok_condition_for_parallel",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "pv_power_balance",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "grid_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "grid_frequency",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "ac_output_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "ac_output_frequency",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "ac_output_apparent_power",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "ac_output_active_power",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "output_load_percent",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "bus_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "battery_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "battery_charging_current",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "battery_capacity_percent",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "inverter_heat_sink_temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "pv_input_current_for_battery",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "pv_input_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "battery_voltage_scc",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "battery_discharge_current",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "battery_voltage_offset_for_fans_on",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "eeprom_version",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "pv_charging_power",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    }
+  ]
+}

@@ -30,12 +30,11 @@
     {
       "key": "mr24hpc1_id",
       "type": "id_ref",
-      "required": true,
+      "required": false,
       "lvl": "simple",
       "domain": "seeed_mr24hpc1",
       "allowSelfReference": true,
-      "emitYAML": "never",
-      "default": "mr24hpc1_radar"
+      "emitYAML": "never"
     },
     {
       "key": "custom_config",

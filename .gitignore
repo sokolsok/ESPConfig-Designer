@@ -1,6 +1,9 @@
 __pycache__/
 *.pyc
 AGENTS.md
+ADDITIONAL_RULES.md
+components_checklist.md
+esp-config-designer-frontend/HOW_TO_CREATE_SCHEMA.md
 esp-config-designer-frontend/node_modules/
 esp-config-designer-frontend/dist/
 esp-config-designer-frontend/runtime/

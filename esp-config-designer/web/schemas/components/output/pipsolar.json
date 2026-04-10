@@ -1,0 +1,215 @@
+{
+  "id": "output.pipsolar",
+  "domain": "output",
+  "platform": "pipsolar",
+  "helpUrl": "https://esphome.io/components/pipsolar/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "pipsolar",
+      "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Inverter hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_pipsolar.json"
+    },
+    {
+      "key": "pipsolar_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "pipsolar",
+      "allowSelfReference": true,
+      "default": "pipsolar_hub"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "battery_recharge_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_output_float.json",
+      "fields": [
+        {
+          "key": "possible_values",
+          "type": "list",
+          "required": false,
+          "lvl": "normal",
+          "item": {
+            "type": "text",
+            "suppressQuotes": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "battery_under_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_output_float.json",
+      "fields": [
+        {
+          "key": "possible_values",
+          "type": "list",
+          "required": false,
+          "lvl": "normal",
+          "item": {
+            "type": "text",
+            "suppressQuotes": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "battery_float_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_output_float.json",
+      "fields": [
+        {
+          "key": "possible_values",
+          "type": "list",
+          "required": false,
+          "lvl": "normal",
+          "item": {
+            "type": "text",
+            "suppressQuotes": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "battery_type",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_output_float.json",
+      "fields": [
+        {
+          "key": "possible_values",
+          "type": "list",
+          "required": false,
+          "lvl": "normal",
+          "item": {
+            "type": "text",
+            "suppressQuotes": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "current_max_ac_charging_current",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_output_float.json",
+      "fields": [
+        {
+          "key": "possible_values",
+          "type": "list",
+          "required": false,
+          "lvl": "normal",
+          "item": {
+            "type": "text",
+            "suppressQuotes": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "current_max_charging_current",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_output_float.json",
+      "fields": [
+        {
+          "key": "possible_values",
+          "type": "list",
+          "required": false,
+          "lvl": "normal",
+          "item": {
+            "type": "text",
+            "suppressQuotes": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "output_source_priority",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_output_float.json",
+      "fields": [
+        {
+          "key": "possible_values",
+          "type": "list",
+          "required": false,
+          "lvl": "normal",
+          "item": {
+            "type": "text",
+            "suppressQuotes": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "charger_source_priority",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_output_float.json",
+      "fields": [
+        {
+          "key": "possible_values",
+          "type": "list",
+          "required": false,
+          "lvl": "normal",
+          "item": {
+            "type": "text",
+            "suppressQuotes": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "battery_redischarge_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_output_float.json",
+      "fields": [
+        {
+          "key": "possible_values",
+          "type": "list",
+          "required": false,
+          "lvl": "normal",
+          "item": {
+            "type": "text",
+            "suppressQuotes": true
+          }
+        }
+      ]
+    }
+  ]
+}

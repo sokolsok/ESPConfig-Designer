@@ -4,61 +4,131 @@
   "platform": "ble_presence",
   "helpUrl": "https://esphome.io/components/binary_sensor/ble_presence/",
   "extends": "base_binary_sensor.json",
+  "embedded": [
+    {
+      "key": "ble_tracker",
+      "domain": "esp32_ble_tracker",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "component:esp32_ble_tracker"
+    }
+  ],
   "fields": [
+    {
+      "key": "ble_tracker",
+      "label": "BLE tracker hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_esp32_ble_tracker.json"
+    },
+    {
+      "key": "esp32_ble_tracker_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "esp32_ble_tracker",
+      "allowSelfReference": true,
+      "emitYAML": "never",
+      "default": "esp32_ble_tracker_hub"
+    },
+    {
+      "key": "addressing_mode",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "mac_address",
+      "emitYAML": "never",
+      "options": [
+        "mac_address",
+        "irk",
+        "service_uuid",
+        "ibeacon_uuid"
+      ]
+    },
     {
       "key": "mac_address",
       "type": "text",
-      "required": false,
+      "required": true,
       "lvl": "simple",
       "placeholder": "AA:BB:CC:DD:EE:FF",
-      "note": "Use exactly one of mac_address, irk, service_uuid or ibeacon_uuid"
+      "dependsOn": {
+        "key": "addressing_mode",
+        "value": "mac_address"
+      }
     },
     {
       "key": "irk",
       "type": "text",
-      "required": false,
-      "lvl": "normal",
-      "placeholder": "1234567890abcdef1234567890abcdef"
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "1234567890abcdef1234567890abcdef",
+      "dependsOn": {
+        "key": "addressing_mode",
+        "value": "irk"
+      }
     },
     {
       "key": "service_uuid",
       "type": "text",
-      "required": false,
-      "lvl": "normal",
-      "placeholder": "11aa"
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "11aa",
+      "dependsOn": {
+        "key": "addressing_mode",
+        "value": "service_uuid"
+      }
     },
     {
       "key": "ibeacon_uuid",
       "type": "text",
-      "required": false,
-      "lvl": "normal",
-      "placeholder": "68586f1e-89c2-11eb-8dcd-0242ac130003"
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "68586f1e-89c2-11eb-8dcd-0242ac130003",
+      "dependsOn": {
+        "key": "addressing_mode",
+        "value": "ibeacon_uuid"
+      }
     },
     {
       "key": "ibeacon_major",
       "type": "number",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "addressing_mode",
+        "value": "ibeacon_uuid"
+      }
     },
     {
       "key": "ibeacon_minor",
       "type": "number",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "addressing_mode",
+        "value": "ibeacon_uuid"
+      }
     },
     {
       "key": "min_rssi",
       "type": "number",
       "required": false,
-      "lvl": "normal",
+      "lvl": "advanced",
       "placeholder": "-80"
     },
     {
       "key": "timeout",
       "type": "duration",
       "required": false,
-      "lvl": "normal",
-      "default": "5min"
+      "lvl": "advanced",
+      "placeholder": "5min"
     }
   ]
 }

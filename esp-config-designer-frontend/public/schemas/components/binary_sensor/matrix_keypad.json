@@ -1,0 +1,63 @@
+{
+  "id": "binary_sensor.matrix_keypad",
+  "domain": "binary_sensor",
+  "platform": "matrix_keypad",
+  "helpUrl": "https://esphome.io/components/matrix_keypad/",
+  "extends": "base_binary_sensor.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "matrix_keypad",
+      "dedupeBy": "id"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Keypad hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_matrix_keypad.json"
+    },
+    {
+      "key": "keypad_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "matrix_keypad",
+      "allowSelfReference": true,
+      "placeholder": "matrix_keypad_id"
+    },
+    {
+      "key": "name",
+      "placeholder": "Binary Sensor Name",
+      "type": "text",
+      "required": true,
+      "lvl": "simple"
+    },
+    {
+      "key": "row",
+      "type": "number",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "1"
+    },
+    {
+      "key": "col",
+      "type": "number",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "0"
+    },
+    {
+      "key": "key",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "A",
+      "note": "Use key, or use row + col. Key must exist in the root keys string."
+    }
+  ]
+}

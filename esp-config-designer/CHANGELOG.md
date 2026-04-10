@@ -1,7 +1,4 @@
-## 1.1.1
+## 1.1.2
 
-- Added the changelog.
-
-## 1.0.0
-
-- Initial public release
+- Added full Binary Sensor component coverage.
+- Fixed bugs in schema handling and builder flows.

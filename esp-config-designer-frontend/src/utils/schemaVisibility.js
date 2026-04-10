@@ -1,7 +1,7 @@
 import { getTemplatableInnerValue, isTemplatableValue } from "./schemaTemplatable";
 
 const isObjectArrayLikeField = (field, value) =>
-  (field?.type === "list" || field?.type === "fixed_list") &&
+  (field?.type === "list" || field?.type === "fixed_list" || field?.type === "generated_list") &&
   Array.isArray(value) &&
   field?.item?.type === "object" &&
   field?.item?.fields;

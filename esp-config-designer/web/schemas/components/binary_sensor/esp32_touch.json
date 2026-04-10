@@ -30,7 +30,15 @@
       "lvl": "simple",
       "domain": "esp32_touch",
       "allowSelfReference": true,
-      "emitYAML": "never"
+      "emitYAML": "never",
+      "default": "esp32_touch_hub"
+    },
+    {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "Binary Sensor Name"
     },
     {
       "key": "pin",
@@ -38,20 +46,21 @@
       "required": true,
       "lvl": "simple",
       "placeholder": "GPIOXX",
-      "note": "Use a touch-capable pin for the active ESP32 variant: ESP32 GPIO4/0/2/15/13/12/14/27/33/32, ESP32-S2/S3 GPIO1-14, ESP32-P4 GPIO2-15."
+      "note": "Use a touch-capable pin. ESP32 GPIO4/0/2/15/13/12/14/27/33/32, ESP32-S2/S3 GPIO1-14, ESP32-P4 GPIO2-15."
     },
     {
       "key": "threshold",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "1000"
     },
     {
       "key": "wakeup_threshold",
       "type": "number",
       "required": false,
       "lvl": "normal",
-      "note": "Used for deep sleep wake-up threshold configuration."
+	  "placeholder": "500"
     }
   ]
 }

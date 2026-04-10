@@ -1,0 +1,8 @@
+{
+  "id": "matrix_keypad",
+  "domain": "matrix_keypad",
+  "platform": "",
+  "renderAs": "root_map",
+  "helpUrl": "https://esphome.io/components/matrix_keypad/",
+  "extends": "hub_matrix_keypad.json"
+}

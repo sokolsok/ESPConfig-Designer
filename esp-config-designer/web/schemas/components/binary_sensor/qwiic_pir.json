@@ -11,6 +11,13 @@
   ],
   "fields": [
     {
+      "key": "name",
+      "placeholder": "Binary Sensor Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
       "key": "debounce_mode",
       "type": "select",
       "required": false,

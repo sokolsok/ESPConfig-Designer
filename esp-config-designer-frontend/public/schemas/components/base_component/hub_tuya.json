@@ -1,0 +1,75 @@
+{
+  "id": "hub.tuya",
+  "domain": "tuya",
+  "platform": "",
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "tuya_hub",
+      "idDomain": "tuya"
+    },
+    {
+      "key": "time_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "time",
+	  "placeholder": "time_id"
+    },
+    {
+      "key": "status_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
+    },
+    {
+      "key": "ignore_mcu_update_on_datapoints",
+      "type": "list",
+      "required": false,
+      "lvl": "normal",
+      "item": {
+        "type": "number"
+      }
+    },
+    {
+      "key": "on_datapoint_update",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "sensor_datapoint",
+            "type": "number",
+            "required": true,
+            "lvl": "simple"
+          },
+          {
+            "key": "datapoint_type",
+            "type": "select",
+            "required": false,
+            "lvl": "simple",
+            "options": [
+              "raw",
+              "string",
+              "bool",
+              "int",
+              "uint",
+              "enum",
+              "bitmask",
+              "any"
+            ]
+          }
+        ],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

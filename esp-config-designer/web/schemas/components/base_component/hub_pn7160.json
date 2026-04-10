@@ -1,0 +1,125 @@
+{
+  "id": "hub.pn7160",
+  "domain": "pn7160",
+  "platform": "",
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple",
+      "idDomain": "pn7160"
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+	  "placeholder": "GPIOXX",
+      "globalDependsOn": {
+        "key": "pn7160_bus",
+        "value": "spi"
+      }
+    },
+    {
+      "key": "irq_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
+    },
+    {
+      "key": "ven_pin",
+      "type": "gpio",
+      "required": true,
+	  "placeholder": "GPIOXX",
+      "lvl": "simple"
+    },
+    {
+      "key": "dwl_req_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
+    },
+    {
+      "key": "wkup_req_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
+    },
+    {
+      "key": "emulation_message",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "tag_ttl",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1s"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "i2c",
+      "globalDependsOn": {
+        "key": "pn7160_bus",
+        "value": "i2c"
+      }
+    },
+    {
+      "key": "spi_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "spi",
+      "globalDependsOn": {
+        "key": "pn7160_bus",
+        "value": "spi"
+      }
+    },
+    {
+      "key": "on_tag",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_tag_removed",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_emulated_tag_scan",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

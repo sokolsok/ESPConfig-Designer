@@ -106,6 +106,7 @@ import { computed, defineAsyncComponent, inject, onBeforeUnmount, ref, watch } f
 import SchemaField from "./SchemaField.vue";
 import { loadComponentSchema, loadSchemaByPath } from "../utils/schemaLoader";
 import { isFieldVisible } from "../utils/schemaVisibility";
+import { resolveAutoValue } from "../utils/schemaAuto";
 
 const DisplayBuilder = defineAsyncComponent(() => import("./display/DisplayBuilder.vue"));
 
@@ -304,6 +305,10 @@ const sharedHubBindings = computed(() => {
   embedded.forEach((definition) => {
     const sourceKey = typeof definition?.key === "string" ? definition.key.trim() : "";
     const domain = typeof definition?.domain === "string" ? definition.domain.trim() : "";
+    const logicalDomain =
+      typeof definition?.logicalDomain === "string" && definition.logicalDomain.trim()
+        ? definition.logicalDomain.trim()
+        : domain;
     const dedupeBy =
       typeof definition?.dedupeBy === "string" && definition.dedupeBy.trim()
         ? definition.dedupeBy.trim()
@@ -312,7 +317,7 @@ const sharedHubBindings = computed(() => {
       typeof definition?.emitAs === "string" ? definition.emitAs.trim().toLowerCase() : "list";
     const singleton = Boolean(definition?.singleton);
 
-    if (!sourceKey || !domain) return;
+    if (!sourceKey || !logicalDomain) return;
     const supportsListSharedHub = emitAsValue === "list" && dedupeBy === "id";
     const supportsSingletonMapSharedHub = emitAsValue === "map" && singleton;
     if (!supportsListSharedHub && !supportsSingletonMapSharedHub) return;
@@ -323,7 +328,7 @@ const sharedHubBindings = computed(() => {
     const idRefCandidates = fields.filter(
       (field) =>
         field?.type === "id_ref" &&
-        field?.domain === domain &&
+        field?.domain === logicalDomain &&
         typeof field?.key === "string" &&
         field.key.trim()
     );
@@ -332,7 +337,7 @@ const sharedHubBindings = computed(() => {
       (idRefCandidates.length === 1 ? idRefCandidates[0] : null);
     if (!idRefField) return;
 
-    const idOptions = buildSharedHubIdOptions(domain);
+    const idOptions = buildSharedHubIdOptions(logicalDomain);
 
     // Shared hub flow:
     // - Select existing hub id (no local hub object emission)
@@ -341,7 +346,7 @@ const sharedHubBindings = computed(() => {
       sourceKey,
       sourceField,
       idRefKey: idRefField.key,
-      domain,
+      domain: logicalDomain,
       idOptions,
       selectLabel: "Select hub"
     });
@@ -385,6 +390,51 @@ const isSharedHubSelectionMissing = (binding) => {
 
 const isPlainObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
 
+const cloneSeedValue = (value) => {
+  if (Array.isArray(value)) return value.map((item) => cloneSeedValue(item));
+  if (isPlainObject(value)) {
+    return Object.fromEntries(Object.entries(value).map(([key, nested]) => [key, cloneSeedValue(nested)]));
+  }
+  return value;
+};
+
+const buildSeededObjectFromFields = (fields = [], currentValue = {}, rootValue = props.rootValue || props.componentConfig || {}) => {
+  const base = isPlainObject(currentValue) ? { ...currentValue } : {};
+
+  fields.forEach((field) => {
+    if (!field?.key) return;
+    if (!isFieldVisible(field, base, fields, props.globalStore)) return;
+
+    const existingValue = base[field.key];
+    if (existingValue !== undefined && existingValue !== null && !(typeof existingValue === "string" && existingValue.trim() === "")) {
+      if (field.type === "object" && Array.isArray(field.fields) && isPlainObject(existingValue)) {
+        base[field.key] = buildSeededObjectFromFields(field.fields, existingValue, rootValue);
+      }
+      return;
+    }
+
+    if (field.type === "object" && Array.isArray(field.fields)) {
+      const nested = buildSeededObjectFromFields(field.fields, {}, rootValue);
+      if (hasConfiguredData(nested)) {
+        base[field.key] = nested;
+      }
+      return;
+    }
+
+    const autoValue = resolveAutoValue(field, base, rootValue);
+    if (autoValue !== undefined && autoValue !== null && !(typeof autoValue === "string" && autoValue.trim() === "")) {
+      base[field.key] = cloneSeedValue(autoValue);
+      return;
+    }
+
+    if (field.default !== undefined) {
+      base[field.key] = cloneSeedValue(field.default);
+    }
+  });
+
+  return base;
+};
+
 const onSharedHubSelectionChange = (binding, event) => {
   const nextValue = String(event?.target?.value || "").trim();
   sharedHubSelectionOverrides.value = {
@@ -400,7 +450,7 @@ const onSharedHubSelectionChange = (binding, event) => {
   if (nextValue === "__add_new__") {
     const sourceValue = props.componentConfig?.[binding.sourceKey];
     const currentRef = String(props.componentConfig?.[binding.idRefKey] || "").trim();
-    const nextObject = isPlainObject(sourceValue) ? { ...sourceValue } : {};
+    const nextObject = buildSeededObjectFromFields(binding.sourceField?.fields || [], sourceValue || {});
     if (!String(nextObject?.id || "").trim() && currentRef) {
       nextObject.id = currentRef;
     }
@@ -481,7 +531,7 @@ const showModeUpgrade = computed(() => {
         return hasPromotableFields(field.fields || [], valueMap?.[field.key] || {});
       }
 
-      if (field.type === "list" && field.item?.type === "object" && Array.isArray(field.item?.fields)) {
+      if ((field.type === "list" || field.type === "generated_list") && field.item?.type === "object" && Array.isArray(field.item?.fields)) {
         const entries = Array.isArray(valueMap?.[field.key]) && valueMap[field.key].length
           ? valueMap[field.key]
           : [{}];

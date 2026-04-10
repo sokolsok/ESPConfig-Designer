@@ -1,0 +1,28 @@
+{
+  "id": "at581x",
+  "domain": "at581x",
+  "platform": "",
+  "renderAs": "root_map",
+  "helpUrl": "https://esphome.io/components/at581x/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple",
+      "idDomain": "at581x"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "i2c"
+    }
+  ]
+}

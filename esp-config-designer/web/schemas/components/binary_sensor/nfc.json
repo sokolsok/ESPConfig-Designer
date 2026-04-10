@@ -13,25 +13,53 @@
       "lvl": "simple"
     },
     {
+      "key": "match_by",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "tag_id",
+	  "emitYAML": "never",
+      "options": [
+        "uid",
+        "tag_id",
+        "ndef_contains"
+      ]
+    },
+    {
       "key": "uid",
       "type": "text",
-      "required": false,
+      "required": true,
       "lvl": "simple",
-      "placeholder": "74-10-37-94"
+      "placeholder": "74-10-37-94",
+	  "suppressQuotes": true,
+      "dependsOn": {
+        "key": "match_by",
+        "value": "uid"
+      }
     },
     {
       "key": "tag_id",
       "type": "text",
-      "required": false,
-      "lvl": "normal",
-      "placeholder": "pulsed"
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "pulsed",
+	  "suppressQuotes": true,
+      "dependsOn": {
+        "key": "match_by",
+        "value": "tag_id"
+      }
     },
     {
       "key": "ndef_contains",
       "type": "text",
-      "required": false,
-      "lvl": "normal",
-      "placeholder": "pulse"
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "pulse",
+	  "suppressQuotes": true,
+      "dependsOn": {
+        "key": "match_by",
+        "value": "ndef_contains"
+      }
     }
   ]
 }

@@ -6,14 +6,16 @@
   "extends": "base_binary_sensor.json",
   "embedded": [
     {
-      "key": "hub_spi",
-      "domain": "pn532_spi",
-      "dedupeBy": "id"
-    },
-    {
-      "key": "hub_i2c",
-      "domain": "pn532_i2c",
-      "dedupeBy": "id"
+      "key": "hub",
+      "logicalDomain": "pn532",
+      "domainBy": "bus",
+      "domainMap": {
+        "spi": "pn532_spi",
+        "i2c": "pn532_i2c"
+      },
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
     }
   ],
   "requirements": [
@@ -35,10 +37,12 @@
   "fields": [
     {
       "key": "bus",
-      "label": "Transport",
+      "label": "transport",
       "type": "select",
       "required": true,
+	  "emitYAML": "never",
       "lvl": "simple",
+      "set_global": "pn532_bus",
       "default": "spi",
       "options": [
         "spi",
@@ -46,30 +50,23 @@
       ]
     },
     {
-      "key": "hub_spi",
+      "key": "hub",
       "label": "Hub settings",
       "type": "object",
       "required": false,
       "lvl": "simple",
       "emitYAML": "never",
-      "extends": "hub_pn532_spi.json",
-      "dependsOn": {
-        "key": "bus",
-        "value": "spi"
-      }
+      "extends": "hub_pn532.json"
     },
     {
-      "key": "hub_i2c",
-      "label": "Hub settings",
-      "type": "object",
-      "required": false,
+      "key": "pn532_id",
+      "type": "id_ref",
+      "required": true,
       "lvl": "simple",
       "emitYAML": "never",
-      "extends": "hub_pn532_i2c.json",
-      "dependsOn": {
-        "key": "bus",
-        "value": "i2c"
-      }
+      "domain": "pn532",
+      "allowSelfReference": true,
+      "default": "pn532_component"
     },
     {
       "key": "uid",

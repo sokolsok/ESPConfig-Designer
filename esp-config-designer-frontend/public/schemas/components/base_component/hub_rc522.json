@@ -1,0 +1,99 @@
+{
+  "id": "hub.rc522",
+  "domain": "rc522",
+  "platform": "",
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "rc522_component",
+      "idDomain": "rc522"
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+	  "placeholder": "GPIOXX",
+      "globalDependsOn": {
+        "key": "rc522_bus",
+        "value": "spi"
+      }
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x28",
+      "emitYAML": "always",
+      "globalDependsOn": {
+        "key": "rc522_bus",
+        "value": "i2c"
+      }
+    },
+    {
+      "key": "reset_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "1s"
+    },
+    {
+      "key": "spi_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "advanced",
+      "domain": "spi",
+      "globalDependsOn": {
+        "key": "rc522_bus",
+        "value": "spi"
+      }
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "advanced",
+      "domain": "i2c",
+      "globalDependsOn": {
+        "key": "rc522_bus",
+        "value": "i2c"
+      }
+    },
+    {
+      "key": "on_tag",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_tag_removed",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

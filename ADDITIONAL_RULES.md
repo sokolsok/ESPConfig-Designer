@@ -88,7 +88,8 @@ Zakres:
 - Jeśli komponent jest helperem root-level, a child encje odwołują się do niego przez `id`, preferuj shared-hub pattern.
 - Dla wyboru `ADD NEW` / istniejący hub używaj wzorca opartego o:
   - `embedded`
-  - `dedupeBy: "id"`
+  - `dedupeBy: "id"` dla listowych helperów
+  - albo `emitAs: "map"` + `singleton: true` dla helperów singleton-map
   - helper schema z wymaganym `id`
 - Jeśli po wybraniu `ADD NEW` hub nie materializuje się od razu, sprawdź najpierw czy helper schema ma pole `id` ustawione jako `required: true`.
 - Nie wciskaj child `sensor:` albo `binary_sensor:` do root helpera, jeśli to są osobne platformy. Zrób osobny helper i osobne child schemas.
@@ -103,8 +104,10 @@ Zakres:
 ## platformByBus i wybór transportu
 
 - Jeśli komponent ma różne platformy zależnie od transportu, używaj `platformByBus`.
-- Jeśli użytkownik wybiera `i2c` albo `spi`, schema ma prowadzić do właściwej platformy bez hacków.
-- Pola zależne od transportu modeluj przez `dependsOn`.
+- Jeśli komponent ma jeden logiczny schema/helper, ale różne root klucze YAML zależnie od transportu, używaj `domainBy` + `domainMap`.
+- Jeśli użytkownik wybiera `i2c` albo `spi`, schema ma prowadzić do właściwej platformy albo właściwego root key bez hacków.
+- Pola zależne od transportu modeluj przez `dependsOn` albo `globalDependsOn`.
+- Dla transportowych helperów preferuj jeden logiczny helper schema zamiast dwóch ukrytych helper branchy (`hub_spi`, `hub_i2c`) w jednym komponencie.
 
 ## Dla list i zagnieżdżonych itemów
 

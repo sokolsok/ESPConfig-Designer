@@ -1,0 +1,23 @@
+{
+  "id": "hub.pipsolar",
+  "domain": "pipsolar",
+  "platform": "",
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+	  "default": "pipsolar_hub",
+      "idDomain": "pipsolar"
+    },
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "uart"
+    }
+  ]
+}

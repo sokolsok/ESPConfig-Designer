@@ -1,0 +1,106 @@
+{
+  "id": "pn7150_i2c",
+  "domain": "pn7150_i2c",
+  "platform": "",
+  "renderAs": "root_map",
+  "helpUrl": "https://esphome.io/components/pn7150/",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple",
+      "idDomain": "pn7150_i2c",
+      "placeholder": "pn7150_reader"
+    },
+    {
+      "key": "irq_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
+    },
+    {
+      "key": "ven_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
+    },
+    {
+      "key": "dwl_req_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal",
+	  "placeholder": "GPIOXX"
+    },
+    {
+      "key": "wkup_req_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal",
+	  "placeholder": "GPIOXX"
+    },
+    {
+      "key": "emulation_message",
+      "type": "text",
+      "required": false,
+      "lvl": "normal"
+    },
+    {
+      "key": "tag_ttl",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "1s"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "i2c"
+    },
+    {
+      "key": "on_tag",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_tag_removed",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_emulated_tag_scan",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

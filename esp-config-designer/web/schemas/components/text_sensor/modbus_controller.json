@@ -4,6 +4,11 @@
   "platform": "modbus_controller",
   "helpUrl": "https://esphome.io/components/text_sensor/modbus_controller/",
   "extends": "base_text_sensor.json",
+  "requirements": [
+    {
+      "require": "bus:modbus"
+    }
+  ],
   "fields": [
     {
       "key": "modbus_controller_id",

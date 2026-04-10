@@ -1,0 +1,108 @@
+{
+  "id": "text_sensor.pipsolar",
+  "domain": "text_sensor",
+  "platform": "pipsolar",
+  "helpUrl": "https://esphome.io/components/pipsolar/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "pipsolar",
+      "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Inverter hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_pipsolar.json"
+    },
+    {
+      "key": "pipsolar_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "pipsolar",
+      "allowSelfReference": true,
+      "default": "pipsolar_hub"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "device_mode",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_text_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "last_qpigs",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_text_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "last_qpiri",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_text_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "last_qmod",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_text_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "last_qflag",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_text_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "last_qpiws",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_text_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "last_qt",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_text_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "last_qmn",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_text_sensor.json",
+      "fields": []
+    }
+  ]
+}

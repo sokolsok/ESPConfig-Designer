@@ -40,6 +40,28 @@
     @update="emitUpdate"
     @open-secrets="emitOpenSecrets"
   />
+  <GeneratedListField
+    v-else-if="isGeneratedListField"
+    :field="field"
+    :field-label="fieldLabel"
+    :field-path="fieldPath"
+    :generated-list-value="generatedListValue"
+    :has-explicit-value="hasExplicitGeneratedListValue"
+    :root-value="rootValue"
+    :value="value"
+    :mode-level="modeLevel"
+    :id-registry="idRegistry"
+    :name-registry="nameRegistry"
+    :id-index="idIndex"
+    :gpio-options="gpioOptions"
+    :gpio-usage="gpioUsage"
+    :gpio-title="gpioTitle"
+    :context-component-id="contextComponentId"
+    :context-scope-id="contextScopeId"
+    :global-store="globalStore"
+    @update="emitUpdate"
+    @open-secrets="emitOpenSecrets"
+  />
   <ListField
     v-else-if="isListField"
     :field="field"
@@ -146,6 +168,7 @@
 <script setup>
 import { computed, ref, watch } from "vue";
 import FixedListField from "./schema-fields/FixedListField.vue";
+import GeneratedListField from "./schema-fields/GeneratedListField.vue";
 import ListField from "./schema-fields/ListField.vue";
 import ObjectField from "./schema-fields/ObjectField.vue";
 import PrimitiveField from "./schema-fields/PrimitiveField.vue";
@@ -285,6 +308,7 @@ const selectOptions = computed(() => {
   return props.field.options || [];
 });
 const isFixedListField = computed(() => props.field.type === "fixed_list");
+const isGeneratedListField = computed(() => props.field.type === "generated_list");
 const isListField = computed(() => props.field.type === "list");
 const isIconField = computed(() => props.field.type === "icon");
 const isYamlField = computed(() =>
@@ -334,6 +358,8 @@ const listValue = computed(() => {
   return [];
 });
 const fixedListValue = computed(() => normalizeFixedListValue(listValue.value));
+const generatedListValue = computed(() => (Array.isArray(fieldValue.value) ? fieldValue.value : []));
+const hasExplicitGeneratedListValue = computed(() => Array.isArray(fieldValue.value));
 
 const fixedListItemLabel = (index) => {
   const labels = Array.isArray(props.field?.labels) ? props.field.labels : [];
@@ -614,7 +640,7 @@ watch(
     if (hasAppliedDefault.value) return;
     if (currentValue !== undefined || defaultValue === undefined) return;
     if (props.field.type === "object") return;
-    if ((props.field.type === "list" || props.field.type === "fixed_list") && !Array.isArray(defaultValue)) return;
+    if ((props.field.type === "list" || props.field.type === "fixed_list" || props.field.type === "generated_list") && !Array.isArray(defaultValue)) return;
     if (props.field.type === "boolean") return;
     emit("update", {
       path: fieldPath.value,

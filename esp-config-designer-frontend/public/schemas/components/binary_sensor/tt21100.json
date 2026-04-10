@@ -1,0 +1,24 @@
+{
+  "id": "binary_sensor.tt21100",
+  "domain": "binary_sensor",
+  "platform": "tt21100",
+  "helpUrl": "https://esphome.io/components/touchscreen/tt21100/",
+  "extends": "base_binary_sensor.json",
+  "fields": [
+    {
+      "key": "tt21100_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "touchscreen",
+      "placeholder": "touchscreen_id"
+    },
+    {
+      "key": "index",
+      "type": "number",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "0"
+    }
+  ]
+}

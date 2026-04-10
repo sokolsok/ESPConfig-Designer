@@ -1,0 +1,67 @@
+{
+  "id": "wiegand",
+  "domain": "wiegand",
+  "platform": "",
+  "renderAs": "root_list",
+  "helpUrl": "https://esphome.io/components/wiegand/",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "mykeypad",
+      "idDomain": "wiegand"
+    },
+    {
+      "key": "d0",
+      "type": "gpio",
+      "required": true,
+	  "placeholder": "GPIOXX",
+      "lvl": "simple"
+    },
+    {
+      "key": "d1",
+      "type": "gpio",
+      "required": true,
+	  "placeholder": "GPIOXX",
+      "lvl": "simple"
+    },
+    {
+      "key": "on_key",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_tag",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_raw",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

@@ -7,7 +7,7 @@
     {
       "key": "id",
       "type": "id",
-      "required": false,
+      "required": true,
       "lvl": "simple",
       "default": "esp32_touch_hub",
       "idDomain": "esp32_touch"
@@ -24,16 +24,14 @@
       "type": "duration",
       "required": false,
       "lvl": "normal",
-      "default": "27ms",
-      "note": "For ESP32-S2, ESP32-S3, and ESP32-P4 the default 27ms may be too high. Docs suggest starting around 0.5ms."
+      "default": "27ms"
     },
     {
       "key": "measurement_duration",
       "type": "duration",
       "required": false,
       "lvl": "normal",
-      "default": "8ms",
-      "note": "For ESP32-S2, ESP32-S3, and ESP32-P4 the default 8ms may be too high. Docs suggest starting around 0.25ms."
+      "default": "8ms"
     },
     {
       "key": "low_voltage_reference",

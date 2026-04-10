@@ -1,0 +1,35 @@
+{
+  "id": "hub.pylontech",
+  "domain": "pylontech",
+  "platform": "",
+  "type": "object",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "pylontech_component",
+      "idDomain": "pylontech"
+    },
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "uart"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "60s"
+    }
+  ]
+}

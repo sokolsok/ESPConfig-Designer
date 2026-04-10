@@ -1,0 +1,53 @@
+{
+  "id": "switch.dfrobot_sen0395",
+  "domain": "switch",
+  "platform": "dfrobot_sen0395",
+  "helpUrl": "https://esphome.io/components/dfrobot_sen0395/",
+  "extends": "base_switch.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "dfrobot_sen0395",
+      "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Radar hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_dfrobot_sen0395.json"
+    },
+    {
+      "key": "dfrobot_sen0395_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "dfrobot_sen0395",
+      "allowSelfReference": true,
+      "placeholder": "dfrobot_sen0395_id"
+    },
+    {
+      "key": "type",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+	  "emitYAML": "always",
+	  "default": "sensor_active",
+      "options": [
+        "presence_via_uart",
+        "sensor_active",
+        "start_after_boot",
+        "turn_on_led"
+      ]
+    }
+  ]
+}

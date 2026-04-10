@@ -24,8 +24,7 @@
       "required": false,
       "lvl": "simple",
       "emitYAML": "never",
-      "extends": "hub_cap1188.json",
-      "helpUrl": "https://esphome.io/components/binary_sensor/cap1188/"
+      "extends": "hub_cap1188.json"
     },
     {
       "key": "cap1188_id",

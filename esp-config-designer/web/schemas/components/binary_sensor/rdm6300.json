@@ -8,7 +8,9 @@
     {
       "key": "hub",
       "domain": "rdm6300",
-      "dedupeBy": "id"
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
     }
   ],
   "requirements": [
@@ -25,6 +27,16 @@
       "lvl": "simple",
       "emitYAML": "never",
       "extends": "hub_rdm6300.json"
+    },
+    {
+      "key": "rdm6300_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "domain": "rdm6300",
+      "allowSelfReference": true,
+      "default": "rdm6300_component"
     },
     {
       "key": "uid",

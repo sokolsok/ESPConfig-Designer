@@ -1,0 +1,80 @@
+{
+  "id": "hub.pn532",
+  "domain": "pn532",
+  "platform": "",
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "pn532_component",
+      "idDomain": "pn532"
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+	  "placeholder": "GPIOXX",
+      "globalDependsOn": {
+        "key": "pn532_bus",
+        "value": "spi"
+      }
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "1s"
+    },
+    {
+      "key": "spi_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "spi",
+      "globalDependsOn": {
+        "key": "pn532_bus",
+        "value": "spi"
+      }
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2c",
+      "globalDependsOn": {
+        "key": "pn532_bus",
+        "value": "i2c"
+      }
+    },
+    {
+      "key": "on_tag",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_tag_removed",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

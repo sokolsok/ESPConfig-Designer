@@ -26,7 +26,8 @@
       "key": "interrupt_pin",
       "type": "gpio",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
     }
   ]
 }

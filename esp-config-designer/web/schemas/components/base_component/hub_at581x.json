@@ -1,0 +1,36 @@
+{
+  "id": "hub.at581x",
+  "domain": "at581x",
+  "platform": "",
+  "type": "object",
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "at581x_hub",
+      "idDomain": "at581x"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2c"
+    },
+    {
+      "key": "address",
+      "type": "address",
+      "required": false,
+      "lvl": "simple",
+      "default": "0x28",
+      "emitYAML": "always"
+    }
+  ]
+}
