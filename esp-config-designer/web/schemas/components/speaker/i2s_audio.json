@@ -16,6 +16,7 @@
       "required": true,
       "lvl": "simple",
       "default": "external",
+      "note": "Use external when the I2S bus is paired with an external audio driver configured on the bus itself.",
       "options": [
         "external",
         "internal"

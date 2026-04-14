@@ -1,0 +1,75 @@
+{
+  "id": "audio_driver.es7210",
+  "domain": "audio_adc",
+  "platform": "",
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "placeholder": "audio_adc_id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple",
+      "idDomain": "audio_adc"
+    },
+    {
+      "key": "bits_per_sample",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "16bit",
+      "options": [
+        "16bit",
+        "24bit",
+        "32bit"
+      ]
+    },
+    {
+      "key": "mic_gain",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "24DB",
+      "options": [
+        "0DB",
+        "3DB",
+        "6DB",
+        "9DB",
+        "12DB",
+        "15DB",
+        "18DB",
+        "21DB",
+        "24DB",
+        "27DB",
+        "30DB",
+        "33DB",
+        "34.5DB",
+        "36DB",
+        "37.5DB"
+      ]
+    },
+    {
+      "key": "sample_rate",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "note": "Keep this aligned with the paired i2s_audio microphone configuration.",
+      "default": 16000
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "emitYAML": "always",
+      "default": "0x40"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2c"
+    }
+  ]
+}

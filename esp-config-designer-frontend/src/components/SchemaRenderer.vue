@@ -337,6 +337,11 @@ const sharedHubBindings = computed(() => {
       (idRefCandidates.length === 1 ? idRefCandidates[0] : null);
     if (!idRefField) return;
 
+    const valueMap = props.componentConfig || {};
+    const sourceVisible = isFieldVisible(sourceField, valueMap, fields, props.globalStore) && !sourceField.uiHidden;
+    const idRefVisible = isFieldVisible(idRefField, valueMap, fields, props.globalStore) && !idRefField.uiHidden;
+    if (!sourceVisible || !idRefVisible) return;
+
     const idOptions = buildSharedHubIdOptions(logicalDomain);
 
     // Shared hub flow:

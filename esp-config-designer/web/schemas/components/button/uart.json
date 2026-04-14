@@ -11,11 +11,18 @@
   ],
   "fields": [
     {
+      "key": "name",
+      "placeholder": "Button Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
       "key": "data",
-      "type": "yaml",
+      "type": "text",
       "required": true,
       "lvl": "simple",
-      "placeholder": "\"DataToSend\"\n# or:\n- 0xDE\n- 0xAD\n- 0xBE\n- 0xEF"
+      "placeholder": "(string) UART Bytes Output"
     },
     {
       "key": "uart_id",

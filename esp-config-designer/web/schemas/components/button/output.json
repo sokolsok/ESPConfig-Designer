@@ -6,6 +6,13 @@
   "extends": "base_button.json",
   "fields": [
     {
+      "key": "name",
+      "placeholder": "Button Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
       "key": "output",
       "type": "id_ref",
       "required": true,

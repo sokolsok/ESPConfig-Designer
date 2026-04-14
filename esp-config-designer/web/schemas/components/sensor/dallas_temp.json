@@ -43,11 +43,12 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
+	  "default": "12",
       "options": [
-        9,
-        10,
-        11,
-        12
+        "9",
+        "10",
+        "11",
+        "12"
       ]
     },
     {
@@ -55,7 +56,8 @@
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
-      "domain": "one_wire"
+      "domain": "one_wire",
+	  "placeholder": "one_wire_id"
     }
   ]
 }

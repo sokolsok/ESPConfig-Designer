@@ -4,5 +4,14 @@
   "platform": "factory_reset",
   "helpUrl": "https://esphome.io/components/button/factory_reset/",
   "extends": "base_button.json",
-  "fields": []
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Button Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "note": "Pressing this button wipes stored ESPHome preferences and credentials from flash."
+    }
+  ]
 }

@@ -16,6 +16,7 @@
       "required": true,
       "lvl": "simple",
       "default": "external",
+      "note": "Use external when your microphone relies on an external audio driver configured on the I2S bus.",
       "options": [
         "external",
         "internal"

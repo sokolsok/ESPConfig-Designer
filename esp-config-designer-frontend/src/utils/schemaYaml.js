@@ -744,6 +744,56 @@ export const buildSchemaYaml = (
   return lines;
 };
 
+export const buildGeneralSchemaBlocks = (
+  domain,
+  configValue,
+  schema,
+  rootValue = configValue,
+  globalStore = null
+) => {
+  const resolvedDomain = String(domain || resolveSchemaDomain(schema, configValue || {})).trim();
+  if (!resolvedDomain || !schema) return [];
+
+  const fields = Array.isArray(schema.fields) ? schema.fields : [];
+  const blocks = [];
+  const mainLines = buildSchemaYaml(configValue || {}, fields, 2, rootValue, globalStore);
+  blocks.push({ key: resolvedDomain, lines: [`${resolvedDomain}:`, ...mainLines] });
+
+  const embeddedItems = resolveEmbeddedComponentItems(schema, configValue || {}, globalStore);
+  const embeddedByKey = new Map();
+
+  embeddedItems.forEach((item) => {
+    const dedupeToken = item.emitAs === "list" ? resolveEmbeddedDedupeToken(item) : "";
+    const dedupeIdentity =
+      item.emitAs === "list" && item.dedupeBy && dedupeToken
+        ? `${item.domain}:${item.dedupeBy}:${dedupeToken}`
+        : `${item.domain}:${item.sourceKey}`;
+    if (embeddedByKey.has(dedupeIdentity)) return;
+    embeddedByKey.set(dedupeIdentity, item);
+  });
+
+  embeddedByKey.forEach((item) => {
+    const lines = [`${item.domain}:`];
+    if (item.emitAs === "map") {
+      const mapLines = [];
+      renderYamlObject(item.payload || {}, item.fields || [], 2, mapLines, item.payload || {}, globalStore);
+      lines.push(...mapLines);
+    } else {
+      renderYamlArray(
+        [item.payload],
+        { type: "object", fields: item.fields || [] },
+        2,
+        lines,
+        item.payload,
+        globalStore
+      );
+    }
+    blocks.push({ key: item.domain, lines });
+  });
+
+  return blocks;
+};
+
 // Render arrays with optional item schema definitions.
 const renderYamlArray = (arrayValue, itemSchema, indent, lines, rootValue, globalStore) => {
   arrayValue.forEach((item) => {
@@ -895,7 +945,7 @@ const resolveEmbeddedComponentItems = (schema, config, globalStore) => {
 
     let payload = null;
     if (isPlainObject(sourceValue)) {
-      payload = cloneYamlValue(sourceValue);
+      payload = defaultPayload ? mergeYamlObjects(defaultPayload, sourceValue) : cloneYamlValue(sourceValue);
     } else if (defaultPayload) {
       payload = defaultPayload;
     } else if (definition?.alwaysEmit) {

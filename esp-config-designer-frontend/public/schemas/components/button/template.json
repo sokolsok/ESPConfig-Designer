@@ -4,5 +4,13 @@
   "platform": "template",
   "helpUrl": "https://esphome.io/components/button/template/",
   "extends": "base_button.json",
-  "fields": []
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Button Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    }
+  ]
 }

@@ -4,5 +4,14 @@
   "platform": "shutdown",
   "helpUrl": "https://esphome.io/components/button/shutdown/",
   "extends": "base_button.json",
-  "fields": []
+  "fields": [
+    {
+      "key": "name",
+      "placeholder": "Button Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "note": "Shutdown enters deep sleep without a wake source; the device returns only after reset or power cycle."
+    }
+  ]
 }

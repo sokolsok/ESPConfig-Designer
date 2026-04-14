@@ -1,0 +1,31 @@
+{
+  "id": "audio_driver.aic3204",
+  "domain": "audio_dac",
+  "platform": "",
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "placeholder": "audio_dac_id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple",
+      "idDomain": "audio_dac"
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "emitYAML": "always",
+      "default": "0x18"
+    },
+    {
+      "key": "i2c_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "i2c"
+    }
+  ]
+}

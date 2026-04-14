@@ -518,6 +518,7 @@ import { loadSchemaByPath } from "../utils/schemaLoader";
 import {
   buildComponentsYaml,
   buildDisplayAnimationIntervals,
+  buildGeneralSchemaBlocks,
   buildSchemaYaml
 } from "../utils/schemaYaml";
 import { buildGlobalRegistry, isFieldVisible as isSchemaFieldVisible } from "../utils/schemaVisibility";
@@ -1784,6 +1785,9 @@ const getRequirementMetadata = (requirementId) => {
   if (namespace === "protocol") return { id: requirementId, namespace, targetKey, tab: "Protocols", label };
   if (namespace === "system") return { id: requirementId, namespace, targetKey, tab: "System", label };
   if (namespace === "network") return { id: requirementId, namespace, targetKey, tab: "Network", label };
+  if (namespace === "component" && targetKey === "i2s_audio") {
+    return { id: requirementId, namespace: "bus", targetKey: "i2s", tab: "Busses", label: "I2S Audio" };
+  }
   if (namespace === "component") return { id: requirementId, namespace, targetKey, tab: "", label };
   return { id: requirementId, namespace, targetKey, tab: "", label };
 };
@@ -3219,7 +3223,7 @@ const otherConfig = systemConfig.value || {};
     { key: "spi", label: "spi" },
     { key: "uart", label: "uart" },
     { key: "one_wire", label: "one_wire" },
-    { key: "i2s", label: "i2s" },
+    { key: "i2s", label: "i2s_audio" },
     { key: "canbus", label: "canbus" },
     { key: "modbus", label: "modbus" }
   ];
@@ -3230,11 +3234,14 @@ const otherConfig = systemConfig.value || {};
     const fields = schema?.fields || [];
     if (!fields.length) return;
     const busValue = filterConfigBySchema(bussesConfig[entry.key] || {}, fields);
-    const busLines = buildSchemaYaml(busValue, fields, 2, config.value, globalStore.value);
-    if (!busLines.length && !shouldEmitEmptyBlock(fields)) return;
-    lines.push("");
-    lines.push(`${entry.label}:`);
-    lines.push(...busLines);
+    const busBlocks = buildGeneralSchemaBlocks(entry.label, busValue, schema, config.value, globalStore.value);
+    const primaryBlock = busBlocks[0] || null;
+    const hasPrimaryContent = (primaryBlock?.lines?.length || 0) > 1;
+    if (!hasPrimaryContent && !shouldEmitEmptyBlock(fields)) return;
+    busBlocks.forEach((block) => {
+      lines.push("");
+      lines.push(...block.lines);
+    });
   });
 
   const componentLines = buildComponentsYaml(
@@ -3387,9 +3394,13 @@ const automationBlockKeys = new Set([
   "globals",
   "interval"
 ]);
-const bussesBlockKeys = computed(
-  () => new Set(bussesDefinitions.map((entry) => entry.key))
-);
+const bussesBlockKeys = computed(() => new Set(bussesDefinitions.map((entry) => entry.key)));
+
+const i2sAudioBlockKeys = new Set([
+  "i2s_audio",
+  "audio_adc",
+  "audio_dac"
+]);
 
 const titleCase = (value) =>
   value
@@ -3448,6 +3459,12 @@ const previewTabs = computed(() => {
     bussesBlocks.forEach((block) => used.add(block.key));
   }
 
+  const i2sAudioBlocks = blocks.filter((block) => i2sAudioBlockKeys.has(block.key));
+  if (i2sAudioBlocks.length) {
+    tabs.push({ key: "i2s_audio", label: "I2S Audio", blocks: i2sAudioBlocks, content: buildPreviewText(i2sAudioBlocks) });
+    i2sAudioBlocks.forEach((block) => used.add(block.key));
+  }
+
   const hubsBlocks = blocks.filter((block) => hubDomainsInUse.value.has(block.key));
   if (hubsBlocks.length) {
     tabs.push({ key: "hubs", label: "Hubs", blocks: hubsBlocks, content: buildPreviewText(hubsBlocks) });
@@ -3480,7 +3497,7 @@ const previewTabs = computed(() => {
 });
 
 const resolvePreviewTabKeyFromMain = () => {
-  if (activeTab.value === "Busses") return "busses";
+  if (activeTab.value === "Busses") return activeBussesKey.value === "i2s" ? "i2s_audio" : "busses";
   if (activeTab.value === "Automation") return "automation";
   if (activeTab.value === "Components") {
     const componentId = activeComponentId.value || "";

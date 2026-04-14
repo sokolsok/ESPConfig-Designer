@@ -6,10 +6,18 @@
   "extends": "base_alarm_control_panel.json",
   "fields": [
     {
+      "key": "name",
+      "placeholder": "Alarm Panel",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
       "key": "codes",
       "type": "list",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
+      "note": "Required when requires_code_to_arm is enabled.",
       "item": {
         "type": "text"
       }
@@ -18,33 +26,35 @@
       "key": "requires_code_to_arm",
       "type": "boolean",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "default": false
     },
     {
       "key": "arming_away_time",
       "type": "duration",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "default": "0s"
     },
     {
       "key": "arming_home_time",
       "type": "duration",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+	  "placeholder": "10s"
     },
     {
       "key": "arming_night_time",
       "type": "duration",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+	  "placeholder": "10s"
     },
     {
       "key": "pending_time",
       "type": "duration",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "default": "0s"
     },
     {
@@ -53,6 +63,12 @@
       "required": false,
       "lvl": "normal",
       "default": "0s"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     },
     {
       "key": "binary_sensors",
@@ -92,6 +108,7 @@
             "type": "select",
             "required": false,
             "lvl": "normal",
+            "note": "Choose how this zone triggers: delayed, instant, instant_always, or delayed_follower.",
             "default": "delayed",
             "options": [
               "delayed",
@@ -115,6 +132,7 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
+      "note": "Template alarm control panel supports only ALWAYS_DISARMED and RESTORE_DEFAULT_DISARMED.",
       "default": "ALWAYS_DISARMED",
       "options": [
         "ALWAYS_DISARMED",

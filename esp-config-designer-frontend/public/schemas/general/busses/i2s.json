@@ -1,7 +1,49 @@
 {
   "id": "busses.i2s",
-  "domain": "i2s",
+  "domain": "i2s_audio",
   "platform": "core",
+  "embedded": [
+    {
+      "key": "es7210_driver",
+      "domain": "audio_adc",
+      "defaultPayload": {
+        "platform": "es7210"
+      },
+      "dedupeBy": "id"
+    },
+    {
+      "key": "es7243e_driver",
+      "domain": "audio_adc",
+      "defaultPayload": {
+        "platform": "es7243e"
+      },
+      "dedupeBy": "id"
+    },
+    {
+      "key": "aic3204_driver",
+      "domain": "audio_dac",
+      "defaultPayload": {
+        "platform": "aic3204"
+      },
+      "dedupeBy": "id"
+    },
+    {
+      "key": "es8156_driver",
+      "domain": "audio_dac",
+      "defaultPayload": {
+        "platform": "es8156"
+      },
+      "dedupeBy": "id"
+    },
+    {
+      "key": "es8311_driver",
+      "domain": "audio_dac",
+      "defaultPayload": {
+        "platform": "es8311"
+      },
+      "dedupeBy": "id"
+    }
+  ],
   "fields": [
     {
       "key": "enabled",
@@ -14,10 +56,10 @@
       "helpUrl": "https://esphome.io/components/i2s_audio/"
     },
     {
-      "key": "bck_pin",
+      "key": "i2s_lrclk_pin",
       "type": "gpio",
-      "required": false,
-      "lvl": "normal",
+      "required": true,
+      "lvl": "simple",
       "dependsOn": {
         "key": "enabled",
         "value": true
@@ -25,10 +67,10 @@
       "placeholder": "GPIOXX"
     },
     {
-      "key": "ws_pin",
+      "key": "i2s_bclk_pin",
       "type": "gpio",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "dependsOn": {
         "key": "enabled",
         "value": true
@@ -36,10 +78,10 @@
       "placeholder": "GPIOXX"
     },
     {
-      "key": "dout_pin",
+      "key": "i2s_mclk_pin",
       "type": "gpio",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "dependsOn": {
         "key": "enabled",
         "value": true
@@ -47,30 +89,9 @@
       "placeholder": "GPIOXX"
     },
     {
-      "key": "din_pin",
-      "type": "gpio",
-      "required": false,
-      "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
-      "placeholder": "GPIOXX"
-    },
-    {
-      "key": "mclk_pin",
-      "type": "gpio",
-      "required": false,
-      "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
-      "placeholder": "GPIOXX"
-    },
-    {
-      "key": "use_apll",
+      "key": "use_legacy",
       "type": "boolean",
+      "required": false,
       "required": false,
       "lvl": "normal",
       "dependsOn": {
@@ -80,11 +101,98 @@
       "default": false
     },
     {
+      "key": "audio_driver",
+      "type": "select",
+      "required": false,
+      "lvl": "simple",
+      "default": "NONE",
+      "emitYAML": "never",
+      "note": "Optional external audio codec/ADC driver attached to this I2S bus. Choose NONE if your setup does not need a dedicated driver. All currently supported drivers require I2C.",
+      "dependsOn": {
+        "key": "enabled",
+        "value": true
+      },
+      "options": [
+        "NONE",
+        "es7210",
+        "es7243e",
+        "aic3204",
+        "es8156",
+        "es8311"
+      ]
+    },
+    {
+      "key": "es7210_driver",
+      "label": "ES7210 driver",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "audio_driver_es7210.json",
+      "dependsOn": {
+        "key": "audio_driver",
+        "value": "es7210"
+      }
+    },
+    {
+      "key": "es7243e_driver",
+      "label": "ES7243E driver",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "audio_driver_es7243e.json",
+      "dependsOn": {
+        "key": "audio_driver",
+        "value": "es7243e"
+      }
+    },
+    {
+      "key": "aic3204_driver",
+      "label": "AIC3204 driver",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "audio_driver_aic3204.json",
+      "dependsOn": {
+        "key": "audio_driver",
+        "value": "aic3204"
+      }
+    },
+    {
+      "key": "es8156_driver",
+      "label": "ES8156 driver",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "audio_driver_es8156.json",
+      "dependsOn": {
+        "key": "audio_driver",
+        "value": "es8156"
+      }
+    },
+    {
+      "key": "es8311_driver",
+      "label": "ES8311 driver",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "audio_driver_es8311.json",
+      "dependsOn": {
+        "key": "audio_driver",
+        "value": "es8311"
+      }
+    },
+    {
       "key": "id",
       "type": "id",
-      "required": true,
+      "required": false,
       "lvl": "simple",
       "default": "i2s_id",
+      "idDomain": "i2s_audio",
       "dependsOn": {
         "key": "enabled",
         "value": true

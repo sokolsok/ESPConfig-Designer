@@ -32,6 +32,7 @@
       </div>
       <SchemaRenderer
         v-if="bussesDetailId"
+        :key="bussesDetailScopeId"
         :component-id="bussesDetailId"
         :component-config="bussesDetailConfig"
         :root-value="config"

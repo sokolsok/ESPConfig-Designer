@@ -35,6 +35,12 @@
       "default": "mr60fda2_radar"
     },
     {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
       "key": "get_radar_parameters",
       "type": "object",
       "required": false,

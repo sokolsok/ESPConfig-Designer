@@ -2145,64 +2145,8 @@
           "name": "Template Alarm Control Panel",
           "path": "components/alarm_control_panel/template",
           "id": "alarm_control_panel/template",
-          "available": false,
+          "available": true,
           "schemaPath": "components/alarm_control_panel/template.json"
-        }
-      ],
-      "subcategories": []
-    },
-    {
-      "title": "Audio ADC Components",
-      "slug": "audio-adc-components",
-      "items": [
-        {
-          "name": "ES7210",
-          "path": "components/audio_adc/es7210",
-          "id": "audio_adc/es7210",
-          "available": false,
-          "schemaPath": "components/audio_adc/es7210.json"
-        },
-        {
-          "name": "ES7243E",
-          "path": "components/audio_adc/es7243e",
-          "id": "audio_adc/es7243e",
-          "available": false,
-          "schemaPath": "components/audio_adc/es7243e.json"
-        }
-      ],
-      "subcategories": []
-    },
-    {
-      "title": "Audio DAC Components",
-      "slug": "audio-dac-components",
-      "items": [
-        {
-          "name": "AIC3204",
-          "path": "components/audio_dac/aic3204",
-          "id": "audio_dac/aic3204",
-          "available": false,
-          "schemaPath": "components/audio_dac/aic3204.json"
-        },
-        {
-          "name": "ES8156",
-          "path": "components/audio_dac/es8156",
-          "id": "audio_dac/es8156",
-          "available": true,
-          "schemaPath": "components/audio_dac/es8156.json"
-        },
-        {
-          "name": "ES8311",
-          "path": "components/audio_dac/es8311",
-          "id": "audio_dac/es8311",
-          "available": true,
-          "schemaPath": "components/audio_dac/es8311.json"
-        },
-        {
-          "name": "ES8388",
-          "path": "components/audio_dac/es8388",
-          "id": "audio_dac/es8388",
-          "available": true,
-          "schemaPath": "components/audio_dac/es8388.json"
         }
       ],
       "subcategories": []
@@ -4223,14 +4167,6 @@
     "alarm_control_panel/template",
     "animation",
     "api",
-    "audio_adc",
-    "audio_adc/es7210",
-    "audio_adc/es7243e",
-    "audio_dac",
-    "audio_dac/aic3204",
-    "audio_dac/es8156",
-    "audio_dac/es8311",
-    "audio_dac/es8388",
     "binary_sensor",
     "binary_sensor/analog_threshold",
     "binary_sensor/ble_presence",
