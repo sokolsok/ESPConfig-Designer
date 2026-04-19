@@ -4,6 +4,13 @@
   "platform": "modbus_controller",
   "helpUrl": "https://esphome.io/components/output/modbus_controller/",
   "extends": "base_output.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "modbus_controller",
+      "dedupeBy": "id"
+    }
+  ],
   "requirements": [
     {
       "require": "bus:modbus"
@@ -11,11 +18,23 @@
   ],
   "fields": [
     {
+      "key": "hub",
+      "label": "Modbus controller hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_modbus_controller.json"
+    },
+    {
       "key": "modbus_controller_id",
       "type": "id_ref",
-      "required": true,
+      "required": false,
       "lvl": "simple",
-      "domain": "modbus_controller"
+      "domain": "modbus_controller",
+      "allowSelfReference": true,
+      "default": "modbus_controller_hub",
+      "placeholder": "modbus_controller_hub"
     },
     {
       "key": "address",
@@ -62,6 +81,7 @@
       "type": "number",
       "required": false,
       "lvl": "normal",
+      "placeholder": "1.0",
       "dependsOn": {
         "key": "register_type",
         "value": "holding"
@@ -71,19 +91,25 @@
       "key": "use_write_multiple",
       "type": "boolean",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "register_type",
+        "value": "holding"
+      }
     },
     {
       "key": "write_lambda",
       "type": "lambda",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "return x;"
     },
     {
       "key": "offset",
       "type": "number",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "0"
     },
     {
       "key": "min_power",

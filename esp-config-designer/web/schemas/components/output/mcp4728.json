@@ -40,6 +40,7 @@
       "type": "select",
       "required": true,
       "lvl": "simple",
+	  "default": "A",
       "options": [
         "A",
         "B",

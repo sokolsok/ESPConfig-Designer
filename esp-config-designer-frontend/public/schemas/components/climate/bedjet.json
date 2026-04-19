@@ -4,13 +4,69 @@
   "platform": "bedjet",
   "helpUrl": "https://esphome.io/components/climate/bedjet/",
   "extends": "base_climate.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "bedjet",
+      "selectLabel": "Select BedJet hub",
+      "injectFields": [
+        {
+          "from": "ble_client_id",
+          "to": "ble_client_id"
+        }
+      ],
+      "dedupeBy": "id"
+    },
+    {
+      "key": "ble_hub",
+      "domain": "ble_client",
+      "selectLabel": "Select BLE hub",
+      "dedupeBy": "id"
+    }
+  ],
   "fields": [
+    {
+      "key": "ble_hub",
+      "label": "BLE hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_ble_client_with_tracker.json"
+    },
+    {
+      "key": "ble_client_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "ble_client",
+      "allowSelfReference": true,
+      "default": "ble_client_hub"
+    },
+    {
+      "key": "hub",
+      "label": "BedJet hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_bedjet.json"
+    },
     {
       "key": "bedjet_id",
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
-      "domain": "bedjet"
+      "domain": "bedjet",
+      "allowSelfReference": true,
+      "default": "bedjet_hub"
+    },
+    {
+      "key": "name",
+      "placeholder": "Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
     },
     {
       "key": "heat_mode",
@@ -33,12 +89,6 @@
         "ambient",
         "outlet"
       ]
-    },
-    {
-      "key": "custom_config",
-      "type": "raw_yaml",
-      "required": false,
-      "lvl": "advanced"
     }
   ]
 }

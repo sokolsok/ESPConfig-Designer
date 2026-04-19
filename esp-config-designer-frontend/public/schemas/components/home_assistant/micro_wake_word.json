@@ -17,17 +17,53 @@
     },
     {
       "key": "microphone",
-      "type": "yaml",
-      "required": true,
+      "type": "id_ref",
+      "domain": "microphone",
+      "required": false,
       "lvl": "simple",
-      "placeholder": "# microphone source configuration"
+      "note": "Optional when the microphone is provided by the surrounding voice pipeline."
     },
     {
       "key": "models",
-      "type": "yaml",
+      "type": "list",
       "required": true,
       "lvl": "simple",
-      "placeholder": "- model: okay_nabu\n  probability_cutoff: 0.5\n  sliding_window_size: 5"
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "model",
+            "type": "text",
+            "required": true,
+            "lvl": "simple",
+            "placeholder": "okay_nabu"
+          },
+          {
+            "key": "id",
+            "type": "id",
+            "required": false,
+            "lvl": "normal"
+          },
+          {
+            "key": "probability_cutoff",
+            "type": "number",
+            "required": false,
+            "lvl": "normal"
+          },
+          {
+            "key": "sliding_window_size",
+            "type": "number",
+            "required": false,
+            "lvl": "normal"
+          },
+          {
+            "key": "internal",
+            "type": "boolean",
+            "required": false,
+            "lvl": "normal"
+          }
+        ]
+      }
     },
     {
       "key": "stop_after_detection",
@@ -50,9 +86,29 @@
     },
     {
       "key": "vad",
-      "type": "yaml",
+      "type": "object",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "model",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced"
+        },
+        {
+          "key": "probability_cutoff",
+          "type": "number",
+          "required": false,
+          "lvl": "advanced"
+        },
+        {
+          "key": "sliding_window_size",
+          "type": "number",
+          "required": false,
+          "lvl": "advanced"
+        }
+      ]
     }
   ]
 }

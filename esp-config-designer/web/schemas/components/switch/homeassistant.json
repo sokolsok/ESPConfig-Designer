@@ -4,13 +4,26 @@
   "platform": "homeassistant",
   "helpUrl": "https://esphome.io/components/switch/homeassistant/",
   "extends": "base_switch.json",
+  "requirements": [
+    {
+      "require": "protocol:api"
+    }
+  ],
   "fields": [
+    {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "Switch Name"
+    },
     {
       "key": "entity_id",
       "type": "text",
       "required": true,
       "lvl": "simple",
-      "placeholder": "switch.my_cool_switch"
+      "placeholder": "switch.my_cool_switch",
+      "note": "Supported Home Assistant domains include automation, fan, humidifier, input_boolean, light, remote, siren and switch."
     }
   ]
 }

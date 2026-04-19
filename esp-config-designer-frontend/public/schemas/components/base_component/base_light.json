@@ -14,20 +14,22 @@
       "key": "id",
       "type": "id",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+	  "placeholder": "light_id"
     },
     {
       "key": "icon",
       "type": "icon",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+	  "placeholder": "mdi:lightbulb"
     },
     {
       "key": "effects",
       "type": "yaml",
       "required": false,
       "lvl": "advanced",
-      "placeholder": "- pulse:\n- random:"
+	  "helpUrl": "https://esphome.io/components/light/#light-effects"
     },
     {
       "key": "gamma_correct",
@@ -52,10 +54,11 @@
     },
     {
       "key": "initial_state",
-      "type": "yaml",
+      "type": "text",
       "required": false,
       "lvl": "advanced",
-      "placeholder": "state: true\nbrightness: 80%"
+      "placeholder": "state: true\nbrightness: 80%",
+	  "helpUrl": "https://esphome.io/components/light/#light-state_config"
     },
     {
       "key": "restore_mode",
@@ -112,7 +115,7 @@
     },
     {
       "key": "color_correct",
-      "type": "yaml",
+      "type": "text",
       "required": false,
       "lvl": "advanced",
       "placeholder": "[100%, 50%, 100%]"
@@ -122,7 +125,8 @@
       "type": "id_ref",
       "required": false,
       "lvl": "advanced",
-      "domain": "power_supply"
+      "domain": "power_supply",
+	  "placeholder": "power_supply_id"
     },
     {
       "key": "internal",
@@ -139,6 +143,12 @@
     {
       "key": "entity_category",
       "type": "text",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
       "required": false,
       "lvl": "advanced"
     }

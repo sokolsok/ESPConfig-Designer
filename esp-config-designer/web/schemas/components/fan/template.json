@@ -6,10 +6,16 @@
   "extends": "base_fan.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
       "key": "has_direction",
       "type": "boolean",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "default": false
     },
     {

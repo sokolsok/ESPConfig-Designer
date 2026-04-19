@@ -6,78 +6,112 @@
   "extends": "base_cover.json",
   "fields": [
     {
+      "key": "name",
+      "placeholder": "Cover Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
       "key": "open_sensor",
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
+      "placeholder": "open_current_sensor",
       "domain": "sensor"
     },
     {
       "key": "open_action",
-      "type": "yaml",
+      "type": "list",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "open_duration",
       "type": "duration",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "15s"
     },
     {
       "key": "open_moving_current_threshold",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "0.5"
     },
     {
       "key": "open_obstacle_current_threshold",
       "type": "number",
-      "required": true,
-      "lvl": "simple"
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0.8"
     },
     {
       "key": "close_sensor",
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
+      "placeholder": "close_current_sensor",
       "domain": "sensor"
     },
     {
       "key": "close_action",
-      "type": "yaml",
-      "required": false,
-      "lvl": "normal"
+      "type": "list",
+      "required": true,
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "close_duration",
       "type": "duration",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "15s"
     },
     {
       "key": "close_moving_current_threshold",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "0.5"
     },
     {
       "key": "close_obstacle_current_threshold",
       "type": "number",
-      "required": true,
-      "lvl": "simple"
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0.8"
     },
     {
       "key": "stop_action",
-      "type": "yaml",
+      "type": "list",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "max_duration",
       "type": "duration",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "45s"
     },
     {
       "key": "start_sensing_delay",
@@ -88,10 +122,11 @@
     },
     {
       "key": "obstacle_rollback",
-      "type": "number",
+      "type": "text",
       "required": false,
       "lvl": "advanced",
-      "default": 10
+      "default": "10%",
+      "placeholder": "10%"
     },
     {
       "key": "malfunction_detection",
@@ -102,15 +137,15 @@
     },
     {
       "key": "malfunction_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
-    },
-    {
-      "key": "custom_config",
-      "type": "raw_yaml",
-      "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     }
   ]
 }

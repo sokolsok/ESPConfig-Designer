@@ -22,7 +22,9 @@
       "type": "text",
       "required": false,
       "lvl": "normal",
-      "default": "1kHz"
+	  "suppressQuotes": true,
+      "default": "1kHz",
+      "placeholder": "1kHz"
     },
     {
       "key": "external_clock_input",

@@ -4,12 +4,18 @@
   "platform": "homeassistant",
   "helpUrl": "https://esphome.io/components/number/homeassistant/",
   "extends": "base_number.json",
+  "requirements": [
+    {
+      "require": "protocol:api"
+    }
+  ],
   "fields": [
     {
       "key": "entity_id",
       "type": "text",
       "required": true,
       "lvl": "simple",
+	  "suppressQuotes": true,
       "placeholder": "number.my_number"
     }
   ]

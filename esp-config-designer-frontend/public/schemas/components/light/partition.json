@@ -6,6 +6,13 @@
   "extends": "base_light.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "Light Name"
+    },
+    {
       "key": "segments",
       "type": "list",
       "required": true,

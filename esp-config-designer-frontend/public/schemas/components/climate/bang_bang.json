@@ -6,6 +6,13 @@
   "extends": "base_climate.json",
   "fields": [
     {
+      "key": "name",
+      "placeholder": "Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
       "key": "sensor",
       "type": "id_ref",
       "required": true,
@@ -21,36 +28,56 @@
     },
     {
       "key": "default_target_temperature_low",
-      "type": "number",
+      "type": "text",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "suppressQuotes": true,
+	  "placeholder": "20 °C"
     },
     {
       "key": "default_target_temperature_high",
-      "type": "number",
+      "type": "text",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "suppressQuotes": true,
+	  "placeholder": "22 °C"
     },
     {
       "key": "idle_action",
-      "type": "yaml",
+      "type": "list",
       "required": true,
       "lvl": "simple",
-      "placeholder": "then:\n  - switch.turn_off: heater\n  - switch.turn_off: cooler"
+      "note": "Configure at least one of heat_action or cool_action in addition to idle_action.",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "heat_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
       "lvl": "normal",
-      "placeholder": "then:\n  - switch.turn_on: heater"
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "cool_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
       "lvl": "normal",
-      "placeholder": "then:\n  - switch.turn_on: cooler"
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "away_config",
@@ -71,12 +98,6 @@
           "lvl": "normal"
         }
       ]
-    },
-    {
-      "key": "custom_config",
-      "type": "raw_yaml",
-      "required": false,
-      "lvl": "advanced"
     }
   ]
 }

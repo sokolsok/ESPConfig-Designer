@@ -1,0 +1,23 @@
+{
+  "id": "lightwaverf",
+  "domain": "lightwaverf",
+  "platform": "",
+  "renderAs": "root_map",
+  "helpUrl": "https://esphome.io/components/lightwaverf/",
+  "fields": [
+    {
+      "key": "read_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
+    },
+    {
+      "key": "write_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
+    }
+  ]
+}

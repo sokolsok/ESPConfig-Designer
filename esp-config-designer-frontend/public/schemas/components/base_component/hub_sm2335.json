@@ -16,13 +16,15 @@
       "key": "data_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "clock_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "max_power_color_channels",
@@ -37,6 +39,12 @@
       "required": false,
       "lvl": "normal",
       "default": 4
+    },
+	{
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

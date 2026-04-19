@@ -12,6 +12,7 @@
   "fields": [
     {
       "key": "name",
+      "placeholder": "Garage Door",
       "type": "text",
       "required": true,
       "lvl": "simple"
@@ -21,6 +22,7 @@
       "type": "duration",
       "required": false,
       "lvl": "normal",
+      "note": "Requires Tormatic UART setup (9600 baud, 8N1) and proper 5V logic level shifting on the UART side.",
       "default": "15s"
     },
     {
@@ -28,13 +30,8 @@
       "type": "duration",
       "required": false,
       "lvl": "normal",
+      "note": "Requires Tormatic UART setup (9600 baud, 8N1) and proper 5V logic level shifting on the UART side.",
       "default": "22s"
-    },
-    {
-      "key": "custom_config",
-      "type": "raw_yaml",
-      "required": false,
-      "lvl": "advanced"
     }
   ]
 }

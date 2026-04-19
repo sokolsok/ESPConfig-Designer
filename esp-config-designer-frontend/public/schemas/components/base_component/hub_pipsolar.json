@@ -9,7 +9,8 @@
       "type": "id",
       "required": true,
       "lvl": "simple",
-	  "default": "pipsolar_hub",
+      "default": "pipsolar_hub",
+      "placeholder": "pipsolar_hub",
       "idDomain": "pipsolar"
     },
     {

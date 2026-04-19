@@ -9,13 +9,15 @@
       "key": "gate_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
     },
     {
       "key": "zero_cross_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
     },
     {
       "key": "method",

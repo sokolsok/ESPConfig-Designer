@@ -11,6 +11,13 @@
   ],
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "Light Name"
+    },
+    {
       "key": "use_rm433_remote",
       "type": "boolean",
       "required": false,

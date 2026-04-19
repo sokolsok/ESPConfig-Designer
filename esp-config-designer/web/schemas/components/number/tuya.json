@@ -42,22 +42,32 @@
       "default": "tuya_hub"
     },
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Number Name"
+    },
+    {
       "key": "number_datapoint",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "1"
     },
     {
       "key": "min_value",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "0"
     },
     {
       "key": "max_value",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "100"
     },
     {
       "key": "step",
@@ -70,7 +80,8 @@
       "key": "multiply",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "1.0"
     },
     {
       "key": "datapoint_hidden",
@@ -93,7 +104,8 @@
           "key": "initial_value",
           "type": "number",
           "required": false,
-          "lvl": "normal"
+          "lvl": "normal",
+          "placeholder": "0"
         },
         {
           "key": "restore_value",

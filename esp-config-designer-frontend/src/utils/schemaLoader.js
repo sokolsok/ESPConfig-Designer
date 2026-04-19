@@ -40,6 +40,27 @@ const mergeFieldsKeepFirst = (primaryFields = [], secondaryFields = []) => {
   return result;
 };
 
+const mergeArrayKeepFirstByKey = (primaryItems = [], secondaryItems = []) => {
+  const merged = [...primaryItems, ...secondaryItems];
+  const seen = new Set();
+  const result = [];
+
+  merged.forEach((item) => {
+    const key = typeof item?.key === "string" ? item.key : null;
+    if (!key) {
+      result.push(item);
+      return;
+    }
+    if (seen.has(key)) {
+      return;
+    }
+    seen.add(key);
+    result.push(item);
+  });
+
+  return result;
+};
+
 // Fetch a schema JSON file from public/schemas.
 const fetchSchemaJson = async (path) => {
   if (!isDev && rawSchemaCache.has(path)) {
@@ -128,14 +149,28 @@ const resolveSchemaField = async (field) => {
   let resolvedField = field;
 
   if (resolvedField.extends) {
+    let resolvedBase = null;
     let baseFields = [];
     if (!isCatalogExtends(resolvedField.extends)) {
       const baseSchema = await fetchSchemaJson(`components/base_component/${resolvedField.extends}`);
-      const resolvedBase = await resolveSchema(baseSchema);
+      resolvedBase = await resolveSchema(baseSchema);
       baseFields = Array.isArray(resolvedBase.fields) ? resolvedBase.fields : [];
     }
     const extraFields = Array.isArray(resolvedField.fields) ? resolvedField.fields : [];
     resolvedField = {
+      ...(resolvedBase
+        ? {
+            embedded: mergeArrayKeepFirstByKey(
+              Array.isArray(resolvedField.embedded) ? resolvedField.embedded : [],
+              Array.isArray(resolvedBase.embedded) ? resolvedBase.embedded : []
+            ),
+            requirements: [
+              ...(Array.isArray(resolvedBase.requirements) ? resolvedBase.requirements : []),
+              ...(Array.isArray(resolvedField.requirements) ? resolvedField.requirements : [])
+            ],
+            helpUrl: resolvedField.helpUrl || resolvedBase.helpUrl || undefined
+          }
+        : {}),
       ...resolvedField,
       fields: mergeFieldsKeepFirst(extraFields, baseFields)
     };

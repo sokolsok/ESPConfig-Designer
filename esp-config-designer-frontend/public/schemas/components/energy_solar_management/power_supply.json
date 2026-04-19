@@ -1,6 +1,8 @@
 {
   "id": "power_supply",
   "domain": "power_supply",
+  "platform": "",
+  "renderAs": "root_list",
   "helpUrl": "https://esphome.io/components/power_supply/",
   "fields": [
     {
@@ -8,13 +10,15 @@
       "type": "id",
       "required": true,
       "lvl": "simple",
-      "idDomain": "power_supply"
+      "idDomain": "power_supply",
+	  "placeholder": "power_supply_id"
     },
     {
       "key": "pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "enable_time",
@@ -36,6 +40,12 @@
       "required": false,
       "lvl": "normal",
       "default": false
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

@@ -87,6 +87,16 @@ const resolveFieldDefault = (field) => {
   return undefined;
 };
 
+const resolveFieldYamlKey = (field) => {
+  if (typeof field?.emitKey === "string" && field.emitKey.trim() && field.emitKey !== "inline") {
+    return field.emitKey.trim();
+  }
+  if (typeof field?.yamlKey === "string" && field.yamlKey.trim()) {
+    return field.yamlKey.trim();
+  }
+  return field?.key || "";
+};
+
 const shouldSuppressDefaultValue = (field, value) => {
   if (!field || resolveEmitMode(field) === "always" || field.required) return false;
   if (field.type !== "boolean" && field.type !== "select") return false;
@@ -432,7 +442,8 @@ const renderConditionEntry = (entry, indent, lines, rootValue, globalStore) => {
       return;
     }
     if (isYamlPrimitive(value)) {
-      lines.push(`${" ".repeat(indent + 2)}${field.key}: ${formatYamlValue(value, field.type)}`);
+      const yamlKey = resolveFieldYamlKey(field);
+      lines.push(`${" ".repeat(indent + 2)}${yamlKey}: ${formatYamlValue(value, field.type)}`);
       return;
     }
     if (Array.isArray(value) && field.item?.extends === "base_conditions.json") {
@@ -440,25 +451,30 @@ const renderConditionEntry = (entry, indent, lines, rootValue, globalStore) => {
         renderConditionEntries(value, indent + 2, lines, rootValue, globalStore);
         return;
       }
-      lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
+      const yamlKey = resolveFieldYamlKey(field);
+      lines.push(`${" ".repeat(indent + 2)}${yamlKey}:`);
       renderConditionEntries(value, indent + 4, lines, rootValue, globalStore);
       return;
     }
     if (Array.isArray(value) && field.item?.extends === "base_actions.json") {
-      lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
+      const yamlKey = resolveFieldYamlKey(field);
+      lines.push(`${" ".repeat(indent + 2)}${yamlKey}:`);
       renderActionEntries(value, indent + 4, lines, rootValue, globalStore);
       return;
     }
     if (Array.isArray(value)) {
       if (field.yamlStyle === "flow" && canRenderFlowArray(value)) {
-        renderFlowArrayLine(`${" ".repeat(indent + 2)}${field.key}`, value, field.item, lines);
+        const yamlKey = resolveFieldYamlKey(field);
+        renderFlowArrayLine(`${" ".repeat(indent + 2)}${yamlKey}`, value, field.item, lines);
         return;
       }
-      lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
+      const yamlKey = resolveFieldYamlKey(field);
+      lines.push(`${" ".repeat(indent + 2)}${yamlKey}:`);
       renderYamlArray(value, field.item, indent + 4, lines, rootValue, globalStore);
       return;
     }
-    lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
+    const yamlKey = resolveFieldYamlKey(field);
+    lines.push(`${" ".repeat(indent + 2)}${yamlKey}:`);
     renderYamlObject(value, field.fields, indent + 4, lines, rootValue, globalStore);
   });
 };
@@ -905,6 +921,28 @@ const normalizeDedupeToken = (value) => {
   return "";
 };
 
+const getValueAtPath = (target, path) => {
+  const parts = Array.isArray(path) ? path : String(path || "").split(".").filter(Boolean);
+  return parts.reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), target);
+};
+
+const setValueAtPath = (target, path, value) => {
+  const parts = Array.isArray(path) ? path : String(path || "").split(".").filter(Boolean);
+  if (!parts.length) return target;
+  let current = target;
+  parts.forEach((part, index) => {
+    if (index === parts.length - 1) {
+      current[part] = value;
+      return;
+    }
+    if (!isPlainObject(current[part])) {
+      current[part] = {};
+    }
+    current = current[part];
+  });
+  return target;
+};
+
 const resolveEmbeddedComponentItems = (schema, config, globalStore) => {
   const embedded = Array.isArray(schema?.embedded) ? schema.embedded : [];
   if (!embedded.length) return [];
@@ -953,12 +991,24 @@ const resolveEmbeddedComponentItems = (schema, config, globalStore) => {
     }
 
     if (!payload) return;
+
+    const injectFields = Array.isArray(definition?.injectFields) ? definition.injectFields : [];
+    injectFields.forEach((entry) => {
+      const from = typeof entry?.from === "string" ? entry.from.trim() : "";
+      const to = typeof entry?.to === "string" ? entry.to.trim() : from;
+      if (!from || !to) return;
+      const injectedValue = getValueAtPath(config, from);
+      if (injectedValue === undefined || injectedValue === null || injectedValue === "") return;
+      setValueAtPath(payload, to, cloneYamlValue(injectedValue));
+    });
+
     if (!definition.alwaysEmit && !hasConfiguredData(payload)) return;
 
-    items.push({
+    const item = {
       domain,
       payload,
       fields: Array.isArray(sourceField.fields) ? sourceField.fields : [],
+      embedded: Array.isArray(sourceField.embedded) ? sourceField.embedded : [],
       sourceKey: key,
       dedupeBy:
         typeof definition?.dedupeBy === "string" && definition.dedupeBy.trim()
@@ -967,7 +1017,21 @@ const resolveEmbeddedComponentItems = (schema, config, globalStore) => {
       emitAs,
       singleton,
       merge
-    });
+    };
+    items.push(item);
+
+    if (item.fields.length && item.embedded.length && isPlainObject(payload)) {
+      items.push(
+        ...resolveEmbeddedComponentItems(
+          {
+            fields: item.fields,
+            embedded: item.embedded
+          },
+          payload,
+          globalStore
+        )
+      );
+    }
   });
 
   return items;

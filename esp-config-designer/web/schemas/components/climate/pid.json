@@ -10,6 +10,7 @@
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
+      "placeholder": "temperature_sensor",
       "domain": "sensor"
     },
     {
@@ -17,19 +18,24 @@
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
+      "note": "Humidity sensor is display-only for PID climate and does not affect control behavior.",
+      "placeholder": "humidity_sensor",
       "domain": "sensor"
     },
     {
       "key": "default_target_temperature",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "21.5"
     },
     {
       "key": "heat_output",
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
+      "note": "Configure at least one of heat_output or cool_output. PID climate expects float-capable outputs.",
+      "placeholder": "heater_output",
       "domain": "output"
     },
     {
@@ -37,6 +43,7 @@
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
+      "placeholder": "cooler_output",
       "domain": "output"
     },
     {
@@ -49,13 +56,15 @@
           "key": "kp",
           "type": "number",
           "required": true,
-          "lvl": "simple"
+          "lvl": "simple",
+          "placeholder": "0.9"
         },
         {
           "key": "ki",
           "type": "number",
           "required": false,
           "lvl": "normal",
+          "placeholder": "0.01",
           "default": 0
         },
         {
@@ -63,6 +72,7 @@
           "type": "number",
           "required": false,
           "lvl": "normal",
+          "placeholder": "0.0",
           "default": 0
         },
         {
@@ -70,6 +80,7 @@
           "type": "number",
           "required": false,
           "lvl": "normal",
+          "placeholder": "-1.0",
           "default": -1
         },
         {
@@ -77,19 +88,22 @@
           "type": "number",
           "required": false,
           "lvl": "normal",
+          "placeholder": "1.0",
           "default": 1
         },
         {
           "key": "starting_integral_term",
           "type": "number",
           "required": false,
-          "lvl": "advanced"
+          "lvl": "advanced",
+          "placeholder": "0.0"
         },
         {
           "key": "output_averaging_samples",
           "type": "number",
           "required": false,
           "lvl": "advanced",
+          "placeholder": "1",
           "default": 1
         },
         {
@@ -97,6 +111,7 @@
           "type": "number",
           "required": false,
           "lvl": "advanced",
+          "placeholder": "1",
           "default": 1
         }
       ]
@@ -111,19 +126,22 @@
           "key": "threshold_low",
           "type": "number",
           "required": true,
-          "lvl": "normal"
+          "lvl": "normal",
+          "placeholder": "-1.0"
         },
         {
           "key": "threshold_high",
           "type": "number",
           "required": true,
-          "lvl": "normal"
+          "lvl": "normal",
+          "placeholder": "0.5"
         },
         {
           "key": "kp_multiplier",
           "type": "number",
           "required": false,
           "lvl": "normal",
+          "placeholder": "0.05",
           "default": 0
         },
         {
@@ -131,6 +149,7 @@
           "type": "number",
           "required": false,
           "lvl": "normal",
+          "placeholder": "0.0",
           "default": 0
         },
         {
@@ -138,6 +157,7 @@
           "type": "number",
           "required": false,
           "lvl": "normal",
+          "placeholder": "0.0",
           "default": 0
         },
         {
@@ -145,6 +165,7 @@
           "type": "number",
           "required": false,
           "lvl": "advanced",
+          "placeholder": "1",
           "default": 1
         }
       ]

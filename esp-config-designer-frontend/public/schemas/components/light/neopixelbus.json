@@ -6,10 +6,18 @@
   "extends": "base_light.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "Light Name"
+    },
+    {
       "key": "num_leds",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "30"
     },
     {
       "key": "type",
@@ -21,42 +29,170 @@
     },
     {
       "key": "variant",
-      "type": "text",
+      "type": "select",
       "required": true,
       "lvl": "simple",
-      "placeholder": "WS2812"
+	  "default": "WS2812",
+      "options": [
+        "800KBPS",
+        "400KBPS",
+        "WS2811",
+        "WS2812",
+        "WS2812X",
+        "WS2813",
+        "SK6812",
+        "TM1814",
+        "TM1829",
+        "TM1914",
+        "APA106",
+        "LC8812",
+        "WS2801",
+        "DotStar",
+        "LPD6803",
+        "LPD8806",
+        "P9813"
+      ]
     },
     {
       "key": "method",
-      "type": "yaml",
+      "type": "object",
       "required": false,
       "lvl": "advanced",
-      "placeholder": "type: esp32_rmt\nchannel: 1"
+      "note": "Leave empty to let ESPHome choose the best method automatically.",
+      "fields": [
+        {
+          "key": "type",
+          "type": "select",
+          "required": false,
+          "lvl": "advanced",
+          "options": [
+            "bit_bang",
+            "esp8266_dma",
+            "esp8266_uart",
+            "esp32_i2s",
+            "esp32_rmt",
+            "spi"
+          ]
+        },
+        {
+          "key": "bus",
+          "type": "number",
+          "required": false,
+          "lvl": "advanced",
+          "dependsOn": {
+            "key": "type",
+            "values": [
+              "esp8266_uart",
+              "esp32_i2s"
+            ]
+          }
+        },
+        {
+          "key": "spi_bus",
+          "yamlKey": "bus",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "dependsOn": {
+            "key": "type",
+            "value": "spi"
+          }
+        },
+        {
+          "key": "async",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "dependsOn": {
+            "key": "type",
+            "value": "esp8266_uart"
+          }
+        },
+        {
+          "key": "channel",
+          "type": "number",
+          "required": false,
+          "lvl": "advanced",
+          "dependsOn": {
+            "key": "type",
+            "value": "esp32_rmt"
+          }
+        },
+        {
+          "key": "speed",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "placeholder": "10MHz",
+          "dependsOn": {
+            "key": "type",
+            "value": "spi"
+          }
+        }
+      ]
     },
     {
       "key": "invert",
       "type": "boolean",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": false
     },
     {
       "key": "pin",
       "type": "gpio",
       "required": false,
       "lvl": "simple",
-      "note": "Use pin for one-wire, or clock_pin + data_pin for two-wire"
+      "note": "Use pin for one-wire variants.",
+      "dependsOn": {
+        "key": "variant",
+        "values": [
+          "800KBPS",
+          "400KBPS",
+          "WS2811",
+          "WS2812",
+          "WS2812X",
+          "WS2813",
+          "SK6812",
+          "TM1814",
+          "TM1829",
+          "TM1914",
+          "APA106",
+          "LC8812"
+        ]
+      }
     },
     {
       "key": "clock_pin",
       "type": "gpio",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "variant",
+        "values": [
+          "WS2801",
+          "DotStar",
+          "LPD6803",
+          "LPD8806",
+          "P9813"
+        ]
+      }
     },
     {
       "key": "data_pin",
       "type": "gpio",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "dependsOn": {
+        "key": "variant",
+        "values": [
+          "WS2801",
+          "DotStar",
+          "LPD6803",
+          "LPD8806",
+          "P9813"
+        ]
+      }
     }
   ]
 }

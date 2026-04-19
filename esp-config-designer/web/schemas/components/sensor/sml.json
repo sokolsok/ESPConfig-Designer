@@ -1,0 +1,54 @@
+{
+  "id": "sensor.sml",
+  "domain": "sensor",
+  "platform": "sml",
+  "extends": "base_sensor.json",
+  "helpUrl": "https://esphome.io/components/sml/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "sml",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "SML hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_sml.json"
+    },
+    {
+      "key": "sml_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "sml",
+      "allowSelfReference": true
+    },
+    {
+      "key": "obis_code",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "1-0:1.8.0"
+    },
+    {
+      "key": "server_id",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "0123456789abcdef"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "id": "hub.ezo_pmp",
+  "domain": "ezo_pmp",
+  "platform": "",
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "dosing_pump",
+      "placeholder": "dosing_pump",
+      "idDomain": "ezo_pmp"
+    },
+    {
+      "key": "address",
+      "type": "number",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "always",
+      "default": 103
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "60s"
+    }
+  ]
+}

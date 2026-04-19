@@ -23,6 +23,27 @@
   ],
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "Light Name"
+    },
+    {
+      "key": "gamma_correct",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 1.0
+    },
+    {
+      "key": "default_transition_length",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "0s"
+    },
+    {
       "key": "hub",
       "label": "Tuya hub",
       "type": "object",
@@ -45,7 +66,8 @@
       "key": "dimmer_datapoint",
       "type": "number",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "note": "Configure at least one datapoint used by this light."
     },
     {
       "key": "min_value_datapoint",
@@ -57,7 +79,8 @@
       "key": "switch_datapoint",
       "type": "number",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "note": "Configure at least one datapoint used by this light."
     },
     {
       "key": "color_temperature_datapoint",
@@ -69,13 +92,15 @@
       "key": "color_datapoint",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "note": "Set together with color_type when color control is exposed."
     },
     {
       "key": "color_type",
       "type": "select",
       "required": false,
       "lvl": "normal",
+      "note": "Set together with color_datapoint when color control is exposed.",
       "options": [
         "RGB",
         "HSV",

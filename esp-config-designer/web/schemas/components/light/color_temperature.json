@@ -6,18 +6,27 @@
   "extends": "base_light.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "Light Name"
+    },
+    {
       "key": "color_temperature",
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
-      "domain": "output"
+      "domain": "output",
+	  "placeholder": "output_component1_id"
     },
     {
       "key": "brightness",
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
-      "domain": "output"
+      "domain": "output",
+	  "placeholder": "output_component2_id"
     },
     {
       "key": "cold_white_color_temperature",

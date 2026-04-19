@@ -1,0 +1,93 @@
+{
+  "id": "sensor.sun_gtil2",
+  "domain": "sensor",
+  "platform": "sun_gtil2",
+  "helpUrl": "https://esphome.io/components/sun_gtil2/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "sun_gtil2",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Inverter hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_sun_gtil2.json"
+    },
+    {
+      "key": "sun_gtil2_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "sun_gtil2",
+      "allowSelfReference": true
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "temperature",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "dc_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "ac_voltage",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "dc_power",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "ac_power",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "limiter_power",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_sensor.json",
+      "fields": []
+    }
+  ]
+}

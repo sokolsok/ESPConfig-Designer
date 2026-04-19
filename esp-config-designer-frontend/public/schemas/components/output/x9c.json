@@ -9,26 +9,30 @@
       "key": "cs_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
     },
     {
       "key": "inc_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
     },
     {
       "key": "ud_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
     },
     {
       "key": "initial_value",
       "type": "number",
       "required": false,
       "lvl": "normal",
-      "default": 1
+      "default": 1,
+      "placeholder": "1.0"
     },
     {
       "key": "step_delay",

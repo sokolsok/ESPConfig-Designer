@@ -14,7 +14,7 @@
       "key": "address",
       "type": "text",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "default": "0x2E",
       "suppressQuotes": true
     },
@@ -22,7 +22,7 @@
       "key": "i2c_id",
       "type": "id_ref",
       "required": false,
-      "lvl": "advanced",
+      "lvl": "normal",
       "domain": "i2c"
     }
   ]

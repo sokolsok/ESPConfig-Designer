@@ -20,10 +20,11 @@
     },
     {
       "key": "microphone",
-      "type": "yaml",
-      "required": true,
+      "type": "id_ref",
+      "domain": "microphone",
+      "required": false,
       "lvl": "simple",
-      "placeholder": "# microphone source configuration"
+      "note": "Provide either a microphone here or rely on an external voice pipeline that injects it."
     },
     {
       "key": "micro_wake_word",
@@ -37,14 +38,16 @@
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
-      "domain": "speaker"
+      "domain": "speaker",
+      "note": "Use speaker or media_player, not both."
     },
     {
       "key": "media_player",
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
-      "domain": "media_player"
+      "domain": "media_player",
+      "note": "Use media_player or speaker, not both."
     },
     {
       "key": "use_wake_word",
@@ -69,10 +72,10 @@
     },
     {
       "key": "auto_gain",
-      "type": "text",
+      "type": "number",
       "required": false,
       "lvl": "normal",
-      "default": "0dBFS"
+      "default": 0
     },
     {
       "key": "volume_multiplier",

@@ -1,0 +1,62 @@
+{
+  "id": "binary_sensor.ezo_pmp",
+  "domain": "binary_sensor",
+  "platform": "ezo_pmp",
+  "helpUrl": "https://esphome.io/components/ezo_pmp/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "ezo_pmp",
+      "dedupeBy": "id"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:i2c"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Pump hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_ezo_pmp.json"
+    },
+    {
+      "key": "ezo_pmp_id",
+      "yamlKey": "id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "ezo_pmp",
+      "allowSelfReference": true,
+      "default": "dosing_pump",
+      "placeholder": "dosing_pump"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "pump_state",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    },
+    {
+      "key": "is_paused",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_binary_sensor.json",
+      "fields": []
+    }
+  ]
+}

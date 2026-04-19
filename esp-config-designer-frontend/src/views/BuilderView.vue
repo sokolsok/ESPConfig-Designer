@@ -2034,25 +2034,12 @@ const generatedAutomation = computed(() => ({
 const embeddedDomainsByComponentDomain = computed(() => {
   const map = new Map();
 
-  (config.value.components || []).forEach((entry) => {
-    const componentId = componentIdFromEntry(entry);
-    if (!componentId) return;
-    const schema = componentSchemas.value?.[componentId];
-    if (!schema || schema.domain === "display") return;
+  const collectEmbeddedDomains = (schemaLike, valueMap, domains) => {
+    const embedded = Array.isArray(schemaLike?.embedded) ? schemaLike.embedded : [];
+    const fields = Array.isArray(schemaLike?.fields) ? schemaLike.fields : [];
+    if (!embedded.length || !fields.length) return;
 
-    const embedded = Array.isArray(schema.embedded) ? schema.embedded : [];
-    if (!embedded.length) return;
-
-    const componentDomain = String(schema.domain || parseComponentId(componentId).domain || "").trim();
-    if (!componentDomain) return;
-
-    const fields = Array.isArray(schema.fields) ? schema.fields : [];
-    if (!fields.length) return;
     const fieldByKey = new Map(fields.map((field) => [field?.key, field]));
-    const componentConfig =
-      entry?.config && typeof entry.config === "object" && !Array.isArray(entry.config)
-        ? entry.config
-        : {};
 
     embedded.forEach((definition) => {
       const key = typeof definition?.key === "string" ? definition.key.trim() : "";
@@ -2062,7 +2049,7 @@ const embeddedDomainsByComponentDomain = computed(() => {
         definition?.domainMap && typeof definition.domainMap === "object" && !Array.isArray(definition.domainMap)
           ? definition.domainMap
           : null;
-      const mappedDomainValue = domainBy ? componentConfig?.[domainBy] : undefined;
+      const mappedDomainValue = domainBy ? valueMap?.[domainBy] : undefined;
       const mappedDomain =
         domainMap && mappedDomainValue !== undefined && domainMap[String(mappedDomainValue)]
           ? String(domainMap[String(mappedDomainValue)]).trim()
@@ -2072,13 +2059,39 @@ const embeddedDomainsByComponentDomain = computed(() => {
 
       const sourceField = fieldByKey.get(key);
       if (!sourceField || sourceField.type !== "object") return;
-      if (!isSchemaFieldVisible(sourceField, componentConfig, fields, globalStore.value)) return;
+      if (!isSchemaFieldVisible(sourceField, valueMap, fields, globalStore.value)) return;
+      domains.add(domain);
 
-      if (!map.has(componentDomain)) {
-        map.set(componentDomain, new Set());
+      const nestedValue = valueMap?.[key];
+      if (nestedValue && typeof nestedValue === "object" && !Array.isArray(nestedValue)) {
+        collectEmbeddedDomains(sourceField, nestedValue, domains);
       }
-      map.get(componentDomain).add(domain);
     });
+  };
+
+  (config.value.components || []).forEach((entry) => {
+    const componentId = componentIdFromEntry(entry);
+    if (!componentId) return;
+    const schema = componentSchemas.value?.[componentId];
+    if (!schema || schema.domain === "display") return;
+
+    const componentDomain = String(schema.domain || parseComponentId(componentId).domain || "").trim();
+    if (!componentDomain) return;
+    const componentConfig =
+      entry?.config && typeof entry.config === "object" && !Array.isArray(entry.config)
+        ? entry.config
+        : {};
+
+    const domains = new Set();
+    collectEmbeddedDomains(schema, componentConfig, domains);
+    if (domains.size) {
+      const existing = map.get(componentDomain);
+      if (existing) {
+        domains.forEach((domain) => existing.add(domain));
+      } else {
+        map.set(componentDomain, domains);
+      }
+    }
   });
 
   return map;

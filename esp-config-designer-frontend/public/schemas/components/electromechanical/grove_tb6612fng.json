@@ -13,6 +13,7 @@
       "type": "id",
       "required": true,
       "lvl": "simple",
+      "placeholder": "motor_driver",
       "idDomain": "grove_tb6612fng"
     },
     {
@@ -20,7 +21,14 @@
       "type": "text",
       "required": false,
       "lvl": "normal",
+      "emitYAML": "always",
       "default": "0x14"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

@@ -6,35 +6,52 @@
   "extends": "base_number.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Number Name"
+    },
+    {
       "key": "min_value",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "0"
     },
     {
       "key": "max_value",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "100"
     },
     {
       "key": "step",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "1"
     },
     {
       "key": "lambda",
       "type": "lambda",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "return id(my_sensor).state;"
     },
     {
       "key": "set_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
       "lvl": "normal",
-      "placeholder": "- logger.log: !lambda 'return to_string(x);'"
+      "note": "The action receives the new value as x.",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "update_interval",
@@ -61,7 +78,8 @@
       "key": "initial_value",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "0"
     }
   ]
 }

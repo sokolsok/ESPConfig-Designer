@@ -3,17 +3,47 @@
   "domain": "climate",
   "platform": "climate_ir_lg",
   "platformByBus": {
+    "ballu": "ballu",
+    "coolix": "coolix",
+    "daikin": "daikin",
+    "daikin_arc": "daikin_arc",
     "climate_ir_lg": "climate_ir_lg",
     "daikin_brc": "daikin_brc",
+    "delonghi": "delonghi",
+    "emmeti": "emmeti",
+    "fujitsu_general": "fujitsu_general",
     "gree": "gree",
+    "heatpumpir": "heatpumpir",
+    "hitachi_ac344": "hitachi_ac344",
+    "hitachi_ac424": "hitachi_ac424",
     "midea_ir": "midea_ir",
     "mitsubishi": "mitsubishi",
+    "noblex": "noblex",
+    "tcl112": "tcl112",
     "toshiba": "toshiba",
+    "whirlpool": "whirlpool",
     "whynter": "whynter"
+    ,"yashima": "yashima",
+    "zhlt01": "zhlt01"
   },
   "helpUrl": "https://esphome.io/components/climate/climate_ir/",
   "extends": "base_climate.json",
+  "embedded": [
+    {
+      "key": "transmitter_hub",
+      "domain": "remote_transmitter",
+      "dedupeBy": "id",
+      "selectLabel": "Select Transmitter hub"
+    }
+  ],
   "fields": [
+    {
+      "key": "name",
+      "placeholder": "Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
     {
       "key": "bus",
       "label": "IR Platform",
@@ -22,13 +52,28 @@
       "lvl": "simple",
       "default": "climate_ir_lg",
       "options": [
+        "ballu",
+        "coolix",
+        "daikin",
+        "daikin_arc",
         "climate_ir_lg",
         "daikin_brc",
+        "delonghi",
+        "emmeti",
+        "fujitsu_general",
         "gree",
+        "heatpumpir",
+        "hitachi_ac344",
+        "hitachi_ac424",
         "midea_ir",
         "mitsubishi",
+        "noblex",
+        "tcl112",
         "toshiba",
+        "whirlpool",
         "whynter"
+        ,"yashima",
+        "zhlt01"
       ]
     },
     {
@@ -67,10 +112,19 @@
       "domain": "remote_receiver"
     },
     {
+      "key": "transmitter_hub",
+      "label": "Transmitter hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_remote_transmitter.json"
+    },
+    {
       "key": "transmitter_id",
       "type": "id_ref",
-      "required": false,
-      "lvl": "advanced",
+      "required": true,
+      "lvl": "simple",
       "domain": "remote_transmitter"
     },
     {
@@ -78,14 +132,28 @@
       "type": "text",
       "required": false,
       "lvl": "normal",
+      "note": "Required for Gree models. Optional for Toshiba and Whirlpool.",
       "dependsOn": {
         "key": "bus",
         "values": [
           "gree",
-          "toshiba"
+          "toshiba",
+          "whirlpool"
         ]
       },
-      "placeholder": "gree: generic/yan/yaa/yac/yac1fb9/yx1ff/yag, toshiba: GENERIC/RAC-PT1411HWRU-C/RAC-PT1411HWRU-F/RAS-2819T"
+      "placeholder": "gree: generic/yan/yaa/yac/yac1fb9/yx1ff/yag; toshiba: GENERIC/RAC-PT1411HWRU-C/RAC-PT1411HWRU-F/RAS-2819T; whirlpool: DG11J1-3A/DG11J1-04"
+    },
+    {
+      "key": "protocol",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "note": "Required when IR Platform is heatpumpir. Use one of the documented HeatpumpIR protocol names from ESPHome docs.",
+      "dependsOn": {
+        "key": "bus",
+        "value": "heatpumpir"
+      },
+      "placeholder": "panasonic_dke, mitsubishi_fa, samsung_aqv, toshiba, zhlt01, ..."
     },
     {
       "key": "use_fahrenheit",
@@ -224,12 +292,6 @@
         "key": "bus",
         "value": "climate_ir_lg"
       }
-    },
-    {
-      "key": "custom_config",
-      "type": "raw_yaml",
-      "required": false,
-      "lvl": "advanced"
     }
   ]
 }

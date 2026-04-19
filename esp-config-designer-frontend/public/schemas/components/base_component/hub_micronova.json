@@ -21,7 +21,8 @@
       "key": "enable_rx_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "uart_id",

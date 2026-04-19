@@ -9,7 +9,8 @@
       "key": "pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
     },
     {
       "key": "frequency",
@@ -22,13 +23,16 @@
       "key": "channel",
       "type": "number",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "0"
     },
     {
       "key": "phase_angle",
       "type": "number",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "default": 0,
+      "placeholder": "180"
     }
   ]
 }

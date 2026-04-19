@@ -11,6 +11,13 @@
   ],
   "fields": [
     {
+      "key": "name",
+      "placeholder": "Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
       "key": "uart_id",
       "type": "id_ref",
       "required": false,
@@ -45,13 +52,21 @@
       "key": "alternative_swing_control",
       "type": "boolean",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "dependsOn": {
+        "key": "protocol",
+        "value": "smartair2"
+      }
     },
     {
       "key": "status_message_header_size",
       "type": "number",
       "required": false,
       "lvl": "advanced",
+      "dependsOn": {
+        "key": "protocol",
+        "value": "hon"
+      },
       "default": 0
     },
     {
@@ -59,6 +74,10 @@
       "type": "number",
       "required": false,
       "lvl": "advanced",
+      "dependsOn": {
+        "key": "protocol",
+        "value": "hon"
+      },
       "default": 10
     },
     {
@@ -66,6 +85,10 @@
       "type": "number",
       "required": false,
       "lvl": "advanced",
+      "dependsOn": {
+        "key": "protocol",
+        "value": "hon"
+      },
       "default": 22
     },
     {
@@ -73,6 +96,10 @@
       "type": "list",
       "required": false,
       "lvl": "advanced",
+      "dependsOn": {
+        "key": "protocol",
+        "value": "hon"
+      },
       "item": {
         "type": "select",
         "options": [
@@ -92,7 +119,11 @@
       "key": "beeper",
       "type": "boolean",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "protocol",
+        "value": "hon"
+      }
     },
     {
       "key": "supported_modes",
@@ -131,6 +162,7 @@
       "type": "list",
       "required": false,
       "lvl": "advanced",
+      "note": "Preset values depend on protocol: smartair2 supports AWAY/BOOST/COMFORT, hOn supports AWAY/BOOST/SLEEP.",
       "item": {
         "type": "select",
         "options": [
@@ -146,6 +178,10 @@
       "type": "list",
       "required": false,
       "lvl": "advanced",
+      "dependsOn": {
+        "key": "protocol",
+        "value": "hon"
+      },
       "item": {
         "type": "object",
         "fields": [],
@@ -158,6 +194,10 @@
       "type": "list",
       "required": false,
       "lvl": "advanced",
+      "dependsOn": {
+        "key": "protocol",
+        "value": "hon"
+      },
       "item": {
         "type": "object",
         "fields": [],
@@ -170,18 +210,16 @@
       "type": "list",
       "required": false,
       "lvl": "advanced",
+      "dependsOn": {
+        "key": "protocol",
+        "value": "hon"
+      },
       "item": {
         "type": "object",
         "fields": [],
         "extends": "base_actions.json"
       },
       "wrapThen": true
-    },
-    {
-      "key": "custom_config",
-      "type": "raw_yaml",
-      "required": false,
-      "lvl": "advanced"
     }
   ]
 }

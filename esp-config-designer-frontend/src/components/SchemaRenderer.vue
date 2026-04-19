@@ -7,18 +7,18 @@
           <label :for="sharedHubSelectId(binding)">{{ binding.selectLabel }}</label>
           <select
             :id="sharedHubSelectId(binding)"
-            :value="resolveSharedHubSelection(binding)"
+            :value="resolveLocalSharedHubSelection(binding)"
             @change="onSharedHubSelectionChange(binding, $event)"
           >
-            <option v-if="resolveSharedHubSelection(binding) === '__none__'" value="__none__" hidden>
+            <option v-if="resolveLocalSharedHubSelection(binding) === '__none__'" value="__none__" hidden>
               Select shared hub
             </option>
             <option
-              v-if="isSharedHubSelectionMissing(binding)"
-              :value="resolveSharedHubSelection(binding)"
+              v-if="isLocalSharedHubSelectionMissing(binding)"
+              :value="resolveLocalSharedHubSelection(binding)"
               hidden
             >
-              {{ resolveSharedHubSelection(binding) }}
+              {{ resolveLocalSharedHubSelection(binding) }}
             </option>
             <option value="__add_new__">ADD NEW</option>
             <option
@@ -31,7 +31,7 @@
           </select>
         </div>
         <SchemaField
-          v-if="resolveSharedHubSelection(binding) === '__add_new__'"
+          v-if="resolveLocalSharedHubSelection(binding) === '__add_new__'"
           :field="binding.sourceField"
           :path="[]"
           :value="componentConfig"
@@ -106,7 +106,14 @@ import { computed, defineAsyncComponent, inject, onBeforeUnmount, ref, watch } f
 import SchemaField from "./SchemaField.vue";
 import { loadComponentSchema, loadSchemaByPath } from "../utils/schemaLoader";
 import { isFieldVisible } from "../utils/schemaVisibility";
-import { resolveAutoValue } from "../utils/schemaAuto";
+import {
+  buildSeededObjectFromFields,
+  buildSharedHubManagedKeys,
+  collectSharedHubBindings,
+  hasConfiguredData,
+  isSharedHubSelectionMissing,
+  resolveSharedHubSelection
+} from "../utils/schemaSharedHubs";
 
 const DisplayBuilder = defineAsyncComponent(() => import("./display/DisplayBuilder.vue"));
 
@@ -250,195 +257,30 @@ const filteredSchemaFields = computed(() => {
   return fields.filter((field) => allowed.has(field.key));
 });
 
-const hasConfiguredData = (value) => {
-  if (value === undefined || value === null) return false;
-  if (typeof value === "string") return value.trim() !== "";
-  if (Array.isArray(value)) return value.some((item) => hasConfiguredData(item));
-  if (typeof value === "object") {
-    return Object.entries(value).some(([key, nested]) => {
-      if (key.startsWith("_")) return false;
-      return hasConfiguredData(nested);
-    });
-  }
-  return true;
-};
-
-const buildSharedHubIdOptions = (domain) => {
-  const entries = [];
-  const seen = new Set();
-
-  (props.idIndex || []).forEach((entry) => {
-    if (!entry || entry.domain !== domain) return;
-    const rawId = typeof entry.id === "string" ? entry.id.trim() : "";
-    if (!rawId) return;
-    const idLower = rawId.toLowerCase();
-    if (seen.has(idLower)) return;
-
-    const entryScopeId = typeof entry.scopeId === "string" ? entry.scopeId.trim() : "";
-    const sameScope = Boolean(props.contextScopeId) && entryScopeId === props.contextScopeId;
-    const sameComponentFallback =
-      !props.contextScopeId &&
-      Boolean(props.contextComponentId) &&
-      entry.componentId === props.contextComponentId;
-    if (sameScope || sameComponentFallback) return;
-
-    seen.add(idLower);
-    entries.push({
-      id: rawId,
-      idLower,
-      scopeId: entryScopeId
-    });
-  });
-
-  return entries.sort((left, right) => left.id.localeCompare(right.id));
-};
-
 const sharedHubBindings = computed(() => {
   const schema = activeSchema.value;
-  const fields = Array.isArray(schema?.fields) ? schema.fields : [];
-  const embedded = Array.isArray(schema?.embedded) ? schema.embedded : [];
-  if (!fields.length || !embedded.length) return [];
-
-  const byKey = new Map(fields.map((field) => [field?.key, field]));
-  const bindings = [];
-
-  embedded.forEach((definition) => {
-    const sourceKey = typeof definition?.key === "string" ? definition.key.trim() : "";
-    const domain = typeof definition?.domain === "string" ? definition.domain.trim() : "";
-    const logicalDomain =
-      typeof definition?.logicalDomain === "string" && definition.logicalDomain.trim()
-        ? definition.logicalDomain.trim()
-        : domain;
-    const dedupeBy =
-      typeof definition?.dedupeBy === "string" && definition.dedupeBy.trim()
-        ? definition.dedupeBy.trim()
-        : "";
-    const emitAsValue =
-      typeof definition?.emitAs === "string" ? definition.emitAs.trim().toLowerCase() : "list";
-    const singleton = Boolean(definition?.singleton);
-
-    if (!sourceKey || !logicalDomain) return;
-    const supportsListSharedHub = emitAsValue === "list" && dedupeBy === "id";
-    const supportsSingletonMapSharedHub = emitAsValue === "map" && singleton;
-    if (!supportsListSharedHub && !supportsSingletonMapSharedHub) return;
-
-    const sourceField = byKey.get(sourceKey);
-    if (!sourceField || sourceField.type !== "object") return;
-
-    const idRefCandidates = fields.filter(
-      (field) =>
-        field?.type === "id_ref" &&
-        field?.domain === logicalDomain &&
-        typeof field?.key === "string" &&
-        field.key.trim()
-    );
-    const idRefField =
-      idRefCandidates.find((field) => field.key.includes(sourceKey)) ||
-      (idRefCandidates.length === 1 ? idRefCandidates[0] : null);
-    if (!idRefField) return;
-
-    const valueMap = props.componentConfig || {};
-    const sourceVisible = isFieldVisible(sourceField, valueMap, fields, props.globalStore) && !sourceField.uiHidden;
-    const idRefVisible = isFieldVisible(idRefField, valueMap, fields, props.globalStore) && !idRefField.uiHidden;
-    if (!sourceVisible || !idRefVisible) return;
-
-    const idOptions = buildSharedHubIdOptions(logicalDomain);
-
-    // Shared hub flow:
-    // - Select existing hub id (no local hub object emission)
-    // - Or ADD NEW (local hub object is shown and emitted)
-    bindings.push({
-      sourceKey,
-      sourceField,
-      idRefKey: idRefField.key,
-      domain: logicalDomain,
-      idOptions,
-      selectLabel: "Select hub"
-    });
+  return collectSharedHubBindings({
+    schemaFields: Array.isArray(schema?.fields) ? schema.fields : [],
+    embeddedDefinitions: Array.isArray(schema?.embedded) ? schema.embedded : [],
+    valueMap: props.componentConfig || {},
+    globalStore: props.globalStore,
+    idIndex: props.idIndex || [],
+    contextScopeId: props.contextScopeId,
+    contextComponentId: props.contextComponentId
   });
-
-  return bindings;
 });
 
 const sharedHubManagedKeys = computed(() => {
-  const keys = new Set();
-  sharedHubBindings.value.forEach((binding) => {
-    keys.add(binding.sourceKey);
-    keys.add(binding.idRefKey);
-  });
-  return keys;
+  return buildSharedHubManagedKeys(sharedHubBindings.value);
 });
 
-const resolveSharedHubSelection = (binding) => {
-  const override = sharedHubSelectionOverrides.value?.[binding.sourceKey];
-  if (typeof override === "string" && override.trim()) {
-    return override.trim();
-  }
-  const sourceValue = props.componentConfig?.[binding.sourceKey];
-  const idRefValue = props.componentConfig?.[binding.idRefKey];
-  if (hasConfiguredData(sourceValue)) {
-    return "__add_new__";
-  }
-  if (typeof idRefValue === "string" && idRefValue.trim()) {
-    return idRefValue.trim();
-  }
-  return "__none__";
-};
+const resolveLocalSharedHubSelection = (binding) =>
+  resolveSharedHubSelection(binding, props.componentConfig || {}, sharedHubSelectionOverrides.value);
 
 const sharedHubSelectId = (binding) => `shared-hub-select-${binding.sourceKey}`;
 
-const isSharedHubSelectionMissing = (binding) => {
-  const selected = resolveSharedHubSelection(binding);
-  if (!selected || selected === "__none__" || selected === "__add_new__") return false;
-  return !binding.idOptions.some((option) => option.id.toLowerCase() === selected.toLowerCase());
-};
-
-const isPlainObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
-
-const cloneSeedValue = (value) => {
-  if (Array.isArray(value)) return value.map((item) => cloneSeedValue(item));
-  if (isPlainObject(value)) {
-    return Object.fromEntries(Object.entries(value).map(([key, nested]) => [key, cloneSeedValue(nested)]));
-  }
-  return value;
-};
-
-const buildSeededObjectFromFields = (fields = [], currentValue = {}, rootValue = props.rootValue || props.componentConfig || {}) => {
-  const base = isPlainObject(currentValue) ? { ...currentValue } : {};
-
-  fields.forEach((field) => {
-    if (!field?.key) return;
-    if (!isFieldVisible(field, base, fields, props.globalStore)) return;
-
-    const existingValue = base[field.key];
-    if (existingValue !== undefined && existingValue !== null && !(typeof existingValue === "string" && existingValue.trim() === "")) {
-      if (field.type === "object" && Array.isArray(field.fields) && isPlainObject(existingValue)) {
-        base[field.key] = buildSeededObjectFromFields(field.fields, existingValue, rootValue);
-      }
-      return;
-    }
-
-    if (field.type === "object" && Array.isArray(field.fields)) {
-      const nested = buildSeededObjectFromFields(field.fields, {}, rootValue);
-      if (hasConfiguredData(nested)) {
-        base[field.key] = nested;
-      }
-      return;
-    }
-
-    const autoValue = resolveAutoValue(field, base, rootValue);
-    if (autoValue !== undefined && autoValue !== null && !(typeof autoValue === "string" && autoValue.trim() === "")) {
-      base[field.key] = cloneSeedValue(autoValue);
-      return;
-    }
-
-    if (field.default !== undefined) {
-      base[field.key] = cloneSeedValue(field.default);
-    }
-  });
-
-  return base;
-};
+const isLocalSharedHubSelectionMissing = (binding) =>
+  isSharedHubSelectionMissing(binding, props.componentConfig || {}, sharedHubSelectionOverrides.value);
 
 const onSharedHubSelectionChange = (binding, event) => {
   const nextValue = String(event?.target?.value || "").trim();
@@ -455,7 +297,12 @@ const onSharedHubSelectionChange = (binding, event) => {
   if (nextValue === "__add_new__") {
     const sourceValue = props.componentConfig?.[binding.sourceKey];
     const currentRef = String(props.componentConfig?.[binding.idRefKey] || "").trim();
-    const nextObject = buildSeededObjectFromFields(binding.sourceField?.fields || [], sourceValue || {});
+    const nextObject = buildSeededObjectFromFields({
+      fields: binding.sourceField?.fields || [],
+      currentValue: sourceValue || {},
+      rootValue: props.rootValue || props.componentConfig || {},
+      globalStore: props.globalStore
+    });
     if (!String(nextObject?.id || "").trim() && currentRef) {
       nextObject.id = currentRef;
     }

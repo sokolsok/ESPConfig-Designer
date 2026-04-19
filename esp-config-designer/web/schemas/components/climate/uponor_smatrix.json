@@ -1,0 +1,50 @@
+{
+  "id": "climate.uponor_smatrix",
+  "domain": "climate",
+  "platform": "uponor_smatrix",
+  "helpUrl": "https://esphome.io/components/uponor_smatrix/",
+  "extends": "base_climate.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "uponor_smatrix",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "Uponor hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_uponor_smatrix.json"
+    },
+    {
+      "key": "uponor_smatrix_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "uponor_smatrix",
+      "allowSelfReference": true,
+      "emitYAML": "never",
+      "placeholder": "smatrix_hub"
+    },
+    {
+      "key": "address",
+      "type": "number",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "0x110BDE13",
+      "note": "Required thermostat device address from the Uponor Smatrix bus."
+    }
+  ]
+}

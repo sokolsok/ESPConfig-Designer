@@ -8,19 +8,22 @@
       "key": "name",
       "type": "text",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "Number Name"
     },
     {
       "key": "id",
       "type": "id",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+	  "placeholder": "number_id"
     },
     {
       "key": "icon",
       "type": "icon",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+	  "placeholder": "mdi:cat"
     },
     {
       "key": "internal",
@@ -38,13 +41,15 @@
       "key": "entity_category",
       "type": "text",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "config"
     },
     {
       "key": "unit_of_measurement",
       "type": "text",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "W"
     },
     {
       "key": "mode",
@@ -62,7 +67,8 @@
       "key": "device_class",
       "type": "text",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "temperature"
     },
     {
       "key": "on_value",

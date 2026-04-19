@@ -6,25 +6,35 @@
   "extends": "base_fan.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "Fan Name"
+    },
+    {
       "key": "pin_a",
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
-      "domain": "output"
+      "domain": "output",
+	  "placeholder": "motor_forward_pin_id"
     },
     {
       "key": "pin_b",
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
-      "domain": "output"
+      "domain": "output",
+	  "placeholder": "motor_reverse_pin_id"
     },
     {
       "key": "enable_pin",
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
-      "domain": "output"
+      "domain": "output",
+	  "placeholder": "motor_enable_pin_id"
     },
     {
       "key": "decay_mode",

@@ -1,19 +1,4 @@
 ## 1.1.4
 
-- Audio ADC Components
-- Audio DAC
-- Climate
-- Cover
-- Datetime
-- Electromechanical
-- Energy/Solar Management Components
-- Event
-- Fan
-- Home Assistant Components
-- Light
-- Lock
-- Media Player
-- Microphone
-- Number
-- Output
+- Added and updated components in Audio ADC, Audio DAC, Climate, Cover, Datetime, Electromechanical, Energy/Solar Management, Event, Fan, Home Assistant, Light, Lock, Media Player, Microphone, Number, and Output.
 - Fixed several bugs in the schema renderer.

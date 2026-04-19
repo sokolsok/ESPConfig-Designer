@@ -34,14 +34,16 @@
       "key": "channel",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "1"
     },
     {
       "key": "current",
       "type": "number",
       "required": false,
       "lvl": "normal",
-      "default": 10
+      "default": 10,
+      "placeholder": "10"
     }
   ]
 }

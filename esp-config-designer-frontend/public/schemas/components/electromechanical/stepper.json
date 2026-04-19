@@ -19,6 +19,7 @@
       "type": "id",
       "required": true,
       "lvl": "simple",
+      "placeholder": "stepper_motor",
       "idDomain": "stepper"
     },
     {
@@ -33,6 +34,7 @@
       "type": "text",
       "required": false,
       "lvl": "normal",
+      "placeholder": "inf",
       "default": "inf"
     },
     {
@@ -40,6 +42,7 @@
       "type": "text",
       "required": false,
       "lvl": "normal",
+      "placeholder": "inf",
       "default": "inf"
     },
     {
@@ -47,6 +50,7 @@
       "type": "gpio",
       "required": true,
       "lvl": "simple",
+      "placeholder": "GPIOXX",
       "dependsOn": {
         "key": "platform",
         "value": "a4988"
@@ -57,6 +61,7 @@
       "type": "gpio",
       "required": true,
       "lvl": "simple",
+      "placeholder": "GPIOXX",
       "dependsOn": {
         "key": "platform",
         "value": "a4988"
@@ -67,6 +72,7 @@
       "type": "gpio",
       "required": false,
       "lvl": "normal",
+      "placeholder": "GPIOXX",
       "dependsOn": {
         "key": "platform",
         "value": "a4988"
@@ -77,6 +83,7 @@
       "type": "gpio",
       "required": true,
       "lvl": "simple",
+      "placeholder": "GPIOXX",
       "dependsOn": {
         "key": "platform",
         "value": "uln2003"
@@ -87,6 +94,7 @@
       "type": "gpio",
       "required": true,
       "lvl": "simple",
+      "placeholder": "GPIOXX",
       "dependsOn": {
         "key": "platform",
         "value": "uln2003"
@@ -97,6 +105,7 @@
       "type": "gpio",
       "required": true,
       "lvl": "simple",
+      "placeholder": "GPIOXX",
       "dependsOn": {
         "key": "platform",
         "value": "uln2003"
@@ -107,6 +116,7 @@
       "type": "gpio",
       "required": true,
       "lvl": "simple",
+      "placeholder": "GPIOXX",
       "dependsOn": {
         "key": "platform",
         "value": "uln2003"
@@ -137,6 +147,12 @@
         "key": "platform",
         "value": "uln2003"
       }
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

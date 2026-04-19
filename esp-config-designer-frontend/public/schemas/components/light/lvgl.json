@@ -6,11 +6,26 @@
   "extends": "base_light.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "Light Name"
+    },
+    {
+      "key": "gamma_correct",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 0
+    },
+    {
       "key": "widget",
       "type": "text",
       "required": true,
       "lvl": "simple",
-      "placeholder": "widget_id"
+      "placeholder": "widget_id",
+      "note": "Reference an LVGL led widget ID."
     }
   ]
 }

@@ -8,35 +8,60 @@
     {
       "key": "update_interval",
       "type": "duration",
-      "required": true,
-      "lvl": "simple"
+      "required": false,
+      "lvl": "simple",
+      "default": "60s",
+      "placeholder": "60s"
     },
     {
       "key": "pin",
       "type": "gpio",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "GPIOXX"
     },
     {
       "key": "state_change_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
       "lvl": "advanced",
-      "placeholder": "- logger.log: !lambda 'return state ? \"ON\" : \"OFF\";'"
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "turn_on_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
       "lvl": "advanced",
-      "placeholder": "- output.turn_on: relay_output"
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "turn_off_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
       "lvl": "advanced",
-      "placeholder": "- output.turn_off: relay_output"
+      "note": "Use together with turn_on_action for automation-driven switching.",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

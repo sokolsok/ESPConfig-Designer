@@ -9,7 +9,8 @@
       "key": "pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
     }
   ]
 }

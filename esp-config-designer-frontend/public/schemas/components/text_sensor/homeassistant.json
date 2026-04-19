@@ -4,7 +4,19 @@
   "platform": "homeassistant",
   "helpUrl": "https://esphome.io/components/text_sensor/homeassistant/",
   "extends": "base_text_sensor.json",
+  "requirements": [
+    {
+      "require": "protocol:api"
+    }
+  ],
   "fields": [
+    {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "Sensor Name"
+    },
     {
       "key": "entity_id",
       "type": "text",

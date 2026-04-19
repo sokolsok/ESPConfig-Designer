@@ -10,6 +10,13 @@
   "extends": "base_light.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "Light Name"
+    },
+    {
       "key": "bus",
       "label": "Variant",
       "type": "select",
@@ -23,10 +30,37 @@
     },
     {
       "key": "chipset",
-      "type": "text",
+      "type": "select",
       "required": true,
       "lvl": "simple",
-      "placeholder": "WS2812B"
+	  "default": "NEOPIXEL",
+      "options": [
+        "NEOPIXEL",
+        "WS2811",
+        "WS2811_400",
+        "WS2812B",
+        "WS2812",
+        "WS2813",
+        "WS2852",
+        "APA104",
+        "APA106",
+        "GW6205",
+        "GW6205_400",
+        "LPD1886",
+        "LPD1886_8BIT",
+        "PL9823",
+        "SK6812",
+        "SK6822",
+        "TM1803",
+        "TM1804",
+        "TM1809",
+        "TM1829",
+        "UCS1903B",
+        "UCS1903",
+        "UCS1904",
+        "UCS2903",
+        "SM16703"
+      ]
     },
     {
       "key": "pin",
@@ -36,7 +70,8 @@
       "dependsOn": {
         "key": "bus",
         "value": "clockless"
-      }
+      },
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "data_pin",
@@ -46,7 +81,8 @@
       "dependsOn": {
         "key": "bus",
         "value": "spi"
-      }
+      },
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "clock_pin",
@@ -56,13 +92,15 @@
       "dependsOn": {
         "key": "bus",
         "value": "spi"
-      }
+      },
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "num_leds",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "30"
     },
     {
       "key": "rgb_order",
@@ -83,7 +121,8 @@
       "key": "max_refresh_rate",
       "type": "duration",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+	  "placeholder": "60Hz"
     },
     {
       "key": "data_rate",

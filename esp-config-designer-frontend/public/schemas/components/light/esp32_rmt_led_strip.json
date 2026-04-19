@@ -6,22 +6,33 @@
   "extends": "base_light.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "Light Name"
+    },
+    {
       "key": "pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "num_leds",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "30"
     },
     {
       "key": "chipset",
       "type": "select",
-      "required": true,
+      "required": false,
       "lvl": "simple",
+	  "default": "WS2812",
+	  "emitYAML": "always",
       "options": [
         "WS2811",
         "WS2812",
@@ -35,6 +46,7 @@
       "type": "select",
       "required": true,
       "lvl": "simple",
+	  "default": "RGB",
       "options": [
         "RGB",
         "RBG",
@@ -48,13 +60,15 @@
       "key": "is_rgbw",
       "type": "boolean",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": false
     },
     {
       "key": "is_wrgb",
       "type": "boolean",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": false
     },
     {
       "key": "max_refresh_rate",

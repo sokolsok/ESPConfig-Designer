@@ -54,6 +54,7 @@
           "lvl": "normal",
           "item": {
             "type": "text",
+            "placeholder": "48.0",
             "suppressQuotes": true
           }
         }
@@ -73,6 +74,7 @@
           "lvl": "normal",
           "item": {
             "type": "text",
+            "placeholder": "44.0",
             "suppressQuotes": true
           }
         }
@@ -92,6 +94,7 @@
           "lvl": "normal",
           "item": {
             "type": "text",
+            "placeholder": "54.0",
             "suppressQuotes": true
           }
         }
@@ -111,6 +114,7 @@
           "lvl": "normal",
           "item": {
             "type": "text",
+            "placeholder": "USE",
             "suppressQuotes": true
           }
         }
@@ -130,6 +134,7 @@
           "lvl": "normal",
           "item": {
             "type": "text",
+            "placeholder": "10",
             "suppressQuotes": true
           }
         }
@@ -149,6 +154,7 @@
           "lvl": "normal",
           "item": {
             "type": "text",
+            "placeholder": "20",
             "suppressQuotes": true
           }
         }
@@ -168,6 +174,7 @@
           "lvl": "normal",
           "item": {
             "type": "text",
+            "placeholder": "SBU",
             "suppressQuotes": true
           }
         }
@@ -187,6 +194,7 @@
           "lvl": "normal",
           "item": {
             "type": "text",
+            "placeholder": "SOLAR_FIRST",
             "suppressQuotes": true
           }
         }
@@ -206,6 +214,7 @@
           "lvl": "normal",
           "item": {
             "type": "text",
+            "placeholder": "54.0",
             "suppressQuotes": true
           }
         }

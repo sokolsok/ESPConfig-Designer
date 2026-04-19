@@ -1,6 +1,8 @@
 {
   "id": "dfplayer",
   "domain": "dfplayer",
+  "platform": "",
+  "renderAs": "root_map",
   "helpUrl": "https://esphome.io/components/dfplayer/",
   "requirements": [
     {

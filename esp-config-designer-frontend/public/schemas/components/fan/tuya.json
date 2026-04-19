@@ -42,6 +42,13 @@
       "default": "tuya_hub"
     },
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "Fan Name"
+    },
+    {
       "key": "speed_datapoint",
       "type": "number",
       "required": true,

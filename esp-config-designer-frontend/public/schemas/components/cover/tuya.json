@@ -42,28 +42,39 @@
       "default": "tuya_hub"
     },
     {
+      "key": "name",
+      "placeholder": "Cover Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
       "key": "control_datapoint",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "1"
     },
     {
       "key": "position_datapoint",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "2"
     },
     {
       "key": "position_report_datapoint",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "3"
     },
     {
       "key": "direction_datapoint",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "4"
     },
     {
       "key": "min_value",
@@ -103,12 +114,6 @@
         "RESTORE_AND_CALL",
         "NO_RESTORE"
       ]
-    },
-    {
-      "key": "custom_config",
-      "type": "raw_yaml",
-      "required": false,
-      "lvl": "advanced"
     }
   ]
 }

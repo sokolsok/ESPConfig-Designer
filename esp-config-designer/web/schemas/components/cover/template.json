@@ -6,34 +6,65 @@
   "extends": "base_cover.json",
   "fields": [
     {
+      "key": "name",
+      "placeholder": "Cover Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
       "key": "lambda",
       "type": "lambda",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple"
     },
     {
       "key": "open_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "close_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "stop_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "toggle_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "optimistic",
@@ -58,27 +89,34 @@
     },
     {
       "key": "tilt_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "tilt_lambda",
       "type": "lambda",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "return id(blinds_tilt_sensor).state / 100.0;"
     },
     {
       "key": "position_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "custom_config",
-      "type": "raw_yaml",
-      "required": false,
-      "lvl": "advanced"
+      "lvl": "normal",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     }
   ]
 }

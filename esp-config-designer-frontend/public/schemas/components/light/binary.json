@@ -6,11 +6,19 @@
   "extends": "base_light.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "Light Name"
+    },
+    {
       "key": "output",
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
-      "domain": "output"
+      "domain": "output",
+	  "placeholder": "binary_output_id"
     }
   ]
 }

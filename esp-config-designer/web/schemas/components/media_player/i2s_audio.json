@@ -11,6 +11,13 @@
   ],
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "Player Name"
+    },
+    {
       "key": "dac_type",
       "type": "select",
       "required": true,
@@ -30,17 +37,37 @@
       "domain": "i2s_audio"
     },
     {
-      "key": "mode",
+      "key": "external_mode",
+      "yamlKey": "mode",
       "type": "select",
       "required": false,
       "lvl": "normal",
       "default": "mono",
       "options": [
+        "mono",
+        "stereo"
+      ],
+      "dependsOn": {
+        "key": "dac_type",
+        "value": "external"
+      }
+    },
+    {
+      "key": "internal_mode",
+      "yamlKey": "mode",
+      "type": "select",
+      "required": true,
+      "lvl": "normal",
+      "options": [
         "left",
         "right",
-        "stereo",
-        "mono"
+        "stereo"
       ]
+      ,
+      "dependsOn": {
+        "key": "dac_type",
+        "value": "internal"
+      }
     },
     {
       "key": "i2s_dout_pin",
@@ -50,7 +77,8 @@
       "dependsOn": {
         "key": "dac_type",
         "value": "external"
-      }
+      },
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "mute_pin",
@@ -60,7 +88,8 @@
       "dependsOn": {
         "key": "dac_type",
         "value": "external"
-      }
+      },
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "i2s_comm_fmt",

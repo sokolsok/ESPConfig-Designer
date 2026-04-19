@@ -10,7 +10,7 @@
       "type": "select",
       "required": true,
       "lvl": "simple",
-      "default": "float",
+	  "default": "binary",
       "options": [
         "binary",
         "float"
@@ -18,10 +18,16 @@
     },
     {
       "key": "write_action",
-      "type": "yaml",
+      "type": "list",
       "required": true,
       "lvl": "simple",
-      "placeholder": "- output.set_level:\n    id: another_output\n    level: !lambda return state;"
+      "note": "The action receives the template output state as the lambda variable state.",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "min_power",

@@ -6,60 +6,84 @@
   "extends": "base_cover.json",
   "fields": [
     {
-      "key": "open_action",
-      "type": "yaml",
-      "required": true,
+      "key": "name",
+      "placeholder": "Cover Name",
+      "type": "text",
+      "required": false,
       "lvl": "simple"
+    },
+    {
+      "key": "open_action",
+      "type": "list",
+      "required": true,
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "open_duration",
       "type": "duration",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "15s"
     },
     {
       "key": "open_endstop",
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
+      "placeholder": "open_endstop_sensor",
       "domain": "binary_sensor"
     },
     {
       "key": "close_action",
-      "type": "yaml",
+      "type": "list",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "close_duration",
       "type": "duration",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "15s"
     },
     {
       "key": "close_endstop",
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
+      "placeholder": "close_endstop_sensor",
       "domain": "binary_sensor"
     },
     {
       "key": "stop_action",
-      "type": "yaml",
+      "type": "list",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "max_duration",
       "type": "duration",
       "required": false,
-      "lvl": "advanced"
-    },
-    {
-      "key": "custom_config",
-      "type": "raw_yaml",
-      "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "45s"
     }
   ]
 }

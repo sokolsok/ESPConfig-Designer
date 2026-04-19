@@ -6,22 +6,33 @@
   "extends": "base_light.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "Light Name"
+    },
+    {
       "key": "pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "GPIOXX",
+      "note": "BK72xx SPI LED strips use P16 in ESPHome docs."
     },
     {
       "key": "num_leds",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "30"
     },
     {
       "key": "chipset",
       "type": "select",
       "required": true,
       "lvl": "simple",
+	  "default": "WS2812",
       "options": [
         "WS2812",
         "SK6812",
@@ -34,6 +45,7 @@
       "type": "select",
       "required": true,
       "lvl": "simple",
+	  "default": "RGB",
       "options": [
         "RGB",
         "RBG",
@@ -47,19 +59,22 @@
       "key": "is_rgbw",
       "type": "boolean",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": false
     },
     {
       "key": "is_wrgb",
       "type": "boolean",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": false
     },
     {
       "key": "max_refresh_rate",
       "type": "duration",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+	  "placeholder": "60Hz"
     }
   ]
 }

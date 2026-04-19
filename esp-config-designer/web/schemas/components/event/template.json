@@ -6,6 +6,13 @@
   "extends": "base_event.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Template Event"
+    },
+    {
       "key": "event_types",
       "type": "list",
       "required": true,

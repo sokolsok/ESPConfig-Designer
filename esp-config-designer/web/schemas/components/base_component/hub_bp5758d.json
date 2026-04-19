@@ -16,13 +16,15 @@
       "key": "data_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
     },
     {
       "key": "clock_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
     }
   ]
 }

@@ -189,6 +189,12 @@
         "extends": "base_actions.json"
       },
       "wrapThen": true
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

@@ -34,6 +34,7 @@
       "required": false,
       "lvl": "normal",
       "default": "GP8403",
+	  "emitYAML": "always",
       "options": [
         "GP8403",
         "GP8413"

@@ -1,4 +1,14 @@
 {
   "id": "rtttl.stop",
-  "fields": []
+  "fields": [
+    {
+      "key": "id",
+      "label": "RTTTL",
+      "type": "id_ref",
+      "required": false,
+      "placeholder": "rtttl_id",
+      "domain": "rtttl",
+      "lvl": "normal"
+    }
+  ]
 }

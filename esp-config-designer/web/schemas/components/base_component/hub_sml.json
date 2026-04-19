@@ -1,0 +1,39 @@
+{
+  "id": "hub.sml",
+  "domain": "sml",
+  "platform": "",
+  "type": "object",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "idDomain": "sml"
+    },
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "uart"
+    },
+    {
+      "key": "on_data",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

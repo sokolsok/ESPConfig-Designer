@@ -1,0 +1,59 @@
+{
+  "id": "rtttl",
+  "domain": "rtttl",
+  "helpUrl": "https://esphome.io/components/rtttl/",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "buzzer_rtttl",
+      "idDomain": "rtttl"
+    },
+    {
+      "key": "output",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "note": "Use exactly one audio target: output or speaker. RTTTL is documented to work with PWM-style outputs such as esp8266_pwm and ledc.",
+      "placeholder": "buzzer_output",
+      "domain": "output"
+    },
+    {
+      "key": "speaker",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "note": "Use exactly one audio target: output or speaker.",
+      "placeholder": "buzzer_speaker",
+      "domain": "speaker"
+    },
+    {
+      "key": "gain",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "60%",
+      "default": "60%"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
+      "key": "on_finished_playback",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

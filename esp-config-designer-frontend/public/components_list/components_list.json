@@ -770,6 +770,20 @@
               "schemaPath": "components/sensor/teleinfo.json"
             },
             {
+              "name": "SML Sensor",
+              "path": "components/sensor/sml",
+              "id": "sensor/sml",
+              "available": true,
+              "schemaPath": "components/sensor/sml.json"
+            },
+            {
+              "name": "SUN-GTIL2 Sensor",
+              "path": "components/sensor/sun_gtil2",
+              "id": "sensor/sun_gtil2",
+              "available": true,
+              "schemaPath": "components/sensor/sun_gtil2.json"
+            },
+            {
               "name": "Total Daily Energy",
               "path": "components/sensor/total_daily_energy",
               "id": "sensor/total_daily_energy",
@@ -1000,6 +1014,13 @@
               "schemaPath": "components/sensor/pipsolar.json"
             },
             {
+              "name": "EZO PMP Sensor",
+              "path": "components/sensor/ezo_pmp",
+              "id": "sensor/ezo_pmp",
+              "available": true,
+              "schemaPath": "components/sensor/ezo_pmp.json"
+            },
+            {
               "name": "HYT271",
               "path": "components/sensor/hyt271",
               "id": "sensor/hyt271",
@@ -1075,6 +1096,13 @@
               "id": "sensor/ntc",
               "available": true,
               "schemaPath": "components/sensor/ntc.json"
+            },
+            {
+              "name": "Modbus Sensor",
+              "path": "components/sensor/modbus_controller",
+              "id": "sensor/modbus_controller",
+              "available": true,
+              "schemaPath": "components/sensor/modbus_controller.json"
             },
             {
               "name": "PMWCS3",
@@ -2106,6 +2134,13 @@
               "schemaPath": "components/binary_sensor/pipsolar.json"
             },
             {
+              "name": "EZO PMP Binary Sensor",
+              "path": "components/binary_sensor/ezo_pmp",
+              "id": "binary_sensor/ezo_pmp",
+              "available": true,
+              "schemaPath": "components/binary_sensor/ezo_pmp.json"
+            },
+            {
               "name": "Pylontech Sensor",
               "path": "components/sensor/pylontech",
               "id": "sensor/pylontech",
@@ -2332,10 +2367,10 @@
         },
         {
           "name": "Uponor Smatrix Base Pulse Underfloor Heating",
-          "path": "components/uponor_smatrix",
-          "id": "uponor_smatrix",
-          "available": false,
-          "schemaPath": ""
+          "path": "components/climate/uponor_smatrix",
+          "id": "climate/uponor_smatrix",
+          "available": true,
+          "schemaPath": "components/climate/uponor_smatrix.json"
         }
       ],
       "subcategories": []
@@ -2667,11 +2702,25 @@
       "slug": "electromechanical-components",
       "items": [
         {
-          "name": "Atlas Scientific Peristaltic Pump",
-          "path": "components/ezo_pmp",
-          "id": "ezo_pmp",
-          "available": false,
-          "schemaPath": ""
+          "name": "EZO PMP Sensor",
+          "path": "components/sensor/ezo_pmp",
+          "id": "sensor/ezo_pmp",
+          "available": true,
+          "schemaPath": "components/sensor/ezo_pmp.json"
+        },
+        {
+          "name": "EZO PMP Binary Sensor",
+          "path": "components/binary_sensor/ezo_pmp",
+          "id": "binary_sensor/ezo_pmp",
+          "available": true,
+          "schemaPath": "components/binary_sensor/ezo_pmp.json"
+        },
+        {
+          "name": "EZO PMP Text Sensor",
+          "path": "components/text_sensor/ezo_pmp",
+          "id": "text_sensor/ezo_pmp",
+          "available": true,
+          "schemaPath": "components/text_sensor/ezo_pmp.json"
         },
         {
           "name": "Grove TB6612FNG",
@@ -2684,8 +2733,8 @@
           "name": "RTTTL Buzzer",
           "path": "components/rtttl",
           "id": "rtttl",
-          "available": false,
-          "schemaPath": ""
+          "available": true,
+          "schemaPath": "components/electromechanical/rtttl.json"
         },
         {
           "name": "Servo",
@@ -2920,8 +2969,8 @@
           "name": "LightWaveRF",
           "path": "components/lightwaverf",
           "id": "lightwaverf",
-          "available": false,
-          "schemaPath": ""
+          "available": true,
+          "schemaPath": "components/miscellaneous/lightwaverf.json"
         },
         {
           "name": "LVGL widget",
@@ -3795,6 +3844,20 @@
           "schemaPath": "components/text_sensor/pipsolar.json"
         },
         {
+          "name": "SML Text Sensor",
+          "path": "components/text_sensor/sml",
+          "id": "text_sensor/sml",
+          "available": true,
+          "schemaPath": "components/text_sensor/sml.json"
+        },
+        {
+          "name": "SUN-GTIL2 Text Sensor",
+          "path": "components/text_sensor/sun_gtil2",
+          "id": "text_sensor/sun_gtil2",
+          "available": true,
+          "schemaPath": "components/text_sensor/sun_gtil2.json"
+        },
+        {
           "name": "MicroNova Text Sensor",
           "path": "components/text_sensor/micronova",
           "id": "text_sensor/micronova",
@@ -3835,6 +3898,13 @@
           "id": "text_sensor/tuya",
           "available": true,
           "schemaPath": "components/text_sensor/tuya.json"
+        },
+        {
+          "name": "EZO PMP Text Sensor",
+          "path": "components/text_sensor/ezo_pmp",
+          "id": "text_sensor/ezo_pmp",
+          "available": true,
+          "schemaPath": "components/text_sensor/ezo_pmp.json"
         },
         {
           "name": "Version",
@@ -4127,8 +4197,8 @@
           "name": "Modbus Controller",
           "path": "components/modbus_controller",
           "id": "modbus_controller",
-          "available": false,
-          "schemaPath": ""
+          "available": true,
+          "schemaPath": "components/miscellaneous/modbus_controller.json"
         },
         {
           "name": "Sprinkler",
@@ -4312,7 +4382,7 @@
     "event/template",
     "exposure_notifications",
     "external_components",
-    "ezo_pmp",
+    "binary_sensor/ezo_pmp",
     "factory_reset",
     "fan",
     "fan/binary",
@@ -4527,6 +4597,7 @@
     "sensor/duty_cycle",
     "sensor/duty_time",
     "sensor/ee895",
+    "sensor/ezo_pmp",
     "sensor/ens160",
     "sensor/ens210",
     "sensor/ezo",
@@ -4670,6 +4741,8 @@
     "sensor/tsl2561",
     "sensor/tsl2591",
     "sensor/pylontech",
+    "sensor/sml",
+    "sensor/sun_gtil2",
     "sensor/tuya",
     "sensor/tx20",
     "sensor/ufire_ec",
@@ -4755,6 +4828,9 @@
     "text_sensor/nextion",
     "text_sensor/openthread_info",
     "text_sensor/pipsolar",
+    "text_sensor/ezo_pmp",
+    "text_sensor/sml",
+    "text_sensor/sun_gtil2",
     "text_sensor/wireguard",
     "text_sensor/template",
     "text_sensor/pylontech",
@@ -4788,7 +4864,7 @@
     "udp",
     "update",
     "update/http_request",
-    "uponor_smatrix",
+    "climate/uponor_smatrix",
     "usb_cdc_acm",
     "usb_host",
     "usb_uart",

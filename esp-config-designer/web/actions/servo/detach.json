@@ -5,7 +5,7 @@
       "key": "id",
       "label": "Servo",
       "type": "id_ref",
-      "required": false,
+      "required": true,
       "placeholder": "servo_id",
       "domain": "servo",
       "lvl": "normal"

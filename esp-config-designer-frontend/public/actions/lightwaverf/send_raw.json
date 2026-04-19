@@ -15,18 +15,23 @@
       "label": "Name",
       "type": "text",
       "templatable": false,
-      "required": false,
+      "required": true,
       "lvl": "normal",
       "placeholder": "lamp"
     },
     {
       "key": "code",
       "label": "Code",
-      "type": "text",
+      "type": "list",
       "templatable": false,
       "required": true,
       "lvl": "normal",
-      "placeholder": "0101F0AA"
+      "yamlStyle": "flow",
+      "item": {
+        "type": "text",
+        "suppressQuotes": true,
+        "placeholder": "0x04"
+      }
     },
     {
       "key": "repeat",

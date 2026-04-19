@@ -556,7 +556,7 @@ const idRefOptions = computed(() => {
 const searchOptions = computed(() => {
   const term = String(resolvedValue.value || "").trim().toLowerCase();
   if (!term) return selectOptions.value;
-  return selectOptions.value.filter((option) => option.toLowerCase().includes(term));
+  return selectOptions.value.filter((option) => String(option).toLowerCase().includes(term));
 });
 
 const showSearchOptions = computed(

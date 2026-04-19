@@ -10,6 +10,7 @@
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
+      "placeholder": "temperature_sensor",
       "domain": "sensor"
     },
     {
@@ -17,295 +18,670 @@
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
+      "note": "Used for humidity control logic when humidity actions are configured.",
+      "placeholder": "humidity_sensor",
       "domain": "sensor"
     },
     {
       "key": "idle_action",
-      "type": "yaml",
+      "type": "list",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "note": "Thermostat requires min_idle_time and at least one of heat_action, cool_action, fan_only_action or dry_action.",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "heat_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "supplemental_heating_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "note": "Requires supplemental_heating_delta and max_heating_run_time.",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "cool_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "supplemental_cooling_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "note": "Requires supplemental_cooling_delta and max_cooling_run_time.",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "dry_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "fan_only_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "heat_mode",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "cool_mode",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "dry_mode",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "fan_only_mode",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "heat_cool_mode",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "note": "Use actions here if switching into heat_cool mode needs automations. Docs also allow simply enabling this mode without actions.",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "auto_mode",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "off_mode",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "fan_mode_auto_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "fan_mode_on_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "fan_mode_off_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "fan_mode_low_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "fan_mode_medium_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "fan_mode_high_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "fan_mode_middle_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "fan_mode_focus_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "fan_mode_diffuse_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "fan_mode_quiet_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "swing_off_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "swing_horizontal_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "swing_vertical_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "swing_both_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "humidity_control_dehumidify_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "humidity_control_humidify_action",
-      "type": "yaml",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "humidity_control_off_action",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "note": "Required if either humidity_control_dehumidify_action or humidity_control_humidify_action is configured.",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
       "required": false,
       "lvl": "advanced"
     },
     {
-      "key": "humidity_control_off_action",
-      "type": "yaml",
+      "key": "preset",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "name",
+            "type": "text",
+            "required": true,
+            "lvl": "simple",
+            "placeholder": "Home"
+          },
+          {
+            "key": "default_target_temperature_low",
+            "type": "number",
+            "required": false,
+            "lvl": "normal",
+            "placeholder": "20"
+          },
+          {
+            "key": "default_target_temperature_high",
+            "type": "number",
+            "required": false,
+            "lvl": "normal",
+            "placeholder": "24"
+          },
+          {
+            "key": "mode",
+            "type": "select",
+            "required": false,
+            "lvl": "normal",
+            "options": [
+              "heat_cool",
+              "cool",
+              "heat",
+              "dry",
+              "fan_only",
+              "auto"
+            ]
+          },
+          {
+            "key": "fan_mode",
+            "type": "select",
+            "required": false,
+            "lvl": "normal",
+            "options": [
+              "on",
+              "off",
+              "auto",
+              "low",
+              "medium",
+              "high",
+              "middle",
+              "focus",
+              "diffuse",
+              "quiet"
+            ]
+          },
+          {
+            "key": "swing_mode",
+            "type": "select",
+            "required": false,
+            "lvl": "normal",
+            "options": [
+              "off",
+              "both",
+              "horizontal",
+              "vertical"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "preset_change",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "default_preset",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "Home"
+    },
+    {
+      "key": "on_boot_restore_from",
+      "type": "select",
+      "required": false,
+      "lvl": "advanced",
+      "default": "memory",
+      "options": [
+        "memory",
+        "default_preset"
+      ]
+    },
+    {
+      "key": "target_temperature_change_action",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "target_humidity_change_action",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "default_target_temperature_low",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "20"
     },
     {
       "key": "default_target_temperature_high",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "24"
     },
     {
       "key": "default_target_humidity",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "45"
     },
     {
       "key": "set_point_minimum_differential",
       "type": "number",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "0.5"
+    },
+    {
+      "key": "humidity_hysteresis",
+      "type": "number",
+      "required": false,
+      "lvl": "advanced",
+      "default": 1,
+      "placeholder": "1"
     },
     {
       "key": "heat_deadband",
       "type": "number",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "0.5"
     },
     {
       "key": "heat_overrun",
       "type": "number",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "0.5"
     },
     {
       "key": "cool_deadband",
       "type": "number",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "0.5"
     },
     {
       "key": "cool_overrun",
       "type": "number",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "0.5"
     },
     {
       "key": "min_heating_off_time",
       "type": "duration",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "300s"
     },
     {
       "key": "min_heating_run_time",
       "type": "duration",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "300s"
     },
     {
       "key": "min_cooling_off_time",
       "type": "duration",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "300s"
     },
     {
       "key": "min_cooling_run_time",
       "type": "duration",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "300s"
     },
     {
       "key": "min_idle_time",
       "type": "duration",
+      "required": true,
+      "lvl": "advanced",
+      "placeholder": "30s"
+    },
+    {
+      "key": "min_fanning_off_time",
+      "type": "duration",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "60s"
+    },
+    {
+      "key": "min_fanning_run_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "60s"
+    },
+    {
+      "key": "min_fan_mode_switching_time",
+      "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "60s"
     },
     {
       "key": "max_heating_run_time",
       "type": "duration",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "900s"
     },
     {
       "key": "max_cooling_run_time",
       "type": "duration",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "900s"
     },
     {
       "key": "supplemental_heating_delta",
       "type": "number",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "2.0"
     },
     {
       "key": "supplemental_cooling_delta",
       "type": "number",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "2.0"
     },
     {
       "key": "fan_only_cooling",
@@ -314,14 +690,29 @@
       "lvl": "advanced"
     },
     {
-      "key": "startup_delay",
+      "key": "fan_with_cooling",
       "type": "boolean",
       "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "fan_with_heating",
+      "type": "boolean",
+      "required": false,
+      "lvl": "advanced",
+      "default": false
+    },
+    {
+      "key": "fan_only_action_uses_fan_mode_timer",
+      "type": "boolean",
+      "required": false,
+      "note": "Use min_fan_mode_switching_time as the timer for fan-only action.",
       "lvl": "advanced"
     },
     {
-      "key": "custom_config",
-      "type": "raw_yaml",
+      "key": "startup_delay",
+      "type": "boolean",
       "required": false,
       "lvl": "advanced"
     }

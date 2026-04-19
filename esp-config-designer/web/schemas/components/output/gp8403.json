@@ -40,9 +40,10 @@
       "type": "select",
       "required": true,
       "lvl": "simple",
+	  "default": "0",
       "options": [
-        0,
-        1
+        "0",
+        "1"
       ]
     }
   ]

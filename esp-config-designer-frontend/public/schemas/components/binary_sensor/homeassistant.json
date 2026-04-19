@@ -4,14 +4,12 @@
   "platform": "homeassistant",
   "helpUrl": "https://esphome.io/components/binary_sensor/homeassistant/",
   "extends": "base_binary_sensor.json",
-  "fields": [
+  "requirements": [
     {
-      "key": "name",
-      "placeholder": "Binary Sensor Name",
-      "type": "text",
-      "required": false,
-      "lvl": "simple"
-    },
+      "require": "protocol:api"
+    }
+  ],
+  "fields": [
     {
       "key": "entity_id",
       "type": "text",

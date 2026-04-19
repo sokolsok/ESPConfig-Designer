@@ -5,7 +5,7 @@
       "key": "id",
       "label": "Grove TB6612FNG",
       "type": "id_ref",
-      "required": false,
+      "required": true,
       "placeholder": "grove_tb6612fng_id",
       "domain": "grove_tb6612fng",
       "lvl": "normal"
@@ -13,22 +13,19 @@
     {
       "key": "channel",
       "label": "Channel",
-      "type": "select",
-      "templatable": false,
+      "type": "number",
+      "templatable": true,
       "required": true,
       "lvl": "normal",
-      "options": [
-        "A",
-        "B",
-        "BOTH"
-      ]
+      "placeholder": "0",
+      "lambdaPlaceholder": "return 0;"
     },
     {
       "key": "direction",
       "label": "Direction",
       "type": "select",
       "templatable": false,
-      "required": false,
+      "required": true,
       "lvl": "normal",
       "options": [
         "FORWARD",

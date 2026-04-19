@@ -6,39 +6,51 @@
   "extends": "base_light.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "Light Name"
+    },
+    {
       "key": "red",
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
-      "domain": "output"
+      "domain": "output",
+	  "placeholder": "output_red_component_id"
     },
     {
       "key": "green",
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
-      "domain": "output"
+      "domain": "output",
+	  "placeholder": "output_green_component_id"
     },
     {
       "key": "blue",
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
-      "domain": "output"
+      "domain": "output",
+	  "placeholder": "output_blue_component_id"
     },
     {
       "key": "cold_white",
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
-      "domain": "output"
+      "domain": "output",
+	  "placeholder": "output_cold_white_component_id"
     },
     {
       "key": "warm_white",
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
-      "domain": "output"
+      "domain": "output",
+	  "placeholder": "output_warm_white_component_id"
     },
     {
       "key": "cold_white_color_temperature",

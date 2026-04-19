@@ -14,13 +14,15 @@
       "key": "id",
       "type": "id",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+	  "placeholder": "fan_id"
     },
     {
       "key": "icon",
       "type": "icon",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+	  "placeholder": "mdi:fan"
     },
     {
       "key": "restore_mode",

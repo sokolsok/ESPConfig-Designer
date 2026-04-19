@@ -2,12 +2,33 @@
   "id": "bluetooth_proxy",
   "domain": "bluetooth_proxy",
   "helpUrl": "https://esphome.io/components/bluetooth_proxy/",
+  "embedded": [
+    {
+      "key": "ble_tracker",
+      "domain": "esp32_ble_tracker",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
   "requirements": [
     {
       "require": "protocol:api"
+    },
+    {
+      "require": "component:esp32_ble_tracker"
     }
   ],
   "fields": [
+    {
+      "key": "ble_tracker",
+      "label": "BLE tracker hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_esp32_ble_tracker.json"
+    },
     {
       "key": "id",
       "type": "id",
@@ -34,14 +55,8 @@
       "type": "number",
       "required": false,
       "lvl": "normal",
-      "default": 3
-    },
-    {
-      "key": "connections",
-      "type": "yaml",
-      "required": false,
-      "lvl": "advanced",
-      "placeholder": "- mac_address: AA:BB:CC:DD:EE:FF"
+      "default": 3,
+      "note": "ESPHome docs allow up to 9 slots and recommend staying at 5 or below unless you know the device can handle more."
     }
   ]
 }

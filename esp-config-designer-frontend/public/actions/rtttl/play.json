@@ -17,6 +17,7 @@
       "templatable": true,
       "required": true,
       "lvl": "normal",
+      "note": "If a melody is already playing, stop it first before starting a new one.",
       "placeholder": "two_short:d=4,o=5,b=100:16e6,16e6"
     }
   ]

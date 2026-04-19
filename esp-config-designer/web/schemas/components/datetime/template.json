@@ -6,6 +6,13 @@
   "extends": "base_datetime.json",
   "fields": [
     {
+      "key": "name",
+      "placeholder": "Datetime Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
       "key": "type",
       "type": "select",
       "required": true,
@@ -21,27 +28,36 @@
       "key": "lambda",
       "type": "lambda",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "note": "Do not use lambda together with optimistic or restore_value.",
+      "placeholder": "if (id(homeassistant_time).now().is_valid()) return id(homeassistant_time).now();\nreturn {};"
     },
     {
       "key": "set_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
       "lvl": "normal",
-      "placeholder": "then:\n  - logger.log: \"Datetime set request\""
+      "note": "Runs when a new value is written. The incoming value is available as x.",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "update_interval",
       "type": "duration",
       "required": false,
       "lvl": "normal",
-      "default": "60s"
+      "placeholder": "60s"
     },
     {
       "key": "optimistic",
       "type": "boolean",
       "required": false,
       "lvl": "normal",
+      "note": "Cannot be used together with lambda.",
       "default": false
     },
     {
@@ -49,6 +65,7 @@
       "type": "boolean",
       "required": false,
       "lvl": "normal",
+      "note": "Cannot be used together with lambda.",
       "default": false
     },
     {
@@ -56,6 +73,7 @@
       "type": "yaml",
       "required": false,
       "lvl": "normal",
+      "note": "Use a value matching the selected type: date, time or datetime.",
       "placeholder": "\"2024-12-31 12:34:56\"\n# or:\nyear: 2024\nmonth: 12\nday: 31\nhour: 12\nminute: 34\nsecond: 56"
     }
   ]

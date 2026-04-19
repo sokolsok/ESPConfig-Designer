@@ -3,9 +3,9 @@
   "fields": [
     {
       "key": "id",
-      "label": "Grove Tb6612fng",
+      "label": "Grove TB6612FNG",
       "type": "id_ref",
-      "required": false,
+      "required": true,
       "placeholder": "grove_tb6612fng_id",
       "domain": "grove_tb6612fng",
       "lvl": "normal"

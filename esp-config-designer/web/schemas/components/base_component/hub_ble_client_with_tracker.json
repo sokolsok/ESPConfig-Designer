@@ -1,0 +1,50 @@
+{
+  "id": "hub.ble_client_with_tracker",
+  "domain": "ble_client",
+  "platform": "",
+  "embedded": [
+    {
+      "key": "ble_tracker",
+      "domain": "esp32_ble_tracker",
+      "emitAs": "map",
+      "singleton": true,
+      "alwaysEmit": true,
+      "defaultPayload": {},
+      "merge": "first"
+    }
+  ],
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "ble_client_hub",
+      "idDomain": "ble_client"
+    },
+    {
+      "key": "mac_address",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "AA:BB:CC:DD:EE:FF"
+    },
+    {
+      "key": "auto_connect",
+      "type": "boolean",
+      "required": false,
+      "lvl": "simple",
+      "default": true
+    },
+    {
+      "key": "ble_tracker",
+      "label": "BLE tracker",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "emitYAML": "never",
+      "extends": "hub_esp32_ble_tracker.json"
+    }
+  ]
+}

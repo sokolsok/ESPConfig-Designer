@@ -49,13 +49,15 @@
       "key": "nrst_pin",
       "type": "gpio",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "default": "GPIO5"
     },
     {
       "key": "boot0_pin",
       "type": "gpio",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "default": "GPIO4"
     },
     {
       "key": "current",
@@ -91,7 +93,7 @@
           "key": "version",
           "type": "text",
           "required": false,
-          "lvl": "normal",
+          "lvl": "advanced",
           "default": "51.6"
         },
         {
@@ -110,7 +112,7 @@
           "key": "update",
           "type": "boolean",
           "required": false,
-          "lvl": "normal",
+          "lvl": "advanced",
           "default": false
         }
       ]

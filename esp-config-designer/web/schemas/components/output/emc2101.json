@@ -29,8 +29,9 @@
     {
       "key": "emc2101_id",
       "type": "id_ref",
-      "required": true,
+      "required": false,
       "lvl": "simple",
+      "placeholder": "emc2101_hub",
       "domain": "emc2101",
       "allowSelfReference": true,
       "default": "emc2101_hub"

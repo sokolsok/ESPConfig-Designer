@@ -4,13 +4,25 @@
   "platform": "homeassistant",
   "helpUrl": "https://esphome.io/components/sensor/homeassistant/",
   "extends": "base_sensor.json",
+  "requirements": [
+    {
+      "require": "protocol:api"
+    }
+  ],
   "fields": [
     {
       "key": "name",
-      "placeholder": "Sensor Name",
       "type": "text",
-      "required": true,
-      "lvl": "simple"
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "Sensor Name"
+    },
+    {
+      "key": "internal",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": true
     },
     {
       "key": "entity_id",

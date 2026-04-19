@@ -14,13 +14,15 @@
       "key": "id",
       "type": "id",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+	  "placeholder": "text_sensor_id"
     },
     {
       "key": "icon",
       "type": "icon",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+	  "placeholder": "mdi:cat"
     },
     {
       "key": "device_class",

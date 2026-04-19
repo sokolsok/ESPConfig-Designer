@@ -12,17 +12,71 @@
   "fields": [
     {
       "key": "announcement_pipeline",
-      "type": "yaml",
+      "type": "object",
       "required": true,
       "lvl": "simple",
-      "placeholder": "speaker: my_speaker\nformat: FLAC\nsample_rate: 48000\nnum_channels: 1"
+      "fields": [
+        {
+          "key": "speaker",
+          "type": "id_ref",
+          "required": true,
+          "lvl": "simple",
+          "domain": "speaker"
+        },
+        {
+          "key": "format",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "FLAC"
+        },
+        {
+          "key": "sample_rate",
+          "type": "number",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "num_channels",
+          "type": "number",
+          "required": false,
+          "lvl": "normal"
+        }
+      ]
     },
     {
       "key": "media_pipeline",
-      "type": "yaml",
+      "type": "object",
       "required": false,
       "lvl": "normal",
-      "placeholder": "speaker: my_media_speaker\nformat: MP3\nsample_rate: 48000\nnum_channels: 2"
+      "fields": [
+        {
+          "key": "speaker",
+          "type": "id_ref",
+          "required": true,
+          "lvl": "normal",
+          "domain": "speaker"
+        },
+        {
+          "key": "format",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "MP3"
+        },
+        {
+          "key": "sample_rate",
+          "type": "number",
+          "required": false,
+          "lvl": "normal"
+        },
+        {
+          "key": "num_channels",
+          "type": "number",
+          "required": false,
+          "lvl": "normal"
+        }
+      ]
     },
     {
       "key": "buffer_size",
@@ -36,11 +90,11 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
-      "default": "needed",
+      "default": "NEEDED",
       "options": [
-        "all",
-        "needed",
-        "none"
+        "ALL",
+        "NEEDED",
+        "NONE"
       ]
     },
     {
@@ -79,10 +133,28 @@
     },
     {
       "key": "files",
-      "type": "yaml",
+      "type": "list",
       "required": false,
       "lvl": "advanced",
-      "placeholder": "- id: startup_sound\n  file: /config/sounds/startup.wav"
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "id",
+            "type": "text",
+            "required": true,
+            "lvl": "advanced",
+            "placeholder": "startup_sound"
+          },
+          {
+            "key": "file",
+            "type": "text",
+            "required": true,
+            "lvl": "advanced",
+            "placeholder": "/config/sounds/startup.wav"
+          }
+        ]
+      }
     },
     {
       "key": "on_mute",

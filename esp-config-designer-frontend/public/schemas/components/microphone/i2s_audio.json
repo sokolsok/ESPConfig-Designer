@@ -128,6 +128,7 @@
       "required": false,
       "lvl": "normal",
       "default": false,
+      "note": "PDM is documented only for ESP32 and ESP32-S3 when using an external ADC path.",
       "dependsOn": {
         "key": "adc_type",
         "value": "external"
@@ -138,6 +139,7 @@
       "type": "gpio",
       "required": true,
       "lvl": "simple",
+      "note": "Internal ADC mode is documented for classic ESP32 only and requires the legacy I2S driver.",
       "dependsOn": {
         "key": "adc_type",
         "value": "internal"

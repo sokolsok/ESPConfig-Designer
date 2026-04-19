@@ -34,7 +34,8 @@
       "key": "channel",
       "type": "number",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "1"
     }
   ]
 }

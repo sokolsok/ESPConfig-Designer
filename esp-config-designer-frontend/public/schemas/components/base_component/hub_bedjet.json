@@ -1,0 +1,30 @@
+{
+  "id": "hub.bedjet",
+  "domain": "bedjet",
+  "platform": "",
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "bedjet_hub",
+      "idDomain": "bedjet"
+    },
+    {
+      "key": "time_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "time"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "5s"
+    }
+  ]
+}

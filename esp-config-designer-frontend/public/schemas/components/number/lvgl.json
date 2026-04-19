@@ -10,7 +10,8 @@
       "type": "text",
       "required": true,
       "lvl": "simple",
-      "placeholder": "slider_id"
+      "placeholder": "slider_id",
+      "note": "Supported LVGL widgets: arc, bar, slider, spinbox."
     },
     {
       "key": "animated",
@@ -23,7 +24,8 @@
       "key": "update_on_release",
       "type": "boolean",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": false
     },
     {
       "key": "restore_value",

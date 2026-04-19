@@ -48,6 +48,7 @@
       "type": "id_ref",
       "required": false,
       "lvl": "advanced",
+      "placeholder": "homeassistant_time",
       "domain": "time"
     },
     {
@@ -75,6 +76,12 @@
         "extends": "base_actions.json"
       },
       "wrapThen": true
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

@@ -16,25 +16,29 @@
       "key": "data_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "clock_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "lat_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "oe_pin",
       "type": "gpio",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "num_chips",
@@ -42,6 +46,12 @@
       "required": false,
       "lvl": "normal",
       "default": 1
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

@@ -8,6 +8,7 @@
       "type": "id",
       "required": true,
       "lvl": "simple",
+      "placeholder": "servo_motor",
       "idDomain": "servo"
     },
     {
@@ -15,6 +16,7 @@
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
+      "placeholder": "pwm_output_id",
       "domain": "output"
     },
     {
@@ -22,6 +24,7 @@
       "type": "text",
       "required": false,
       "lvl": "normal",
+      "placeholder": "3%",
       "default": "3%"
     },
     {
@@ -29,6 +32,7 @@
       "type": "text",
       "required": false,
       "lvl": "normal",
+      "placeholder": "7.5%",
       "default": "7.5%"
     },
     {
@@ -36,13 +40,15 @@
       "type": "text",
       "required": false,
       "lvl": "normal",
+      "placeholder": "12%",
       "default": "12%"
     },
     {
       "key": "restore",
       "type": "boolean",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "default": false
     },
     {
       "key": "auto_detach_time",
@@ -54,6 +60,13 @@
     {
       "key": "transition_length",
       "type": "duration",
+      "required": false,
+      "lvl": "advanced",
+      "default": "0s"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
       "required": false,
       "lvl": "advanced"
     }

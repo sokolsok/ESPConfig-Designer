@@ -40,6 +40,7 @@
       "type": "select",
       "required": true,
       "lvl": "simple",
+	  "default": "A",
       "options": [
         "A",
         "B",
@@ -55,7 +56,8 @@
       "key": "initial_value",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "0.5"
     },
     {
       "key": "terminal_a",

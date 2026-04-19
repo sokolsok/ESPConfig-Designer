@@ -6,25 +6,35 @@
   "extends": "base_fan.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "Fan Name"
+    },
+    {
       "key": "output",
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
-      "domain": "output"
+      "domain": "output",
+	  "placeholder": "binary_output_id"
     },
     {
       "key": "oscillation_output",
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
-      "domain": "output"
+      "domain": "output",
+	  "placeholder": "oscillation_output_id"
     },
     {
       "key": "direction_output",
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
-      "domain": "output"
+      "domain": "output",
+	  "placeholder": "direction_output_id"
     }
   ]
 }

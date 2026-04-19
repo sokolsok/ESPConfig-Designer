@@ -1,0 +1,40 @@
+{
+  "id": "hub.uponor_smatrix",
+  "domain": "uponor_smatrix",
+  "platform": "",
+  "type": "object",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple",
+      "default": "smatrix_hub_id",
+      "idDomain": "uponor_smatrix"
+    },
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "uart_bus",
+      "domain": "uart"
+    },
+    {
+      "key": "time_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "homeassistant_time",
+      "domain": "time"
+    },
+    {
+      "key": "time_device_address",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "note": "Optional. If omitted, the time device address is auto-detected from the bus.",
+      "placeholder": "1"
+    }
+  ]
+}

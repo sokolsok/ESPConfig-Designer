@@ -6,6 +6,13 @@
   "extends": "base_lock.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+	  "placeholder": "Lock Name"
+    },
+    {
       "key": "lambda",
       "type": "lambda",
       "required": false,
@@ -13,21 +20,40 @@
     },
     {
       "key": "lock_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "unlock_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "open_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "note": "Shown in ESPHome examples, even though the config table focuses on lock_action and unlock_action.",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "optimistic",

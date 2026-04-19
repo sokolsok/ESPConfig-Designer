@@ -17,7 +17,7 @@
       "templatable": true,
       "required": true,
       "lvl": "normal",
-      "placeholder": "hello"
+      "placeholder": "LOCK_STATE_LOCKED"
     }
   ]
 }

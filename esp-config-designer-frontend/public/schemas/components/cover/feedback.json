@@ -6,28 +6,49 @@
   "extends": "base_cover.json",
   "fields": [
     {
-      "key": "stop_action",
-      "type": "yaml",
-      "required": true,
+      "key": "name",
+      "placeholder": "Cover Name",
+      "type": "text",
+      "required": false,
       "lvl": "simple"
     },
     {
-      "key": "open_action",
-      "type": "yaml",
+      "key": "stop_action",
+      "type": "list",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "open_action",
+      "type": "list",
+      "required": true,
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "open_duration",
       "type": "duration",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "15s"
     },
     {
       "key": "open_endstop",
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
+      "placeholder": "open_endstop_sensor",
       "domain": "binary_sensor"
     },
     {
@@ -35,6 +56,7 @@
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
+      "placeholder": "open_feedback_sensor",
       "domain": "binary_sensor"
     },
     {
@@ -42,25 +64,34 @@
       "type": "id_ref",
       "required": false,
       "lvl": "advanced",
+      "placeholder": "open_obstacle_sensor",
       "domain": "binary_sensor"
     },
     {
       "key": "close_action",
-      "type": "yaml",
+      "type": "list",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "close_duration",
       "type": "duration",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "15s"
     },
     {
       "key": "close_endstop",
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
+      "placeholder": "close_endstop_sensor",
       "domain": "binary_sensor"
     },
     {
@@ -68,6 +99,7 @@
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
+      "placeholder": "close_feedback_sensor",
       "domain": "binary_sensor"
     },
     {
@@ -75,6 +107,7 @@
       "type": "id_ref",
       "required": false,
       "lvl": "advanced",
+      "placeholder": "close_obstacle_sensor",
       "domain": "binary_sensor"
     },
     {
@@ -101,13 +134,15 @@
       "key": "max_duration",
       "type": "duration",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "45s"
     },
     {
       "key": "direction_change_wait_time",
       "type": "duration",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "200ms"
     },
     {
       "key": "acceleration_wait_time",
@@ -125,16 +160,11 @@
     },
     {
       "key": "obstacle_rollback",
-      "type": "number",
+      "type": "text",
       "required": false,
       "lvl": "advanced",
-      "default": 10
-    },
-    {
-      "key": "custom_config",
-      "type": "raw_yaml",
-      "required": false,
-      "lvl": "advanced"
+      "default": "10%",
+      "placeholder": "10%"
     }
   ]
 }

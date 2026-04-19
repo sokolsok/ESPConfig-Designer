@@ -1,0 +1,197 @@
+{
+  "id": "hub.modbus_controller",
+  "domain": "modbus_controller",
+  "platform": "",
+  "type": "object",
+  "requirements": [
+    {
+      "require": "bus:modbus"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": true,
+      "lvl": "simple",
+      "default": "modbus_controller_hub",
+      "placeholder": "modbus_controller_hub",
+      "idDomain": "modbus_controller"
+    },
+    {
+      "key": "modbus_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "modbus",
+      "default": "modbus_id",
+      "placeholder": "modbus_id"
+    },
+    {
+      "key": "address",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "0x01",
+      "suppressQuotes": true
+    },
+    {
+      "key": "allow_duplicate_commands",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "command_throttle",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "0ms",
+      "placeholder": "100ms"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s",
+      "placeholder": "60s"
+    },
+    {
+      "key": "offline_skip_updates",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "3"
+    },
+    {
+      "key": "max_cmd_retries",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 4,
+      "placeholder": "4"
+    },
+    {
+      "key": "server_courtesy_response",
+      "type": "object",
+      "required": false,
+      "lvl": "advanced",
+      "fields": [
+        {
+          "key": "enabled",
+          "type": "boolean",
+          "required": false,
+          "lvl": "advanced",
+          "default": false
+        },
+        {
+          "key": "register_last_address",
+          "type": "number",
+          "required": false,
+          "lvl": "advanced",
+          "default": 65535,
+          "placeholder": "65535"
+        },
+        {
+          "key": "register_value",
+          "type": "number",
+          "required": false,
+          "lvl": "advanced",
+          "default": 0,
+          "placeholder": "0"
+        }
+      ]
+    },
+    {
+      "key": "server_registers",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "address",
+            "type": "number",
+            "required": true,
+            "lvl": "advanced",
+            "placeholder": "1000"
+          },
+          {
+            "key": "value_type",
+            "type": "select",
+            "required": false,
+            "lvl": "advanced",
+            "default": "U_WORD",
+            "options": [
+              "U_WORD",
+              "S_WORD",
+              "U_DWORD",
+              "S_DWORD",
+              "U_DWORD_R",
+              "S_DWORD_R",
+              "U_QWORD",
+              "S_QWORD",
+              "U_QWORD_R",
+              "S_QWORD_R",
+              "FP32",
+              "FP32_R"
+            ]
+          },
+          {
+            "key": "read_lambda",
+            "type": "lambda",
+            "required": true,
+            "lvl": "advanced",
+            "placeholder": "return 42;"
+          },
+          {
+            "key": "write_lambda",
+            "type": "lambda",
+            "required": false,
+            "lvl": "advanced",
+            "placeholder": "return value;"
+          }
+        ]
+      }
+    },
+    {
+      "key": "on_command_sent",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_online",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_offline",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

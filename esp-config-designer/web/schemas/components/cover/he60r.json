@@ -11,10 +11,18 @@
   ],
   "fields": [
     {
+      "key": "name",
+      "placeholder": "Cover Name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple"
+    },
+    {
       "key": "open_duration",
       "type": "duration",
       "required": false,
       "lvl": "normal",
+      "note": "Requires HE60R UART bus setup (1200 baud, even parity, 1 stop bit) on the matching UART component.",
       "default": "15s"
     },
     {
@@ -22,13 +30,8 @@
       "type": "duration",
       "required": false,
       "lvl": "normal",
+      "note": "Requires HE60R UART bus setup (1200 baud, even parity, 1 stop bit) on the matching UART component.",
       "default": "15s"
-    },
-    {
-      "key": "custom_config",
-      "type": "raw_yaml",
-      "required": false,
-      "lvl": "advanced"
     }
   ]
 }

@@ -6,34 +6,61 @@
   "extends": "base_cover.json",
   "fields": [
     {
-      "key": "open_action",
-      "type": "yaml",
-      "required": true,
+      "key": "name",
+      "placeholder": "Cover Name",
+      "type": "text",
+      "required": false,
       "lvl": "simple"
+    },
+    {
+      "key": "open_action",
+      "type": "list",
+      "required": true,
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "open_duration",
       "type": "duration",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "15s"
     },
     {
       "key": "close_action",
-      "type": "yaml",
-      "required": false,
-      "lvl": "normal"
+      "type": "list",
+      "required": true,
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "close_duration",
       "type": "duration",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "15s"
     },
     {
       "key": "stop_action",
-      "type": "yaml",
+      "type": "list",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "has_built_in_endstop",
@@ -55,12 +82,6 @@
       "required": false,
       "lvl": "normal",
       "default": true
-    },
-    {
-      "key": "custom_config",
-      "type": "raw_yaml",
-      "required": false,
-      "lvl": "advanced"
     }
   ]
 }

@@ -4,6 +4,13 @@
   "platform": "modbus_controller",
   "helpUrl": "https://esphome.io/components/number/modbus_controller/",
   "extends": "base_number.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "modbus_controller",
+      "dedupeBy": "id"
+    }
+  ],
   "requirements": [
     {
       "require": "bus:modbus"
@@ -11,19 +18,31 @@
   ],
   "fields": [
     {
+      "key": "hub",
+      "label": "Modbus controller hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_modbus_controller.json"
+    },
+    {
       "key": "modbus_controller_id",
       "type": "id_ref",
       "required": false,
       "lvl": "simple",
       "domain": "modbus_controller",
-      "placeholder": "modbus_controller_id"
+      "allowSelfReference": true,
+      "default": "modbus_controller_hub",
+      "placeholder": "modbus_controller_hub"
     },
     {
       "key": "address",
       "type": "text",
       "required": true,
       "lvl": "simple",
-      "placeholder": "0x9001"
+      "placeholder": "0x9001",
+      "suppressQuotes": true
     },
     {
       "key": "value_type",
@@ -49,13 +68,15 @@
       "key": "min_value",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "0"
     },
     {
       "key": "max_value",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "100"
     },
     {
       "key": "step",
@@ -68,7 +89,8 @@
       "key": "multiply",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "1.0"
     },
     {
       "key": "use_write_multiple",
@@ -80,7 +102,8 @@
       "key": "skip_updates",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "3"
     },
     {
       "key": "register_count",
@@ -93,7 +116,8 @@
       "key": "response_size",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "2"
     },
     {
       "key": "force_new_range",
@@ -105,7 +129,8 @@
       "key": "offset",
       "type": "number",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "0"
     },
     {
       "key": "custom_command",
@@ -118,13 +143,15 @@
       "key": "lambda",
       "type": "lambda",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "return x;"
     },
     {
       "key": "write_lambda",
       "type": "lambda",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "return value;"
     }
   ]
 }

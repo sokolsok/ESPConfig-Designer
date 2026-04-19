@@ -8,7 +8,8 @@
       "key": "id",
       "type": "id",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "output_id"
     },
     {
       "key": "power_supply",
@@ -23,6 +24,12 @@
       "required": false,
       "lvl": "normal",
       "default": false
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }
