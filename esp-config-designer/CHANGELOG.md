@@ -1,10 +1,19 @@
-## 1.1.3
+## 1.1.4
 
-- Added and updated Alarm Control Panel components.
-- Added and updated Button components.
-- Fixed various bugs.
-
-## 1.1.2
-
-- Added full Binary Sensor component coverage.
-- Fixed bugs in schema handling and builder flows.
+- Audio ADC Components
+- Audio DAC
+- Climate
+- Cover
+- Datetime
+- Electromechanical
+- Energy/Solar Management Components
+- Event
+- Fan
+- Home Assistant Components
+- Light
+- Lock
+- Media Player
+- Microphone
+- Number
+- Output
+- Fixed several bugs in the schema renderer.
