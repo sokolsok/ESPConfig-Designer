@@ -15,13 +15,14 @@
       "type": "text",
       "required": false,
       "lvl": "simple",
-	  "placeholder": "Switch Name"
+      "placeholder": "Switch Name"
     },
     {
       "key": "entity_id",
       "type": "text",
       "required": true,
       "lvl": "simple",
+	  "suppressQuotes": true,
       "placeholder": "switch.my_cool_switch",
       "note": "Supported Home Assistant domains include automation, fan, humidifier, input_boolean, light, remote, siren and switch."
     }

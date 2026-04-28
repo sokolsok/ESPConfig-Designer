@@ -1975,11 +1975,6 @@ const otherDetailConfig = computed(() => {
 const automationCoreConfig = computed(() => config.value.automation || {});
 const automationDefinitions = [
   {
-    key: "time",
-    label: "Time",
-    schemaId: "general/automation/time"
-  },
-  {
     key: "deep_sleep",
     label: "Deep Sleep",
     schemaId: "general/automation/deep_sleep"
@@ -2020,7 +2015,6 @@ const automationItemFields = computed(() => {
   return listField?.item?.fields || [];
 });
 const generatedAutomation = computed(() => ({
-  time: [],
   deep_sleep: [],
   script: [],
   globals: [],
@@ -2323,7 +2317,6 @@ const globalStore = computed(() => {
   pushEntry(systemConfig.value?.status_led || {}, otherSchemas.value?.status_led?.fields);
   pushEntry(systemConfig.value?.debug || {}, otherSchemas.value?.debug?.fields);
   pushEntry(systemConfig.value?.psram || {}, otherSchemas.value?.psram?.fields);
-  pushEntry(automationCoreConfig.value || {}, automationSchemas.value?.time?.fields);
   pushEntry(automationCoreConfig.value || {}, automationSchemas.value?.deep_sleep?.fields);
   pushEntry(automationCoreConfig.value || {}, automationSchemas.value?.script?.fields);
   pushEntry(automationCoreConfig.value || {}, automationSchemas.value?.globals?.fields);
@@ -2748,6 +2741,10 @@ const materializeGeneratedPasswordsBySchemas = () => {
 
   if (!targetConfig.automation || typeof targetConfig.automation !== "object") {
     targetConfig.automation = {};
+    changed = true;
+  }
+  if (Object.prototype.hasOwnProperty.call(targetConfig.automation, "time")) {
+    delete targetConfig.automation.time;
     changed = true;
   }
   automationDefinitions.forEach((entry) => {
@@ -3401,12 +3398,12 @@ const substitutionsBlockKeys = new Set([
 ]);
 
 const automationBlockKeys = new Set([
-  "time",
   "deep_sleep",
   "script",
   "globals",
   "interval"
 ]);
+const timeBlockKeys = new Set(["time"]);
 const bussesBlockKeys = computed(() => new Set(bussesDefinitions.map((entry) => entry.key)));
 
 const i2sAudioBlockKeys = new Set([
@@ -3444,6 +3441,46 @@ const humanizePreviewKey = (key) => {
   return titleCase(normalized);
 };
 
+const previewGroups = computed(() => {
+  const groups = new Map();
+
+  (config.value.components || []).forEach((entry) => {
+    const componentId = componentIdFromEntry(entry);
+    if (!componentId) return;
+    const schema = componentSchemas.value?.[componentId];
+    if (!schema) return;
+
+    const previewGroup = typeof schema?.previewGroup === "string" ? schema.previewGroup.trim() : "";
+    if (!previewGroup) return;
+
+    const entryConfig = entry?.config && typeof entry.config === "object" ? entry.config : {};
+    const fallbackDomain = String(schema?.domain || parseComponentId(componentId).domain || "").trim();
+    const domainBy = typeof schema?.domainBy === "string" ? schema.domainBy.trim() : "";
+    const domainMap = schema?.domainMap && typeof schema.domainMap === "object" && !Array.isArray(schema.domainMap)
+      ? schema.domainMap
+      : null;
+    const mappedDomainValue = domainBy ? entryConfig?.[domainBy] : undefined;
+    const mappedDomain =
+      domainMap && mappedDomainValue !== undefined && domainMap[String(mappedDomainValue)]
+        ? String(domainMap[String(mappedDomainValue)]).trim()
+        : "";
+    const domain = mappedDomain || fallbackDomain;
+    if (!domain) return;
+
+    const groupKey = `preview-group:${previewGroup}`;
+    if (!groups.has(groupKey)) {
+      groups.set(groupKey, {
+        key: groupKey,
+        label: humanizePreviewKey(previewGroup),
+        blockKeys: new Set()
+      });
+    }
+    groups.get(groupKey).blockKeys.add(domain);
+  });
+
+  return Array.from(groups.values());
+});
+
 const buildPreviewText = (blocks = []) => {
   const parts = blocks.map((block) => block.lines.join("\n").replace(/\n+$/g, ""));
   return parts.join("\n\n").trim();
@@ -3465,6 +3502,19 @@ const previewTabs = computed(() => {
     tabs.push({ key: "automation", label: "Automation", blocks: automationBlocks, content: buildPreviewText(automationBlocks) });
     automationBlocks.forEach((block) => used.add(block.key));
   }
+
+  const timeBlocks = blocks.filter((block) => timeBlockKeys.has(block.key));
+  if (timeBlocks.length) {
+    tabs.push({ key: "time", label: "Time", blocks: timeBlocks, content: buildPreviewText(timeBlocks) });
+    timeBlocks.forEach((block) => used.add(block.key));
+  }
+
+  previewGroups.value.forEach((group) => {
+    const groupBlocks = blocks.filter((block) => group.blockKeys.has(block.key));
+    if (!groupBlocks.length) return;
+    tabs.push({ key: group.key, label: group.label, blocks: groupBlocks, content: buildPreviewText(groupBlocks) });
+    groupBlocks.forEach((block) => used.add(block.key));
+  });
 
   const bussesBlocks = blocks.filter((block) => bussesBlockKeys.value.has(block.key));
   if (bussesBlocks.length) {
@@ -3517,6 +3567,10 @@ const resolvePreviewTabKeyFromMain = () => {
     const schema = componentSchemas.value?.[componentId];
     if (schema?.renderStrategy === "verbatim_root") {
       return "custom";
+    }
+    const previewGroup = typeof schema?.previewGroup === "string" ? schema.previewGroup.trim() : "";
+    if (previewGroup) {
+      return `preview-group:${previewGroup}`;
     }
     const entryConfig = activeComponentEntry.value?.config && typeof activeComponentEntry.value.config === "object"
       ? activeComponentEntry.value.config

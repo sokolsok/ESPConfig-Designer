@@ -11,13 +11,6 @@
   ],
   "fields": [
     {
-      "key": "name",
-      "type": "text",
-      "required": false,
-      "lvl": "simple",
-	  "placeholder": "Sensor Name"
-    },
-    {
       "key": "entity_id",
       "type": "text",
       "required": true,

@@ -14,6 +14,7 @@
       "type": "id",
       "required": true,
       "lvl": "simple",
+	  "default": "sml_hub",
       "idDomain": "sml"
     },
     {

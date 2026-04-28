@@ -1,0 +1,27 @@
+{
+  "id": "zwave_proxy",
+  "domain": "zwave_proxy",
+  "platform": "",
+  "renderAs": "root_map",
+  "previewGroup": "misc",
+  "helpUrl": "https://esphome.io/components/zwave_proxy/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    },
+    {
+      "require": "protocol:api"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "my_zwave_proxy",
+      "idDomain": "zwave_proxy",
+      "note": "Docs also require either Wi-Fi or Ethernet to be configured."
+    }
+  ]
+}

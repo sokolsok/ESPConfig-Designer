@@ -6,6 +6,13 @@
   "extends": "base_text.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Text Name"
+    },
+    {
       "key": "min_length",
       "type": "number",
       "required": false,
@@ -23,14 +30,21 @@
       "key": "lambda",
       "type": "lambda",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "return std::string(\"hello\");"
     },
     {
       "key": "set_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
       "lvl": "normal",
-      "placeholder": "- logger.log:\n    format: \"%s\"\n    args: [\"x.c_str()\"]"
+      "note": "The action receives the new text value as x.",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "update_interval",
@@ -57,7 +71,8 @@
       "key": "initial_value",
       "type": "text",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "hello"
     }
   ]
 }

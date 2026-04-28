@@ -1,6 +1,9 @@
 {
   "id": "sx126x",
   "domain": "sx126x",
+  "platform": "",
+  "renderAs": "root_map",
+  "previewGroup": "wireless",
   "helpUrl": "https://esphome.io/components/sx126x/",
   "requirements": [
     {
@@ -13,31 +16,36 @@
       "type": "id",
       "required": false,
       "lvl": "normal",
+      "placeholder": "sx126x_id",
       "idDomain": "sx126x"
     },
     {
       "key": "busy_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
     },
     {
       "key": "cs_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
     },
     {
       "key": "dio1_pin",
       "type": "gpio",
-      "required": false,
-      "lvl": "normal"
+      "required": true,
+      "lvl": "normal",
+      "placeholder": "GPIOXX"
     },
     {
       "key": "rst_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
     },
     {
       "key": "frequency",
@@ -51,6 +59,7 @@
       "type": "select",
       "required": true,
       "lvl": "simple",
+	  "default": "sx1261",
       "options": [
         "sx1261",
         "sx1262",

@@ -8,13 +8,14 @@
       "key": "name",
       "type": "text",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "Text Sensor Name"
     },
     {
       "key": "id",
       "type": "id",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
 	  "placeholder": "text_sensor_id"
     },
     {
@@ -28,7 +29,8 @@
       "key": "device_class",
       "type": "text",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "timestamp"
     },
     {
       "key": "internal",
@@ -46,7 +48,8 @@
       "key": "entity_category",
       "type": "text",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "diagnostic"
     },
     {
       "key": "on_value",
@@ -73,6 +76,12 @@
         "extends": "base_actions.json"
       },
       "wrapThen": true
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

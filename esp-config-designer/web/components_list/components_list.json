@@ -4155,8 +4155,8 @@
           "name": "Camera Encoder",
           "path": "components/camera/camera_encoder",
           "id": "camera/camera_encoder",
-          "available": false,
-          "schemaPath": ""
+          "available": true,
+          "schemaPath": "components/miscellaneous/camera_encoder.json"
         },
         {
           "name": "ESP32 Camera",
@@ -4169,29 +4169,29 @@
           "name": "Exposure Notifications",
           "path": "components/exposure_notifications",
           "id": "exposure_notifications",
-          "available": false,
-          "schemaPath": ""
+          "available": true,
+          "schemaPath": "components/miscellaneous/exposure_notifications.json"
         },
         {
           "name": "GPS",
           "path": "components/gps",
           "id": "gps",
-          "available": false,
-          "schemaPath": ""
+          "available": true,
+          "schemaPath": "components/miscellaneous/gps.json"
         },
         {
           "name": "Grow Fingerprint Reader",
           "path": "components/fingerprint_grow",
           "id": "fingerprint_grow",
-          "available": false,
-          "schemaPath": ""
+          "available": true,
+          "schemaPath": "components/miscellaneous/fingerprint_grow.json"
         },
         {
           "name": "HLK-FM22x Face Recognition Module",
           "path": "components/hlk_fm22x",
           "id": "hlk_fm22x",
-          "available": false,
-          "schemaPath": ""
+          "available": true,
+          "schemaPath": "components/miscellaneous/hlk_fm22x.json"
         },
         {
           "name": "Modbus Controller",
@@ -4204,29 +4204,22 @@
           "name": "Sprinkler",
           "path": "components/sprinkler",
           "id": "sprinkler",
-          "available": false,
-          "schemaPath": ""
-        },
-        {
-          "name": "Status LED",
-          "path": "components/status_led",
-          "id": "status_led",
-          "available": false,
-          "schemaPath": ""
+          "available": true,
+          "schemaPath": "components/miscellaneous/sprinkler.json"
         },
         {
           "name": "Sun",
           "path": "components/sun",
           "id": "sun",
-          "available": false,
-          "schemaPath": ""
+          "available": true,
+          "schemaPath": "components/miscellaneous/sun.json"
         },
         {
           "name": "Z-Wave Proxy",
           "path": "components/zwave_proxy",
           "id": "zwave_proxy",
-          "available": false,
-          "schemaPath": ""
+          "available": true,
+          "schemaPath": "components/miscellaneous/zwave_proxy.json"
         }
       ],
       "subcategories": []

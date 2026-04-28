@@ -1,0 +1,203 @@
+{
+  "id": "sprinkler",
+  "domain": "sprinkler",
+  "platform": "",
+  "renderAs": "root_list",
+  "previewGroup": "misc",
+  "helpUrl": "https://esphome.io/components/sprinkler/",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "sprinkler_id",
+      "idDomain": "sprinkler"
+    },
+    {
+      "key": "manual_selection_delay",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "3s"
+    },
+    {
+      "key": "valve_open_delay",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "5s"
+    },
+    {
+      "key": "valve_overlap",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "5s"
+    },
+    {
+      "key": "pump_switch_off_during_valve_open_delay",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "pump_start_pump_delay",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "3s"
+    },
+    {
+      "key": "pump_start_valve_delay",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "3s"
+    },
+    {
+      "key": "pump_stop_pump_delay",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "3s"
+    },
+    {
+      "key": "pump_stop_valve_delay",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "3s"
+    },
+    {
+      "key": "repeat",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 0,
+      "placeholder": "0"
+    },
+    {
+      "key": "next_prev_ignore_disabled",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "main_switch",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_switch.json",
+      "fields": []
+    },
+    {
+      "key": "auto_advance_switch",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_switch.json",
+      "fields": []
+    },
+    {
+      "key": "queue_enable_switch",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_switch.json",
+      "fields": []
+    },
+    {
+      "key": "reverse_switch",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_switch.json",
+      "fields": []
+    },
+    {
+      "key": "standby_switch",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_switch.json",
+      "fields": []
+    },
+    {
+      "key": "multiplier_number",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_number.json",
+      "fields": []
+    },
+    {
+      "key": "repeat_number",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "extends": "base_number.json",
+      "fields": []
+    },
+    {
+      "key": "valves",
+      "type": "list",
+      "required": true,
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "enable_switch",
+            "type": "object",
+            "required": false,
+            "lvl": "simple",
+            "extends": "base_switch.json",
+            "fields": []
+          },
+          {
+            "key": "valve_switch",
+            "type": "object",
+            "required": true,
+            "lvl": "simple",
+            "extends": "base_switch.json",
+            "fields": []
+          },
+          {
+            "key": "pump_switch_id",
+            "type": "id_ref",
+            "required": false,
+            "lvl": "normal",
+            "domain": "switch",
+            "placeholder": "pump_switch"
+          },
+          {
+            "key": "valve_switch_id",
+            "type": "id_ref",
+            "required": true,
+            "lvl": "normal",
+            "domain": "switch",
+            "placeholder": "front_valve_sw"
+          },
+          {
+            "key": "run_duration",
+            "type": "duration",
+            "required": false,
+            "lvl": "normal",
+            "placeholder": "900s"
+          },
+          {
+            "key": "run_duration_number",
+            "type": "object",
+            "required": false,
+            "lvl": "simple",
+            "extends": "base_number.json",
+            "fields": []
+          }
+        ]
+      }
+    }
+  ]
+}

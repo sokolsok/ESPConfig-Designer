@@ -26,7 +26,8 @@
       "type": "text",
       "required": false,
       "lvl": "normal",
-      "placeholder": "my_text_var"
+      "placeholder": "my_text_var",
+      "note": "Set only one of component_name or variable_name"
     },
     {
       "key": "update_interval",
@@ -53,7 +54,8 @@
       "key": "font_id",
       "type": "number",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "1"
     },
     {
       "key": "visible",

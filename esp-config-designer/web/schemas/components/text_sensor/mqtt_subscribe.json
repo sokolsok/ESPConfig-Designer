@@ -11,10 +11,18 @@
   ],
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "MQTT Sensor Name"
+    },
+    {
       "key": "topic",
       "type": "text",
       "required": true,
       "lvl": "simple",
+	  "suppressQuotes": true,
       "placeholder": "the/topic"
     },
     {
@@ -22,7 +30,8 @@
       "type": "number",
       "required": false,
       "lvl": "normal",
-      "default": 0
+      "default": 0,
+      "placeholder": "0"
     }
   ]
 }

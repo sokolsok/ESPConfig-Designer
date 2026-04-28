@@ -14,10 +14,11 @@
       "key": "recipient",
       "label": "Recipient",
       "type": "text",
-      "templatable": false,
+      "templatable": true,
       "required": true,
       "lvl": "normal",
-      "placeholder": "+48123456789"
+      "placeholder": "+48123456789",
+      "lambdaPlaceholder": "return std::string(\"+48123456789\");"
     }
   ]
 }

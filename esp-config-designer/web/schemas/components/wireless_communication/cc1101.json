@@ -1,6 +1,9 @@
 {
   "id": "cc1101",
   "domain": "cc1101",
+  "platform": "",
+  "renderAs": "root_map",
+  "previewGroup": "wireless",
   "helpUrl": "https://esphome.io/components/cc1101/",
   "requirements": [
     {
@@ -12,20 +15,23 @@
       "key": "id",
       "type": "id",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
+      "placeholder": "cc1101_id",
       "idDomain": "cc1101"
     },
     {
       "key": "cs_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
     },
     {
       "key": "gdo0_pin",
       "type": "gpio",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
     },
     {
       "key": "frequency",
@@ -226,6 +232,7 @@
       "type": "text",
       "required": false,
       "lvl": "advanced",
+      "default": "42dB",
       "placeholder": "42dB"
     },
     {
@@ -366,6 +373,12 @@
         "extends": "base_actions.json"
       },
       "wrapThen": true
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

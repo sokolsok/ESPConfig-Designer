@@ -1,6 +1,9 @@
 {
   "id": "rf_bridge",
   "domain": "rf_bridge",
+  "platform": "",
+  "renderAs": "root_map",
+  "previewGroup": "wireless",
   "helpUrl": "https://esphome.io/components/rf_bridge/",
   "requirements": [
     {
@@ -12,7 +15,8 @@
       "key": "id",
       "type": "id",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
+      "placeholder": "rf_bridge_id",
       "idDomain": "rf_bridge"
     },
     {
@@ -20,7 +24,8 @@
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
-      "domain": "uart"
+      "domain": "uart",
+      "placeholder": "uart_bus"
     },
     {
       "key": "on_code_received",
@@ -38,13 +43,19 @@
       "key": "on_advanced_code_received",
       "type": "list",
       "required": false,
-      "lvl": "advanced",
+      "lvl": "normal",
       "item": {
         "type": "object",
         "fields": [],
         "extends": "base_actions.json"
       },
       "wrapThen": true
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

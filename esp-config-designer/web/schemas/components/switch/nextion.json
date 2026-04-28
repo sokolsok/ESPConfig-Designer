@@ -26,13 +26,15 @@
       "type": "text",
       "required": false,
       "lvl": "normal",
-      "placeholder": "darkmode"
+      "placeholder": "darkmode",
+      "note": "Set only one of component_name or variable_name"
     },
     {
       "key": "update_interval",
       "type": "duration",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "1s"
     },
     {
       "key": "background_color",

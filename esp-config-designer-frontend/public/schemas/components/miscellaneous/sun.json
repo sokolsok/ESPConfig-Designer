@@ -1,0 +1,103 @@
+{
+  "id": "sun",
+  "domain": "sun",
+  "platform": "",
+  "renderAs": "root_map",
+  "previewGroup": "misc",
+  "helpUrl": "https://esphome.io/components/sun/",
+  "requirements": [
+    {
+      "require": "component:time"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "sun_component",
+      "idDomain": "sun"
+    },
+    {
+      "key": "latitude",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "48.8584°",
+      "suppressQuotes": true
+    },
+    {
+      "key": "longitude",
+      "type": "text",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "2.2945°",
+      "suppressQuotes": true
+    },
+    {
+      "key": "on_sunrise",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "elevation",
+            "type": "text",
+            "required": false,
+            "lvl": "advanced",
+            "default": "-0.833°",
+            "placeholder": "5°",
+            "suppressQuotes": true
+          },
+          {
+            "key": "then",
+            "type": "list",
+            "required": true,
+            "lvl": "advanced",
+            "item": {
+              "type": "object",
+              "fields": [],
+              "extends": "base_actions.json"
+            },
+            "wrapThen": true
+          }
+        ]
+      }
+    },
+    {
+      "key": "on_sunset",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [
+          {
+            "key": "elevation",
+            "type": "text",
+            "required": false,
+            "lvl": "advanced",
+            "default": "-0.833°",
+            "placeholder": "-0.833°",
+            "suppressQuotes": true
+          },
+          {
+            "key": "then",
+            "type": "list",
+            "required": true,
+            "lvl": "advanced",
+            "item": {
+              "type": "object",
+              "fields": [],
+              "extends": "base_actions.json"
+            },
+            "wrapThen": true
+          }
+        ]
+      }
+    }
+  ]
+}

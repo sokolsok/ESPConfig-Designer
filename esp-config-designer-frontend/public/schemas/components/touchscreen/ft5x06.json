@@ -15,6 +15,7 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
+      "placeholder": "0",
       "options": [
         0,
         90,

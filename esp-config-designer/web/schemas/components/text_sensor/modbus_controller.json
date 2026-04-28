@@ -60,7 +60,8 @@
       "key": "skip_updates",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "3"
     },
     {
       "key": "register_count",
@@ -73,7 +74,8 @@
       "key": "response_size",
       "type": "number",
       "required": true,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "2"
     },
     {
       "key": "raw_encode",
@@ -105,13 +107,15 @@
       "key": "lambda",
       "type": "lambda",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "return x;"
     },
     {
       "key": "offset",
       "type": "number",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "0"
     }
   ]
 }

@@ -4,14 +4,39 @@
   "platform": "ble_client",
   "helpUrl": "https://esphome.io/components/switch/ble_client/",
   "extends": "base_switch.json",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "ble_client",
+      "dedupeBy": "id"
+    }
+  ],
   "fields": [
+    {
+      "key": "hub",
+      "label": "BLE client hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_ble_client_with_tracker.json"
+    },
+    {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Switch Name"
+    },
     {
       "key": "ble_client_id",
       "type": "id_ref",
-      "required": true,
+      "required": false,
       "lvl": "simple",
       "domain": "ble_client",
-      "placeholder": "ble_client_id"
+      "allowSelfReference": true,
+      "default": "ble_client_hub",
+      "placeholder": "ble_client_hub"
     }
   ]
 }

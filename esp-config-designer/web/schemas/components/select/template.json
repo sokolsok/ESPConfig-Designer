@@ -6,39 +6,31 @@
   "extends": "base_select.json",
   "fields": [
     {
-      "key": "options",
-      "type": "list",
-      "required": true,
+      "key": "name",
+      "type": "text",
+      "required": false,
       "lvl": "simple",
-      "item": {
-        "type": "text"
-      }
+      "placeholder": "Select Name"
     },
     {
       "key": "lambda",
       "type": "lambda",
       "required": false,
-      "lvl": "normal"
-    },
-    {
-      "key": "set_action",
-      "type": "yaml",
-      "required": false,
-      "lvl": "normal",
-      "placeholder": "- logger.log:\n    format: \"Chosen option: %s\"\n    args: [\"x.c_str()\"]"
+      "lvl": "simple",
+      "placeholder": "return std::string(\"Option 1\");"
     },
     {
       "key": "update_interval",
       "type": "duration",
       "required": false,
-      "lvl": "normal",
-      "default": "60s"
+      "lvl": "simple",
+      "placeholder": "60s"
     },
     {
       "key": "optimistic",
       "type": "boolean",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "default": false
     },
     {
@@ -52,7 +44,32 @@
       "key": "initial_option",
       "type": "text",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "Option 1"
+    },
+    {
+      "key": "options",
+      "type": "list",
+      "required": true,
+      "lvl": "simple",
+      "item": {
+        "type": "text",
+		"suppressQuotes": true,
+        "placeholder": "Option 1"
+      }
+    },
+    {
+      "key": "set_action",
+      "type": "list",
+      "required": false,
+      "lvl": "normal",
+      "note": "The action receives the selected option as x and the selected index as i.",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     }
   ]
 }

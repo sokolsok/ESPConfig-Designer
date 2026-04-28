@@ -14,6 +14,7 @@
       "type": "id",
       "required": true,
       "lvl": "simple",
+	  "default": "sun_gtil2_hub",
       "idDomain": "sun_gtil2"
     },
     {

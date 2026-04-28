@@ -10,40 +10,46 @@
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
-      "domain": "speaker"
+      "domain": "speaker",
+      "placeholder": "main_speaker"
     },
     {
       "key": "buffer_duration",
       "type": "duration",
       "required": false,
       "lvl": "normal",
-      "default": "500ms"
+      "default": "500ms",
+      "placeholder": "500ms"
     },
     {
       "key": "bits_per_sample",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "16"
     },
     {
       "key": "sample_rate",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "16000"
     },
     {
       "key": "filters",
       "type": "number",
       "required": false,
       "lvl": "advanced",
-      "default": 16
+      "default": 16,
+      "placeholder": "16"
     },
     {
       "key": "taps",
       "type": "number",
       "required": false,
       "lvl": "advanced",
-      "default": 16
+      "default": 16,
+      "placeholder": "16"
     },
     {
       "key": "task_stack_in_psram",

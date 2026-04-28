@@ -1,0 +1,24 @@
+{
+  "id": "status_led",
+  "domain": "status_led",
+  "platform": "",
+  "renderAs": "root_map",
+  "helpUrl": "https://esphome.io/components/status_led/",
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "status_led_id",
+      "idDomain": "status_led"
+    },
+    {
+      "key": "pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
+    }
+  ]
+}

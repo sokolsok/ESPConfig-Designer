@@ -6,7 +6,21 @@
   "extends": "base_text_sensor.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Text Sensor Name"
+    },
+    {
       "key": "hide_timestamp",
+      "type": "boolean",
+      "required": false,
+      "lvl": "normal",
+      "default": false
+    },
+    {
+      "key": "hide_hash",
       "type": "boolean",
       "required": false,
       "lvl": "normal",

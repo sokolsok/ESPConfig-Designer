@@ -42,17 +42,26 @@
       "default": "tuya_hub"
     },
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Select Name"
+    },
+    {
       "key": "enum_datapoint",
       "type": "number",
       "required": false,
       "lvl": "simple",
-      "note": "Set enum_datapoint or int_datapoint."
+      "note": "Set enum_datapoint or int_datapoint.",
+      "placeholder": "1"
     },
     {
       "key": "int_datapoint",
       "type": "number",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "2"
     },
     {
       "key": "options",
@@ -64,7 +73,7 @@
         "fields": [
           {
             "key": "key",
-            "type": "text",
+            "type": "number",
             "required": true,
             "lvl": "simple",
             "placeholder": "0"

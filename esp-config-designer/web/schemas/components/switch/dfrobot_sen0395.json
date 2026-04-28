@@ -29,11 +29,12 @@
     {
       "key": "dfrobot_sen0395_id",
       "type": "id_ref",
-      "required": true,
+      "required": false,
       "lvl": "simple",
       "domain": "dfrobot_sen0395",
       "allowSelfReference": true,
-      "placeholder": "dfrobot_sen0395_id"
+      "default": "dfrobot_sen0395_hub",
+      "placeholder": "dfrobot_sen0395_hub"
     },
     {
       "key": "type",

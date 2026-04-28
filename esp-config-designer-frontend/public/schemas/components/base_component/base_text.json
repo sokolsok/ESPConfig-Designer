@@ -8,20 +8,34 @@
       "key": "name",
       "type": "text",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "Text Name"
     },
     {
       "key": "id",
       "type": "id",
       "required": false,
       "lvl": "normal",
+      "placeholder": "text_id",
       "idDomain": "text"
+    },
+    {
+      "key": "mode",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "text",
+      "options": [
+        "text",
+        "password"
+      ]
     },
     {
       "key": "icon",
       "type": "icon",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "mdi:form-textbox"
     },
     {
       "key": "internal",
@@ -41,18 +55,8 @@
       "key": "entity_category",
       "type": "text",
       "required": false,
-      "lvl": "advanced"
-    },
-    {
-      "key": "mode",
-      "type": "select",
-      "required": true,
-      "lvl": "simple",
-      "default": "text",
-      "options": [
-        "text",
-        "password"
-      ]
+      "lvl": "advanced",
+      "placeholder": "config"
     },
     {
       "key": "on_value",

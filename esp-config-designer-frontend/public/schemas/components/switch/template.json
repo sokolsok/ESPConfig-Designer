@@ -6,24 +6,42 @@
   "extends": "base_switch.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Template Name"
+    },
+    {
       "key": "lambda",
       "type": "lambda",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "placeholder": "return true;"
     },
     {
       "key": "turn_on_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
       "lvl": "normal",
-      "placeholder": "- switch.turn_on: switch2"
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "turn_off_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
       "lvl": "normal",
-      "placeholder": "- switch.turn_on: switch1"
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "optimistic",

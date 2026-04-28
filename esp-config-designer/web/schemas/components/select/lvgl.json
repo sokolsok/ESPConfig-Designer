@@ -6,11 +6,19 @@
   "extends": "base_select.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Select Name"
+    },
+    {
       "key": "widget",
       "type": "text",
       "required": true,
       "lvl": "simple",
-      "placeholder": "dropdown_id"
+      "placeholder": "dropdown_id",
+      "note": "Supported LVGL widgets: dropdown, roller."
     },
     {
       "key": "restore_value",

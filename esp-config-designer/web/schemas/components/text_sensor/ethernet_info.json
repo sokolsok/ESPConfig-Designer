@@ -20,35 +20,35 @@
           "key": "address_0",
           "type": "object",
           "required": false,
-          "lvl": "normal",
+          "lvl": "simple",
           "extends": "base_text_sensor.json"
         },
         {
           "key": "address_1",
           "type": "object",
           "required": false,
-          "lvl": "normal",
+          "lvl": "simple",
           "extends": "base_text_sensor.json"
         },
         {
           "key": "address_2",
           "type": "object",
           "required": false,
-          "lvl": "normal",
+          "lvl": "simple",
           "extends": "base_text_sensor.json"
         },
         {
           "key": "address_3",
           "type": "object",
           "required": false,
-          "lvl": "normal",
+          "lvl": "simple",
           "extends": "base_text_sensor.json"
         },
         {
           "key": "address_4",
           "type": "object",
           "required": false,
-          "lvl": "normal",
+          "lvl": "simple",
           "extends": "base_text_sensor.json"
         }
       ]
@@ -66,6 +66,12 @@
       "required": false,
       "lvl": "normal",
       "extends": "base_text_sensor.json"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

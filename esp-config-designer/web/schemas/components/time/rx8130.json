@@ -16,6 +16,7 @@
       "required": false,
       "lvl": "normal",
       "default": "0x32",
+      "emitYAML": "always",
       "suppressQuotes": true
     },
     {
@@ -23,7 +24,8 @@
       "type": "id_ref",
       "required": false,
       "lvl": "advanced",
-      "domain": "i2c"
+      "domain": "i2c",
+      "placeholder": "i2c_bus"
     }
   ]
 }

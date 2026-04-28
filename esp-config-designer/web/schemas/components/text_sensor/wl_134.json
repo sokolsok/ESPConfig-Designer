@@ -6,6 +6,13 @@
   "extends": "base_text_sensor.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Text Sensor Name"
+    },
+    {
       "key": "reset",
       "type": "boolean",
       "required": false,

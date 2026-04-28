@@ -10,6 +10,12 @@
   ],
   "fields": [
     {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
       "key": "ip_address",
       "type": "object",
       "required": false,

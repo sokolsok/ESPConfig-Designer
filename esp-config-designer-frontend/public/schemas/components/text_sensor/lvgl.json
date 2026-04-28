@@ -10,7 +10,8 @@
       "type": "text",
       "required": true,
       "lvl": "simple",
-      "placeholder": "textarea_id"
+      "placeholder": "textarea_id",
+      "note": "LVGL must be configured; docs explicitly describe this as a textarea widget ID."
     }
   ]
 }

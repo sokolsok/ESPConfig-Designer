@@ -14,6 +14,12 @@
   ],
   "fields": [
     {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    },
+    {
       "key": "hub",
       "label": "WireGuard hub",
       "type": "object",
@@ -25,7 +31,7 @@
     {
       "key": "wireguard_id",
       "type": "id_ref",
-      "required": true,
+      "required": false,
       "lvl": "simple",
       "domain": "wireguard",
       "allowSelfReference": true,

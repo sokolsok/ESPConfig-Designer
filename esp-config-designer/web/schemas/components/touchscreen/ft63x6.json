@@ -14,13 +14,15 @@
       "key": "reset_pin",
       "type": "gpio",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
     },
     {
       "key": "interrupt_pin",
       "type": "gpio",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
     }
   ]
 }

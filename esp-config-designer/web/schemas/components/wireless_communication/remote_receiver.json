@@ -1,27 +1,72 @@
 {
   "id": "remote_receiver",
   "domain": "remote_receiver",
+  "platform": "",
+  "renderAs": "root_map",
+  "previewGroup": "wireless",
   "helpUrl": "https://esphome.io/components/remote_receiver/",
   "fields": [
     {
       "key": "id",
       "type": "id",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
+      "placeholder": "remote_receiver_id",
       "idDomain": "remote_receiver"
     },
     {
       "key": "pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
     },
     {
       "key": "dump",
-      "type": "yaml",
+      "type": "select",
       "required": false,
       "lvl": "simple",
-      "placeholder": "all"
+      "default": "none",
+      "options": [
+	    "none",
+        "all",
+        "abbwelcome",
+        "aeha",
+        "beo4",
+        "brennenstuhl",
+        "byronsx",
+        "canalsat",
+        "canalsatld",
+        "coolix",
+        "dish",
+        "dooya",
+        "drayton",
+        "dyson",
+        "jvc",
+        "gobox",
+        "keeloq",
+        "haier",
+        "lg",
+        "magiquest",
+        "midea",
+        "nec",
+        "nexa",
+        "panasonic",
+        "pioneer",
+        "pronto",
+        "raw",
+        "rc5",
+        "rc6",
+        "rc_switch",
+        "roomba",
+        "samsung",
+        "samsung36",
+        "symphony",
+        "sony",
+        "toshiba_ac",
+        "mirage",
+        "toto"
+      ]
     },
     {
       "key": "tolerance",
@@ -148,8 +193,7 @@
       "key": "custom_config",
       "type": "raw_yaml",
       "required": false,
-      "lvl": "advanced",
-      "placeholder": "# Additional on_<protocol> triggers"
+      "lvl": "advanced"
     }
   ]
 }

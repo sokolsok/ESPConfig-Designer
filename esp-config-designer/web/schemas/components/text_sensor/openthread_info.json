@@ -34,35 +34,35 @@
       "key": "rloc16",
       "type": "object",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "extends": "base_text_sensor.json"
     },
     {
       "key": "ext_addr",
       "type": "object",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "extends": "base_text_sensor.json"
     },
     {
       "key": "eui64",
       "type": "object",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "extends": "base_text_sensor.json"
     },
     {
       "key": "network_name",
       "type": "object",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "extends": "base_text_sensor.json"
     },
     {
       "key": "network_key",
       "type": "object",
       "required": false,
-      "lvl": "advanced",
+      "lvl": "normal",
       "extends": "base_text_sensor.json"
     },
     {
@@ -78,6 +78,12 @@
       "required": false,
       "lvl": "normal",
       "extends": "base_text_sensor.json"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

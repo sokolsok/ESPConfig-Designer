@@ -28,11 +28,17 @@
     {
       "key": "mr60fda2_id",
       "type": "id_ref",
-      "required": true,
+      "required": false,
       "lvl": "simple",
       "domain": "seeed_mr60fda2",
       "allowSelfReference": true,
       "default": "mr60fda2_radar"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     },
     {
       "key": "install_height",

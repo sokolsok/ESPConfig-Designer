@@ -40,11 +40,11 @@
     {
       "key": "code",
       "label": "Code",
-      "type": "text",
+      "type": "number",
       "templatable": false,
       "required": true,
       "lvl": "normal",
-      "placeholder": "011001010101"
+      "placeholder": "123456"
     }
   ]
 }

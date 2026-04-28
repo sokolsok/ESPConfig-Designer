@@ -40,7 +40,8 @@
       "type": "number",
       "required": false,
       "lvl": "normal",
-      "default": 16000
+      "default": 16000,
+      "placeholder": "16000"
     },
     {
       "key": "bits_per_sample",
@@ -103,7 +104,8 @@
       "type": "id_ref",
       "required": false,
       "lvl": "normal",
-      "domain": "i2s_audio"
+      "domain": "i2s_audio",
+      "placeholder": "i2s_audio_bus"
     },
     {
       "key": "i2s_comm_fmt",
@@ -129,20 +131,23 @@
       "type": "duration",
       "required": false,
       "lvl": "normal",
-      "default": "500ms"
+      "default": "500ms",
+      "placeholder": "500ms"
     },
     {
       "key": "timeout",
       "type": "duration",
       "required": false,
       "lvl": "normal",
-      "default": "500ms"
+      "default": "500ms",
+      "placeholder": "500ms"
     },
     {
       "key": "i2s_dout_pin",
       "type": "gpio",
       "required": true,
       "lvl": "simple",
+      "placeholder": "GPIO25",
       "dependsOn": {
         "key": "dac_type",
         "value": "external"
@@ -153,6 +158,7 @@
       "type": "select",
       "required": true,
       "lvl": "simple",
+      "note": "Internal DAC mode is supported only on classic ESP32 with the legacy driver.",
       "options": [
         "left",
         "right",

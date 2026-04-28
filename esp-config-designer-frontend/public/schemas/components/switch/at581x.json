@@ -34,7 +34,9 @@
       "required": false,
       "lvl": "simple",
       "domain": "at581x",
-      "placeholder": "at581x_id"
+      "allowSelfReference": true,
+      "default": "at581x_hub",
+      "placeholder": "at581x_hub"
     }
   ]
 }

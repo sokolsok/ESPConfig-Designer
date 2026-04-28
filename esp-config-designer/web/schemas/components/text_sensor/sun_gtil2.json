@@ -36,12 +36,6 @@
       "allowSelfReference": true
     },
     {
-      "key": "custom_config",
-      "type": "raw_yaml",
-      "required": false,
-      "lvl": "advanced"
-    },
-    {
       "key": "state",
       "type": "object",
       "required": false,
@@ -56,6 +50,12 @@
       "lvl": "simple",
       "extends": "base_text_sensor.json",
       "fields": []
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

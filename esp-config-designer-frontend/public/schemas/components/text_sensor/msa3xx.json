@@ -28,7 +28,7 @@
     {
       "key": "msa3xx_id",
       "type": "id_ref",
-      "required": true,
+      "required": false,
       "lvl": "simple",
       "domain": "msa3xx",
       "allowSelfReference": true,

@@ -8,19 +8,22 @@
       "key": "name",
       "type": "text",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "Select Name"
     },
     {
       "key": "id",
       "type": "id",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "select_id"
     },
     {
       "key": "icon",
       "type": "icon",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "mdi:format-list-bulleted"
     },
     {
       "key": "internal",
@@ -40,7 +43,8 @@
       "key": "entity_category",
       "type": "text",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "config"
     },
     {
       "key": "on_value",
@@ -53,6 +57,12 @@
         "extends": "base_actions.json"
       },
       "wrapThen": true
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

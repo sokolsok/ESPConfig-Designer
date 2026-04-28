@@ -1,0 +1,180 @@
+{
+  "id": "fingerprint_grow",
+  "domain": "fingerprint_grow",
+  "platform": "",
+  "renderAs": "root_map",
+  "previewGroup": "misc",
+  "helpUrl": "https://esphome.io/components/fingerprint_grow/",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "id",
+      "type": "id",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "fingerprint_grow_id",
+      "idDomain": "fingerprint_grow"
+    },
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "simple",
+      "domain": "uart",
+      "placeholder": "uart_bus"
+    },
+    {
+      "key": "sensing_pin",
+      "type": "gpio",
+      "required": false,
+      "lvl": "normal",
+      "placeholder": "GPIOXX"
+    },
+    {
+      "key": "password",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "0x00",
+      "placeholder": "0x00",
+      "suppressQuotes": true
+    },
+    {
+      "key": "new_password",
+      "type": "text",
+      "required": false,
+      "lvl": "advanced",
+      "placeholder": "0x12345678",
+      "suppressQuotes": true
+    },
+    {
+      "key": "idle_period_to_sleep",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "5s",
+      "placeholder": "5s"
+    },
+    {
+      "key": "sensor_power_pin",
+      "type": "object",
+      "required": false,
+      "lvl": "normal",
+      "fields": [
+        {
+          "key": "number",
+          "type": "gpio",
+          "required": true,
+          "lvl": "normal",
+          "placeholder": "GPIOXX"
+        },
+        {
+          "key": "inverted",
+          "type": "boolean",
+          "required": false,
+          "lvl": "normal"
+        }
+      ]
+    },
+    {
+      "key": "on_finger_scan_start",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_finger_scan_matched",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_finger_scan_unmatched",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_finger_scan_misplaced",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_finger_scan_invalid",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_enrollment_scan",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_enrollment_done",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    },
+    {
+      "key": "on_enrollment_failed",
+      "type": "list",
+      "required": false,
+      "lvl": "advanced",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}

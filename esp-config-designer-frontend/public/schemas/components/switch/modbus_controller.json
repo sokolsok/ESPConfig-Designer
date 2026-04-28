@@ -37,6 +37,13 @@
       "placeholder": "modbus_controller_hub"
     },
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Switch Name"
+    },
+    {
       "key": "register_type",
       "type": "select",
       "required": true,
@@ -53,7 +60,8 @@
       "type": "text",
       "required": true,
       "lvl": "simple",
-      "placeholder": "0x3200"
+      "placeholder": "0x3200",
+      "suppressQuotes": true
     },
     {
       "key": "assumed_state",
@@ -66,7 +74,8 @@
       "key": "skip_updates",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "3"
     },
     {
       "key": "register_count",
@@ -79,7 +88,11 @@
       "key": "use_write_multiple",
       "type": "boolean",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "dependsOn": {
+        "key": "register_type",
+        "value": "holding"
+      }
     },
     {
       "key": "bitmask",
@@ -92,13 +105,15 @@
       "key": "lambda",
       "type": "lambda",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "return x;"
     },
     {
       "key": "write_lambda",
       "type": "lambda",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "return x;"
     },
     {
       "key": "custom_command",
@@ -111,7 +126,8 @@
       "key": "offset",
       "type": "number",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "0"
     },
     {
       "key": "restore_mode",

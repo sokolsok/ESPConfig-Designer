@@ -6,28 +6,54 @@
   "extends": "base_valve.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Valve Name"
+    },
+    {
       "key": "lambda",
       "type": "lambda",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "placeholder": "return VALVE_OPEN;"
     },
     {
       "key": "open_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "close_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "stop_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "normal"
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
     },
     {
       "key": "optimistic",
@@ -52,21 +78,28 @@
       "key": "assumed_state",
       "type": "boolean",
       "required": false,
-      "lvl": "normal",
+      "lvl": "advanced",
       "default": false
     },
     {
       "key": "has_position",
       "type": "boolean",
       "required": false,
-      "lvl": "normal",
+      "lvl": "advanced",
       "default": false
     },
     {
       "key": "position_action",
-      "type": "yaml",
+      "type": "list",
       "required": false,
-      "lvl": "normal",
+      "lvl": "advanced",
+      "note": "The action receives the target position as pos.",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true,
       "dependsOn": {
         "key": "has_position",
         "value": true

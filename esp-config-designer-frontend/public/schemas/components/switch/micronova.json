@@ -28,7 +28,7 @@
     {
       "key": "micronova_id",
       "type": "id_ref",
-      "required": true,
+      "required": false,
       "lvl": "simple",
       "domain": "micronova",
       "allowSelfReference": true,
@@ -47,6 +47,13 @@
       "lvl": "simple",
       "extends": "base_switch.json",
       "fields": [
+	    {
+		  "key": "name",
+		  "type": "text",
+		  "required": false,
+		  "lvl": "simple",
+		  "placeholder": "Switch Name"
+		},
         {
           "key": "update_interval",
           "type": "duration",

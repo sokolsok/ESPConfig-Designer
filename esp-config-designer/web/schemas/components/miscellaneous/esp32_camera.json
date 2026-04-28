@@ -3,6 +3,7 @@
   "domain": "esp32_camera",
   "platform": "",
   "renderAs": "root_map",
+  "previewGroup": "misc",
   "helpUrl": "https://esphome.io/components/esp32_camera/",
   "requirements": [
     {

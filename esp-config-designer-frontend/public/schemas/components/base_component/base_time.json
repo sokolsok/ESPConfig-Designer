@@ -16,7 +16,7 @@
       "key": "timezone",
       "type": "select",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "suppressQuotes": true,
       "placeholder": "Europe/Warsaw",
       "optionsFrom": "general/automation/timezones.json",
@@ -26,7 +26,7 @@
       "key": "on_time",
       "type": "list",
       "required": false,
-      "lvl": "advanced",
+      "lvl": "normal",
       "item": {
         "type": "object",
         "fields": [],
@@ -38,7 +38,7 @@
       "key": "on_time_sync",
       "type": "list",
       "required": false,
-      "lvl": "advanced",
+      "lvl": "normal",
       "item": {
         "type": "object",
         "fields": [],
@@ -51,7 +51,14 @@
       "type": "duration",
       "required": false,
       "lvl": "normal",
-      "default": "15min"
+      "default": "15min",
+      "placeholder": "15min"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

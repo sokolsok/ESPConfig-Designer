@@ -30,7 +30,7 @@
     {
       "key": "ld2420_id",
       "type": "id_ref",
-      "required": true,
+      "required": false,
       "lvl": "simple",
       "domain": "ld2420",
       "allowSelfReference": true,

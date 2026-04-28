@@ -6,6 +6,13 @@
   "extends": "base_switch.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Switch Name"
+    },
+    {
       "key": "output",
       "type": "id_ref",
       "required": true,

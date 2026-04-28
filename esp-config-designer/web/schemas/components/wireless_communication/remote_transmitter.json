@@ -1,6 +1,9 @@
 {
   "id": "remote_transmitter",
   "domain": "remote_transmitter",
+  "platform": "",
+  "renderAs": "root_map",
+  "previewGroup": "wireless",
   "helpUrl": "https://esphome.io/components/remote_transmitter/",
   "extends": "hub_remote_transmitter.json",
   "fields": []

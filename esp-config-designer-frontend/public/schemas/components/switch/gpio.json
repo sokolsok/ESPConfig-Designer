@@ -6,24 +6,36 @@
   "extends": "base_switch.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Switch Name"
+    },
+    {
       "key": "pin",
       "type": "gpio",
       "required": true,
       "lvl": "simple",
-      "helpUrl": "https://esphome.io/guides/configuration-types#pin-schema"
+      "placeholder": "GPIOXX"
     },
     {
       "key": "interlock",
-      "type": "yaml",
+      "type": "list",
       "required": false,
       "lvl": "normal",
-      "placeholder": "[relay2]"
+      "item": {
+        "type": "id_ref",
+        "domain": "switch",
+        "placeholder": "relay2"
+      }
     },
     {
       "key": "interlock_wait_time",
       "type": "duration",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "100ms"
     }
   ]
 }

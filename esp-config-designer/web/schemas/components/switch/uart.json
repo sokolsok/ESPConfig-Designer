@@ -14,7 +14,7 @@
       "key": "uart_id",
       "type": "id_ref",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "domain": "uart",
       "placeholder": "uart_bus"
     },
@@ -29,7 +29,8 @@
       "key": "send_every",
       "type": "duration",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "1s"
     }
   ]
 }

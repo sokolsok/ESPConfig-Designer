@@ -15,10 +15,10 @@
     {
       "key": "display",
       "type": "id_ref",
-      "required": false,
+      "required": true,
       "lvl": "simple",
       "domain": "display",
-      "placeholder": "display1"
+      "placeholder": "display_id"
     },
     {
       "key": "transform",
@@ -54,13 +54,15 @@
       "type": "duration",
       "required": false,
       "lvl": "normal",
-      "default": "50ms"
+      "default": "50ms",
+      "placeholder": "50ms"
     },
     {
       "key": "touch_timeout",
       "type": "duration",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "100ms"
     },
     {
       "key": "calibration",
@@ -71,26 +73,30 @@
         {
           "key": "x_min",
           "type": "number",
-          "required": true,
-          "lvl": "normal"
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0"
         },
         {
           "key": "x_max",
           "type": "number",
-          "required": true,
-          "lvl": "normal"
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "4095"
         },
         {
           "key": "y_min",
           "type": "number",
-          "required": true,
-          "lvl": "normal"
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "0"
         },
         {
           "key": "y_max",
           "type": "number",
-          "required": true,
-          "lvl": "normal"
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "4095"
         }
       ]
     },
@@ -129,6 +135,12 @@
         "extends": "base_actions.json"
       },
       "wrapThen": true
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

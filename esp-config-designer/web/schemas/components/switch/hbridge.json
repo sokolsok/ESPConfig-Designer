@@ -6,18 +6,25 @@
   "extends": "base_switch.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Bridge Name"
+    },
+    {
       "key": "on_pin",
       "type": "gpio",
       "required": true,
       "lvl": "simple",
-      "helpUrl": "https://esphome.io/guides/configuration-types#pin-schema"
+      "placeholder": "GPIOXX"
     },
     {
       "key": "off_pin",
       "type": "gpio",
       "required": true,
       "lvl": "simple",
-      "helpUrl": "https://esphome.io/guides/configuration-types#pin-schema"
+      "placeholder": "GPIOXX"
     },
     {
       "key": "pulse_length",
@@ -30,7 +37,8 @@
       "key": "wait_time",
       "type": "duration",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "0ms"
     },
     {
       "key": "optimistic",

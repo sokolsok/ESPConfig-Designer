@@ -1,0 +1,44 @@
+{
+  "id": "camera_encoder",
+  "domain": "camera_encoder",
+  "platform": "",
+  "renderAs": "root_map",
+  "previewGroup": "misc",
+  "helpUrl": "https://esphome.io/components/camera/camera_encoder/",
+  "fields": [
+    {
+      "key": "type",
+      "type": "select",
+      "required": true,
+      "lvl": "simple",
+      "default": "esp32_camera",
+      "options": [
+        "esp32_camera"
+      ]
+    },
+    {
+      "key": "quality",
+      "type": "number",
+      "required": false,
+      "lvl": "simple",
+      "default": 80,
+      "placeholder": "80"
+    },
+    {
+      "key": "buffer_size",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 4096,
+      "placeholder": "4096"
+    },
+    {
+      "key": "buffer_expand_size",
+      "type": "number",
+      "required": false,
+      "lvl": "normal",
+      "default": 1024,
+      "placeholder": "1024"
+    }
+  ]
+}

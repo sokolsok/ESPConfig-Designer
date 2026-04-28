@@ -13,11 +13,16 @@
     {
       "key": "data",
       "label": "Data",
-      "type": "text",
+      "type": "list",
       "templatable": true,
       "required": true,
       "lvl": "normal",
-      "placeholder": "payload"
+      "item": {
+        "type": "text",
+        "placeholder": "0xA5",
+        "suppressQuotes": true
+      },
+      "lambdaPlaceholder": "return std::vector<uint8_t>{0xA5, 0x5A};"
     }
   ]
 }

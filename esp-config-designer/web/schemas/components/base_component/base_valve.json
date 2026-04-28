@@ -8,13 +8,15 @@
       "key": "name",
       "type": "text",
       "required": false,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "Valve Name"
     },
     {
       "key": "id",
       "type": "id",
       "required": false,
       "lvl": "normal",
+      "placeholder": "valve_id",
       "idDomain": "valve"
     },
     {
@@ -28,7 +30,8 @@
       "key": "icon",
       "type": "icon",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "mdi:valve"
     },
     {
       "key": "internal",
@@ -48,19 +51,22 @@
       "key": "entity_category",
       "type": "text",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "config"
     },
     {
       "key": "position_state_topic",
       "type": "text",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "valve/position/state"
     },
     {
       "key": "position_command_topic",
       "type": "text",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "valve/position/set"
     },
     {
       "key": "on_open",
@@ -85,6 +91,12 @@
         "extends": "base_actions.json"
       },
       "wrapThen": true
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

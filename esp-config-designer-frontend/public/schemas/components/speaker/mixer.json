@@ -10,13 +10,15 @@
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
-      "domain": "speaker"
+      "domain": "speaker",
+      "placeholder": "main_speaker"
     },
     {
       "key": "source_speakers",
       "type": "list",
       "required": true,
       "lvl": "simple",
+      "note": "ESPHome mixer requires 2 to 8 source speakers.",
       "item": {
         "type": "object",
         "extends": "base_speaker.json",
@@ -28,28 +30,31 @@
             "lvl": "simple",
             "idDomain": "speaker"
           },
-          {
-            "key": "buffer_duration",
-            "type": "duration",
-            "required": false,
-            "lvl": "normal",
-            "default": "100ms"
-          },
-          {
-            "key": "timeout",
-            "type": "duration",
-            "required": false,
-            "lvl": "normal",
-            "default": "500ms"
-          }
-        ]
-      }
+            {
+              "key": "buffer_duration",
+              "type": "duration",
+              "required": false,
+              "lvl": "normal",
+              "default": "100ms",
+              "placeholder": "100ms"
+            },
+            {
+              "key": "timeout",
+              "type": "duration",
+              "required": false,
+              "lvl": "normal",
+              "default": "500ms",
+              "placeholder": "500ms"
+            }
+          ]
+        }
     },
     {
       "key": "num_channels",
       "type": "select",
       "required": false,
       "lvl": "normal",
+      "placeholder": "2",
       "options": [
         1,
         2

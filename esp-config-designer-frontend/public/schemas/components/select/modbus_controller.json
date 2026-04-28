@@ -37,6 +37,13 @@
       "placeholder": "modbus_controller_hub"
     },
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Select Name"
+    },
+    {
       "key": "address",
       "type": "text",
       "required": true,
@@ -64,7 +71,7 @@
             "type": "number",
             "required": true,
             "lvl": "simple",
-            "placeholder": 0
+            "placeholder": "0"
           }
         ]
       }
@@ -74,6 +81,7 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
+	  "emitYAML": "always",
       "default": "U_WORD",
       "options": [
         "U_WORD",
@@ -94,13 +102,15 @@
       "key": "register_count",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "1"
     },
     {
       "key": "skip_updates",
       "type": "number",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "3"
     },
     {
       "key": "force_new_range",
@@ -112,13 +122,15 @@
       "key": "lambda",
       "type": "lambda",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "return {};"
     },
     {
       "key": "write_lambda",
       "type": "lambda",
       "required": false,
-      "lvl": "advanced"
+      "lvl": "advanced",
+      "placeholder": "return value;"
     },
     {
       "key": "use_write_multiple",

@@ -28,17 +28,11 @@
     {
       "key": "micronova_id",
       "type": "id_ref",
-      "required": true,
+      "required": false,
       "lvl": "simple",
       "domain": "micronova",
       "allowSelfReference": true,
       "default": "micronova_hub"
-    },
-    {
-      "key": "custom_config",
-      "type": "raw_yaml",
-      "required": false,
-      "lvl": "advanced"
     },
     {
       "key": "stove_state",
@@ -71,6 +65,12 @@
           "suppressQuotes": true
         }
       ]
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
     }
   ]
 }

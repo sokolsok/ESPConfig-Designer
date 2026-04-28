@@ -6,17 +6,25 @@
   "extends": "base_text_sensor.json",
   "fields": [
     {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Sensor Name"
+    },
+    {
       "key": "lambda",
       "type": "lambda",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "return std::string(\"hello\");"
     },
     {
       "key": "update_interval",
       "type": "duration",
       "required": false,
       "lvl": "normal",
-      "default": "60s"
+      "placeholder": "60s"
     }
   ]
 }

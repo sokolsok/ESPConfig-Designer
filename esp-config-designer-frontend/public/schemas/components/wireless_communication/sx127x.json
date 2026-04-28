@@ -1,6 +1,9 @@
 {
   "id": "sx127x",
   "domain": "sx127x",
+  "platform": "",
+  "renderAs": "root_map",
+  "previewGroup": "wireless",
   "helpUrl": "https://esphome.io/components/sx127x/",
   "requirements": [
     {
@@ -13,25 +16,29 @@
       "type": "id",
       "required": false,
       "lvl": "normal",
+      "placeholder": "sx127x_id",
       "idDomain": "sx127x"
     },
     {
       "key": "cs_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
     },
     {
       "key": "rst_pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+      "placeholder": "GPIOXX"
     },
     {
       "key": "dio0_pin",
       "type": "gpio",
       "required": false,
-      "lvl": "normal"
+      "lvl": "normal",
+      "placeholder": "GPIOXX"
     },
     {
       "key": "auto_cal",
@@ -64,7 +71,9 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
+	  "default": "NONE",
       "options": [
+		"NONE",
         "BOOST",
         "RFO"
       ]

@@ -14,16 +14,18 @@
       "key": "address",
       "type": "text",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "default": "0x51",
+      "emitYAML": "always",
       "suppressQuotes": true
     },
     {
       "key": "i2c_id",
       "type": "id_ref",
       "required": false,
-      "lvl": "advanced",
-      "domain": "i2c"
+      "lvl": "normal",
+      "domain": "i2c",
+      "placeholder": "i2c_bus"
     }
   ]
 }

@@ -15,6 +15,7 @@
       "type": "list",
       "required": false,
       "lvl": "normal",
+      "placeholder": "0.pool.ntp.org",
       "item": {
         "type": "text",
         "suppressQuotes": true,

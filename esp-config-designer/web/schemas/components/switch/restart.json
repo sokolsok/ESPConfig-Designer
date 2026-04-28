@@ -4,5 +4,13 @@
   "platform": "restart",
   "helpUrl": "https://esphome.io/components/switch/restart/",
   "extends": "base_switch.json",
-  "fields": []
+  "fields": [
+    {
+      "key": "name",
+      "type": "text",
+      "required": false,
+      "lvl": "simple",
+      "placeholder": "Switch Name"
+    }
+  ]
 }

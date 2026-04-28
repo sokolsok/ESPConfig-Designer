@@ -9,16 +9,6 @@
       "placeholder": "rf_bridge_id",
       "domain": "rf_bridge",
       "lvl": "normal"
-    },
-    {
-      "key": "duration",
-      "label": "Duration",
-      "type": "duration",
-      "templatable": true,
-      "required": false,
-      "lvl": "normal",
-      "placeholder": "10s",
-      "lambdaPlaceholder": "return 10000;"
     }
   ]
 }

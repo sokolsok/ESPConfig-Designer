@@ -30,7 +30,7 @@
     {
       "key": "mr24hpc1_id",
       "type": "id_ref",
-      "required": true,
+      "required": false,
       "lvl": "simple",
       "domain": "seeed_mr24hpc1",
       "allowSelfReference": true,
@@ -43,6 +43,13 @@
       "required": false,
       "lvl": "advanced"
     },
-    { "key": "underlying_open_function", "type": "object", "required": false, "lvl": "simple", "extends": "base_switch.json", "fields": [] }
+    { 
+	  "key": "underlying_open_function", 
+	  "type": "object", 
+	  "required": false, 
+	  "lvl": "simple", 
+	  "extends": "base_switch.json", 
+	  "fields": [] 
+	}
   ]
 }

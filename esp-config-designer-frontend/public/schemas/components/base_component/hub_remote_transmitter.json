@@ -8,7 +8,7 @@
       "key": "id",
       "type": "id",
       "required": false,
-      "lvl": "normal",
+      "lvl": "simple",
       "default": "remote_transmitter_hub",
       "idDomain": "remote_transmitter"
     },
@@ -16,7 +16,8 @@
       "key": "pin",
       "type": "gpio",
       "required": true,
-      "lvl": "simple"
+      "lvl": "simple",
+	  "placeholder": "GPIOXX"
     },
     {
       "key": "carrier_duty_percent",

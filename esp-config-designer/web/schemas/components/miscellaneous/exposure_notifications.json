@@ -1,0 +1,57 @@
+{
+  "id": "exposure_notifications",
+  "domain": "exposure_notifications",
+  "platform": "",
+  "renderAs": "root_map",
+  "previewGroup": "misc",
+  "helpUrl": "https://esphome.io/components/exposure_notifications/",
+  "embedded": [
+    {
+      "key": "ble_tracker",
+      "domain": "esp32_ble_tracker",
+      "emitAs": "map",
+      "singleton": true,
+      "alwaysEmit": true,
+      "defaultPayload": {},
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "component:esp32_ble_tracker"
+    }
+  ],
+  "fields": [
+    {
+      "key": "ble_tracker",
+      "label": "BLE tracker hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "extends": "hub_esp32_ble_tracker.json"
+    },
+    {
+      "key": "esp32_ble_tracker_id",
+      "type": "id_ref",
+      "required": true,
+      "lvl": "simple",
+      "domain": "esp32_ble_tracker",
+      "allowSelfReference": true,
+      "emitYAML": "never",
+      "default": "esp32_ble_tracker_hub"
+    },
+    {
+      "key": "on_exposure_notification",
+      "type": "list",
+      "required": true,
+      "lvl": "simple",
+      "item": {
+        "type": "object",
+        "fields": [],
+        "extends": "base_actions.json"
+      },
+      "wrapThen": true
+    }
+  ]
+}
