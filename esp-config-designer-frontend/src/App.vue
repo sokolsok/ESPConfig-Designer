@@ -56,7 +56,7 @@
             Install
           </button>
           <div v-if="installMenuOpen" class="topbar-install-dropdown" role="menu" aria-label="Install options">
-            <button type="button" role="menuitem" @click="selectInstallOption('serial')">Via Serial Port</button>
+            <button type="button" role="menuitem" @click="selectInstallOption('serial')">Serial Port</button>
             <button
               type="button"
               role="menuitem"

@@ -1,5 +1,5 @@
-## 1.2.0
+## 1.2.1
 
-- Added the ability to configure multiple networks simultaneously
-- Improved the order of settings displayed in the form on the Network tab
-- Added several missing settings
+- Fixed the layer ordering bug in Display Configurator.
+- Renamed several options to better match their purpose.
+- Fixed several smaller bugs.

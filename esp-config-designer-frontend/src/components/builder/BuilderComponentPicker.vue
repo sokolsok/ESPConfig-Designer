@@ -28,6 +28,30 @@
       <div v-if="componentsImportError" class="notice notice--error components-error">
         {{ componentsImportError }}
       </div>
+      <div v-if="notices.length" class="components-picker-notices">
+        <section
+          v-for="notice in notices"
+          :key="notice.id"
+          class="components-picker-notice"
+        >
+          <span class="components-picker-notice__icon" aria-hidden="true">
+            <img v-if="notice.icon" :src="notice.icon" alt="" />
+          </span>
+          <div class="components-picker-notice__content">
+            <h3>{{ notice.title }}</h3>
+            <p>{{ notice.message }}</p>
+          </div>
+          <a
+            v-if="notice.href && notice.actionLabel"
+            class="components-picker-notice__action"
+            :href="notice.href"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ notice.actionLabel }}
+          </a>
+        </section>
+      </div>
       <div class="components-list">
         <details
           v-for="(category, categoryIndex) in visibleCategories"
@@ -116,6 +140,7 @@ const props = defineProps({
   componentsImportError: { type: String, default: "" },
   componentsAvailableOnly: { type: Boolean, default: false },
   filteredCategories: { type: Array, default: () => [] },
+  notices: { type: Array, default: () => [] },
   selectedComponentKeys: { type: Object, required: true },
   isComponentAvailable: { type: Function, required: true },
   isResolvingComponentSelection: { type: Boolean, default: false },

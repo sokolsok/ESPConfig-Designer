@@ -16,6 +16,14 @@ const toApiErrorMessage = (payload, fallback) => {
   return message || fallback;
 };
 
+export const catalogHasUnavailableComponents = (catalog) =>
+  (catalog?.categories || []).some((category) => {
+    if ((category.items || []).some((item) => item?.available === false)) return true;
+    return (category.subcategories || []).some((subcategory) =>
+      (subcategory.items || []).some((item) => item?.available === false)
+    );
+  });
+
 export const useBuilderComponentCatalog = ({
   config,
   activeTab,
@@ -113,6 +121,10 @@ export const useBuilderComponentCatalog = ({
 
   const isComponentCatalogReady = computed(
     () => !isComponentCatalogLoading.value && !componentCatalogError.value
+  );
+
+  const hasUnavailableCatalogComponents = computed(() =>
+    catalogHasUnavailableComponents(componentCatalog.value)
   );
 
   const componentIndex = computed(() => {
@@ -352,6 +364,7 @@ export const useBuilderComponentCatalog = ({
     importSummaryModalMessage,
     importSummaryModalOpen,
     importSummaryModalRows,
+    hasUnavailableCatalogComponents,
     isComponentCatalogLoading,
     isComponentCatalogReady,
     isComponentPickerOpen,

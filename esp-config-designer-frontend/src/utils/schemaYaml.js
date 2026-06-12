@@ -2029,7 +2029,9 @@ const buildDisplayLambda = (
   displayType
 ) => {
   const lines = [];
-  (elements || []).forEach((element) => {
+  // The editor stores layers topmost-first, but ESPHome draws later lambda
+  // commands over earlier ones, so YAML must emit layers bottommost-first.
+  [...(elements || [])].reverse().forEach((element) => {
     if (element?.type === "icon") {
       const iconLines = buildIconLambda([element], mdiSubstitutions, displayType);
       lines.push(...iconLines);
