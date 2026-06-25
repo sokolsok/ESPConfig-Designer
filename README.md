@@ -51,6 +51,8 @@ The repository includes Docker Compose examples in:
 docker/
 ```
 
+Before using Docker standalone, install Docker and Docker Compose on your system.
+
 Recommended Linux setup uses host networking for the best ESPHome behavior:
 
 ```bash
@@ -58,6 +60,8 @@ cd docker
 cp .env.example .env
 docker compose up -d
 ```
+
+Before starting the container, edit `docker/.env` and change `ECD_AUTH_PASSWORD=change-me`. After startup, open `http://localhost:8099` and log in with username `admin` and the password from `ECD_AUTH_PASSWORD`.
 
 For systems where host networking is not available, use the bridge example:
 
