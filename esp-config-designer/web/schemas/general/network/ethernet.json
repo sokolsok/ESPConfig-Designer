@@ -153,7 +153,7 @@
       }
     },
     {
-      "key": "cs_pin",
+      "key": "mosi_pin",
       "type": "gpio",
       "required": true,
       "lvl": "simple",
@@ -167,12 +167,39 @@
       }
     },
     {
-      "key": "spi_id",
-      "type": "id_ref",
+      "key": "miso_pin",
+      "type": "gpio",
       "required": true,
       "lvl": "simple",
-      "placeholder": "spi_bus",
-      "domain": "spi",
+      "placeholder": "GPIOXX",
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "W5500",
+          "DM9051"
+        ]
+      }
+    },
+    {
+      "key": "clk_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "GPIOXX",
+      "dependsOn": {
+        "key": "type",
+        "values": [
+          "W5500",
+          "DM9051"
+        ]
+      }
+    },
+    {
+      "key": "cs_pin",
+      "type": "gpio",
+      "required": true,
+      "lvl": "simple",
+      "placeholder": "GPIOXX",
       "dependsOn": {
         "key": "type",
         "values": [

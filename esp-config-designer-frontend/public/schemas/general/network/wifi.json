@@ -225,7 +225,7 @@
         {
           "key": "password",
           "type": "password",
-          "required": false,
+          "required": true,
           "lvl": "normal",
           "emitYAML": "dependsOn",
           "settings": {

@@ -86,6 +86,7 @@
       "type": "select",
       "required": true,
       "lvl": "simple",
+	  "emitYAML": "never",
       "default": "i2c",
       "options": [
         "i2c",

@@ -120,6 +120,11 @@ const socialLinks = [
     label: "Support on PayPal",
     href: "https://www.paypal.com/paypalme/ss4h",
     icon: "https://cdn.jsdelivr.net/npm/@mdi/svg/svg/paypal.svg"
+  },
+  {
+    label: "Buy me a coffee",
+    href: "https://buymeacoffee.com/smartsolutionsforhome",
+    icon: "https://cdn.jsdelivr.net/npm/@mdi/svg/svg/coffee.svg"
   }
 ];
 
@@ -192,6 +197,7 @@ onMounted(() => {
   window.addEventListener("app:route-switch-request", handleRouteSwitchRequest);
   window.addEventListener("click", handleGlobalClick);
   window.addEventListener("keydown", handleGlobalKeydown);
+  window.addEventListener("beforeunload", handleBeforeUnload);
 });
 
 onBeforeUnmount(() => {
@@ -200,6 +206,7 @@ onBeforeUnmount(() => {
   window.removeEventListener("app:route-switch-request", handleRouteSwitchRequest);
   window.removeEventListener("click", handleGlobalClick);
   window.removeEventListener("keydown", handleGlobalKeydown);
+  window.removeEventListener("beforeunload", handleBeforeUnload);
 });
 
 const closeInstallMenu = () => {
@@ -239,6 +246,12 @@ const handleGlobalClick = (event) => {
 const handleGlobalKeydown = (event) => {
   if (event.key !== "Escape") return;
   closeInstallMenu();
+};
+
+const handleBeforeUnload = (event) => {
+  if (!isBuilderRoute.value || !builderHasUnsavedChanges.value) return;
+  event.preventDefault();
+  event.returnValue = "";
 };
 
 const triggerBuilderSave = async () => {

@@ -1153,6 +1153,7 @@ import {
   supportsDither,
   supportsInvertAlpha
 } from "../../utils/displayImageEncoding";
+import { deriveGoogleFontStyle as deriveVariantStyle } from "../../utils/displayFonts";
 
 const props = defineProps({
   selectedElement: {
@@ -1551,13 +1552,6 @@ const handleTraceColorSelect = (value) => {
 
 const updatePatch = (patch) => {
   emit("update", patch);
-};
-
-const deriveVariantStyle = (variant) => {
-  const value = `${variant || ""}`.toLowerCase();
-  const style = value.includes("italic") ? "italic" : "normal";
-  const weight = Number.parseInt(value, 10) || 400;
-  return { weight, style };
 };
 
 const deriveLocalStyle = (label, fileName) => {

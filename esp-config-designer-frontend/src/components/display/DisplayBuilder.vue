@@ -195,6 +195,7 @@ import {
   normalizeAnimationElementEncoding,
   normalizeImageElementEncoding
 } from "../../utils/displayImageEncoding";
+import { deriveGoogleFontStyle } from "../../utils/displayFonts";
 import { resolveDisplayViewport } from "../../utils/displayViewport";
 
 const props = defineProps({
@@ -335,13 +336,14 @@ const getDefaultTextFont = () => {
   if (google) {
     const variant = google.variants?.includes("regular") ? "regular" : google.variants?.[0];
     const url = google.files?.[variant];
+    const { style, weight } = deriveGoogleFontStyle(variant);
     return {
       fontSource: "google",
       fontFamily: google.family,
       fontVariant: variant || "regular",
       fontUrl: url || "",
-      fontStyle: variant?.includes("italic") ? "italic" : "normal",
-      fontWeight: Number.parseInt(variant, 10) || 400
+      fontStyle: style,
+      fontWeight: weight
     };
   }
 
@@ -385,8 +387,7 @@ const getDefaultLegendFont = (size) => {
   if (google) {
     const variant = google.variants?.includes("regular") ? "regular" : google.variants?.[0];
     const url = google.files?.[variant] || "";
-    const fontStyle = variant?.includes("italic") ? "italic" : "normal";
-    const weight = Number.parseInt(variant, 10) || 400;
+    const { style, weight } = deriveGoogleFontStyle(variant);
     return {
       source: "google",
       family: google.family,
@@ -394,7 +395,7 @@ const getDefaultLegendFont = (size) => {
       variant: variant || "regular",
       url,
       weight,
-      style: fontStyle,
+      style,
       size
     };
   }
@@ -883,14 +884,15 @@ const ensureTextDefaults = () => {
     if (google) {
       const variant = google.variants?.includes("regular") ? "regular" : google.variants?.[0];
       const url = google.files?.[variant];
+      const { style, weight } = deriveGoogleFontStyle(variant);
       return {
         ...element,
         fontSource: "google",
         fontFamily: google.family,
         fontVariant: variant,
         fontUrl: url || "",
-        fontStyle: variant?.includes("italic") ? "italic" : "normal",
-        fontWeight: Number.parseInt(variant, 10) || 400
+        fontStyle: style,
+        fontWeight: weight
       };
     }
 

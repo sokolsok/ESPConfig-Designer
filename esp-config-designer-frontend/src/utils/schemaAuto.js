@@ -95,6 +95,28 @@ export const resolveGenerationSpec = (field) => {
   };
 };
 
+export const hasGeneratedPasswordSeedValue = (value) =>
+  value !== undefined && value !== null;
+
+export const isSecretReferenceValue = (value) =>
+  /^\s*!secret\b/.test(String(value || ""));
+
+export const validateGeneratedPasswordValue = (field, value) => {
+  if (field?.type !== "password") return "";
+  if (isSecretReferenceValue(value)) return "";
+  const spec = resolveGenerationSpec(field);
+  if (!spec || spec.mode === "none" || !spec.onEmpty) return "";
+
+  const text = typeof value === "string" ? value.trim() : "";
+  if (!text) return "Password is required.";
+
+  if (spec.minLength > 0 && text.length < spec.minLength) {
+    return `Password must be at least ${spec.minLength} characters.`;
+  }
+
+  return "";
+};
+
 export const generateFieldValue = (field) => {
   if (!globalThis.crypto?.getRandomValues) return "";
   const spec = resolveGenerationSpec(field);

@@ -11,6 +11,7 @@ import {
   isTemplatableField
 } from "./schemaTemplatable";
 import { serializeGpioValue } from "./schemaGpio";
+import { parseGoogleFontVariant } from "./displayFonts";
 
 // schemaYaml is the central YAML emission pipeline for the Builder.
 // It converts normalized runtime config plus schema metadata into final ESPHome YAML,
@@ -40,9 +41,11 @@ const resolveSchemaDomain = (schema, config) => {
 };
 
 const filterSchemaFieldsForYaml = (fields = [], schema = null) =>
-  (Array.isArray(fields) ? fields : []).filter((field) => {
-    if (schema?.platformByBus && field?.key === "bus") return false;
-    return true;
+  (Array.isArray(fields) ? fields : []).map((field) => {
+    if (schema?.platformByBus && field?.key === "bus") {
+      return { ...field, emitYAML: "never" };
+    }
+    return field;
   });
 
 const isYamlPrimitive = (value) =>
@@ -303,34 +306,36 @@ const renderActionEntries = (actions, indent, lines, rootValue, globalStore) => 
     }
 
     lines.push(`${" ".repeat(indent)}- ${entry.type}:`);
+    const actionBodyIndent = indent + 4;
     outputFields.forEach((field) => {
+      const yamlKey = resolveFieldYamlKey(field);
       const state = resolveFieldRenderState(field, config[field.key]);
       let value = normalizeYamlFieldValue(field, state.value);
       if (value === "") value = undefined;
       if (value === undefined) {
         if (field.required) {
-          lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
+          lines.push(`${" ".repeat(actionBodyIndent)}${yamlKey}:`);
         }
         return;
       }
       if (state.templatableLambda) {
-        renderLambdaAssignment(`${" ".repeat(indent + 2)}${field.key}`, value, indent + 4, lines, "!lambda");
+        renderLambdaAssignment(`${" ".repeat(actionBodyIndent)}${yamlKey}`, value, actionBodyIndent + 2, lines, "!lambda");
         return;
       }
       if (field.type === "lambda" && typeof value === "string") {
-        renderLambdaAssignment(`${" ".repeat(indent + 2)}${field.key}`, value, indent + 4, lines);
+        renderLambdaAssignment(`${" ".repeat(actionBodyIndent)}${yamlKey}`, value, actionBodyIndent + 2, lines);
         return;
       }
       if (field.type === "raw_yaml") {
         const raw = typeof value === "string" ? value.trimEnd() : "";
         if (!raw) {
           if (field.required) {
-            lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
+            lines.push(`${" ".repeat(actionBodyIndent)}${yamlKey}:`);
           }
           return;
         }
         raw.split(/\r?\n/).forEach((line) => {
-          lines.push(`${" ".repeat(indent + 2)}${line}`);
+          lines.push(`${" ".repeat(actionBodyIndent)}${line}`);
         });
         return;
       }
@@ -338,44 +343,44 @@ const renderActionEntries = (actions, indent, lines, rootValue, globalStore) => 
         const raw = typeof value === "string" ? value.trimEnd() : "";
         if (!raw) {
           if (field.required) {
-            lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
+            lines.push(`${" ".repeat(actionBodyIndent)}${yamlKey}:`);
           }
           return;
         }
-        lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
+        lines.push(`${" ".repeat(actionBodyIndent)}${yamlKey}:`);
         raw.split(/\r?\n/).forEach((line) => {
-          lines.push(`${" ".repeat(indent + 4)}${line}`);
+          lines.push(`${" ".repeat(actionBodyIndent + 2)}${line}`);
         });
         return;
       }
       if (isYamlPrimitive(value)) {
         lines.push(
-          `${" ".repeat(indent + 2)}${field.key}: ${formatYamlValue(value, field.type)}`
+          `${" ".repeat(actionBodyIndent)}${yamlKey}: ${formatYamlValue(value, field.type)}`
         );
         return;
       }
       if (Array.isArray(value)) {
         if (!value.length) return;
         if (field.item?.extends === "base_actions.json") {
-          lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
-          renderActionEntries(value, indent + 4, lines, rootValue, globalStore);
+          lines.push(`${" ".repeat(actionBodyIndent)}${yamlKey}:`);
+          renderActionEntries(value, actionBodyIndent + 2, lines, rootValue, globalStore);
           return;
         }
         if (field.item?.extends === "base_conditions.json") {
-          lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
-          renderConditionEntries(value, indent + 4, lines, rootValue, globalStore);
+          lines.push(`${" ".repeat(actionBodyIndent)}${yamlKey}:`);
+          renderConditionEntries(value, actionBodyIndent + 2, lines, rootValue, globalStore);
           return;
         }
         if (field.yamlStyle === "flow" && canRenderFlowArray(value)) {
-          renderFlowArrayLine(`${" ".repeat(indent + 2)}${field.key}`, value, field.item, lines);
+          renderFlowArrayLine(`${" ".repeat(actionBodyIndent)}${yamlKey}`, value, field.item, lines);
           return;
         }
-        lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
-        renderYamlArray(value, field.item, indent + 4, lines, value, globalStore);
+        lines.push(`${" ".repeat(actionBodyIndent)}${yamlKey}:`);
+        renderYamlArray(value, field.item, actionBodyIndent + 2, lines, value, globalStore);
         return;
       }
-      lines.push(`${" ".repeat(indent + 2)}${field.key}:`);
-      renderYamlObject(value, field.fields, indent + 4, lines, rootValue, globalStore);
+      lines.push(`${" ".repeat(actionBodyIndent)}${yamlKey}:`);
+      renderYamlObject(value, field.fields, actionBodyIndent + 2, lines, rootValue, globalStore);
     });
   });
 };
@@ -1455,8 +1460,14 @@ const buildFontSections = (displayData, textFontIdByKey) => {
       const id = textFontIdByKey?.get(key);
       if (!id) return;
       if (font.source === "google") {
-        const variant = font.variant || "regular";
-        lines.push(`  - file: \"gfonts://${font.family}@${variant}\"`);
+        const { weight, italic } = parseGoogleFontVariant(font.variant);
+        lines.push("  - file:");
+        lines.push("      type: gfonts");
+        lines.push(`      family: \"${String(font.family || "").replace(/\"/g, "\\\"")}\"`);
+        lines.push(`      weight: ${weight}`);
+        if (italic) {
+          lines.push("      italic: true");
+        }
       } else {
         lines.push(`  - file: \"esp_assets/fonts/${font.file}\"`);
       }

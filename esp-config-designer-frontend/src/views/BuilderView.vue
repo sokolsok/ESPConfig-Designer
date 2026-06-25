@@ -529,7 +529,14 @@ import {
 import { buildGlobalRegistry, isFieldVisible as isSchemaFieldVisible } from "../utils/schemaVisibility";
 import { buildIdRefOptions } from "../utils/schemaIdRefs";
 import { getRequiredDependencies } from "../utils/schemaRequirements";
-import { generateFieldValue, resolveFieldValue, resolveGenerationSpec } from "../utils/schemaAuto";
+import {
+  generateFieldValue,
+  hasGeneratedPasswordSeedValue,
+  isSecretReferenceValue,
+  resolveFieldValue,
+  resolveGenerationSpec,
+  validateGeneratedPasswordValue
+} from "../utils/schemaAuto";
 import {
   BUILDER_CONFIG_STORAGE_KEY,
   readBuilderSessionProjectName,
@@ -560,6 +567,7 @@ import {
   normalizeAnimationElementEncoding,
   normalizeImageElementEncoding
 } from "../utils/displayImageEncoding";
+import { deriveGoogleFontStyle as deriveVariantStyle } from "../utils/displayFonts";
 import { isDevOffline } from "../utils/devFlags";
 
 // BuilderView is now mainly the orchestration shell for the schema-driven editor.
@@ -972,6 +980,12 @@ const buildValidationErrors = (entries) => {
   };
 
   const validateField = (value, field, entry, path) => {
+    if (field?.type === "password" && isSecretReferenceValue(value)) return;
+    const generatedPasswordError = validateGeneratedPasswordValue(field, value);
+    if (generatedPasswordError) {
+      pushError(entry, path, generatedPasswordError);
+      return;
+    }
     if (field?.type === "password" && field?.settings?.format === "base64_44") {
       const content = typeof value === "string" ? value.trim() : "";
       if (!/^[A-Za-z0-9+/]{43}=$/.test(content)) {
@@ -2608,13 +2622,8 @@ const shouldConsiderFieldForGeneration = (field, valueMap, schemaFields, globalS
   return dependencySatisfied;
 };
 
-const hasSufficientGeneratedValue = (value, spec) => {
-  if (value === undefined || value === null) return false;
-  const text = String(value);
-  if (!text.trim()) return false;
-  const minLength = Number(spec?.minLength) || 0;
-  if (!minLength) return true;
-  return text.length >= minLength;
+const hasGeneratedPasswordValue = (value) => {
+  return hasGeneratedPasswordSeedValue(value);
 };
 
 const hasGeneratablePasswordCandidate = (fields, valueMap, globalStore) => {
@@ -2667,7 +2676,7 @@ const materializeGeneratedPasswordsInObject = (valueMap, fields, globalStore) =>
       const spec = resolveGenerationSpec(field);
       if (spec.mode === "none" || !spec.onEmpty) return;
       const currentValue = valueMap[key];
-      if (hasSufficientGeneratedValue(currentValue, spec)) return;
+      if (hasGeneratedPasswordValue(currentValue)) return;
       const generated = generateFieldValue(field);
       if (!generated) return;
       valueMap[key] = generated;
@@ -3723,14 +3732,6 @@ const toApiErrorMessage = (payload, fallback) => {
   const message = typeof payload?.message === "string" ? payload.message.trim() : "";
   if (message) return message;
   return fallback;
-};
-
-const deriveVariantStyle = (variant) => {
-  const value = String(variant || "regular").toLowerCase();
-  const style = value.includes("italic") ? "italic" : "normal";
-  const numeric = Number.parseInt(value, 10);
-  const weight = Number.isFinite(numeric) ? numeric : value === "regular" ? 400 : 400;
-  return { style, weight };
 };
 
 const toAssetFileSet = (items) =>

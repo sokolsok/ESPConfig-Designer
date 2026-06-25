@@ -175,9 +175,12 @@ import PrimitiveField from "./schema-fields/PrimitiveField.vue";
 import { isFieldVisible } from "../utils/schemaVisibility";
 import {
   generateFieldValue,
+  hasGeneratedPasswordSeedValue,
+  isSecretReferenceValue,
   normalizeSlugValue,
   resolveAutoValue,
-  resolveGenerationSpec
+  resolveGenerationSpec,
+  validateGeneratedPasswordValue
 } from "../utils/schemaAuto";
 import {
   createTemplatableValue,
@@ -336,7 +339,7 @@ const isAutoField = computed(() =>
 );
 const generationSpec = computed(() => resolveGenerationSpec(props.field));
 const hasGenerate = computed(() => generationSpec.value.mode !== "none");
-const hasSecretReference = computed(() => /^\s*!secret\b/.test(String(resolvedValue.value || "")));
+const hasSecretReference = computed(() => isSecretReferenceValue(resolvedValue.value));
 const showSecretAction = computed(() => hasSecretReference.value);
 const showInlineAction = computed(() => hasGenerate.value || hasSecretReference.value);
 const fixedListLength = computed(() => {
@@ -569,6 +572,8 @@ const fieldError = computed(() => {
     }
     return fixedListLength.value <= 0 ? "Fixed list requires a positive length." : "";
   }
+  const generatedPasswordError = validateGeneratedPasswordValue(props.field, rawValue);
+  if (generatedPasswordError) return generatedPasswordError;
   if (passwordFormat.value === "base64_44") {
     const value = typeof rawValue === "string" ? rawValue.trim() : "";
     if (!/^[A-Za-z0-9+/]{43}=$/.test(value)) {
@@ -676,14 +681,11 @@ watch(
 );
 
 watch(
-  () => resolvedValue.value,
+  () => fieldValue.value,
   (currentValue) => {
     if (!hasGenerate.value || !generationSpec.value.onEmpty) return;
     if (generateTouched.value) return;
-    const minLength = generationSpec.value.minLength;
-    if (currentValue) {
-      if (!minLength || String(currentValue).length >= minLength) return;
-    }
+    if (hasGeneratedPasswordSeedValue(currentValue)) return;
     const generated = generateValue();
     if (!generated) return;
     emit("update", { path: fieldPath.value, value: wrapInputValue(generated) });
