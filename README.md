@@ -1,4 +1,4 @@
-# ESPConfig Designer v.1.2.3
+# ESPConfig Designer v.1.2.4
 
 ESPConfig Designer is a Home Assistant ingress add-on for building, organizing, validating, compiling, and deploying ESPHome configurations through a schema-driven visual editor.
 
@@ -8,6 +8,79 @@ The repository contains the full add-on:
 - `esp-config-designer-frontend/` -> Vue 3 frontend (Dashboard + Builder)
 
 The add-on is designed to let users manage complete ESPHome projects without hand-editing YAML unless they want to.
+
+---
+
+## Installation Options
+
+ESPConfig Designer can be installed in two supported modes from this same repository.
+
+### Home Assistant OS / Supervised Add-On
+
+Use this option if your Home Assistant installation has the add-on store.
+
+1. Open Home Assistant.
+2. Go to Settings -> Add-ons -> Add-on Store.
+3. Open the menu in the top-right corner and choose Repositories.
+4. Add this repository URL:
+
+   ```text
+   https://github.com/sokolsok/ESPConfig-Designer
+   ```
+
+5. Find ESPConfig Designer in the add-on store.
+6. Install it.
+7. Start the add-on.
+8. Open the ESPConfig Designer UI from the add-on page or sidebar.
+
+This is the original installation mode. It uses Home Assistant ingress, the existing `esp-config-designer/config.json`, and the existing add-on `esp-config-designer/Dockerfile`. Existing add-on users keep the same update path through Home Assistant.
+
+### Docker Standalone
+
+Use this option if you run Home Assistant Container, or if you want ESPConfig Designer as a separate Docker service outside the Home Assistant add-on system.
+
+Home Assistant Container does not support Home Assistant add-ons. In this setup ESPConfig Designer runs next to Home Assistant as a separate web application, available by default at:
+
+```text
+http://<docker-host-ip>:8099
+```
+
+The repository includes Docker Compose examples in:
+
+```text
+docker/
+```
+
+Recommended Linux setup uses host networking for the best ESPHome behavior:
+
+```bash
+cd docker
+cp .env.example .env
+docker compose up -d
+```
+
+For systems where host networking is not available, use the bridge example:
+
+```bash
+docker compose -f compose.bridge.yaml up -d
+```
+
+Bridge networking may require manual IP addresses for devices because `.local` mDNS resolution, online/offline status, logs, and OTA can be less reliable without host networking.
+
+### Key Differences
+
+| Area | Home Assistant add-on | Docker standalone |
+|---|---|---|
+| Install method | Home Assistant add-on store | Docker Compose / Docker image |
+| Runtime access | Home Assistant ingress | Direct web app on port `8099` by default |
+| Supervisor required | Yes | No |
+| Recommended network | Managed by Home Assistant | `network_mode: host` on Linux |
+| Default storage | `/config/ecd` | `/config/ecd` inside the container volume |
+| Shared ESPHome path | `use_esphome_shared_path=true` -> `/config/esphome` | `ECD_USE_ESPHOME_SHARED_PATH=true` -> `/config/esphome` |
+| Updates | Home Assistant update flow | `docker compose pull && docker compose up -d` or optional external updater |
+| Authentication | Home Assistant ingress/session | Optional Basic Auth with `ECD_AUTH_MODE=basic` |
+
+Do not expose the Docker standalone service directly to the internet. If you use Docker standalone on a LAN, change the default Basic Auth password in `docker/.env` or protect the service with another trusted access layer.
 
 ---
 

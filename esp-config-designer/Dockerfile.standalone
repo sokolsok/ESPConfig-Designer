@@ -1,0 +1,34 @@
+FROM ghcr.io/esphome/esphome:2026.4.5
+
+ARG BUILD_VERSION=dev
+ARG VCS_REF=unknown
+
+LABEL org.opencontainers.image.title="ESPConfig Designer"
+LABEL org.opencontainers.image.description="Standalone Docker image for ESPConfig Designer"
+LABEL org.opencontainers.image.source="https://github.com/sokolsok/ESPConfig-Designer"
+LABEL org.opencontainers.image.version="$BUILD_VERSION"
+LABEL org.opencontainers.image.revision="$VCS_REF"
+LABEL org.opencontainers.image.licenses="MIT"
+
+ENV LANG=C.UTF-8
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV ECD_MODE=standalone
+ENV ECD_VERSION=$BUILD_VERSION
+ENV ECD_PORT=8099
+ENV PORT=8099
+
+RUN python3 -m venv /opt/designer-venv \
+    && /opt/designer-venv/bin/python -m pip install --no-cache-dir -U pip \
+    && /opt/designer-venv/bin/python -m pip install --no-cache-dir flask==3.1.2
+
+COPY server.py /server.py
+COPY run.sh /run.sh
+COPY seed_esphome /seed_esphome
+COPY logo.png /logo.png
+COPY web /web
+RUN chmod a+x /run.sh
+
+EXPOSE 8099
+
+ENTRYPOINT ["/run.sh"]

@@ -4,4 +4,8 @@ esp-config-designer-frontend/node_modules/
 esp-config-designer-frontend/dist/
 esp-config-designer-frontend/runtime/
 tests/
+!esp-config-designer/tests/
+!esp-config-designer/tests/**
+esp-config-designer/tests/**/__pycache__/
+esp-config-designer/tests/**/*.pyc
 R&D/

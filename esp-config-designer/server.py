@@ -1,3 +1,5 @@
+import base64
+import hmac
 import json
 import mimetypes
 import os
@@ -27,6 +29,30 @@ try:
 except Exception:
     IPVersion = None
     Zeroconf = None
+
+TRUTHY_VALUES = {"1", "true", "yes", "on"}
+
+
+def is_truthy(value: str) -> bool:
+    return str(value or "").strip().lower() in TRUTHY_VALUES
+
+
+def normalize_runtime_mode(value: str) -> str:
+    mode = str(value or "").strip().lower()
+    if mode in ("addon", "standalone"):
+        return mode
+    return "addon"
+
+
+ECD_MODE = normalize_runtime_mode(os.environ.get("ECD_MODE", "addon"))
+ESPHOME_IS_HA_ADDON = is_truthy(os.environ.get("ESPHOME_IS_HA_ADDON", "true" if ECD_MODE == "addon" else "false"))
+ECD_STORAGE_MODE = os.environ.get("ECD_STORAGE_MODE", "").strip()
+ECD_VERSION = os.environ.get("ECD_VERSION", "").strip()
+ECD_AUTH_MODE = os.environ.get("ECD_AUTH_MODE", "none").strip().lower()
+ECD_AUTH_USERNAME = os.environ.get("ECD_AUTH_USERNAME", "").strip()
+ECD_AUTH_PASSWORD = os.environ.get("ECD_AUTH_PASSWORD", "")
+ECD_AUTH_PASSWORD_FILE = os.environ.get("ECD_AUTH_PASSWORD_FILE", "").strip()
+ECD_STATUS_USE_PING = is_truthy(os.environ.get("ECD_STATUS_USE_PING", "false"))
 
 TARGET_DIR = os.environ.get("TARGET_DIR", "/config/esphome").strip()
 PROJECT_DIR = os.environ.get("PROJECT_DIR", "/config/esphome/esp_projects").strip()
@@ -1399,7 +1425,64 @@ def resolve_secrets_path() -> str:
     return os.path.join(TARGET_DIR, SECRETS_FILENAME)
 
 
+def is_standalone_mode() -> bool:
+    return ECD_MODE == "standalone"
+
+
+def read_auth_password() -> str:
+    if ECD_AUTH_PASSWORD:
+        return ECD_AUTH_PASSWORD
+    if not ECD_AUTH_PASSWORD_FILE:
+        return ""
+    try:
+        with open(ECD_AUTH_PASSWORD_FILE, "r", encoding="utf-8") as handle:
+            return handle.read().strip()
+    except Exception:
+        return ""
+
+
+def basic_auth_challenge(message: str = "Authentication required"):
+    response = jsonify({"status": "error", "message": message})
+    response.status_code = 401
+    response.headers["WWW-Authenticate"] = 'Basic realm="ESPConfig Designer"'
+    return response
+
+
+def standalone_basic_auth_response():
+    if not is_standalone_mode() or ECD_AUTH_MODE != "basic":
+        return None
+    if request.method == "OPTIONS" or request.path == "/api/health":
+        return None
+
+    expected_username = ECD_AUTH_USERNAME
+    expected_password = read_auth_password()
+    if not expected_username or not expected_password:
+        return basic_auth_challenge("Basic authentication is not configured")
+
+    auth_header = request.headers.get("Authorization", "")
+    if not auth_header.lower().startswith("basic "):
+        return basic_auth_challenge()
+
+    token = auth_header.split(" ", 1)[1].strip()
+    try:
+        decoded = base64.b64decode(token, validate=True).decode("utf-8")
+    except Exception:
+        return basic_auth_challenge()
+
+    username, separator, password = decoded.partition(":")
+    if not separator:
+        return basic_auth_challenge()
+    if not hmac.compare_digest(username, expected_username):
+        return basic_auth_challenge()
+    if not hmac.compare_digest(password, expected_password):
+        return basic_auth_challenge()
+    return None
+
+
 def check_access():
+    if is_standalone_mode():
+        return None
+
     if request.headers.get("X-Ingress-Path") or request.headers.get("X-HA-Ingress"):
         return None
 
@@ -1778,9 +1861,46 @@ job_manager = JobManager()
 app = Flask(__name__)
 
 
+@app.before_request
+def enforce_standalone_auth():
+    return standalone_basic_auth_response()
+
+
 @app.route("/api/health", methods=["GET"])
 def api_health():
-    return jsonify({"status": "ok", "ts": utc_now()})
+    return jsonify({"status": "ok", "ok": True, "mode": ECD_MODE, "ts": utc_now()})
+
+
+@app.route("/api/runtime", methods=["GET"])
+def api_runtime():
+    access = check_access()
+    if access:
+        return access
+
+    payload = {
+        "status": "ok",
+        "mode": ECD_MODE,
+        "isHaAddon": ESPHOME_IS_HA_ADDON,
+        "storageMode": ECD_STORAGE_MODE,
+        "authMode": ECD_AUTH_MODE,
+        "version": ECD_VERSION,
+        "port": PORT,
+    }
+
+    debug = is_truthy(request.args.get("debug", ""))
+    if debug:
+        payload.update(
+            {
+                "targetDir": TARGET_DIR,
+                "projectDir": PROJECT_DIR,
+                "assetRoot": ASSET_ROOT,
+                "jobDir": JOB_DIR,
+                "esphomeDataDir": ESPHOME_DATA_DIR,
+                "webRoot": WEB_ROOT,
+            }
+        )
+
+    return jsonify(payload)
 
 
 @app.route("/api/component-catalog", methods=["GET", "OPTIONS"])
@@ -2916,7 +3036,7 @@ def api_devices_list():
 
     devices = load_devices()
     refresh = str(request.args.get("refresh", "0")).strip() in ("1", "true", "yes")
-    deep = str(request.args.get("deep", "0")).strip() in ("1", "true", "yes")
+    deep = str(request.args.get("deep", "0")).strip() in ("1", "true", "yes") or ECD_STATUS_USE_PING
     response_devices = []
     normalized_any = False
 
@@ -3022,7 +3142,7 @@ def api_device_status():
         return jsonify({"status": "ok", "device": None})
 
     refresh = str(request.args.get("refresh", "0")).strip() in ("1", "true", "yes")
-    deep = str(request.args.get("deep", "0")).strip() in ("1", "true", "yes")
+    deep = str(request.args.get("deep", "0")).strip() in ("1", "true", "yes") or ECD_STATUS_USE_PING
     if not refresh:
         return jsonify({"status": "ok", "device": build_device_response(target)})
 

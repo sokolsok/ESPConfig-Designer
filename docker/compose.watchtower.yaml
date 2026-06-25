@@ -1,0 +1,31 @@
+services:
+  esp-config-designer:
+    image: ghcr.io/sokolsok/esp-config-designer:latest
+    container_name: esp-config-designer
+    restart: unless-stopped
+    network_mode: host
+    labels:
+      com.centurylinklabs.watchtower.scope: ecd
+    environment:
+      TZ: ${TZ:-Europe/Warsaw}
+      ECD_MODE: standalone
+      ECD_PORT: ${ECD_PORT:-8099}
+      ECD_USE_ESPHOME_SHARED_PATH: ${ECD_USE_ESPHOME_SHARED_PATH:-false}
+      ECD_AUTH_MODE: ${ECD_AUTH_MODE:-basic}
+      ECD_AUTH_USERNAME: ${ECD_AUTH_USERNAME:-admin}
+      ECD_AUTH_PASSWORD: ${ECD_AUTH_PASSWORD:-change-me}
+    volumes:
+      - ./config:/config
+      - ./data:/data
+      - ./build:/build
+      - /etc/localtime:/etc/localtime:ro
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: ecd-watchtower
+    restart: unless-stopped
+    command: --scope ecd --cleanup --interval 86400
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      com.centurylinklabs.watchtower.scope: ecd
