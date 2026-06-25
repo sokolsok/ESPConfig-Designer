@@ -8,4 +8,6 @@ tests/
 !esp-config-designer/tests/**
 esp-config-designer/tests/**/__pycache__/
 esp-config-designer/tests/**/*.pyc
+scripts/
+.github/workflows/validate.yml
 R&D/
