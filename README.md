@@ -1,5 +1,9 @@
 # ESPConfig Designer v.1.2.4
 
+<a href="https://buymeacoffee.com/smartsolutionsforhome" target="_blank">
+<img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee">
+</a>
+
 ESPConfig Designer is a Home Assistant ingress add-on for building, organizing, validating, compiling, and deploying ESPHome configurations through a schema-driven visual editor.
 
 The repository contains the full add-on:
@@ -381,8 +385,6 @@ After backend changes you rebuild/restart the add-on.
 ESPConfig Designer is released under the MIT License.
 
 Unless explicitly stated otherwise, the MIT License applies to all files included in this public repository, including the backend, frontend, included free schemas, schema format, and schema authoring documentation.
-
-Separately distributed paid schema packs, if offered, are not part of this public repository and are not covered by the repository MIT License unless explicitly stated in the package itself. Such packs may be distributed under separate commercial license terms.
 
 ESPHome is a separate project and remains governed by its own licenses. ESPConfig Designer does not grant any rights to ESPHome itself, its documentation, trademarks, or third-party dependencies.
 
