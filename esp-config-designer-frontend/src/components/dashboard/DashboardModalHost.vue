@@ -35,6 +35,21 @@
     @close-compile="emit('close-compile-modal')"
   />
 
+  <YamlFileImportModal
+    :open="yamlImportModalOpen"
+    :file-name="yamlImportFileName"
+    :content="yamlImportContent"
+    :analysis="yamlImportAnalysis"
+    :analysis-error="yamlImportAnalysisError"
+    :analyzing="yamlImportAnalyzing"
+    :report-visible="yamlImportReportVisible"
+    :importing="yamlImportSaving"
+    :import-error="yamlImportSaveError"
+    @cancel="emit('cancel-yaml-import')"
+    @continue="emit('continue-yaml-import')"
+    @confirm-import="emit('confirm-yaml-import')"
+  />
+
   <Teleport to="body">
     <div
       v-if="openProjectMenuName"
@@ -145,6 +160,7 @@ import ColorPickerModal from '../ColorPickerModal.vue';
 import ConfirmModal from '../ConfirmModal.vue';
 import IconPicker from '../IconPicker.vue';
 import InstallConsoleModal from '../InstallConsoleModal.vue';
+import YamlFileImportModal from '../import/YamlFileImportModal.vue';
 import ProjectTileCard from './ProjectTileCard.vue';
 
 // DashboardModalHost keeps the view-level modal/menu layer in one place.
@@ -182,11 +198,21 @@ defineProps({
   customizeIconPickerOpen: Boolean,
   customizeIconQuery: { type: String, default: '' },
   customizeColorPickerOpen: Boolean,
-  customizeColorPickerValue: { type: String, default: '' }
+  customizeColorPickerValue: { type: String, default: '' },
+  yamlImportModalOpen: Boolean,
+  yamlImportFileName: { type: String, default: '' },
+  yamlImportContent: { type: String, default: '' },
+  yamlImportAnalysis: { type: Object, default: null },
+  yamlImportAnalysisError: { type: Object, default: null },
+  yamlImportAnalyzing: Boolean,
+  yamlImportReportVisible: Boolean,
+  yamlImportSaving: Boolean,
+  yamlImportSaveError: { type: String, default: '' }
 });
 
 const emit = defineEmits([
   'apply-project-customization',
+  'cancel-yaml-import',
   'cancel-remove-folder',
   'cancel-remove-project',
   'clean-build-from-menu',
@@ -196,6 +222,7 @@ const emit = defineEmits([
   'close-customize-modal',
   'confirm-remove-folder',
   'confirm-remove-project',
+  'confirm-yaml-import',
   'customize-project-from-menu',
   'delete-project-from-menu',
   'download-binary',
@@ -204,6 +231,7 @@ const emit = defineEmits([
   'logs-project-from-menu',
   'open-customize-color-picker',
   'open-customize-icon-picker',
+  'continue-yaml-import',
   'reset-project-customization',
   'select-customize-color',
   'select-customize-icon',

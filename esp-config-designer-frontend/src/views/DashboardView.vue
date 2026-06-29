@@ -31,6 +31,15 @@
     :customize-icon-query="customizeIconQuery"
     :customize-color-picker-open="customizeColorPickerOpen"
     :customize-color-picker-value="customizeColorPickerValue"
+    :yaml-import-modal-open="yamlImportModalOpen"
+    :yaml-import-file-name="yamlImportFileName"
+    :yaml-import-content="yamlImportContent"
+    :yaml-import-analysis="yamlImportAnalysis"
+    :yaml-import-analysis-error="yamlImportAnalysisError"
+    :yaml-import-analyzing="yamlImportAnalyzing"
+    :yaml-import-report-visible="yamlImportReportVisible"
+    :yaml-import-saving="yamlImportSaving"
+    :yaml-import-save-error="yamlImportSaveError"
     @confirm-remove-folder="confirmRemoveFolder"
     @cancel-remove-folder="cancelRemoveFolder"
     @confirm-remove-project="confirmRemoveProject"
@@ -56,6 +65,17 @@
     @select-customize-icon="handleCustomizeIconSelect"
     @close-customize-color-picker="customizeColorPickerOpen = false"
     @select-customize-color="handleCustomizeColorSelect"
+    @cancel-yaml-import="closeYamlImportModal"
+    @continue-yaml-import="handleYamlImportContinue"
+    @confirm-yaml-import="handleYamlImportConfirm"
+  />
+
+  <input
+    ref="yamlImportFileInput"
+    class="dashboard-import-file-input"
+    type="file"
+    accept=".yaml,.yml,application/x-yaml,text/yaml,text/plain"
+    @change="handleYamlImportFileSelected"
   />
 
   <section
@@ -159,6 +179,8 @@ import {
   writeProjectDeploymentState
 } from "../utils/projectDeploymentState";
 import { normalizeHexColor } from "../utils/displayColor";
+import { loadComponentSchema, loadSchemaByPath } from "../utils/schemaLoader";
+import { importYamlToProjectConfig } from "../utils/yamlProjectImport";
 
 // DashboardView coordinates explorer state, shared top-bar actions, and modal flows.
 // Rendering details, tree logic, and device status polling are delegated to focused
@@ -215,6 +237,17 @@ const customizeIconPickerOpen = ref(false);
 const customizeIconQuery = ref("");
 const customizeColorPickerOpen = ref(false);
 const customizeColorTarget = ref("icon");
+const yamlImportFileInput = ref(null);
+const yamlImportModalOpen = ref(false);
+const yamlImportFileName = ref("");
+const yamlImportContent = ref("");
+const yamlImportAnalysis = ref(null);
+const yamlImportAnalysisError = ref(null);
+const yamlImportAnalyzing = ref(false);
+const yamlImportReportVisible = ref(false);
+const yamlImportSaving = ref(false);
+const yamlImportSaveError = ref("");
+const yamlImportComponentCatalog = ref(null);
 const customizeDraft = ref({
   iconName: "",
   iconColor: "",
@@ -231,6 +264,8 @@ let refreshProjectsPromise = null;
 let projectDisplayNamesRequestId = 0;
 let projectMenuPlacementRafId = null;
 let projectMenuResizeObserver = null;
+let yamlImportComponentCatalogPromise = null;
+let yamlImportAnalysisRequestId = 0;
 const deploymentTransitionLocks = new Set();
 // View mode controls the main pane scope:
 // - "folder": show current folder content
@@ -242,6 +277,7 @@ const SIDEBAR_MIN_WIDTH = 210;
 const SIDEBAR_MAX_WIDTH = 520;
 
 const baseUrl = new URL("./", window.location.href).toString();
+const componentCatalogUrl = new URL("components_list/components_list.json", baseUrl).toString();
 const useLocalRuntime = import.meta.env.DEV || import.meta.env.VITE_DASHBOARD_STORAGE === "local";
 const staticProjectsIndexUrl = `${import.meta.env.BASE_URL || "/"}runtime/esp_projects/projects.json`;
 const DEFAULT_TILE_ICON_NAME = "memory";
@@ -263,6 +299,7 @@ const projectsIndexLoadUrl = useLocalRuntime
   ? "/dev/projects/index"
   : getApiUrl("projects/load?name=projects.json");
 const projectsIndexSaveUrl = useLocalRuntime ? "/dev/projects/index" : getApiUrl("projects/save");
+const yamlImportProjectSaveUrl = getApiUrl("api/import/project");
 const projectLoadUrl = (projectName) => {
   const encodedName = encodeURIComponent(String(projectName || "").trim());
   return useLocalRuntime
@@ -1467,8 +1504,186 @@ const requestOpenBlankBuilder = () => {
   openBlankBuilder();
 };
 
+const resetYamlImportInput = () => {
+  if (yamlImportFileInput.value instanceof HTMLInputElement) {
+    yamlImportFileInput.value.value = "";
+  }
+};
+
+const isYamlFile = (file) => {
+  const name = String(file?.name || "").trim().toLowerCase();
+  return name.endsWith(".yaml") || name.endsWith(".yml");
+};
+
+const readYamlImportFile = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = () => reject(new Error("Failed to read YAML file"));
+    reader.readAsText(file);
+  });
+};
+
+const openYamlFilePicker = () => {
+  dashboardActionError.value = "";
+  resetYamlImportInput();
+  yamlImportFileInput.value?.click?.();
+};
+
+const loadYamlImportComponentCatalog = async () => {
+  if (yamlImportComponentCatalog.value) return yamlImportComponentCatalog.value;
+  if (yamlImportComponentCatalogPromise) return yamlImportComponentCatalogPromise;
+  yamlImportComponentCatalogPromise = (async () => {
+    const response = await fetch(componentCatalogUrl, {
+      cache: import.meta.env.DEV ? "no-store" : "default",
+      credentials: "same-origin"
+    });
+    if (!response.ok) {
+      throw new Error(`Component catalog load failed (HTTP ${response.status})`);
+    }
+    const payload = await response.json();
+    if (!payload || typeof payload !== "object") {
+      throw new Error("Invalid component catalog payload");
+    }
+    yamlImportComponentCatalog.value = payload;
+    return payload;
+  })().finally(() => {
+    yamlImportComponentCatalogPromise = null;
+  });
+  return yamlImportComponentCatalogPromise;
+};
+
+const closeYamlImportModal = () => {
+  yamlImportAnalysisRequestId += 1;
+  yamlImportModalOpen.value = false;
+  yamlImportFileName.value = "";
+  yamlImportContent.value = "";
+  yamlImportAnalysis.value = null;
+  yamlImportAnalysisError.value = null;
+  yamlImportAnalyzing.value = false;
+  yamlImportReportVisible.value = false;
+  yamlImportSaving.value = false;
+  yamlImportSaveError.value = "";
+  resetYamlImportInput();
+};
+
+const startYamlImportAnalysis = async (content, requestId) => {
+  if (!content) return;
+  yamlImportAnalyzing.value = true;
+  yamlImportAnalysis.value = null;
+  yamlImportAnalysisError.value = null;
+  yamlImportSaveError.value = "";
+  try {
+    const componentCatalog = await loadYamlImportComponentCatalog();
+    const result = await importYamlToProjectConfig({
+      yamlText: content,
+      sourceName: yamlImportFileName.value,
+      componentCatalog,
+      loadComponentSchema: (component) => loadComponentSchema(component.componentId, component.schemaPath),
+      loadGeneralSchema: loadSchemaByPath
+    });
+    if (requestId !== yamlImportAnalysisRequestId) return;
+    if (result.ok) {
+      yamlImportAnalysis.value = result;
+    } else {
+      yamlImportAnalysisError.value = result.error || { message: "YAML parse failed", line: 0, column: 0 };
+    }
+  } catch (error) {
+    if (requestId !== yamlImportAnalysisRequestId) return;
+    yamlImportAnalysisError.value = {
+      message: error instanceof Error ? error.message : "YAML import analysis failed",
+      line: 0,
+      column: 0
+    };
+  } finally {
+    if (requestId === yamlImportAnalysisRequestId) {
+      yamlImportAnalyzing.value = false;
+    }
+  }
+};
+
+const handleYamlImportContinue = () => {
+  if (yamlImportAnalyzing.value) return;
+  if (!yamlImportAnalysis.value && !yamlImportAnalysisError.value) return;
+  yamlImportReportVisible.value = true;
+};
+
+const handleYamlImportConfirm = async () => {
+  const analysis = yamlImportAnalysis.value;
+  if (!analysis?.projectData || yamlImportSaving.value) return;
+  yamlImportSaving.value = true;
+  yamlImportSaveError.value = "";
+  try {
+    const response = await fetchJson(yamlImportProjectSaveUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        projectName: analysis.generatedProjectName,
+        yamlName: analysis.generatedYamlName,
+        projectData: analysis.projectData,
+        yaml: yamlImportContent.value,
+        overwrite: false,
+        importReport: analysis.importReport || null
+      })
+    });
+    if (!response.ok) {
+      throw new Error(await parseResponseMessage(response, "YAML import failed"));
+    }
+    const payload = await response.json();
+    const importedProjectName = sanitizeProjectName(payload?.projectName || analysis.generatedProjectName);
+    closeYamlImportModal();
+    await refreshProjectsFromBackend();
+    if (importedProjectName) {
+      selectedProjectName.value = importedProjectName;
+      saveMessage.value = "";
+    }
+  } catch (error) {
+    yamlImportSaveError.value = error instanceof Error ? error.message : "YAML import failed";
+  } finally {
+    yamlImportSaving.value = false;
+  }
+};
+
+const handleYamlImportFileSelected = async (event) => {
+  const file = event?.target?.files?.[0] || null;
+  if (!file) return;
+  dashboardActionError.value = "";
+  if (!isYamlFile(file)) {
+    dashboardActionError.value = "Please select a .yaml or .yml file.";
+    resetYamlImportInput();
+    return;
+  }
+  try {
+    const content = await readYamlImportFile(file);
+    yamlImportFileName.value = file.name;
+    yamlImportContent.value = content;
+    yamlImportAnalysis.value = null;
+    yamlImportAnalysisError.value = null;
+    yamlImportAnalyzing.value = false;
+    yamlImportReportVisible.value = false;
+    yamlImportSaving.value = false;
+    yamlImportSaveError.value = "";
+    yamlImportModalOpen.value = true;
+    const requestId = ++yamlImportAnalysisRequestId;
+    startYamlImportAnalysis(content, requestId);
+  } catch (error) {
+    dashboardActionError.value = error instanceof Error ? error.message : "Failed to read YAML file";
+    resetYamlImportInput();
+  }
+};
+
+const handleTopbarImportOption = (event) => {
+  const detail = event?.detail && typeof event.detail === "object" ? event.detail : {};
+  if (detail.source !== "yaml-file") return;
+  openYamlFilePicker();
+};
+
 const handleDashboardKeydown = (event) => {
   if (event.key !== "Escape") return;
+  if (yamlImportModalOpen.value) {
+    closeYamlImportModal();
+    return;
+  }
   if (customizeIconPickerOpen.value || customizeColorPickerOpen.value) return;
   if (customizeModalOpen.value) {
     closeCustomizeModal();
@@ -1930,6 +2145,7 @@ onMounted(() => {
   window.addEventListener("mousemove", handleSidebarResizeMove);
   window.addEventListener("mouseup", stopSidebarResize);
   window.addEventListener("app:install-option", handleTopbarInstallOption);
+  window.addEventListener("app:import-option", handleTopbarImportOption);
   window.addEventListener("app:builder-logs", handleTopbarLogs);
   window.addEventListener("app:validate", handleTopbarValidate);
   window.addEventListener("app:dashboard-edit", handleTopbarEdit);
@@ -1946,6 +2162,7 @@ onBeforeUnmount(() => {
   window.removeEventListener("mousemove", handleSidebarResizeMove);
   window.removeEventListener("mouseup", stopSidebarResize);
   window.removeEventListener("app:install-option", handleTopbarInstallOption);
+  window.removeEventListener("app:import-option", handleTopbarImportOption);
   window.removeEventListener("app:builder-logs", handleTopbarLogs);
   window.removeEventListener("app:validate", handleTopbarValidate);
   window.removeEventListener("app:dashboard-edit", handleTopbarEdit);
@@ -1981,6 +2198,14 @@ onBeforeUnmount(() => {
   flex: 1 1 auto;
   min-height: 0;
   height: 100%;
+}
+
+.dashboard-import-file-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .dashboard-sidebar {

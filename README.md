@@ -13,6 +13,8 @@ The repository contains the full add-on:
 
 The add-on is designed to let users manage complete ESPHome projects without hand-editing YAML unless they want to.
 
+- [Tutorial](https://youtu.be/CrP15p8e_z8)
+
 ---
 
 ## Installation Options

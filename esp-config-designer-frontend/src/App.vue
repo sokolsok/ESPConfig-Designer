@@ -37,6 +37,21 @@
       </div>
 
       <div class="app-topbar-actions">
+        <div v-if="isDashboardRoute" ref="importMenuRef" class="topbar-action-menu">
+          <button
+            class="btn-standard action-import"
+            :disabled="topbarBusy"
+            @click="toggleImportMenu"
+          >
+            Import
+          </button>
+          <div v-if="importMenuOpen" class="topbar-action-dropdown" role="menu" aria-label="Import options">
+            <button type="button" role="menuitem" @click="selectImportOption('esphome-builder')">
+              ESPHome Builder
+            </button>
+            <button type="button" role="menuitem" @click="selectImportOption('yaml-file')">YAML file</button>
+          </div>
+        </div>
         <button
           v-if="isDashboardRoute"
           class="btn-standard action-edit"
@@ -53,15 +68,7 @@
         >
           Save
         </button>
-        <button
-          v-if="showActionButtons"
-          class="btn-standard action-validate"
-          :disabled="!topbarCanValidate || topbarBusy"
-          @click="triggerValidate"
-        >
-          Validate
-        </button>
-        <div v-if="showActionButtons" ref="installMenuRef" class="topbar-install-menu">
+        <div v-if="showActionButtons" ref="installMenuRef" class="topbar-action-menu">
           <button
             class="btn-standard action-install"
             :disabled="!topbarCanInstall || topbarBusy"
@@ -69,7 +76,7 @@
           >
             Install
           </button>
-          <div v-if="installMenuOpen" class="topbar-install-dropdown" role="menu" aria-label="Install options">
+          <div v-if="installMenuOpen" class="topbar-action-dropdown" role="menu" aria-label="Install options">
             <button type="button" role="menuitem" @click="selectInstallOption('serial')">Serial Port</button>
             <button
               type="button"
@@ -82,6 +89,14 @@
             <button type="button" role="menuitem" @click="selectInstallOption('download')">Download Binary</button>
           </div>
         </div>
+        <button
+          v-if="showActionButtons"
+          class="btn-standard action-validate"
+          :disabled="!topbarCanValidate || topbarBusy"
+          @click="triggerValidate"
+        >
+          Validate
+        </button>
         <button
           v-if="showActionButtons"
           class="btn-standard action-logs"
@@ -146,6 +161,8 @@ const dashboardCanEdit = ref(false);
 const dashboardBusy = ref(false);
 const builderHasUnsavedChanges = ref(false);
 const builderSaveRunning = ref(false);
+const importMenuOpen = ref(false);
+const importMenuRef = ref(null);
 const installMenuOpen = ref(false);
 const installMenuRef = ref(null);
 const leaveModalOpen = ref(false);
@@ -213,9 +230,30 @@ const closeInstallMenu = () => {
   installMenuOpen.value = false;
 };
 
+const closeImportMenu = () => {
+  importMenuOpen.value = false;
+};
+
+const closeTopbarMenus = () => {
+  closeImportMenu();
+  closeInstallMenu();
+};
+
+const toggleImportMenu = () => {
+  if (topbarBusy.value) return;
+  closeInstallMenu();
+  importMenuOpen.value = !importMenuOpen.value;
+};
+
 const toggleInstallMenu = () => {
   if (!topbarCanInstall.value || topbarBusy.value) return;
+  closeImportMenu();
   installMenuOpen.value = !installMenuOpen.value;
+};
+
+const selectImportOption = (source) => {
+  closeImportMenu();
+  window.dispatchEvent(new CustomEvent("app:import-option", { detail: { source } }));
 };
 
 const selectInstallOption = (mode) => {
@@ -236,16 +274,17 @@ const triggerValidate = () => {
 };
 
 const handleGlobalClick = (event) => {
-  if (!installMenuOpen.value) return;
+  if (!installMenuOpen.value && !importMenuOpen.value) return;
   const target = event.target;
   if (!(target instanceof Element)) return;
+  if (importMenuRef.value instanceof Element && importMenuRef.value.contains(target)) return;
   if (installMenuRef.value instanceof Element && installMenuRef.value.contains(target)) return;
-  closeInstallMenu();
+  closeTopbarMenus();
 };
 
 const handleGlobalKeydown = (event) => {
   if (event.key !== "Escape") return;
-  closeInstallMenu();
+  closeTopbarMenus();
 };
 
 const handleBeforeUnload = (event) => {
@@ -335,7 +374,7 @@ const handleLeaveModalSave = async () => {
 };
 
 const requestRouteChange = async (routeName) => {
-  closeInstallMenu();
+  closeTopbarMenus();
   const targetRouteName = typeof routeName === "string" && routeName ? routeName : "";
   if (!targetRouteName) return;
   if (route.name === targetRouteName) return;
@@ -352,7 +391,7 @@ const requestRouteChange = async (routeName) => {
 watch(
   () => route.name,
   () => {
-    closeInstallMenu();
+    closeTopbarMenus();
   }
 );
 </script>
@@ -418,14 +457,14 @@ watch(
   gap: 10px;
 }
 
-.topbar-install-menu {
+.topbar-action-menu {
   position: relative;
 }
 
-.topbar-install-dropdown {
+.topbar-action-dropdown {
   position: absolute;
   top: calc(100% + 4px);
-  right: 0;
+  left: 0;
   min-width: 168px;
   display: grid;
   gap: 4px;
@@ -437,7 +476,7 @@ watch(
   z-index: 90;
 }
 
-.topbar-install-dropdown button {
+.topbar-action-dropdown button {
   width: 100%;
   text-align: left;
   border: 1px solid #e2e8f0;
@@ -449,11 +488,11 @@ watch(
   padding: 7px 10px;
 }
 
-.topbar-install-dropdown button:hover:not(:disabled) {
+.topbar-action-dropdown button:hover:not(:disabled) {
   background: #eef3fd;
 }
 
-.topbar-install-dropdown button:disabled {
+.topbar-action-dropdown button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }

@@ -36,8 +36,8 @@
 
     <div v-if="loading" class="dashboard-state">Loading projects...</div>
     <div v-else-if="errorMessage" class="dashboard-state dashboard-state--error">{{ errorMessage }}</div>
-    <div v-else-if="saveMessage" class="dashboard-state dashboard-state--warning">{{ saveMessage }}</div>
     <template v-else>
+      <div v-if="saveMessage" class="dashboard-state dashboard-state--warning">{{ saveMessage }}</div>
       <div class="dashboard-content-actions">
         <button type="button" class="btn-standard dashboard-new-device" @click="emit('open-blank-builder')">New device</button>
       </div>

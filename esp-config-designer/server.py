@@ -1108,10 +1108,67 @@ def save_projects_index(index_payload: dict) -> None:
     payload = dict(index_payload or {})
     payload["updatedAt"] = utc_now()
     path = projects_index_path()
+    write_json_file_atomic(path, payload)
+
+
+def write_text_file_atomic(path: str, content: str) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w", encoding="utf-8") as handle:
-        json.dump(payload, handle, ensure_ascii=False, indent=2)
-        handle.write("\n")
+    temp_path = f"{path}.{uuid.uuid4().hex}.tmp"
+    try:
+        with open(temp_path, "w", encoding="utf-8") as handle:
+            handle.write(content)
+            if not content.endswith("\n"):
+                handle.write("\n")
+        os.replace(temp_path, path)
+    finally:
+        if os.path.isfile(temp_path):
+            try:
+                os.remove(temp_path)
+            except Exception:
+                pass
+
+
+def write_json_file_atomic(path: str, data: dict) -> None:
+    body = json.dumps(data, ensure_ascii=False, indent=2)
+    write_text_file_atomic(path, body)
+
+
+def add_project_to_index(project_filename: str, folder_id: str = "root") -> dict:
+    index_payload = load_projects_index()
+    folders = index_payload.get("folders")
+    if not isinstance(folders, list) or not folders:
+        folders = [{"id": "root", "name": "Projects", "parentId": None}]
+        index_payload["folders"] = folders
+    valid_folder_ids = {
+        str(folder.get("id") or "")
+        for folder in folders
+        if isinstance(folder, dict) and str(folder.get("id") or "")
+    }
+    target_folder_id = folder_id if folder_id in valid_folder_ids else "root"
+    current = index_payload.get("projectPlacement")
+    if not isinstance(current, list):
+        current = []
+    next_items = []
+    found = False
+    now = utc_now()
+    for item in current:
+        if not isinstance(item, dict):
+            continue
+        name = str(item.get("name") or "").strip()
+        if not name:
+            continue
+        if name == project_filename:
+            updated = dict(item)
+            updated["folderId"] = str(updated.get("folderId") or target_folder_id)
+            updated["lastEditedAt"] = now
+            next_items.append(updated)
+            found = True
+            continue
+        next_items.append(item)
+    if not found:
+        next_items.append({"name": project_filename, "folderId": target_folder_id, "lastEditedAt": now})
+    index_payload["projectPlacement"] = next_items
+    return index_payload
 
 
 def remove_project_from_index(project_filename: str) -> bool:
@@ -2594,6 +2651,142 @@ def load_yaml():
         return jsonify({"status": "error", "message": "Read failed"}), 500
 
     return jsonify({"status": "ok", "name": filename, "yaml": yaml_text})
+
+
+@app.route("/api/import/yaml-candidates", methods=["GET", "OPTIONS"])
+def import_yaml_candidates():
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    access = check_access()
+    if access:
+        return access
+
+    if not os.path.isdir(TARGET_DIR):
+        return jsonify({"status": "ok", "items": []})
+
+    items = []
+    for entry in os.listdir(TARGET_DIR):
+        filename = normalize_yaml_filename(str(entry))
+        if not filename or filename.lower() == SECRETS_FILENAME:
+            continue
+        path = os.path.join(TARGET_DIR, filename)
+        if not os.path.isfile(path):
+            continue
+        project_name = normalize_filename(f"{filename[:-5]}.json", ".json")
+        try:
+            stat = os.stat(path)
+            size = stat.st_size
+            mtime = f"{datetime.utcfromtimestamp(stat.st_mtime).isoformat()}Z"
+        except Exception:
+            size = 0
+            mtime = ""
+        items.append(
+            {
+                "name": filename,
+                "size": size,
+                "mtime": mtime,
+                "projectName": project_name,
+                "projectExists": bool(project_name and os.path.isfile(os.path.join(PROJECT_DIR, project_name))),
+            }
+        )
+
+    items.sort(key=lambda item: item["name"].lower())
+    return jsonify({"status": "ok", "items": items})
+
+
+@app.route("/api/import/yaml", methods=["GET", "OPTIONS"])
+def import_yaml_load():
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    access = check_access()
+    if access:
+        return access
+
+    filename = normalize_yaml_filename(str(request.args.get("name") or request.args.get("filename") or ""))
+    if not filename or filename.lower() == SECRETS_FILENAME:
+        return jsonify({"status": "error", "message": "Invalid name"}), 400
+
+    path = os.path.join(TARGET_DIR, filename)
+    if not os.path.isfile(path):
+        return jsonify({"status": "error", "message": "Not found"}), 404
+
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            yaml_text = handle.read()
+    except Exception:
+        return jsonify({"status": "error", "message": "Read failed"}), 500
+
+    return jsonify({"status": "ok", "name": filename, "yaml": yaml_text})
+
+
+@app.route("/api/import/project", methods=["POST", "OPTIONS"])
+def import_project_bundle():
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    access = check_access()
+    if access:
+        return access
+
+    payload = request.get_json(silent=True) or {}
+    project_name = normalize_filename(str(payload.get("projectName") or payload.get("name") or ""), ".json")
+    yaml_name = normalize_yaml_filename(str(payload.get("yamlName") or payload.get("yamlFilename") or ""))
+    if not project_name:
+        return jsonify({"status": "error", "message": "Invalid projectName"}), 400
+    if project_name.lower() == "projects.json":
+        return jsonify({"status": "error", "message": "Reserved project index name"}), 400
+    if not yaml_name or yaml_name.lower() == SECRETS_FILENAME:
+        return jsonify({"status": "error", "message": "Invalid yamlName"}), 400
+
+    project_data = payload.get("projectData")
+    if not isinstance(project_data, dict):
+        return jsonify({"status": "error", "message": "projectData must be an object"}), 400
+    if project_data.get("schemaVersion") != 1:
+        return jsonify({"status": "error", "message": "Unsupported projectData schemaVersion"}), 400
+
+    yaml_text = payload.get("yaml")
+    if not isinstance(yaml_text, str):
+        return jsonify({"status": "error", "message": "yaml must be a string"}), 400
+
+    import_report = payload.get("importReport")
+    if import_report is not None and not isinstance(import_report, dict):
+        return jsonify({"status": "error", "message": "importReport must be an object"}), 400
+
+    overwrite = bool(payload.get("overwrite") is True)
+    project_path = os.path.join(PROJECT_DIR, project_name)
+    yaml_path = os.path.join(TARGET_DIR, yaml_name)
+    conflicts = {
+        "project": os.path.exists(project_path),
+        "yaml": os.path.exists(yaml_path),
+    }
+    if not overwrite and (conflicts["project"] or conflicts["yaml"]):
+        return jsonify({"status": "error", "message": "Import target already exists", "conflicts": conflicts}), 409
+
+    project_payload = dict(project_data)
+    project_payload["isSaved"] = True
+    if import_report is not None:
+        project_payload["importReport"] = import_report
+
+    try:
+        os.makedirs(PROJECT_DIR, exist_ok=True)
+        os.makedirs(TARGET_DIR, exist_ok=True)
+        write_json_file_atomic(project_path, project_payload)
+        write_text_file_atomic(yaml_path, yaml_text)
+        save_projects_index(add_project_to_index(project_name))
+    except Exception as exc:
+        return jsonify({"status": "error", "message": "Import save failed", "details": str(exc)}), 500
+
+    return jsonify(
+        {
+            "status": "ok",
+            "projectName": project_name,
+            "yamlName": yaml_name,
+            "projectPath": project_path,
+            "yamlPath": yaml_path,
+        }
+    )
 
 
 @app.route("/api/secrets/raw", methods=["GET", "OPTIONS"])
