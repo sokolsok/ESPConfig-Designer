@@ -70,9 +70,16 @@ const findFirstLevelListItems = (lines, block) => {
 };
 
 const keyFromReportPath = (path) => {
-  const parts = String(path || "").split(".");
+  const text = String(path || "");
+  const indexedSegment = text.lastIndexOf("].");
+  if (indexedSegment >= 0) return text.slice(indexedSegment + 2).replace(/\[[0-9]+\]$/, "") || "";
+  const parts = text.split(".");
   return parts[parts.length - 1]?.replace(/\[[0-9]+\]$/, "") || "";
 };
+
+const isYamlBlockScalarHeader = (text) => /:\s*[|>](?:[+-][0-9]?|[0-9][+-]?)?\s*(?:#.*)?$/.test(String(text || ""));
+
+const hasInlineYamlValue = (text) => /:\s*\S+/.test(String(text || "")) && !isYamlBlockScalarHeader(text);
 
 const markReportKeys = ({ lines, item, keys, status, message }) => {
   (Array.isArray(keys) ? keys : []).forEach((path) => {
@@ -85,6 +92,7 @@ const markReportKeys = ({ lines, item, keys, status, message }) => {
       if (!keyPattern.test(text)) continue;
       const keyIndent = indentationOf(text);
       setStatus(lines[index], status, message);
+      if (hasInlineYamlValue(text)) continue;
       for (let childIndex = index + 1; childIndex <= item.end; childIndex += 1) {
         const childText = lines[childIndex]?.text || "";
         if (!isNonEmptyLine(childText)) continue;
@@ -119,6 +127,15 @@ const componentPathParts = (path) => {
     domain: match[1],
     index: Number(match[2])
   };
+};
+
+const markImportedComponentDomain = ({ lines, blocksByKey, entry }) => {
+  if (entry?.status !== "mapped" && entry?.status !== "partial") return;
+  const componentParts = componentPathParts(entry.path);
+  if (!componentParts) return;
+  const block = blocksByKey.get(componentParts.domain);
+  if (!block) return;
+  setStatus(lines[block.start], "mapped", entry.message || "Imported component domain");
 };
 
 const resolveReportScope = ({ path, blocksByKey, componentItemsByPath }) => {
@@ -180,6 +197,11 @@ export const annotateYamlImportLines = ({ yamlText, analysis = null, analysisErr
   });
 
   (analysis.importReport?.entries || []).forEach((entry) => {
+    markImportedComponentDomain({
+      lines,
+      blocksByKey,
+      entry
+    });
     const scope = resolveReportScope({
       path: entry.path,
       blocksByKey,
