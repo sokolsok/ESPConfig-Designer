@@ -8,13 +8,16 @@ import {
   resolveImportFieldYamlKey
 } from "./schemaProjectImport";
 import { getTopLevelComponentDomains, identifyYamlComponents } from "./yamlComponentIdentifier";
+import { resolveYamlImportTargetNames } from "./yamlImportNaming";
 import { classifyYamlSections } from "./yamlSectionClassifier";
+import { isMultiInstanceBusKey } from "./busInstances";
 
 const isPlainObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
 
 const GENERAL_SCHEMA_PATHS = {
   esphome: "general/core/core.json",
   wifi: "general/network/wifi.json",
+  ethernet: "general/network/ethernet.json",
   api: "general/protocols/api.json",
   mqtt: "general/protocols/mqtt.json",
   espnow: "general/protocols/esp-now.json",
@@ -26,7 +29,15 @@ const GENERAL_SCHEMA_PATHS = {
 
 const PLATFORM_SCHEMA_PATHS = new Set(["esp32", "esp8266", "rp2040", "bk72xx", "rtl87xx", "ln882x", "host", "nrf52"]);
 
-const BUS_SCHEMA_PATHS = new Set(["i2c", "spi", "uart", "one_wire", "modbus", "i2s", "canbus"]);
+const BUS_SCHEMA_DEFINITIONS = [
+  { key: "i2c", yamlKeys: ["i2c"], schemaPath: "general/busses/i2c.json" },
+  { key: "spi", yamlKeys: ["spi"], schemaPath: "general/busses/spi.json" },
+  { key: "uart", yamlKeys: ["uart"], schemaPath: "general/busses/uart.json" },
+  { key: "one_wire", yamlKeys: ["one_wire"], schemaPath: "general/busses/one_wire.json" },
+  { key: "modbus", yamlKeys: ["modbus"], schemaPath: "general/busses/modbus.json" },
+  { key: "i2s", yamlKeys: ["i2s_audio", "i2s"], schemaPath: "general/busses/i2s.json" },
+  { key: "canbus", yamlKeys: ["canbus"], schemaPath: "general/busses/canbus.json" }
+];
 
 const normalizeTaggedScalar = (tag, value) => {
   const text = value === undefined || value === null ? "" : String(value);
@@ -425,21 +436,6 @@ const mapEmbeddedRootMappings = async ({ document, component, schema, yamlEntry,
   return mappings;
 };
 
-const normalizeImportName = (value, fallback = "imported_project") => {
-  const normalized = String(value || "")
-    .trim()
-    .replace(/\.[^.]+$/, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9_-]+/g, "_")
-    .replace(/_+/g, "_")
-    .replace(/^_+|_+$/g, "");
-  return normalized || fallback;
-};
-
-const makeYamlName = (baseName) => `${normalizeImportName(baseName)}.yaml`;
-
-const makeProjectName = (baseName) => `${normalizeImportName(baseName)}.json`;
-
 const getSectionValue = (document, key) => (isPlainObject(document) ? document[key] : undefined);
 
 const normalizeEsp32PlatformYaml = (value) => {
@@ -531,7 +527,17 @@ const addDroppedReportEntry = (report, { path, message, droppedKeys = [], warnin
   });
 };
 
-const mapYamlSectionWithSchema = async ({ key, yamlValue, schemaPath, loadGeneralSchema, loadActionCatalog, loadActionDefinition, loadConditionCatalog, loadConditionDefinition }) => {
+const mapYamlSectionWithSchema = async ({
+  key,
+  yamlValue,
+  schemaPath,
+  loadGeneralSchema,
+  loadActionCatalog,
+  loadActionDefinition,
+  loadConditionCatalog,
+  loadConditionDefinition,
+  skipPlatform = true
+}) => {
   if (!isPlainObject(yamlValue)) {
     return {
       status: "dropped",
@@ -573,7 +579,8 @@ const mapYamlSectionWithSchema = async ({ key, yamlValue, schemaPath, loadGenera
     yamlValue,
     fields: schema.fields,
     basePath: key,
-    actionContext
+    actionContext,
+    skipPlatform
   });
   return {
     status: mapping.unmappedKeys.length ? "partial" : "mapped",
@@ -872,9 +879,7 @@ export const importYamlToProjectConfig = async ({
   }
 
   const document = isPlainObject(analysis.document) ? analysis.document : {};
-  const baseName = normalizeImportName(document.esphome?.name || sourceName || "imported_project");
-  const generatedProjectName = makeProjectName(baseName);
-  const generatedYamlName = makeYamlName(baseName);
+  const { projectName: generatedProjectName, yamlName: generatedYamlName } = resolveYamlImportTargetNames(document);
   const projectData = defaultConfigFactory();
   const handledTopLevelKeys = new Set();
   const report = makeImportReport({
@@ -959,25 +964,47 @@ export const importYamlToProjectConfig = async ({
     });
   }
 
-  const wifiMapping = await mapRootSection({
-    key: "wifi",
-    target: projectData.networkCore,
-    schemaPath: GENERAL_SCHEMA_PATHS.wifi
-  });
-  if (document.wifi !== undefined && wifiMapping?.status !== "dropped") {
-    projectData.networkCore.transport = "wifi";
-    if (Array.isArray(document.wifi?.networks)) {
-      projectData.networkCore["Multiple Networks Enable"] = true;
+  const presentNetworkTransports = ["wifi", "ethernet"].filter((key) => document[key] !== undefined);
+  const selectedNetworkTransport = presentNetworkTransports.includes("wifi") ? "wifi" : presentNetworkTransports[0];
+  let importedNetworkTransport = "";
+  if (selectedNetworkTransport) {
+    const networkMapping = await mapRootSection({
+      key: selectedNetworkTransport,
+      target: projectData.networkCore,
+      schemaPath: GENERAL_SCHEMA_PATHS[selectedNetworkTransport]
+    });
+    if (networkMapping?.status !== "dropped") {
+      importedNetworkTransport = selectedNetworkTransport;
+      projectData.networkCore.transport = selectedNetworkTransport;
+      if (selectedNetworkTransport === "wifi" && Array.isArray(document.wifi?.networks)) {
+        projectData.networkCore["Multiple Networks Enable"] = true;
+      }
     }
+
+    presentNetworkTransports.forEach((networkKey) => {
+      if (networkKey === selectedNetworkTransport) return;
+      handledTopLevelKeys.add(networkKey);
+      addDroppedReportEntry(report, {
+        path: networkKey,
+        message: `${networkKey} duplicates imported ${selectedNetworkTransport} network transport`
+      });
+    });
   }
 
   if (document.captive_portal !== undefined) {
     handledTopLevelKeys.add("captive_portal");
-    addImportReportEntry(report, {
-      path: "captive_portal",
-      status: "mapped",
-      message: "Mapped captive_portal through network generation"
-    });
+    if (importedNetworkTransport === "wifi") {
+      addImportReportEntry(report, {
+        path: "captive_portal",
+        status: "mapped",
+        message: "Mapped captive_portal through network generation"
+      });
+    } else {
+      addDroppedReportEntry(report, {
+        path: "captive_portal",
+        message: "captive_portal requires imported wifi transport"
+      });
+    }
   }
 
   if (document.ota !== undefined) {
@@ -1034,13 +1061,77 @@ export const importYamlToProjectConfig = async ({
     }
   }
 
-  for (const busKey of BUS_SCHEMA_PATHS) {
-    if (document[busKey] === undefined) continue;
-    handledTopLevelKeys.add(busKey);
-    addDroppedReportEntry(report, {
-      path: busKey,
-      message: `${busKey} bus is not imported in this version`
-    });
+  const claimedBusProjectKeys = new Set();
+  for (const busDefinition of BUS_SCHEMA_DEFINITIONS) {
+    const { key: busKey, yamlKeys, schemaPath } = busDefinition;
+    const presentYamlKeys = yamlKeys.filter((yamlKey) => document[yamlKey] !== undefined);
+    if (!presentYamlKeys.length) continue;
+
+    for (const yamlKey of presentYamlKeys) {
+      handledTopLevelKeys.add(yamlKey);
+      if (claimedBusProjectKeys.has(busKey)) {
+        addDroppedReportEntry(report, {
+          path: yamlKey,
+          message: `${yamlKey} duplicates imported ${busKey} bus config`
+        });
+        continue;
+      }
+      claimedBusProjectKeys.add(busKey);
+
+      if (!isMultiInstanceBusKey(busKey)) {
+        addDroppedReportEntry(report, {
+          path: yamlKey,
+          message: `${yamlKey} bus is not imported in this version`
+        });
+        continue;
+      }
+
+      const rawEntries = Array.isArray(document[yamlKey]) ? document[yamlKey] : [document[yamlKey]];
+      const mappedEntries = [];
+      for (const [index, rawEntry] of rawEntries.entries()) {
+        const path = Array.isArray(document[yamlKey]) ? `${yamlKey}[${index}]` : yamlKey;
+        if (!isPlainObject(rawEntry)) {
+          addDroppedReportEntry(report, {
+            path,
+            message: `${path} bus entry must be a YAML object`
+          });
+          continue;
+        }
+        const mapped = await mapYamlSectionWithSchema({
+          key: path,
+          target: {},
+          schemaPath,
+          yamlValue: rawEntry,
+          loadGeneralSchema,
+          loadActionCatalog,
+          loadActionDefinition,
+          loadConditionCatalog,
+          loadConditionDefinition,
+          skipPlatform: false
+        });
+        if (mapped.status === "dropped") {
+          addDroppedReportEntry(report, {
+            path,
+            message: mapped.message,
+            warnings: mapped.warnings
+          });
+          continue;
+        }
+        mappedEntries.push(mapped.config);
+        addImportReportEntry(report, {
+          path,
+          status: mapped.status,
+          message: mapped.message,
+          mappedKeys: mapped.mapping?.mappedKeys || [],
+          unmappedKeys: mapped.mapping?.unmappedKeys || [],
+          droppedKeys: mapped.mapping?.unmappedKeys || [],
+          warnings: mapped.warnings
+        });
+      }
+      if (mappedEntries.length) {
+        projectData.bussesCore[busKey] = mappedEntries;
+      }
+    }
   }
 
   const componentsByDomain = new Map();

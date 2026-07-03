@@ -28,8 +28,7 @@
         "type": "object",
         "fields": [],
         "extends": "base_actions.json"
-      },
-      "wrapThen": true
+      }
     },
     {
       "key": "turn_off_action",
@@ -40,8 +39,7 @@
         "type": "object",
         "fields": [],
         "extends": "base_actions.json"
-      },
-      "wrapThen": true
+      }
     },
     {
       "key": "optimistic",

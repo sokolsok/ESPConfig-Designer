@@ -45,9 +45,26 @@
     :report-visible="yamlImportReportVisible"
     :importing="yamlImportSaving"
     :import-error="yamlImportSaveError"
+    :can-return-to-source-list="yamlImportCanReturnToSourceList"
+    :target-yaml-names="yamlImportTargetYamlNames"
+    :target-project-names="yamlImportTargetProjectNames"
+    :target-names-loading="yamlImportTargetsLoading"
+    :source-yaml-name="yamlImportSourceName"
+    @back-to-source-list="emit('back-to-yaml-source-list')"
     @cancel="emit('cancel-yaml-import')"
-    @continue="emit('continue-yaml-import')"
+    @continue="emit('continue-yaml-import', $event)"
     @confirm-import="emit('confirm-yaml-import')"
+  />
+
+  <YamlBuilderImportModal
+    :open="builderYamlImportModalOpen"
+    :items="builderYamlImportItems"
+    :loading="builderYamlImportLoading"
+    :loading-name="builderYamlImportLoadingName"
+    :error="builderYamlImportError"
+    @close="emit('close-builder-yaml-import')"
+    @refresh="emit('refresh-builder-yaml-import')"
+    @select="emit('select-builder-yaml-import', $event)"
   />
 
   <Teleport to="body">
@@ -160,6 +177,7 @@ import ColorPickerModal from '../ColorPickerModal.vue';
 import ConfirmModal from '../ConfirmModal.vue';
 import IconPicker from '../IconPicker.vue';
 import InstallConsoleModal from '../InstallConsoleModal.vue';
+import YamlBuilderImportModal from '../import/YamlBuilderImportModal.vue';
 import YamlFileImportModal from '../import/YamlFileImportModal.vue';
 import ProjectTileCard from './ProjectTileCard.vue';
 
@@ -206,16 +224,28 @@ defineProps({
   yamlImportAnalysisError: { type: Object, default: null },
   yamlImportAnalyzing: Boolean,
   yamlImportReportVisible: Boolean,
+  yamlImportCanReturnToSourceList: Boolean,
+  yamlImportTargetYamlNames: { type: Array, default: () => [] },
+  yamlImportTargetProjectNames: { type: Array, default: () => [] },
+  yamlImportTargetsLoading: Boolean,
+  yamlImportSourceName: { type: String, default: '' },
   yamlImportSaving: Boolean,
-  yamlImportSaveError: { type: String, default: '' }
+  yamlImportSaveError: { type: String, default: '' },
+  builderYamlImportModalOpen: Boolean,
+  builderYamlImportItems: { type: Array, default: () => [] },
+  builderYamlImportLoading: Boolean,
+  builderYamlImportLoadingName: { type: String, default: '' },
+  builderYamlImportError: { type: String, default: '' }
 });
 
 const emit = defineEmits([
   'apply-project-customization',
+  'back-to-yaml-source-list',
   'cancel-yaml-import',
   'cancel-remove-folder',
   'cancel-remove-project',
   'clean-build-from-menu',
+  'close-builder-yaml-import',
   'close-compile-modal',
   'close-customize-color-picker',
   'close-customize-icon-picker',
@@ -232,7 +262,9 @@ const emit = defineEmits([
   'open-customize-color-picker',
   'open-customize-icon-picker',
   'continue-yaml-import',
+  'refresh-builder-yaml-import',
   'reset-project-customization',
+  'select-builder-yaml-import',
   'select-customize-color',
   'select-customize-icon',
   'toggle-compile-autoscroll',

@@ -17,6 +17,7 @@
       "type": "select",
       "required": true,
       "lvl": "simple",
+	  "emitYAML": "never",
       "default": "lambda",
       "options": [
         "lambda",

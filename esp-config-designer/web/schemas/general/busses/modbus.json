@@ -2,39 +2,22 @@
   "id": "busses.modbus",
   "domain": "modbus",
   "platform": "core",
+  "helpUrl": "https://esphome.io/components/modbus/",
   "fields": [
-    {
-      "key": "enabled",
-      "label": "Enable Modbus",
-      "type": "boolean",
-      "required": false,
-      "lvl": "simple",
-      "default": false,
-      "emitYAML": "never",
-      "helpUrl": "https://esphome.io/components/modbus/"
-    },
     {
       "key": "id",
       "type": "id",
       "required": true,
       "lvl": "simple",
       "default": "modbus_id",
-      "idDomain": "modbus",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      }
+      "idDomain": "modbus"
     },
     {
       "key": "uart_id",
       "type": "id_ref",
       "required": true,
       "lvl": "simple",
-      "domain": "uart",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      }
+      "domain": "uart"
     },
     {
       "key": "role",
@@ -45,11 +28,7 @@
       "options": [
         "client",
         "server"
-      ],
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      }
+      ]
     },
     {
       "key": "flow_control_pin",
@@ -57,10 +36,6 @@
       "disableAdvancedConfig": true,
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "GPIOXX"
     },
     {
@@ -68,10 +43,6 @@
       "type": "duration",
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "250ms"
     },
     {
@@ -79,10 +50,6 @@
       "type": "duration",
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "100ms"
     },
     {
@@ -90,11 +57,7 @@
       "type": "boolean",
       "required": false,
       "lvl": "normal",
-      "default": false,
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      }
+      "default": false
     }
   ]
 }

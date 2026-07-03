@@ -60,6 +60,7 @@ PORT = int(os.environ.get("PORT", "8099"))
 
 JOB_DIR = os.environ.get("JOB_DIR", "/data/jobs").strip()
 ESPHOME_BIN = os.environ.get("ESPHOME_BIN", "esphome").strip()
+ESPHOME_CONFIG_DIR = os.environ.get("ESPHOME_CONFIG_DIR", "/config/esphome").strip()
 ESPHOME_DATA_DIR = os.environ.get("ESPHOME_DATA_DIR", "/data/esphome").strip()
 ESPHOME_BUILD_PATH = os.environ.get("ESPHOME_BUILD_PATH", "").strip()
 WEB_ROOT = os.environ.get("WEB_ROOT", "/web").strip()
@@ -174,6 +175,12 @@ def normalize_device(value: str) -> str:
     if not VALID_DEVICE.match(name):
         return ""
     return name
+
+
+def is_same_filesystem_path(first: str, second: str) -> bool:
+    if not first or not second:
+        return False
+    return os.path.normcase(os.path.abspath(first)) == os.path.normcase(os.path.abspath(second))
 
 
 
@@ -1952,6 +1959,7 @@ def api_runtime():
                 "projectDir": PROJECT_DIR,
                 "assetRoot": ASSET_ROOT,
                 "jobDir": JOB_DIR,
+                "esphomeConfigDir": ESPHOME_CONFIG_DIR,
                 "esphomeDataDir": ESPHOME_DATA_DIR,
                 "webRoot": WEB_ROOT,
             }
@@ -2662,15 +2670,15 @@ def import_yaml_candidates():
     if access:
         return access
 
-    if not os.path.isdir(TARGET_DIR):
+    if not os.path.isdir(ESPHOME_CONFIG_DIR):
         return jsonify({"status": "ok", "items": []})
 
     items = []
-    for entry in os.listdir(TARGET_DIR):
+    for entry in os.listdir(ESPHOME_CONFIG_DIR):
         filename = normalize_yaml_filename(str(entry))
         if not filename or filename.lower() == SECRETS_FILENAME:
             continue
-        path = os.path.join(TARGET_DIR, filename)
+        path = os.path.join(ESPHOME_CONFIG_DIR, filename)
         if not os.path.isfile(path):
             continue
         project_name = normalize_filename(f"{filename[:-5]}.json", ".json")
@@ -2695,6 +2703,42 @@ def import_yaml_candidates():
     return jsonify({"status": "ok", "items": items})
 
 
+@app.route("/api/import/targets", methods=["GET", "OPTIONS"])
+def import_targets():
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    access = check_access()
+    if access:
+        return access
+
+    yaml_names = []
+    if os.path.isdir(TARGET_DIR):
+        for entry in os.listdir(TARGET_DIR):
+            filename = normalize_yaml_filename(str(entry))
+            if not filename or filename.lower() == SECRETS_FILENAME:
+                continue
+            if os.path.isfile(os.path.join(TARGET_DIR, filename)):
+                yaml_names.append(filename)
+
+    project_names = []
+    if os.path.isdir(PROJECT_DIR):
+        for entry in os.listdir(PROJECT_DIR):
+            filename = normalize_filename(str(entry), ".json")
+            if not filename or filename.lower() == "projects.json":
+                continue
+            if os.path.isfile(os.path.join(PROJECT_DIR, filename)):
+                project_names.append(filename)
+
+    return jsonify(
+        {
+            "status": "ok",
+            "yamlNames": sorted(set(yaml_names), key=str.lower),
+            "projectNames": sorted(set(project_names), key=str.lower),
+        }
+    )
+
+
 @app.route("/api/import/yaml", methods=["GET", "OPTIONS"])
 def import_yaml_load():
     if request.method == "OPTIONS":
@@ -2708,7 +2752,7 @@ def import_yaml_load():
     if not filename or filename.lower() == SECRETS_FILENAME:
         return jsonify({"status": "error", "message": "Invalid name"}), 400
 
-    path = os.path.join(TARGET_DIR, filename)
+    path = os.path.join(ESPHOME_CONFIG_DIR, filename)
     if not os.path.isfile(path):
         return jsonify({"status": "error", "message": "Not found"}), 404
 
@@ -2750,6 +2794,12 @@ def import_project_bundle():
     if not isinstance(yaml_text, str):
         return jsonify({"status": "error", "message": "yaml must be a string"}), 400
 
+    source_yaml_name = ""
+    if payload.get("sourceYamlName") is not None:
+        source_yaml_name = normalize_yaml_filename(str(payload.get("sourceYamlName") or ""))
+        if not source_yaml_name or source_yaml_name.lower() == SECRETS_FILENAME:
+            return jsonify({"status": "error", "message": "Invalid sourceYamlName"}), 400
+
     import_report = payload.get("importReport")
     if import_report is not None and not isinstance(import_report, dict):
         return jsonify({"status": "error", "message": "importReport must be an object"}), 400
@@ -2757,9 +2807,36 @@ def import_project_bundle():
     overwrite = bool(payload.get("overwrite") is True)
     project_path = os.path.join(PROJECT_DIR, project_name)
     yaml_path = os.path.join(TARGET_DIR, yaml_name)
+    allow_existing_source_yaml = False
+    if source_yaml_name:
+        source_yaml_path = os.path.join(ESPHOME_CONFIG_DIR, source_yaml_name)
+        if not os.path.isfile(source_yaml_path):
+            return jsonify(
+                {
+                    "status": "error",
+                    "message": "Source YAML is no longer available",
+                    "conflicts": {"project": os.path.exists(project_path), "yaml": source_yaml_name == yaml_name},
+                }
+            ), 409
+        try:
+            with open(source_yaml_path, "r", encoding="utf-8") as handle:
+                existing_yaml_text = handle.read()
+        except Exception:
+            return jsonify({"status": "error", "message": "Source YAML read failed"}), 500
+        source_yaml_matches_payload = existing_yaml_text == yaml_text
+        source_is_target_yaml = source_yaml_name == yaml_name and is_same_filesystem_path(source_yaml_path, yaml_path)
+        allow_existing_source_yaml = source_is_target_yaml and source_yaml_matches_payload
+        if not source_yaml_matches_payload:
+            return jsonify(
+                {
+                    "status": "error",
+                    "message": "Source YAML changed before import save",
+                    "conflicts": {"project": os.path.exists(project_path), "yaml": source_is_target_yaml},
+                }
+            ), 409
     conflicts = {
         "project": os.path.exists(project_path),
-        "yaml": os.path.exists(yaml_path),
+        "yaml": os.path.exists(yaml_path) and not allow_existing_source_yaml,
     }
     if not overwrite and (conflicts["project"] or conflicts["yaml"]):
         return jsonify({"status": "error", "message": "Import target already exists", "conflicts": conflicts}), 409
@@ -2773,7 +2850,8 @@ def import_project_bundle():
         os.makedirs(PROJECT_DIR, exist_ok=True)
         os.makedirs(TARGET_DIR, exist_ok=True)
         write_json_file_atomic(project_path, project_payload)
-        write_text_file_atomic(yaml_path, yaml_text)
+        if not allow_existing_source_yaml:
+            write_text_file_atomic(yaml_path, yaml_text)
         save_projects_index(add_project_to_index(project_name))
     except Exception as exc:
         return jsonify({"status": "error", "message": "Import save failed", "details": str(exc)}), 500

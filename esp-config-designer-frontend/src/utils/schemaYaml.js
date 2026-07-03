@@ -221,7 +221,72 @@ const renderRawList = (values, indent, lines) => {
   });
 };
 
+const buildEmbeddedSchemaBlocks = (schema, configValues, globalStore) => {
+  const sourceValues = Array.isArray(configValues) ? configValues : [configValues || {}];
+  const embeddedByKey = new Map();
+  const embeddedItems = [];
+
+  sourceValues.forEach((configValue, sourceIndex) => {
+    const sourceEmbeddedItems = resolveEmbeddedComponentItems(schema, configValue || {}, globalStore);
+    sourceEmbeddedItems.forEach((item, itemIndex) => {
+      const dedupeToken = item.emitAs === "list" ? resolveEmbeddedDedupeToken(item) : "";
+      const dedupeIdentity =
+        item.emitAs === "list" && item.dedupeBy && dedupeToken
+          ? `${item.domain}:${item.dedupeBy}:${dedupeToken}`
+          : item.emitAs === "list"
+            ? `${item.domain}:${sourceIndex}:${item.sourceKey}:${itemIndex}`
+            : `${item.domain}:${item.sourceKey}`;
+      if (embeddedByKey.has(dedupeIdentity)) return;
+      embeddedByKey.set(dedupeIdentity, item);
+      embeddedItems.push(item);
+    });
+  });
+
+  const blocks = [];
+  const listBlocksByDomain = new Map();
+  embeddedItems.forEach((item) => {
+    if (item.emitAs === "map") {
+      const lines = [`${item.domain}:`];
+      const mapLines = [];
+      renderYamlObject(item.payload || {}, item.fields || [], 2, mapLines, item.payload || {}, globalStore);
+      lines.push(...mapLines);
+      blocks.push({ key: item.domain, lines });
+      return;
+    }
+
+    if (!listBlocksByDomain.has(item.domain)) {
+      const block = { key: item.domain, lines: [`${item.domain}:`] };
+      listBlocksByDomain.set(item.domain, block);
+      blocks.push(block);
+    }
+
+    const block = listBlocksByDomain.get(item.domain);
+    renderYamlArray(
+      [item.payload],
+      { type: "object", fields: item.fields || [] },
+      2,
+      block.lines,
+      item.payload,
+      globalStore
+    );
+  });
+
+  return blocks;
+};
+
 // Render filter list entries using filter catalog metadata.
+const isNestedFilterListEntry = (entry) => {
+  if (entry?.style !== "list" || entry?.valueKey !== "filters") return false;
+  const fields = Array.isArray(entry.fields) ? entry.fields : [];
+  const filtersField = fields.find((field) => field?.key === "filters");
+  return (
+    filtersField?.type === "list" &&
+    filtersField.item?.type === "object" &&
+    Array.isArray(filtersField.item.fields) &&
+    filtersField.item.fields.length === 0
+  );
+};
+
 const renderFilterEntries = (filters, indent, lines) => {
   filters.forEach((entry) => {
     if (!entry?.type) return;
@@ -257,6 +322,10 @@ const renderFilterEntries = (filters, indent, lines) => {
       const listKey = entry.valueKey || "values";
       const listValue = config[listKey] || [];
       lines.push(`${" ".repeat(indent)}- ${entry.type}:`);
+      if (isNestedFilterListEntry(entry)) {
+        renderFilterEntries(listValue, indent + 4, lines);
+        return;
+      }
       const listField = Array.isArray(entry.fields) ? entry.fields.find((field) => field?.key === listKey) : null;
       renderYamlArray(listValue, listField?.item || { type: "text" }, indent + 4, lines, config);
       return;
@@ -794,40 +863,37 @@ export const buildGeneralSchemaBlocks = (
   const blocks = [];
   const mainLines = buildSchemaYaml(configValue || {}, fields, 2, rootValue, globalStore);
   blocks.push({ key: resolvedDomain, lines: [`${resolvedDomain}:`, ...mainLines] });
-
-  const embeddedItems = resolveEmbeddedComponentItems(schema, configValue || {}, globalStore);
-  const embeddedByKey = new Map();
-
-  embeddedItems.forEach((item) => {
-    const dedupeToken = item.emitAs === "list" ? resolveEmbeddedDedupeToken(item) : "";
-    const dedupeIdentity =
-      item.emitAs === "list" && item.dedupeBy && dedupeToken
-        ? `${item.domain}:${item.dedupeBy}:${dedupeToken}`
-        : `${item.domain}:${item.sourceKey}`;
-    if (embeddedByKey.has(dedupeIdentity)) return;
-    embeddedByKey.set(dedupeIdentity, item);
-  });
-
-  embeddedByKey.forEach((item) => {
-    const lines = [`${item.domain}:`];
-    if (item.emitAs === "map") {
-      const mapLines = [];
-      renderYamlObject(item.payload || {}, item.fields || [], 2, mapLines, item.payload || {}, globalStore);
-      lines.push(...mapLines);
-    } else {
-      renderYamlArray(
-        [item.payload],
-        { type: "object", fields: item.fields || [] },
-        2,
-        lines,
-        item.payload,
-        globalStore
-      );
-    }
-    blocks.push({ key: item.domain, lines });
-  });
+  blocks.push(...buildEmbeddedSchemaBlocks(schema, configValue || {}, globalStore));
 
   return blocks;
+};
+
+export const buildGeneralSchemaListBlock = (
+  domain,
+  configValues,
+  schema,
+  rootValue = configValues,
+  globalStore = null
+) => {
+  const resolvedDomain = String(domain || resolveSchemaDomain(schema, {})).trim();
+  const values = Array.isArray(configValues) ? configValues : [];
+  if (!resolvedDomain || !schema || !values.length) return [];
+
+  const fields = Array.isArray(schema.fields) ? schema.fields : [];
+  const lines = [`${resolvedDomain}:`];
+
+  values.forEach((value) => {
+    const itemLines = buildSchemaYaml(value || {}, fields, 4, rootValue, globalStore);
+    if (!itemLines.length) {
+      lines.push("  - {}");
+      return;
+    }
+    const [firstLine, ...rest] = itemLines;
+    lines.push(`  - ${firstLine.slice(4)}`);
+    rest.forEach((line) => lines.push(line));
+  });
+
+  return [{ key: resolvedDomain, lines }, ...buildEmbeddedSchemaBlocks(schema, values, globalStore)];
 };
 
 // Render arrays with optional item schema definitions.

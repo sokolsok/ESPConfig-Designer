@@ -2,17 +2,8 @@
   "id": "busses.one_wire",
   "domain": "one_wire",
   "platform": "core",
+  "helpUrl": "https://esphome.io/components/one_wire/",
   "fields": [
-    {
-      "key": "enabled",
-      "label": "Enable 1-Wire",
-      "type": "boolean",
-      "required": false,
-      "lvl": "simple",
-      "default": false,
-      "emitYAML": "never",
-      "helpUrl": "https://esphome.io/components/one_wire/"
-    },
     {
       "key": "platform",
       "type": "select",
@@ -31,10 +22,6 @@
       "disableAdvancedConfig": true,
       "required": true,
       "lvl": "simple",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "GPIOXX"
     },
     {
@@ -42,11 +29,7 @@
       "type": "id",
       "required": true,
       "lvl": "simple",
-      "default": "one_wire_id",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      }
+      "default": "one_wire_id"
     }
   ]
 }

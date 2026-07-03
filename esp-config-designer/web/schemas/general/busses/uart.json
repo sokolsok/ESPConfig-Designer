@@ -2,26 +2,13 @@
   "id": "busses.uart",
   "domain": "uart",
   "platform": "core",
+  "helpUrl": "https://esphome.io/components/uart/",
   "fields": [
-    {
-      "key": "enabled",
-      "label": "Enable UART",
-      "type": "boolean",
-      "required": false,
-      "lvl": "simple",
-      "default": false,
-      "emitYAML": "never",
-      "helpUrl": "https://esphome.io/components/uart/"
-    },
     {
       "key": "baud_rate",
       "type": "number",
       "required": true,
       "lvl": "simple",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "9600"
     },
     {
@@ -30,10 +17,6 @@
       "disableAdvancedConfig": true,
       "required": false,
       "lvl": "simple",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "GPIOXX"
     },
     {
@@ -42,10 +25,6 @@
       "disableAdvancedConfig": true,
       "required": false,
       "lvl": "simple",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "GPIOXX"
     },
     {
@@ -54,10 +33,6 @@
       "disableAdvancedConfig": true,
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "GPIOXX"
     },
     {
@@ -65,10 +40,6 @@
       "type": "text",
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "/dev/ttyUSB0"
     },
     {
@@ -76,10 +47,6 @@
       "type": "number",
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "256"
     },
     {
@@ -87,10 +54,6 @@
       "type": "number",
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "114"
     },
     {
@@ -98,10 +61,6 @@
       "type": "number",
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "2"
     },
     {
@@ -109,10 +68,6 @@
       "type": "number",
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "8"
     },
     {
@@ -120,10 +75,6 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "options": [
         "NONE",
         "EVEN",
@@ -136,10 +87,6 @@
       "type": "number",
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "1"
     },
     {
@@ -147,11 +94,7 @@
       "type": "id",
       "required": true,
       "lvl": "simple",
-      "default": "uart_id",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      }
+      "default": "uart_id"
     }
   ]
 }

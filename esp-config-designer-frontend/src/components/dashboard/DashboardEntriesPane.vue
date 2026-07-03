@@ -20,17 +20,13 @@
             <span v-if="index < folderPath.length - 1" class="breadcrumb-sep">›</span>
           </button>
         </div>
-        <label class="dashboard-search" for="dashboardSearch">
-          <img class="dashboard-search-icon" :src="searchIconUrl" alt="" aria-hidden="true" />
-          <input
-            id="dashboardSearch"
-            type="search"
-            placeholder="Search files, folders"
-            autocomplete="off"
-            :value="searchText"
-            @input="emit('update:searchText', $event.target.value)"
-          />
-        </label>
+        <DashboardSearchField
+          input-id="dashboardSearch"
+          placeholder="Search files, folders"
+          :model-value="searchText"
+          :search-icon-url="searchIconUrl"
+          @update:model-value="emit('update:searchText', $event)"
+        />
       </div>
     </div>
 
@@ -99,6 +95,7 @@
 </template>
 
 <script setup>
+import DashboardSearchField from './DashboardSearchField.vue';
 import ProjectTileCard from './ProjectTileCard.vue';
 
 // DashboardEntriesPane renders the right-hand explorer surface: toolbar, breadcrumbs,
@@ -274,46 +271,6 @@ const emit = defineEmits([
 .breadcrumb-sep {
   color: #94a3b8;
   font-size: 13px;
-}
-
-.dashboard-search {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  height: 32px;
-  box-sizing: border-box;
-  align-self: center;
-  background: #f7f9fc;
-  border: 1px solid #dbe3ef;
-  border-radius: 4px;
-  padding: 0 10px;
-}
-
-.dashboard-search-icon {
-  width: 22px;
-  height: 22px;
-  opacity: 0.7;
-}
-
-.dashboard-search input {
-  width: 100%;
-  border: none;
-  background: transparent;
-  font-family: "Space Grotesk", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 16px;
-  color: #475569;
-  padding: 0;
-}
-
-.dashboard-search input:focus,
-.dashboard-search input:focus-visible {
-  box-shadow: none;
-  outline: none;
-}
-
-.dashboard-search input::placeholder {
-  color: #c0cae2;
 }
 
 .dashboard-state {

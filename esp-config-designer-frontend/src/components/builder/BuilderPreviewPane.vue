@@ -114,6 +114,10 @@ const props = defineProps({
     type: String,
     default: ""
   },
+  previewSyncRequest: {
+    type: Number,
+    default: 0
+  },
   isHydrating: {
     type: Boolean,
     default: false
@@ -133,6 +137,7 @@ const preview = useBuilderPreview({
   previewTabs: toRef(props, "previewTabs"),
   yamlPreview: toRef(props, "yamlPreview"),
   mainPreviewTargetKey: toRef(props, "mainPreviewTargetKey"),
+  previewSyncRequest: toRef(props, "previewSyncRequest"),
   isHydrating: toRef(props, "isHydrating"),
   displayAutomationHasInterval: toRef(props, "displayAutomationHasInterval"),
   hubNoticeDomains: computed(() => props.hubNoticeDomains || [])

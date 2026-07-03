@@ -2,27 +2,14 @@
   "id": "busses.i2c",
   "domain": "i2c",
   "platform": "core",
+  "helpUrl": "https://esphome.io/components/i2c/",
   "fields": [
-    {
-      "key": "enabled",
-      "label": "Enable I2C",
-      "type": "boolean",
-      "required": false,
-      "lvl": "simple",
-      "default": false,
-      "emitYAML": "never",
-      "helpUrl": "https://esphome.io/components/i2c/"
-    },
     {
       "key": "sda",
       "type": "gpio",
       "disableAdvancedConfig": true,
       "required": true,
       "lvl": "simple",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "GPIOXX"
     },
     {
@@ -31,10 +18,6 @@
       "disableAdvancedConfig": true,
       "required": true,
       "lvl": "simple",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "GPIOXX"
     },
     {
@@ -42,10 +25,6 @@
       "type": "boolean",
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "default": true
     },
     {
@@ -53,10 +32,6 @@
       "type": "text",
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "50kHz"
     },
     {
@@ -64,10 +39,6 @@
       "type": "duration",
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "100us"
     },
     {
@@ -75,10 +46,6 @@
       "type": "boolean",
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "default": true
     },
     {
@@ -86,10 +53,6 @@
       "type": "boolean",
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "default": true
     },
     {
@@ -97,10 +60,6 @@
       "type": "boolean",
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "default": false
     },
     {
@@ -108,11 +67,7 @@
       "type": "id",
       "required": true,
       "lvl": "simple",
-      "default": "i2c_id",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      }
+      "default": "i2c_id"
     }
   ]
 }

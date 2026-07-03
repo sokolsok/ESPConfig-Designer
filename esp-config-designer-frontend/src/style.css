@@ -1737,6 +1737,10 @@ button.btn-add {
   padding-right: 8px;
 }
 
+.bus-instance-list {
+  margin-top: 4px;
+}
+
 .schema-list.schema-list--compact .schema-list-actions.schema-list-actions--catalog {
   padding-right: 10px;
 }

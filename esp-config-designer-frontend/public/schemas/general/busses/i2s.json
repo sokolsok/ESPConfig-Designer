@@ -2,6 +2,7 @@
   "id": "busses.i2s",
   "domain": "i2s_audio",
   "platform": "core",
+  "helpUrl": "https://esphome.io/components/i2s_audio/",
   "embedded": [
     {
       "key": "es7210_driver",
@@ -46,25 +47,11 @@
   ],
   "fields": [
     {
-      "key": "enabled",
-      "label": "Enable I2S",
-      "type": "boolean",
-      "required": false,
-      "lvl": "simple",
-      "default": false,
-      "emitYAML": "never",
-      "helpUrl": "https://esphome.io/components/i2s_audio/"
-    },
-    {
       "key": "i2s_lrclk_pin",
       "type": "gpio",
       "disableAdvancedConfig": true,
       "required": true,
       "lvl": "simple",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "GPIOXX"
     },
     {
@@ -73,10 +60,6 @@
       "disableAdvancedConfig": true,
       "required": false,
       "lvl": "simple",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "GPIOXX"
     },
     {
@@ -85,22 +68,13 @@
       "disableAdvancedConfig": true,
       "required": false,
       "lvl": "simple",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "GPIOXX"
     },
     {
       "key": "use_legacy",
       "type": "boolean",
       "required": false,
-      "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "default": false
     },
     {
@@ -111,10 +85,6 @@
       "default": "NONE",
       "emitYAML": "never",
       "note": "Optional external audio codec/ADC driver attached to this I2S bus. Choose NONE if your setup does not need a dedicated driver. All currently supported drivers require I2C.",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "options": [
         "NONE",
         "es7210",
@@ -192,14 +162,10 @@
     {
       "key": "id",
       "type": "id",
-      "required": false,
+      "required": true,
       "lvl": "simple",
       "default": "i2s_id",
-      "idDomain": "i2s_audio",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      }
+      "idDomain": "i2s_audio"
     }
   ]
 }

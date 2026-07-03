@@ -1,4 +1,5 @@
 import { computed, nextTick, onBeforeUnmount, onBeforeUpdate, onMounted, ref, watch } from "vue";
+import { highlightYamlFallback, highlightYamlToHtml } from "../../utils/yamlSyntaxHighlight";
 
 // This composable owns the complete YAML preview UX for BuilderView.
 // It keeps preview concerns isolated from builder state concerns:
@@ -7,38 +8,12 @@ import { computed, nextTick, onBeforeUnmount, onBeforeUpdate, onMounted, ref, wa
 // - copy-to-clipboard feedback
 // - lightweight preview callouts and resize bookkeeping
 
-const escapeHtml = (value) =>
-  String(value || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-
-const highlightYamlFallback = (source) => escapeHtml(source).replace(/\n/g, "<br>");
-
-let yamlHighlighter = null;
-let yamlHighlighterPromise = null;
-
-const ensureYamlHighlighter = async () => {
-  if (yamlHighlighter) return yamlHighlighter;
-  if (yamlHighlighterPromise) return yamlHighlighterPromise;
-  yamlHighlighterPromise = import("highlight.js/lib/core")
-    .then(async ({ default: hljs }) => {
-      const { default: yaml } = await import("highlight.js/lib/languages/yaml");
-      hljs.registerLanguage("yaml", yaml);
-      yamlHighlighter = hljs;
-      return hljs;
-    })
-    .finally(() => {
-      yamlHighlighterPromise = null;
-    });
-  return yamlHighlighterPromise;
-};
-
 export const useBuilderPreview = ({
   splitPreviewEnabled,
   previewTabs,
   yamlPreview,
   mainPreviewTargetKey,
+  previewSyncRequest,
   isHydrating,
   displayAutomationHasInterval,
   hubNoticeDomains
@@ -178,13 +153,9 @@ export const useBuilderPreview = ({
     const source = previewContent.value || "";
     highlightedYaml.value = highlightYamlFallback(source);
     if (!source.trim()) return;
-    try {
-      const hljs = await ensureYamlHighlighter();
-      if ((previewContent.value || "") !== source) return;
-      highlightedYaml.value = hljs.highlight(source, { language: "yaml" }).value;
-    } catch {
-      highlightedYaml.value = highlightYamlFallback(source);
-    }
+    const highlighted = await highlightYamlToHtml(source);
+    if ((previewContent.value || "") !== source) return;
+    highlightedYaml.value = highlighted;
   };
 
   const copyLabel = computed(() => (copySuccess.value ? "Copied" : "Copy code"));
@@ -250,6 +221,14 @@ export const useBuilderPreview = ({
     () => mainPreviewTargetKey.value,
     () => {
       void syncPreviewTabToMain();
+    }
+  );
+
+  watch(
+    () => previewSyncRequest?.value,
+    (value, previousValue) => {
+      if (!value || value === previousValue) return;
+      void nextTick(() => syncPreviewTabToMain());
     }
   );
 

@@ -38,8 +38,18 @@
     :yaml-import-analysis-error="yamlImportAnalysisError"
     :yaml-import-analyzing="yamlImportAnalyzing"
     :yaml-import-report-visible="yamlImportReportVisible"
+    :yaml-import-can-return-to-source-list="yamlImportCanReturnToSourceList"
+    :yaml-import-target-yaml-names="yamlImportTargetYamlNames"
+    :yaml-import-target-project-names="yamlImportTargetProjectNames"
+    :yaml-import-targets-loading="yamlImportTargetsLoading"
+    :yaml-import-source-name="yamlImportSourceName"
     :yaml-import-saving="yamlImportSaving"
     :yaml-import-save-error="yamlImportSaveError"
+    :builder-yaml-import-modal-open="builderYamlImportModalOpen"
+    :builder-yaml-import-items="builderYamlImportItems"
+    :builder-yaml-import-loading="builderYamlImportLoading"
+    :builder-yaml-import-loading-name="builderYamlImportLoadingName"
+    :builder-yaml-import-error="builderYamlImportError"
     @confirm-remove-folder="confirmRemoveFolder"
     @cancel-remove-folder="cancelRemoveFolder"
     @confirm-remove-project="confirmRemoveProject"
@@ -66,8 +76,12 @@
     @close-customize-color-picker="customizeColorPickerOpen = false"
     @select-customize-color="handleCustomizeColorSelect"
     @cancel-yaml-import="closeYamlImportModal"
+    @back-to-yaml-source-list="handleYamlImportBackToSourceList"
     @continue-yaml-import="handleYamlImportContinue"
     @confirm-yaml-import="handleYamlImportConfirm"
+    @close-builder-yaml-import="closeBuilderYamlImportModal"
+    @refresh-builder-yaml-import="loadBuilderYamlImportCandidates"
+    @select-builder-yaml-import="handleBuilderYamlImportSelect"
   />
 
   <input
@@ -179,7 +193,15 @@ import {
   writeProjectDeploymentState
 } from "../utils/projectDeploymentState";
 import { normalizeHexColor } from "../utils/displayColor";
-import { loadComponentSchema, loadSchemaByPath } from "../utils/schemaLoader";
+import {
+  loadActionCatalog,
+  loadActionDefinition,
+  loadComponentSchema,
+  loadConditionCatalog,
+  loadConditionDefinition,
+  loadFilterCatalog,
+  loadSchemaByPath
+} from "../utils/schemaLoader";
 import { importYamlToProjectConfig } from "../utils/yamlProjectImport";
 
 // DashboardView coordinates explorer state, shared top-bar actions, and modal flows.
@@ -245,9 +267,19 @@ const yamlImportAnalysis = ref(null);
 const yamlImportAnalysisError = ref(null);
 const yamlImportAnalyzing = ref(false);
 const yamlImportReportVisible = ref(false);
+const yamlImportCanReturnToSourceList = ref(false);
+const yamlImportTargetYamlNames = ref([]);
+const yamlImportTargetProjectNames = ref([]);
+const yamlImportTargetsLoading = ref(false);
 const yamlImportSaving = ref(false);
 const yamlImportSaveError = ref("");
 const yamlImportComponentCatalog = ref(null);
+const yamlImportSourceName = ref("");
+const builderYamlImportModalOpen = ref(false);
+const builderYamlImportItems = ref([]);
+const builderYamlImportLoading = ref(false);
+const builderYamlImportLoadingName = ref("");
+const builderYamlImportError = ref("");
 const customizeDraft = ref({
   iconName: "",
   iconColor: "",
@@ -266,6 +298,8 @@ let projectMenuPlacementRafId = null;
 let projectMenuResizeObserver = null;
 let yamlImportComponentCatalogPromise = null;
 let yamlImportAnalysisRequestId = 0;
+let yamlImportTargetsRequestId = 0;
+let builderYamlImportRequestId = 0;
 const deploymentTransitionLocks = new Set();
 // View mode controls the main pane scope:
 // - "folder": show current folder content
@@ -300,6 +334,7 @@ const projectsIndexLoadUrl = useLocalRuntime
   : getApiUrl("projects/load?name=projects.json");
 const projectsIndexSaveUrl = useLocalRuntime ? "/dev/projects/index" : getApiUrl("projects/save");
 const yamlImportProjectSaveUrl = getApiUrl("api/import/project");
+const yamlImportTargetsUrl = getApiUrl("api/import/targets");
 const projectLoadUrl = (projectName) => {
   const encodedName = encodeURIComponent(String(projectName || "").trim());
   return useLocalRuntime
@@ -1530,6 +1565,129 @@ const openYamlFilePicker = () => {
   yamlImportFileInput.value?.click?.();
 };
 
+const isYamlImportCandidateName = (value) => {
+  const name = String(value || "").trim().toLowerCase();
+  return Boolean(name && name.endsWith(".yaml"));
+};
+
+const normalizeYamlImportCandidate = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const name = String(item.name || "").trim();
+  if (!isYamlImportCandidateName(name)) return null;
+  return {
+    name,
+    size: Number.isFinite(Number(item.size)) ? Number(item.size) : 0,
+    mtime: typeof item.mtime === "string" ? item.mtime : "",
+    projectName: sanitizeProjectName(item.projectName || name.replace(/\.yaml$/i, ".json")),
+    projectExists: item.projectExists === true
+  };
+};
+
+const loadBuilderYamlImportCandidates = async () => {
+  const requestId = ++builderYamlImportRequestId;
+  builderYamlImportLoading.value = true;
+  builderYamlImportError.value = "";
+  try {
+    const response = await addonFetch("api/import/yaml-candidates");
+    if (!response.ok) {
+      throw new Error(await parseResponseMessage(response, "Failed to load YAML files"));
+    }
+    const payload = await response.json();
+    const items = Array.isArray(payload?.items) ? payload.items : [];
+    const normalized = items.map(normalizeYamlImportCandidate).filter(Boolean);
+    if (requestId !== builderYamlImportRequestId) return;
+    builderYamlImportItems.value = normalized;
+  } catch (error) {
+    if (requestId !== builderYamlImportRequestId) return;
+    builderYamlImportItems.value = [];
+    builderYamlImportError.value = error instanceof Error ? error.message : "Failed to load YAML files";
+  } finally {
+    if (requestId === builderYamlImportRequestId) {
+      builderYamlImportLoading.value = false;
+    }
+  }
+};
+
+const openBuilderYamlImportModal = () => {
+  dashboardActionError.value = "";
+  builderYamlImportModalOpen.value = true;
+  builderYamlImportError.value = "";
+  loadBuilderYamlImportCandidates();
+};
+
+const closeBuilderYamlImportModal = () => {
+  if (builderYamlImportLoadingName.value) return;
+  builderYamlImportRequestId += 1;
+  builderYamlImportModalOpen.value = false;
+  builderYamlImportLoading.value = false;
+  builderYamlImportLoadingName.value = "";
+  builderYamlImportError.value = "";
+};
+
+const loadYamlImportTargets = async () => {
+  const requestId = ++yamlImportTargetsRequestId;
+  yamlImportTargetsLoading.value = true;
+  try {
+    const response = await fetchJson(yamlImportTargetsUrl);
+    if (!response.ok) {
+      throw new Error(await parseResponseMessage(response, "Failed to load import targets"));
+    }
+    const payload = await response.json();
+    if (requestId !== yamlImportTargetsRequestId) return;
+    yamlImportTargetYamlNames.value = Array.isArray(payload?.yamlNames) ? payload.yamlNames : [];
+    yamlImportTargetProjectNames.value = Array.isArray(payload?.projectNames) ? payload.projectNames : [];
+  } catch {
+    if (requestId !== yamlImportTargetsRequestId) return;
+    yamlImportTargetYamlNames.value = [];
+    yamlImportTargetProjectNames.value = [];
+  } finally {
+    if (requestId === yamlImportTargetsRequestId) {
+      yamlImportTargetsLoading.value = false;
+    }
+  }
+};
+
+const beginYamlImport = ({ fileName, content, sourceYamlName = "", canReturnToSourceList = false }) => {
+  yamlImportFileName.value = fileName;
+  yamlImportContent.value = content;
+  yamlImportSourceName.value = sourceYamlName;
+  yamlImportAnalysis.value = null;
+  yamlImportAnalysisError.value = null;
+  yamlImportAnalyzing.value = false;
+  yamlImportReportVisible.value = false;
+  yamlImportCanReturnToSourceList.value = canReturnToSourceList;
+  yamlImportSaving.value = false;
+  yamlImportSaveError.value = "";
+  yamlImportModalOpen.value = true;
+  yamlImportAnalysisRequestId += 1;
+  loadYamlImportTargets();
+};
+
+const handleBuilderYamlImportSelect = async (item) => {
+  const name = String(item?.name || "").trim();
+  if (!isYamlImportCandidateName(name) || builderYamlImportLoadingName.value) return;
+  builderYamlImportLoadingName.value = name;
+  builderYamlImportError.value = "";
+  try {
+    const response = await addonFetch(`api/import/yaml?name=${encodeURIComponent(name)}`);
+    if (!response.ok) {
+      throw new Error(await parseResponseMessage(response, "Failed to load YAML file"));
+    }
+    const payload = await response.json();
+    const loadedName = String(payload?.name || name).trim();
+    if (!isYamlImportCandidateName(loadedName)) {
+      throw new Error("Invalid YAML file returned by backend");
+    }
+    const content = typeof payload?.yaml === "string" ? payload.yaml : "";
+    builderYamlImportModalOpen.value = false;
+    beginYamlImport({ fileName: loadedName, content, sourceYamlName: loadedName, canReturnToSourceList: true });
+  } catch (error) {
+    builderYamlImportError.value = error instanceof Error ? error.message : "Failed to load YAML file";
+  } finally {
+    builderYamlImportLoadingName.value = "";
+  }
+};
+
 const loadYamlImportComponentCatalog = async () => {
   if (yamlImportComponentCatalog.value) return yamlImportComponentCatalog.value;
   if (yamlImportComponentCatalogPromise) return yamlImportComponentCatalogPromise;
@@ -1555,6 +1713,7 @@ const loadYamlImportComponentCatalog = async () => {
 
 const closeYamlImportModal = () => {
   yamlImportAnalysisRequestId += 1;
+  yamlImportTargetsRequestId += 1;
   yamlImportModalOpen.value = false;
   yamlImportFileName.value = "";
   yamlImportContent.value = "";
@@ -1562,8 +1721,13 @@ const closeYamlImportModal = () => {
   yamlImportAnalysisError.value = null;
   yamlImportAnalyzing.value = false;
   yamlImportReportVisible.value = false;
+  yamlImportCanReturnToSourceList.value = false;
+  yamlImportTargetYamlNames.value = [];
+  yamlImportTargetProjectNames.value = [];
+  yamlImportTargetsLoading.value = false;
   yamlImportSaving.value = false;
   yamlImportSaveError.value = "";
+  yamlImportSourceName.value = "";
   resetYamlImportInput();
 };
 
@@ -1580,7 +1744,12 @@ const startYamlImportAnalysis = async (content, requestId) => {
       sourceName: yamlImportFileName.value,
       componentCatalog,
       loadComponentSchema: (component) => loadComponentSchema(component.componentId, component.schemaPath),
-      loadGeneralSchema: loadSchemaByPath
+      loadGeneralSchema: loadSchemaByPath,
+      loadFilterCatalog,
+      loadActionCatalog,
+      loadActionDefinition,
+      loadConditionCatalog,
+      loadConditionDefinition
     });
     if (requestId !== yamlImportAnalysisRequestId) return;
     if (result.ok) {
@@ -1602,10 +1771,25 @@ const startYamlImportAnalysis = async (content, requestId) => {
   }
 };
 
-const handleYamlImportContinue = () => {
-  if (yamlImportAnalyzing.value) return;
-  if (!yamlImportAnalysis.value && !yamlImportAnalysisError.value) return;
-  yamlImportReportVisible.value = true;
+const handleYamlImportContinue = (nextContent) => {
+  const normalizedContent = typeof nextContent === "string" ? nextContent : "";
+  const contentChanged = normalizedContent !== yamlImportContent.value;
+  yamlImportContent.value = normalizedContent;
+  if (contentChanged) {
+    yamlImportSourceName.value = "";
+  }
+  yamlImportAnalysis.value = null;
+  yamlImportAnalysisError.value = null;
+  yamlImportReportVisible.value = false;
+  yamlImportSaving.value = false;
+  yamlImportSaveError.value = "";
+  const requestId = ++yamlImportAnalysisRequestId;
+  startYamlImportAnalysis(normalizedContent, requestId);
+};
+
+const handleYamlImportBackToSourceList = () => {
+  closeYamlImportModal();
+  openBuilderYamlImportModal();
 };
 
 const handleYamlImportConfirm = async () => {
@@ -1623,7 +1807,8 @@ const handleYamlImportConfirm = async () => {
         projectData: analysis.projectData,
         yaml: yamlImportContent.value,
         overwrite: false,
-        importReport: analysis.importReport || null
+        importReport: analysis.importReport || null,
+        ...(yamlImportSourceName.value ? { sourceYamlName: yamlImportSourceName.value } : {})
       })
     });
     if (!response.ok) {
@@ -1655,17 +1840,7 @@ const handleYamlImportFileSelected = async (event) => {
   }
   try {
     const content = await readYamlImportFile(file);
-    yamlImportFileName.value = file.name;
-    yamlImportContent.value = content;
-    yamlImportAnalysis.value = null;
-    yamlImportAnalysisError.value = null;
-    yamlImportAnalyzing.value = false;
-    yamlImportReportVisible.value = false;
-    yamlImportSaving.value = false;
-    yamlImportSaveError.value = "";
-    yamlImportModalOpen.value = true;
-    const requestId = ++yamlImportAnalysisRequestId;
-    startYamlImportAnalysis(content, requestId);
+    beginYamlImport({ fileName: file.name, content });
   } catch (error) {
     dashboardActionError.value = error instanceof Error ? error.message : "Failed to read YAML file";
     resetYamlImportInput();
@@ -1674,12 +1849,21 @@ const handleYamlImportFileSelected = async (event) => {
 
 const handleTopbarImportOption = (event) => {
   const detail = event?.detail && typeof event.detail === "object" ? event.detail : {};
-  if (detail.source !== "yaml-file") return;
-  openYamlFilePicker();
+  if (detail.source === "yaml-file") {
+    openYamlFilePicker();
+    return;
+  }
+  if (detail.source === "esphome-builder") {
+    openBuilderYamlImportModal();
+  }
 };
 
 const handleDashboardKeydown = (event) => {
   if (event.key !== "Escape") return;
+  if (builderYamlImportModalOpen.value) {
+    closeBuilderYamlImportModal();
+    return;
+  }
   if (yamlImportModalOpen.value) {
     closeYamlImportModal();
     return;

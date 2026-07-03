@@ -2,27 +2,14 @@
   "id": "busses.spi",
   "domain": "spi",
   "platform": "core",
+  "helpUrl": "https://esphome.io/components/spi/",
   "fields": [
-    {
-      "key": "enabled",
-      "label": "Enable SPI",
-      "type": "boolean",
-      "required": false,
-      "lvl": "simple",
-      "default": false,
-      "emitYAML": "never",
-      "helpUrl": "https://esphome.io/components/spi/"
-    },
     {
       "key": "mosi_pin",
       "type": "gpio",
       "disableAdvancedConfig": true,
       "required": false,
       "lvl": "simple",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "GPIOXX"
     },
     {
@@ -31,10 +18,6 @@
       "disableAdvancedConfig": true,
       "required": false,
       "lvl": "simple",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "GPIOXX"
     },
     {
@@ -43,10 +26,6 @@
       "disableAdvancedConfig": true,
       "required": true,
       "lvl": "simple",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "GPIOXX"
     },
     {
@@ -54,21 +33,13 @@
       "type": "id",
       "required": true,
       "lvl": "simple",
-      "default": "spi_id",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      }
+      "default": "spi_id"
     },
     {
       "key": "interface",
       "type": "select",
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "options": [
         "any",
         "software",
@@ -84,10 +55,6 @@
       "type": "select",
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "options": [
         "single",
         "quad",
@@ -100,10 +67,6 @@
       "type": "list",
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "item": {
         "type": "gpio",
         "disableAdvancedConfig": true,

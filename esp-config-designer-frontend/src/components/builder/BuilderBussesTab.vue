@@ -30,8 +30,51 @@
           {{ tab.label }}
         </button>
       </div>
+
+      <div v-if="isMultiInstanceBus" class="schema-list list-group list-simple bus-instance-list" :class="{ 'is-empty': !busInstances.length }">
+        <div class="schema-list-header">
+          <div class="schema-list-title">
+            <span>{{ activeBusLabel }}</span>
+            <button type="button" class="secondary compact btn-add schema-list-add" @click="emit('add-bus-instance')">
+              Add
+            </button>
+          </div>
+        </div>
+        <div v-if="!busInstances.length" class="note">No bus instances yet</div>
+        <div v-for="(instance, index) in busInstances" :key="busInstanceKey(instance, index)" class="schema-list-item">
+          <SchemaRenderer
+            v-if="bussesDetailId"
+            :key="busInstanceScopeId(index)"
+            :component-id="bussesDetailId"
+            :component-config="instance"
+            :root-value="config"
+            :mode-level="activeModeLevel"
+            :id-registry="idRegistry"
+            :name-registry="nameRegistry"
+            :id-index="idIndex"
+            :gpio-options="gpioOptions"
+            :gpio-usage="gpioUsageIndex"
+            :gpio-title="gpioTitle"
+            :context-component-id="bussesDetailId"
+            :context-scope-id="busInstanceScopeId(index)"
+            :field-filter="bussesDetailFieldFilter"
+            :mode-upgrade-section="'busses'"
+            :mode-upgrade-key="'detail'"
+            :global-store="globalStore"
+            @update="emit('update-bus-instance', { index, ...$event })"
+            @open-secrets="emit('open-secrets')"
+            @mode-upgrade-availability="emit('mode-upgrade-availability', $event)"
+          />
+          <div class="schema-list-actions">
+            <button type="button" class="secondary compact btn-standard" @click="emit('remove-bus-instance', index)">
+              Remove
+            </button>
+          </div>
+        </div>
+      </div>
+
       <SchemaRenderer
-        v-if="bussesDetailId"
+        v-else-if="bussesDetailId"
         :key="bussesDetailScopeId"
         :component-id="bussesDetailId"
         :component-config="bussesDetailConfig"
@@ -67,12 +110,16 @@
 <script setup>
 import SchemaRenderer from "../SchemaRenderer.vue";
 
-defineProps({
+const props = defineProps({
   activeTabHelpUrl: { type: String, default: "" },
   bussesTabs: { type: Array, default: () => [] },
   activeBussesKey: { type: String, default: "" },
+  activeBusLabel: { type: String, default: "" },
+  isMultiInstanceBus: { type: Boolean, default: false },
+  busInstances: { type: Array, default: () => [] },
   bussesDetailId: { type: String, default: "" },
   bussesDetailConfig: { type: Object, default: () => ({}) },
+  bussesDetailFieldFilter: { type: Array, default: () => [] },
   bussesDetailScopeId: { type: String, required: true },
   config: { type: Object, default: null },
   activeModeLevel: { type: String, default: "Simple" },
@@ -88,10 +135,16 @@ defineProps({
 });
 
 const emit = defineEmits([
+  "add-bus-instance",
   "mode-upgrade-availability",
   "open-secrets",
   "promote-mode-level",
+  "remove-bus-instance",
+  "update-bus-instance",
   "update-busses-detail",
   "update:activeBussesKey"
 ]);
+
+const busInstanceScopeId = (index) => `${props.bussesDetailScopeId}:${index}`;
+const busInstanceKey = (instance, index) => `${busInstanceScopeId(index)}:${instance?.id || "new"}`;
 </script>

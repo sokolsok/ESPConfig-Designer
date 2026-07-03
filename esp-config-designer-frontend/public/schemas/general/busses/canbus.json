@@ -2,27 +2,14 @@
   "id": "busses.canbus",
   "domain": "canbus",
   "platform": "core",
+  "helpUrl": "https://esphome.io/components/canbus/",
   "fields": [
-    {
-      "key": "enabled",
-      "label": "Enable CAN Bus",
-      "type": "boolean",
-      "required": false,
-      "lvl": "simple",
-      "default": false,
-      "emitYAML": "never",
-      "helpUrl": "https://esphome.io/components/canbus/"
-    },
     {
       "key": "tx_pin",
       "type": "gpio",
       "disableAdvancedConfig": true,
       "required": true,
-      "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
+      "lvl": "simple",
       "placeholder": "GPIOXX"
     },
     {
@@ -30,11 +17,7 @@
       "type": "gpio",
       "disableAdvancedConfig": true,
       "required": true,
-      "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
+      "lvl": "simple",
       "placeholder": "GPIOXX"
     },
     {
@@ -42,10 +25,6 @@
       "type": "text",
       "required": false,
       "lvl": "normal",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      },
       "placeholder": "500kbps"
     },
     {
@@ -53,11 +32,7 @@
       "type": "id",
       "required": true,
       "lvl": "simple",
-      "default": "canbus_id",
-      "dependsOn": {
-        "key": "enabled",
-        "value": true
-      }
+      "default": "canbus_id"
     }
   ]
 }

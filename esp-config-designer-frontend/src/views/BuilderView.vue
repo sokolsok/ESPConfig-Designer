@@ -170,6 +170,7 @@
             :preview-tabs="previewTabs"
             :yaml-preview="yamlPreview"
             :main-preview-target-key="mainPreviewTargetKey"
+            :preview-sync-request="previewSyncRequest"
             :is-hydrating="isHydrating"
             :display-automation-has-interval="displayAutomationHasInterval"
             :hub-notice-domains="hubNoticeDomains"
@@ -300,8 +301,12 @@
           :active-tab-help-url="activeTabHelpUrl"
           :busses-tabs="bussesTabs"
           :active-busses-key="activeBussesKey"
+          :active-bus-label="activeBusLabel"
+          :is-multi-instance-bus="isActiveMultiInstanceBus"
+          :bus-instances="activeBusInstances"
           :busses-detail-id="bussesDetailId"
           :busses-detail-config="bussesDetailConfig"
+          :busses-detail-field-filter="bussesDetailFieldFilter"
           :busses-detail-scope-id="bussesDetailScopeId"
           :config="config"
           :active-mode-level="activeModeLevel"
@@ -314,8 +319,11 @@
           :global-store="globalStore"
           :should-show-mode-upgrade="shouldShowModeUpgrade('busses')"
           :mode-upgrade-button-label="modeUpgradeButtonLabel"
+          @add-bus-instance="addActiveBusInstance"
           @update:active-busses-key="activeBussesKey = $event"
           @update-busses-detail="handleBussesDetailUpdate"
+          @update-bus-instance="handleBusInstanceUpdate"
+          @remove-bus-instance="removeActiveBusInstance"
           @open-secrets="openSecretsModal"
           @mode-upgrade-availability="handleModeUpgradeAvailability"
           @promote-mode-level="promoteModeLevel"
@@ -524,6 +532,7 @@ import {
   buildComponentsYaml,
   buildDisplayAnimationIntervals,
   buildGeneralSchemaBlocks,
+  buildGeneralSchemaListBlock,
   buildSchemaYaml
 } from "../utils/schemaYaml";
 import { buildGlobalRegistry, isFieldVisible as isSchemaFieldVisible } from "../utils/schemaVisibility";
@@ -543,6 +552,13 @@ import {
   writeBuilderSessionProjectName
 } from "../utils/builderSession";
 import { createDefaultBuilderConfig } from "../utils/builderProjectModel";
+import {
+  createBusInstance,
+  isMultiInstanceBusIdDomain,
+  isMultiInstanceBusKey,
+  normalizeBusConfigValue,
+  normalizeBusInstances
+} from "../utils/busInstances";
 import {
   mergeDeviceStatusCache,
   normalizeProjectKey,
@@ -748,7 +764,7 @@ const buildIdRefErrors = (entries, idIndex) => {
   };
 
   const checkIdRef = (value, field, entry, path) => {
-    if (field?.required !== true) return;
+    const hasValue = typeof value === "string" && value.trim();
     const options = buildIdOptions(
       idIndex,
       field.domain,
@@ -757,10 +773,15 @@ const buildIdRefErrors = (entries, idIndex) => {
       entry?.scopeId || ""
     );
     if (!options.length) {
-      pushError(entry, path, "No matching identifiers available");
+      if (field?.required === true || hasValue) {
+        pushError(entry, path, "No matching identifiers available");
+      }
       return;
     }
-    if (!value || typeof value !== "string") {
+    if (!hasValue) {
+      if (field?.required !== true && isMultiInstanceBusIdDomain(field?.domain) && options.length > 1) {
+        pushError(entry, path, "Select which bus identifier to use");
+      }
       return;
     }
     const match = options.some((option) => option.toLowerCase() === value.toLowerCase());
@@ -1637,6 +1658,8 @@ const schemaHelpUrl = (schema) => {
   return typeof url === "string" ? url.trim() : "";
 };
 
+const BUSSES_HELP_URL = "https://esphome.io/components/#hardware-peripheral-interfacesbusses";
+
 const activeTabHelpUrl = computed(() => {
   if (activeTab.value === "Core") {
     return schemaHelpUrl(esphomeCoreSchema.value) || schemaHelpUrl(substitutionsCoreSchema.value);
@@ -1655,7 +1678,7 @@ const activeTabHelpUrl = computed(() => {
   }
 
   if (activeTab.value === "Busses") {
-    return schemaHelpUrl(bussesSchemas.value?.[activeBussesKey.value]);
+    return BUSSES_HELP_URL;
   }
 
   if (activeTab.value === "System") {
@@ -1801,6 +1824,37 @@ const bussesDefinitions = [
   { key: "canbus", label: "CAN Bus", schemaId: "general/busses/canbus" },
   { key: "modbus", label: "Modbus", schemaId: "general/busses/modbus" }
 ];
+const normalizeBussesCoreConfig = (source) => {
+  const normalized = {};
+  const sourceValue = source && typeof source === "object" && !Array.isArray(source) ? source : {};
+  Object.entries(sourceValue).forEach(([key, value]) => {
+    normalized[key] = value;
+  });
+  bussesDefinitions.forEach((entry) => {
+    if (!Object.prototype.hasOwnProperty.call(sourceValue, entry.key)) return;
+    normalized[entry.key] = normalizeBusConfigValue(entry.key, sourceValue[entry.key]);
+  });
+  return normalized;
+};
+const requiredDependencies = computed(() =>
+  getRequiredDependencies({
+    components: config.value.components || [],
+    componentSchemas: componentSchemas.value,
+    networkConfig: networkCoreConfig.value,
+    networkSchema: networkDetailSchema.value,
+    protocolsConfig: protocolsCoreConfig.value,
+    enabledProtocols: enabledProtocolKeys.value,
+    protocolsSchemas: protocolsSchemas.value
+  })
+);
+const requiredBusses = computed(() => {
+  const busses = new Set();
+  requiredDependencies.value.forEach((id) => {
+    const [namespace, targetKey] = String(id || "").split(":", 2);
+    if (namespace === "bus" && targetKey) busses.add(targetKey);
+  });
+  return busses;
+});
 const otherDefinitions = [
   { key: "logger", label: "Logger", schemaId: "general/system/logger" },
   { key: "status_led", label: "Status LED", schemaId: "general/system/status_led" },
@@ -1881,7 +1935,9 @@ const protocolDetailConfig = computed(() => {
   return protocolsCoreConfig.value?.[activeProtocolKey.value] || {};
 });
 const activeBussesKey = ref(bussesDefinitions[0]?.key || "");
+const getBusInstances = (key) => normalizeBusInstances(bussesCoreConfig.value?.[key]);
 const resolveBusEnabled = (key) => {
+  if (isMultiInstanceBusKey(key)) return getBusInstances(key).length > 0;
   const configEntry = bussesCoreConfig.value?.[key] || {};
   if (configEntry.enabled !== undefined) return Boolean(configEntry.enabled);
   const schema = bussesSchemas.value?.[key];
@@ -2005,15 +2061,27 @@ const focusRequiredNetwork = () => {
 const bussesTabs = computed(() =>
   bussesDefinitions.map((entry) => ({ key: entry.key, label: entry.label }))
 );
+const activeBusDefinition = computed(() =>
+  bussesDefinitions.find((item) => item.key === activeBussesKey.value) || null
+);
+const activeBusLabel = computed(() => activeBusDefinition.value?.label || "Bus");
+const isActiveMultiInstanceBus = computed(() => isMultiInstanceBusKey(activeBussesKey.value));
+const activeBusInstances = computed(() => getBusInstances(activeBussesKey.value));
 const bussesDetailId = computed(() => {
-  const entry = bussesDefinitions.find((item) => item.key === activeBussesKey.value);
-  return entry?.schemaId || "";
+  return activeBusDefinition.value?.schemaId || "";
 });
 const bussesDetailScopeId = computed(() =>
   activeBussesKey.value ? `tab:Busses:${activeBussesKey.value}` : "tab:Busses"
 );
+const bussesDetailFieldFilter = computed(() => {
+  const schema = bussesSchemas.value?.[activeBussesKey.value];
+  const fields = Array.isArray(schema?.fields) ? schema.fields : [];
+  if (!isActiveMultiInstanceBus.value) return [];
+  return fields.map((field) => field.key).filter((key) => key && key !== "enabled");
+});
 const bussesDetailConfig = computed(() => {
   if (!activeBussesKey.value) return {};
+  if (isActiveMultiInstanceBus.value) return {};
   return bussesCoreConfig.value?.[activeBussesKey.value] || {};
 });
 const activeOtherKey = ref(otherDefinitions[0]?.key || "");
@@ -2288,12 +2356,25 @@ const schemaEntries = computed(() => {
   });
 
   bussesDefinitions.forEach((entry) => {
+    const schema = bussesSchemas.value?.[entry.key];
+    if (isMultiInstanceBusKey(entry.key)) {
+      getBusInstances(entry.key).forEach((instance, index) => {
+        pushEntry({
+          scopeId: `tab:Busses:${entry.key}:${index}`,
+          label: `busses.${entry.key}[${index}]`,
+          componentId: entry.schemaId,
+          config: instance,
+          schema
+        });
+      });
+      return;
+    }
     pushEntry({
       scopeId: `tab:Busses:${entry.key}`,
       label: `busses.${entry.key}`,
       componentId: entry.schemaId,
       config: bussesCoreConfig.value?.[entry.key] || {},
-      schema: bussesSchemas.value?.[entry.key]
+      schema
     });
   });
 
@@ -2345,6 +2426,15 @@ const gpioUsageIndex = computed(() => {
     if (!resolveBusEnabled(entry.key)) return;
     const schema = bussesSchemas.value?.[entry.key];
     if (!schema?.fields) return;
+    if (isMultiInstanceBusKey(entry.key)) {
+      getBusInstances(entry.key).forEach((instance) => {
+        bussesExtra.push({
+          config: instance,
+          fields: schema.fields
+        });
+      });
+      return;
+    }
     bussesExtra.push({
       config: bussesCoreConfig.value?.[entry.key] || {},
       fields: schema.fields
@@ -2420,6 +2510,7 @@ const previewMode = computed({
     splitPreviewEnabled.value = value === "tabs";
   }
 });
+const previewSyncRequest = ref(0);
 
 watch(
   () => splitPreviewEnabled.value,
@@ -3264,6 +3355,18 @@ const otherConfig = systemConfig.value || {};
     const schema = bussesSchemaMap[entry.key];
     const fields = schema?.fields || [];
     if (!fields.length) return;
+    if (isMultiInstanceBusKey(entry.key)) {
+      const busValues = getBusInstances(entry.key).map((instance) =>
+        filterConfigBySchema(instance || {}, fields)
+      );
+      const busBlocks = buildGeneralSchemaListBlock(entry.label, busValues, schema, config.value, globalStore.value);
+      if (!busBlocks.length) return;
+      busBlocks.forEach((block) => {
+        lines.push("");
+        lines.push(...block.lines);
+      });
+      return;
+    }
     const busValue = filterConfigBySchema(bussesConfig[entry.key] || {}, fields);
     const busBlocks = buildGeneralSchemaBlocks(entry.label, busValue, schema, config.value, globalStore.value);
     const primaryBlock = busBlocks[0] || null;
@@ -3425,13 +3528,13 @@ const automationBlockKeys = new Set([
   "interval"
 ]);
 const timeBlockKeys = new Set(["time"]);
-const bussesBlockKeys = computed(() => new Set(bussesDefinitions.map((entry) => entry.key)));
-
-const i2sAudioBlockKeys = new Set([
-  "i2s_audio",
-  "audio_adc",
-  "audio_dac"
-]);
+const bussesBlockKeys = computed(() => {
+  const keys = new Set(bussesDefinitions.map((entry) => entry.key));
+  keys.add("i2s_audio");
+  keys.add("audio_adc");
+  keys.add("audio_dac");
+  return keys;
+});
 
 const titleCase = (value) =>
   value
@@ -3543,12 +3646,6 @@ const previewTabs = computed(() => {
     bussesBlocks.forEach((block) => used.add(block.key));
   }
 
-  const i2sAudioBlocks = blocks.filter((block) => i2sAudioBlockKeys.has(block.key));
-  if (i2sAudioBlocks.length) {
-    tabs.push({ key: "i2s_audio", label: "I2S Audio", blocks: i2sAudioBlocks, content: buildPreviewText(i2sAudioBlocks) });
-    i2sAudioBlocks.forEach((block) => used.add(block.key));
-  }
-
   const hubsBlocks = blocks.filter((block) => hubDomainsInUse.value.has(block.key));
   if (hubsBlocks.length) {
     tabs.push({ key: "hubs", label: "Hubs", blocks: hubsBlocks, content: buildPreviewText(hubsBlocks) });
@@ -3581,7 +3678,7 @@ const previewTabs = computed(() => {
 });
 
 const resolvePreviewTabKeyFromMain = () => {
-  if (activeTab.value === "Busses") return activeBussesKey.value === "i2s" ? "i2s_audio" : "busses";
+  if (activeTab.value === "Busses") return "busses";
   if (activeTab.value === "Automation") return "automation";
   if (activeTab.value === "Components") {
     const componentId = activeComponentId.value || "";
@@ -5039,10 +5136,7 @@ const normalizeConfig = (raw) => {
       ...fallback.protocolsCore,
       ...(raw.protocolsCore ?? {})
     },
-    bussesCore: {
-      ...fallback.bussesCore,
-      ...(raw.bussesCore ?? {})
-    },
+    bussesCore: normalizeBussesCoreConfig(raw.bussesCore ?? fallback.bussesCore),
     system: {
       ...fallback.system,
       ...(raw.system ?? {})
@@ -5221,7 +5315,7 @@ const handleNetworkSchemaUpdate = ({ path, value }) => {
 
 const handleBussesDetailUpdate = ({ path, value }) => {
   const key = activeBussesKey.value;
-  if (!key) return;
+  if (!key || isMultiInstanceBusKey(key)) return;
   if (!config.value.bussesCore || typeof config.value.bussesCore !== "object") {
     config.value.bussesCore = {};
   }
@@ -5229,6 +5323,55 @@ const handleBussesDetailUpdate = ({ path, value }) => {
     config.value.bussesCore[key] = {};
   }
   updateRootField(config.value.bussesCore[key], path, value);
+  saveConfig();
+};
+
+const ensureBussesCore = () => {
+  if (!config.value.bussesCore || typeof config.value.bussesCore !== "object" || Array.isArray(config.value.bussesCore)) {
+    config.value.bussesCore = {};
+  }
+  return config.value.bussesCore;
+};
+
+const collectExistingIdValues = () => [
+  ...idIndex.value.map((entry) => entry?.id || ""),
+  ...activeBusInstances.value.map((entry) => entry?.id || "")
+];
+
+const addActiveBusInstance = () => {
+  const key = activeBussesKey.value;
+  if (!isMultiInstanceBusKey(key)) return;
+  const bussesCore = ensureBussesCore();
+  const instances = getBusInstances(key);
+  const nextInstance = createBusInstance({
+    key,
+    schema: bussesSchemas.value?.[key],
+    existingIds: collectExistingIdValues()
+  });
+  bussesCore[key] = [...instances, nextInstance];
+  saveConfig();
+  previewSyncRequest.value += 1;
+};
+
+const handleBusInstanceUpdate = ({ index, path, value }) => {
+  const key = activeBussesKey.value;
+  if (!isMultiInstanceBusKey(key) || !Number.isInteger(index) || index < 0) return;
+  const bussesCore = ensureBussesCore();
+  const instances = getBusInstances(key);
+  if (!instances[index]) return;
+  const nextInstance = { ...instances[index] };
+  updateRootField(nextInstance, path, value);
+  bussesCore[key] = instances.map((instance, itemIndex) => (itemIndex === index ? nextInstance : instance));
+  saveConfig();
+};
+
+const removeActiveBusInstance = (index) => {
+  const key = activeBussesKey.value;
+  if (!isMultiInstanceBusKey(key) || !Number.isInteger(index) || index < 0) return;
+  const bussesCore = ensureBussesCore();
+  const instances = getBusInstances(key);
+  if (!instances[index]) return;
+  bussesCore[key] = instances.filter((_, itemIndex) => itemIndex !== index);
   saveConfig();
 };
 
@@ -5728,8 +5871,10 @@ watch(
 
     if (!requiredBusses.value.has("spi")) {
       if (config.value.bussesCore && typeof config.value.bussesCore === "object") {
-        if (config.value.bussesCore.spi && typeof config.value.bussesCore.spi === "object") {
-          config.value.bussesCore.spi = {};
+        if (Array.isArray(config.value.bussesCore.spi)) {
+          config.value.bussesCore.spi = [];
+        } else if (config.value.bussesCore.spi && typeof config.value.bussesCore.spi === "object") {
+          config.value.bussesCore.spi = isMultiInstanceBusKey("spi") ? [] : {};
         }
       }
     }
