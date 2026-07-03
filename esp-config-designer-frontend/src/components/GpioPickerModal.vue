@@ -35,7 +35,7 @@
             @click="selectPin(pin)"
           >
             <span class="gpio-id">{{ pin.id }}</span>
-            <span class="gpio-tag" v-if="pin.selectable === false">Disabled</span>
+            <span class="gpio-tag" v-if="pin.selectable === false && pin.status !== 'used'">Disabled</span>
           </button>
           <div class="gpio-row-note">
             {{ getPinNote(pin) }}
@@ -95,7 +95,8 @@ const withUsage = computed(() => {
     return {
       ...option,
       key,
-      status
+      status,
+      selectable: usedByOthers ? false : option.selectable
     };
   });
 });
@@ -128,7 +129,7 @@ const handleBackdropClick = () => {
 };
 
 const selectPin = (pin) => {
-  if (pin.selectable === false) return;
+  if (pin.selectable === false || pin.status === "used") return;
   emit("select", pin.value || pin.id);
 };
 

@@ -32,7 +32,7 @@
         {
           "key": "temperature_source",
           "type": "id_ref",
-          "required": true,
+          "required": false,
           "lvl": "normal",
           "domain": "sensor",
           "placeholder": "temperature_sensor_id"
@@ -40,7 +40,7 @@
         {
           "key": "humidity_source",
           "type": "id_ref",
-          "required": true,
+          "required": false,
           "lvl": "normal",
           "domain": "sensor",
           "placeholder": "humidity_sensor_id"

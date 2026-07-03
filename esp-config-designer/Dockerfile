@@ -1,4 +1,4 @@
-FROM ghcr.io/esphome/esphome-hassio:2026.4.5
+FROM ghcr.io/esphome/esphome-hassio:2026.6.4
 
 ENV LANG=C.UTF-8
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1

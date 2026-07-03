@@ -48,7 +48,40 @@
             "key": "id",
             "type": "id",
             "required": false,
-            "lvl": "simple"
+            "lvl": "normal"
+          },
+          {
+            "key": "esp32_ext1_wakeup",
+            "type": "object",
+            "required": false,
+            "lvl": "advanced",
+            "warning": "Cannot be used together with wakeup_pin.",
+            "fields": [
+              {
+                "key": "pins",
+                "type": "list",
+                "required": false,
+                "lvl": "advanced",
+                "item": {
+                  "type": "gpio",
+                  "required": false,
+                  "placeholder": "GPIOXX"
+                }
+              },
+              {
+                "key": "mode",
+                "type": "select",
+                "required": false,
+                "lvl": "advanced",
+				"default": "ANY_HIGH",
+				"emitYAML": "always",
+                "options": [
+                  "ANY_LOW",
+                  "ALL_LOW",
+                  "ANY_HIGH"
+                ]
+              }
+            ]
           },
           {
             "key": "custom_config",

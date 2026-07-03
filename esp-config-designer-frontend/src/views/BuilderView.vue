@@ -533,7 +533,8 @@ import {
   buildDisplayAnimationIntervals,
   buildGeneralSchemaBlocks,
   buildGeneralSchemaListBlock,
-  buildSchemaYaml
+  buildSchemaYaml,
+  formatYamlValue
 } from "../utils/schemaYaml";
 import { buildGlobalRegistry, isFieldVisible as isSchemaFieldVisible } from "../utils/schemaVisibility";
 import { buildIdRefOptions } from "../utils/schemaIdRefs";
@@ -3151,8 +3152,7 @@ const yamlPreview = computed(() => {
       webServerEnabled =
         rawWebServer.enabled !== undefined ? Boolean(rawWebServer.enabled) : false;
       if (webServerEnabled) {
-        const { enabled, ...rest } = rawWebServer;
-        webServerConfig = rest;
+        webServerConfig = rawWebServer;
       }
     }
 
@@ -3198,7 +3198,7 @@ const yamlPreview = computed(() => {
         lines.push("ota:");
         lines.push("  - platform: esphome");
         if (otaPasswordEnabled && otaPassword) {
-          lines.push(`    password: \"${otaPassword}\"`);
+          lines.push(`    password: ${formatYamlValue(otaPassword, { type: "password" })}`);
         }
       }
       if (webServerEnabled) {

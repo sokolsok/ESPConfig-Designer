@@ -1,6 +1,6 @@
 import { isFieldVisible } from "./schemaVisibility";
 import { colorToLambda } from "./displayColor";
-import { resolveAutoValue } from "./schemaAuto";
+import { isSecretReferenceValue, resolveAutoValue } from "./schemaAuto";
 import {
   normalizeAnimationElementEncoding,
   normalizeImageElementEncoding
@@ -115,14 +115,14 @@ const shouldSuppressDefaultValue = (field, value) => {
   return isDeepEqual(value, defaultValue);
 };
 
-const formatYamlValue = (value, fieldType) => {
+export const formatYamlValue = (value, fieldType) => {
   const fieldOptions = resolveFieldOptions(fieldType);
   const resolvedType = fieldOptions.type || fieldType;
   if (value === null) return "null";
   if (typeof value === "boolean") return value ? "true" : "false";
   if (typeof value === "number") return String(value);
   if (typeof value === "string") {
-    if (value.startsWith("!secret")) return value;
+    if (isSecretReferenceValue(value)) return value;
     if (fieldOptions.suppressQuotes) return value;
     if (
       resolvedType === "lambda" ||
