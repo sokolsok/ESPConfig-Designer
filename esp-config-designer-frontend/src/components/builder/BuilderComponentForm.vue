@@ -12,6 +12,7 @@
       @focus-network="emit('focus-network')"
     />
     <SchemaRenderer
+      :key="`${activeComponentScopeId}:${activeComponentId}:${activeComponentSchemaPath}`"
       :component-id="activeComponentId"
       :schema-path="activeComponentSchemaPath"
       :component-config="activeComponentConfig"

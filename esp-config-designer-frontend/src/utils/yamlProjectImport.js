@@ -1,4 +1,4 @@
-import yaml from "js-yaml";
+import { YAML11_SCHEMA, defineScalarTag, load } from "js-yaml";
 import { createDefaultBuilderConfig } from "./builderProjectModel";
 import {
   isActionCatalogExtends,
@@ -45,14 +45,12 @@ const normalizeTaggedScalar = (tag, value) => {
 };
 
 const createEspHomeYamlSchema = (warnings) => {
-  const secretType = new yaml.Type("!secret", {
-    kind: "scalar",
-    construct: (value) => normalizeTaggedScalar("!secret", value)
+  const secretType = defineScalarTag("!secret", {
+    resolve: (value) => normalizeTaggedScalar("!secret", value)
   });
 
-  const includeType = new yaml.Type("!include", {
-    kind: "scalar",
-    construct: (value) => {
+  const includeType = defineScalarTag("!include", {
+    resolve: (value) => {
       const normalized = normalizeTaggedScalar("!include", value);
       warnings.push({
         code: "include_not_resolved",
@@ -62,12 +60,11 @@ const createEspHomeYamlSchema = (warnings) => {
     }
   });
 
-  const lambdaType = new yaml.Type("!lambda", {
-    kind: "scalar",
-    construct: (value) => normalizeTaggedScalar("!lambda", value)
+  const lambdaType = defineScalarTag("!lambda", {
+    resolve: (value) => normalizeTaggedScalar("!lambda", value)
   });
 
-  return yaml.DEFAULT_SCHEMA.extend([secretType, includeType, lambdaType]);
+  return YAML11_SCHEMA.withTags(secretType, includeType, lambdaType);
 };
 
 const normalizeYamlError = (error) => {
@@ -83,7 +80,7 @@ export const parseYamlText = (yamlText) => {
   const source = typeof yamlText === "string" ? yamlText : "";
   const warnings = [];
   try {
-    const document = yaml.load(source, {
+    const document = load(source, {
       schema: createEspHomeYamlSchema(warnings),
       json: false
     });

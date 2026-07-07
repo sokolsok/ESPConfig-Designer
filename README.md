@@ -1,8 +1,9 @@
-# ESPConfig Designer v.1.3.0
+# ESPConfig Designer v.1.3.1
 
 <a href="https://buymeacoffee.com/smartsolutionsforhome" target="_blank">
 <img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee">
 </a>
+
 
 ESPConfig Designer is a Home Assistant ingress add-on for building, organizing, validating, compiling, and deploying ESPHome configurations through a schema-driven visual editor.
 

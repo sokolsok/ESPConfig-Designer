@@ -1,3 +1,15 @@
+## 1.3.1
+
+* Updated:
+  * esptool-js: 0.4.7 -> 0.6.0
+  * js-yaml: 4.1.1 -> 5.2.1
+  * vite: 5.x -> 8.1.3
+  * @vitejs/plugin-vue: 5.x -> 6.0.7
+* Fixed a bug related to incorrectly generated parts of the configuration for displays.
+* Added optional `spi_id` and `i2c_id` fields to some components. Although these fields are not mentioned in the ESPHome documentation, they are sometimes required.
+* Fixed several smaller inconsistencies in component schemas.
+
+
 ## 1.3.0
 
 * Updated ESPHome to the currently latest version: `2026.6.4`.

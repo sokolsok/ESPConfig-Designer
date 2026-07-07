@@ -235,6 +235,7 @@ const activeSchema = ref(null);
 const isLoading = ref(false);
 const isLoaded = ref(false);
 const sharedHubSelectionOverrides = ref({});
+let schemaLoadRequestId = 0;
 
 const modeOrder = {
   simple: 1,
@@ -441,9 +442,12 @@ const handleCustomInput = (event) => {
 watch(
   () => [props.componentId, props.schemaPath],
   async ([componentId, schemaPath]) => {
+    const requestId = ++schemaLoadRequestId;
+    activeSchema.value = null;
+    sharedHubSelectionOverrides.value = {};
     if (!componentId) {
-      activeSchema.value = null;
       isLoaded.value = false;
+      isLoading.value = false;
       return;
     }
     isLoading.value = true;
@@ -452,13 +456,16 @@ watch(
       const schema = componentId.startsWith("general/")
         ? await loadSchemaByPath(`${componentId}.json`)
         : await loadComponentSchema(componentId, schemaPath);
+      if (requestId !== schemaLoadRequestId) return;
       activeSchema.value = schema;
     } catch (error) {
+      if (requestId !== schemaLoadRequestId) return;
       if (error?.message !== "Schema not found") {
         console.error("Schema load failed", componentId, error);
       }
       activeSchema.value = null;
     } finally {
+      if (requestId !== schemaLoadRequestId) return;
       isLoading.value = false;
       isLoaded.value = true;
     }

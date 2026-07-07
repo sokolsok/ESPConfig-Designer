@@ -116,6 +116,14 @@
       "lvl": "normal"
     },
     {
+      "key": "spi_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "spi",
+      "warning": "This option is not documented by ESPHome; use it carefully."
+    },
+    {
       "key": "update_interval",
       "type": "duration",
       "required": false,

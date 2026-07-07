@@ -649,14 +649,11 @@ export const useInstallConsoleFlow = (options) => {
         baudrate: 921600,
         terminal
       });
-      const firmwareString = loader.ui8ToBstr
-        ? loader.ui8ToBstr(firmwareBytes)
-        : String.fromCharCode(...firmwareBytes);
       await loader.main();
       await loader.writeFlash({
         fileArray: [
           {
-            data: firmwareString,
+            data: firmwareBytes,
             address: 0x0
           }
         ],
