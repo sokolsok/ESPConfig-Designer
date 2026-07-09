@@ -41,7 +41,7 @@
           </div>
         </div>
         <div v-if="!busInstances.length" class="note">No bus instances yet</div>
-        <div v-for="(instance, index) in busInstances" :key="busInstanceKey(instance, index)" class="schema-list-item">
+        <div v-for="(instance, index) in busInstances" :key="busInstanceScopeId(index)" class="schema-list-item">
           <SchemaRenderer
             v-if="bussesDetailId"
             :key="busInstanceScopeId(index)"
@@ -146,5 +146,4 @@ const emit = defineEmits([
 ]);
 
 const busInstanceScopeId = (index) => `${props.bussesDetailScopeId}:${index}`;
-const busInstanceKey = (instance, index) => `${busInstanceScopeId(index)}:${instance?.id || "new"}`;
 </script>

@@ -1,5 +1,9 @@
 <template>
-  <div class="schema-fixed-list schema-generated-list">
+  <div
+    class="schema-fixed-list schema-generated-list"
+    :data-schema-scope-id="contextScopeId"
+    :data-schema-field-path="encodedFieldFocusPath"
+  >
     <div class="schema-list-header">
       <div class="schema-list-title">
         <span>{{ fieldLabel }}</span>
@@ -25,6 +29,7 @@
         :key="index"
         :field="inlineSingleChildField"
         :path="[]"
+        :focus-path="generatedListItemFocusPath(index)"
         :value="item || {}"
         :root-value="rootValue || value"
         :mode-level="modeLevel"
@@ -49,6 +54,7 @@
             :key="`${index}-${child.key}`"
             :field="child"
             :path="[]"
+            :focus-path="generatedListItemFocusPath(index)"
             :value="item || {}"
             :root-value="rootValue || value"
             :mode-level="modeLevel"
@@ -73,6 +79,7 @@
         :key="index"
         :field="primitiveChildField"
         :path="[]"
+        :focus-path="generatedListItemFocusPath(index)"
         :value="{ value: item }"
         :root-value="rootValue || value"
         :mode-level="modeLevel"
@@ -96,11 +103,14 @@
 import { computed, watch } from 'vue';
 import SchemaField from '../SchemaField.vue';
 import { isFieldVisible } from '../../utils/schemaVisibility';
+import { encodeFieldPath } from '../../utils/yamlDocumentModel';
+import { fieldModeLevel, isModeLevelVisible } from '../../utils/schemaModeLevel';
 
 const props = defineProps({
   field: { type: Object, required: true },
   fieldLabel: { type: String, required: true },
   fieldPath: { type: Array, default: () => [] },
+  fieldFocusPath: { type: Array, default: () => [] },
   generatedListValue: { type: Array, default: () => [] },
   hasExplicitValue: { type: Boolean, default: false },
   rootValue: { type: Object, default: null },
@@ -120,6 +130,8 @@ const props = defineProps({
 const emit = defineEmits(['update', 'open-secrets']);
 
 const countConfig = computed(() => props.field?.count || {});
+const encodedFieldFocusPath = computed(() => encodeFieldPath(props.fieldFocusPath));
+const generatedListItemFocusPath = (index) => [...props.fieldFocusPath, index];
 const countLabel = computed(() => {
   const label = typeof countConfig.value?.label === 'string' ? countConfig.value.label.trim() : '';
   return label || 'Count';
@@ -139,12 +151,6 @@ const countDefault = computed(() => {
 const countInputId = computed(() => `${props.fieldPath.join('-')}-count`);
 const itemCount = computed(() => (Array.isArray(props.generatedListValue) ? props.generatedListValue.length : 0));
 
-const modeOrder = { simple: 1, normal: 2, advanced: 3 };
-const activeModeRank = computed(() => modeOrder[props.modeLevel?.toLowerCase()] ?? modeOrder.simple);
-const fieldLevel = (field) => {
-  const lvl = field?.lvl?.toLowerCase();
-  return modeOrder[lvl] ? lvl : 'simple';
-};
 const itemSchema = computed(() => props.field?.item || { type: 'text' });
 const isObjectListItem = computed(() => itemSchema.value?.type === 'object');
 const objectFields = computed(() => Array.isArray(itemSchema.value?.fields) ? itemSchema.value.fields : []);
@@ -227,7 +233,7 @@ const updatePrimitiveItem = (index, payload) => {
 const visibleObjectFields = (itemValue = {}) =>
   objectFields.value.filter((field) => {
     if (!isFieldVisible(field, itemValue, objectFields.value, props.globalStore)) return false;
-    return modeOrder[fieldLevel(field)] <= activeModeRank.value;
+    return isModeLevelVisible(fieldModeLevel(field), props.modeLevel);
   });
 
 const handleCountInput = (event) => {

@@ -1,5 +1,5 @@
 import { computed, nextTick, onBeforeUnmount, onBeforeUpdate, onMounted, ref, watch } from "vue";
-import { highlightYamlFallback, highlightYamlToHtml } from "../../utils/yamlSyntaxHighlight";
+import { highlightYamlFallback, highlightYamlLineToHtml } from "../../utils/yamlSyntaxHighlight";
 
 // This composable owns the complete YAML preview UX for BuilderView.
 // It keeps preview concerns isolated from builder state concerns:
@@ -11,6 +11,7 @@ import { highlightYamlFallback, highlightYamlToHtml } from "../../utils/yamlSynt
 export const useBuilderPreview = ({
   splitPreviewEnabled,
   previewTabs,
+  previewLines,
   yamlPreview,
   mainPreviewTargetKey,
   previewSyncRequest,
@@ -27,7 +28,7 @@ export const useBuilderPreview = ({
   const lastPreviewTabKeys = ref([]);
   const previewScrollInner = ref(null);
   const hasPreviewScrollbar = ref(false);
-  const highlightedYaml = ref("");
+  const highlightedYamlLines = ref([]);
   const copySuccess = ref(false);
   let copyResetTimer = null;
 
@@ -35,6 +36,12 @@ export const useBuilderPreview = ({
     if (!splitPreviewEnabled.value) return yamlPreview.value;
     const selected = previewTabs.value.find((tab) => tab.key === activePreviewTab.value);
     return selected?.content || "";
+  });
+
+  const previewContentLines = computed(() => {
+    if (!splitPreviewEnabled.value) return previewLines?.value || [];
+    const selected = previewTabs.value.find((tab) => tab.key === activePreviewTab.value);
+    return selected?.lines || [];
   });
 
   const hasHubsPreviewTab = computed(() => previewTabs.value.some((tab) => tab.key === "hubs"));
@@ -151,11 +158,20 @@ export const useBuilderPreview = ({
 
   const refreshHighlightedYaml = async () => {
     const source = previewContent.value || "";
-    highlightedYaml.value = highlightYamlFallback(source);
+    highlightedYamlLines.value = (previewContentLines.value || []).map((line) => ({
+      ...line,
+      html: highlightYamlFallback(line?.text || "")
+    }));
     if (!source.trim()) return;
-    const highlighted = await highlightYamlToHtml(source);
+    const sourceLines = previewContentLines.value || [];
+    const highlightedLineHtml = await Promise.all(
+      sourceLines.map((line) => highlightYamlLineToHtml(line?.text || ""))
+    );
     if ((previewContent.value || "") !== source) return;
-    highlightedYaml.value = highlighted;
+    highlightedYamlLines.value = sourceLines.map((line, index) => ({
+      ...line,
+      html: highlightedLineHtml[index] || ""
+    }));
   };
 
   const copyLabel = computed(() => (copySuccess.value ? "Copied" : "Copy code"));
@@ -276,7 +292,7 @@ export const useBuilderPreview = ({
   );
 
   watch(
-    () => previewContent.value,
+    () => [previewContent.value, previewContentLines.value],
     () => {
       void refreshHighlightedYaml();
     },
@@ -304,7 +320,7 @@ export const useBuilderPreview = ({
     canScrollRight,
     copyLabel,
     handleCopyPreview,
-    highlightedYaml,
+    highlightedYamlLines,
     hasPreviewScrollbar,
     previewScrollInner,
     previewTabList,

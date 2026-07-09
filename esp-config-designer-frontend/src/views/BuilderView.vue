@@ -168,12 +168,14 @@
           <BuilderPreviewPane
             :split-preview-enabled="splitPreviewEnabled"
             :preview-tabs="previewTabs"
+            :preview-lines="yamlPreviewDocument.lines"
             :yaml-preview="yamlPreview"
             :main-preview-target-key="mainPreviewTargetKey"
             :preview-sync-request="previewSyncRequest"
             :is-hydrating="isHydrating"
             :display-automation-has-interval="displayAutomationHasInterval"
             :hub-notice-domains="hubNoticeDomains"
+            @yaml-line-click="handleYamlLineClick"
           />
         </div>
 
@@ -504,6 +506,7 @@
 <script setup>
 import {
   computed,
+  nextTick,
   onBeforeUnmount,
   onMounted,
   provide,
@@ -529,14 +532,21 @@ import { loadGpioData, resolveGpioKey } from "../utils/gpioData";
 import { extractGpioUsageValue } from "../utils/schemaGpio";
 import { loadSchemaByPath } from "../utils/schemaLoader";
 import {
-  buildComponentsYaml,
+  buildComponentsYamlDocumentLines,
   buildDisplayAnimationIntervals,
-  buildGeneralSchemaBlocks,
-  buildGeneralSchemaListBlock,
+  buildGeneralSchemaDocumentBlocks,
+  buildGeneralSchemaListDocumentBlock,
+  buildSchemaYamlDocumentLines,
   buildSchemaYaml,
   formatYamlValue
 } from "../utils/schemaYaml";
+import {
+  createGeneratedYamlLine,
+  createYamlDocument,
+  encodeFieldPath
+} from "../utils/yamlDocumentModel";
 import { buildGlobalRegistry, isFieldVisible as isSchemaFieldVisible } from "../utils/schemaVisibility";
+import { MODE_LEVELS, modeLevelRank, normalizeModeLevel } from "../utils/schemaModeLevel";
 import { buildIdRefOptions } from "../utils/schemaIdRefs";
 import { getRequiredDependencies } from "../utils/schemaRequirements";
 import {
@@ -604,7 +614,7 @@ const pendingRemoveIndex = ref(null);
 const isSavingCustomComponent = ref(false);
 const customComponentSaveError = ref("");
 const confirmAction = ref(null);
-const modeLevels = ["Simple", "Normal", "Advanced"];
+const modeLevels = MODE_LEVELS;
 const nextModeLevelByMode = {
   Simple: "Normal",
   Normal: "Advanced",
@@ -637,13 +647,7 @@ let deploymentSyncInFlight = false;
 let deviceStatusRefreshPromise = null;
 
 const activeModeLevel = ref(modeLevels[0]);
-const resolveModeLevel = (value) => {
-  if (typeof value !== "string") return modeLevels[0];
-  const trimmed = value.trim();
-  if (modeLevels.includes(trimmed)) return trimmed;
-  const stripped = trimmed.replace(/\s*mode$/i, "");
-  return modeLevels.includes(stripped) ? stripped : modeLevels[0];
-};
+const resolveModeLevel = (value) => normalizeModeLevel(value);
 const modeUpgradeButtonLabel = computed(
   () => modeUpgradeButtonLabelByMode[resolveModeLevel(activeModeLevel.value)] || ""
 );
@@ -3012,8 +3016,67 @@ const shouldEmitEmptyBlock = (fields) => {
   return !schemaFields.some((field) => field.required);
 };
 
+const makePreviewOrigin = ({
+  owner = "schema",
+  type = "field",
+  scopeId = "",
+  tabKey = "",
+  path = [],
+  fieldKey = "",
+  modeLevel = "",
+  confidence = "exact",
+  contentKind = "schema",
+  suppressFocus = false
+} = {}) => ({
+  owner,
+  type,
+  scopeId,
+  tabKey,
+  path: Array.isArray(path) ? path : [],
+  fieldKey,
+  modeLevel,
+  confidence,
+  contentKind,
+  suppressFocus: Boolean(suppressFocus)
+});
+
+const makeSourceContext = ({ owner = "schema", scopeId = "", tabKey = "", path = [] } = {}) => ({
+  owner,
+  scopeId,
+  tabKey,
+  path: Array.isArray(path) ? path : []
+});
+
+const pushPreviewLine = (lines, text, blockKey = "", origin = null) => {
+  lines.push(createGeneratedYamlLine({
+    text,
+    blockKey,
+    origin,
+    id: `preview:${blockKey || "root"}:${lines.length}:${origin?.scopeId || "none"}`
+  }));
+};
+
+const appendPreviewLines = (lines, nextLines = [], fallbackBlockKey = "") => {
+  (nextLines || []).forEach((line) => {
+    if (line && typeof line === "object" && Object.prototype.hasOwnProperty.call(line, "text")) {
+      lines.push(line);
+      return;
+    }
+    pushPreviewLine(lines, String(line ?? ""), fallbackBlockKey, null);
+  });
+};
+
+const appendTextLines = (lines, textLines = [], blockKey = "", origin = null) => {
+  (textLines || []).forEach((line) => pushPreviewLine(lines, line, blockKey, origin));
+};
+
+const documentLineTexts = (lines = []) => (lines || []).map((line) => line?.text ?? "");
+
+const sectionOrigin = (scopeId, tabKey, path = [], options = {}) =>
+  makePreviewOrigin({ type: "section", scopeId, tabKey, path, confidence: "section", ...options });
+
 // Generate the full YAML preview from config + schemas.
-const yamlPreview = computed(() => {
+const yamlPreviewDocument = computed(() => {
   const lines = [];
   const substitutionsValue = config.value.substitutions || {};
   const substitutionsFields = substitutionsCoreSchema.value?.fields || [];
@@ -3022,40 +3085,45 @@ const yamlPreview = computed(() => {
       substitutionsValue,
       substitutionsFields
     );
-    const substitutionLines = buildSchemaYaml(
+    const substitutionLines = buildSchemaYamlDocumentLines(
       filteredSubstitutionsValue,
       substitutionsFields,
       0,
       config.value,
-      globalStore.value
+      globalStore.value,
+      makeSourceContext({ owner: "core", scopeId: substitutionsCoreScopeId, tabKey: "core" }),
+      "substitutions"
     );
     if (substitutionLines.length) {
-      lines.push(...substitutionLines);
+      appendPreviewLines(lines, substitutionLines, "substitutions");
     }
   }
   const coreValue = config.value.esphomeCore || {};
   const coreFields = esphomeCoreSchema.value?.fields || [];
   if (coreFields.length) {
     const filteredCoreValue = filterConfigBySchema(coreValue, coreFields);
-    const coreLines = buildSchemaYaml(
+    const coreLines = buildSchemaYamlDocumentLines(
       filteredCoreValue,
       coreFields,
       2,
       config.value,
-      globalStore.value
+      globalStore.value,
+      makeSourceContext({ owner: "core", scopeId: esphomeCoreScopeId, tabKey: "core" }),
+      "esphome"
     );
     if (coreLines.length) {
-      lines.push("");
-      lines.push("esphome:");
-      lines.push(...coreLines);
+      pushPreviewLine(lines, "", "core", null);
+      pushPreviewLine(lines, "esphome:", "esphome", sectionOrigin(esphomeCoreScopeId, "core", [], { suppressFocus: true }));
+      appendPreviewLines(lines, coreLines, "esphome");
     }
   }
 
   const platformName = platformCoreConfig.value?.platform;
   const detailFields = platformDetailSchema.value?.fields || [];
   if (platformName && detailFields.length) {
-    lines.push("");
-    lines.push(`${platformName}:`);
+    const platformContext = makeSourceContext({ owner: "platform", scopeId: platformDetailScopeId, tabKey: "core" });
+    pushPreviewLine(lines, "", platformName, null);
+    pushPreviewLine(lines, `${platformName}:`, platformName, sectionOrigin(platformDetailScopeId, "core", [], { suppressFocus: true }));
 
     if (platformName === "esp32") {
       const {
@@ -3075,18 +3143,32 @@ const yamlPreview = computed(() => {
             "components"
           ].includes(field.key)
       );
-      const baseLines = buildSchemaYaml(rest, esp32Fields, 2, config.value, globalStore.value);
+      const baseLines = buildSchemaYamlDocumentLines(rest, esp32Fields, 2, config.value, globalStore.value, platformContext, platformName);
       if (baseLines.length) {
-        lines.push(...baseLines);
+        appendPreviewLines(lines, baseLines, platformName);
       }
       const frameworkConfig = framework_config || {};
       const hasFramework = framework || Object.keys(frameworkConfig).length;
       const hasAdvanced = advanced && Object.keys(advanced).length;
       const hasComponents = Array.isArray(components) && components.length;
       if (hasFramework || hasAdvanced || hasComponents) {
-        lines.push("  framework:");
+        pushPreviewLine(lines, "  framework:", platformName, makePreviewOrigin({
+          type: "field",
+          scopeId: platformDetailScopeId,
+          tabKey: "core",
+          path: ["framework"],
+          fieldKey: "framework",
+          confidence: "exact"
+        }));
         if (framework) {
-          lines.push(`    type: ${framework}`);
+          pushPreviewLine(lines, `    type: ${framework}`, platformName, makePreviewOrigin({
+            type: "field",
+            scopeId: platformDetailScopeId,
+            tabKey: "core",
+            path: ["framework"],
+            fieldKey: "framework",
+            confidence: "exact"
+          }));
         }
         const frameworkField = detailFields.find((field) => field.key === "framework_config");
         const advancedField = detailFields.find((field) => field.key === "advanced");
@@ -3101,20 +3183,26 @@ const yamlPreview = computed(() => {
           ...(hasAdvanced ? { advanced } : {}),
           ...(hasComponents ? { components } : {})
         };
-        const frameworkLines = buildSchemaYaml(
+        const frameworkLines = buildSchemaYamlDocumentLines(
           frameworkValue,
           frameworkFields,
           4,
           config.value,
-          globalStore.value
+          globalStore.value,
+          makeSourceContext({ owner: "platform", scopeId: platformDetailScopeId, tabKey: "core", path: ["framework"] }),
+          platformName
         );
         if (frameworkLines.length) {
-          lines.push(...frameworkLines);
+          appendPreviewLines(lines, frameworkLines, platformName);
         }
       }
     } else {
       const { platform, ...rest } = platformCoreConfig.value || {};
-      lines.push(...buildSchemaYaml(rest, detailFields, 2, config.value, globalStore.value));
+      appendPreviewLines(
+        lines,
+        buildSchemaYamlDocumentLines(rest, detailFields, 2, config.value, globalStore.value, platformContext, platformName),
+        platformName
+      );
     }
   }
 
@@ -3156,64 +3244,80 @@ const yamlPreview = computed(() => {
       }
     }
 
-    const networkLines = buildSchemaYaml(
+    const networkContext = makeSourceContext({ owner: "network", scopeId: networkDetailScopeId, tabKey: "core" });
+    const networkLines = buildSchemaYamlDocumentLines(
       networkConfig,
       networkFields,
       2,
       config.value,
-      globalStore.value
+      globalStore.value,
+      networkContext,
+      networkTransport
     );
     if (networkLines.length) {
       if (networkTransport === "wifi") {
         const apIndex = networkLines.findIndex(
-          (line) => line.startsWith("  ") && line.trimStart().startsWith("ap:")
+          (line) => line.text.startsWith("  ") && line.text.trimStart().startsWith("ap:")
         );
         if (apIndex !== -1) {
           const apBlock = [networkLines.splice(apIndex, 1)[0]];
-          while (apIndex < networkLines.length && networkLines[apIndex].startsWith("    ")) {
+          while (apIndex < networkLines.length && networkLines[apIndex].text.startsWith("    ")) {
             apBlock.push(networkLines.splice(apIndex, 1)[0]);
           }
-          if (networkLines.length && networkLines[networkLines.length - 1].trim() !== "") {
-            networkLines.push("");
+          if (networkLines.length && networkLines[networkLines.length - 1].text.trim() !== "") {
+            pushPreviewLine(networkLines, "", networkTransport, null);
           }
           networkLines.push(
-            "  # Enable fallback hotspot (captive portal) in case wifi connection fails",
+            createGeneratedYamlLine({
+              text: "  # Enable fallback hotspot (captive portal) in case wifi connection fails",
+              blockKey: networkTransport,
+              origin: sectionOrigin(networkDetailScopeId, "core", ["ap"])
+            }),
             ...apBlock
           );
         }
       }
-      lines.push("");
-      lines.push(`${networkTransport}:`);
-      lines.push(...networkLines);
+      pushPreviewLine(lines, "", networkTransport, null);
+      pushPreviewLine(lines, `${networkTransport}:`, networkTransport, sectionOrigin(networkDetailScopeId, "core", [], { suppressFocus: true }));
+      appendPreviewLines(lines, networkLines, networkTransport);
       if (networkTransport === "wifi" && captivePortalEnabled) {
-        lines.push("");
-        lines.push("captive_portal:");
+        pushPreviewLine(lines, "", "captive_portal", null);
+        pushPreviewLine(lines, "captive_portal:", "captive_portal", sectionOrigin(networkDetailScopeId, "core", ["ap", "captive_portal"]));
       }
       const otaConfig = networkCoreConfig.value?.ota || null;
       const otaEnabled = otaConfig?.enabled ?? true;
       const otaPasswordEnabled = otaConfig?.use_password ?? true;
       const otaPassword = otaConfig?.password?.trim();
       if (otaEnabled) {
-        lines.push("");
-        lines.push("ota:");
-        lines.push("  - platform: esphome");
+        const otaOrigin = sectionOrigin(networkOtaScopeId, "core");
+        pushPreviewLine(lines, "", "ota", null);
+        pushPreviewLine(lines, "ota:", "ota", otaOrigin);
+        pushPreviewLine(lines, "  - platform: esphome", "ota", otaOrigin);
         if (otaPasswordEnabled && otaPassword) {
-          lines.push(`    password: ${formatYamlValue(otaPassword, { type: "password" })}`);
+          pushPreviewLine(lines, `    password: ${formatYamlValue(otaPassword, { type: "password" })}`, "ota", makePreviewOrigin({
+            type: "field",
+            scopeId: networkOtaScopeId,
+            tabKey: "core",
+            path: ["password"],
+            fieldKey: "password"
+          }));
         }
       }
       if (webServerEnabled) {
-        lines.push("");
-        lines.push("web_server:");
+        pushPreviewLine(lines, "", "web_server", null);
+        pushPreviewLine(lines, "web_server:", "web_server", sectionOrigin(networkWebServerScopeId, "core"));
         if (webServerFields.length) {
-          const webServerLines = buildSchemaYaml(
+          const webServerLines = buildSchemaYamlDocumentLines(
             webServerConfig || {},
             webServerFields,
             2,
             config.value,
-            globalStore.value
+            globalStore.value,
+            makeSourceContext({ owner: "network", scopeId: networkWebServerScopeId, tabKey: "core" }),
+            "web_server"
           );
           if (webServerLines.length) {
-            lines.push(...webServerLines);
+            appendPreviewLines(lines, webServerLines, "web_server");
           }
         }
       }
@@ -3228,12 +3332,21 @@ const yamlPreview = computed(() => {
     const fields = schema?.fields || [];
     if (!fields.length) return;
     const protocolValue = filterConfigBySchema(protocolConfig[entry.key] || {}, fields);
-    const protocolLines = buildSchemaYaml(protocolValue, fields, 2, config.value, globalStore.value);
+    const scopeId = `tab:Protocols:${entry.key}`;
+    const protocolLines = buildSchemaYamlDocumentLines(
+      protocolValue,
+      fields,
+      2,
+      config.value,
+      globalStore.value,
+      makeSourceContext({ owner: "protocol", scopeId, tabKey: "automation" }),
+      entry.key
+    );
     if (!protocolLines.length && !shouldEmitEmptyBlock(fields)) return;
-    lines.push("");
-    lines.push(`${entry.key}:`);
+    pushPreviewLine(lines, "", entry.key, null);
+    pushPreviewLine(lines, `${entry.key}:`, entry.key, sectionOrigin(scopeId, "automation", [], { suppressFocus: true }));
     if (protocolLines.length) {
-      lines.push(...protocolLines);
+      appendPreviewLines(lines, protocolLines, entry.key);
     }
   });
 
@@ -3253,40 +3366,46 @@ const otherConfig = systemConfig.value || {};
     const configValue = otherConfig[entry.key] || {};
     if (!configValue.enabled) return;
     const filteredValue = filterConfigBySchema(configValue || {}, fields);
-    const sectionLines = buildSchemaYaml(
+    const scopeId = `tab:System:${entry.key}`;
+    const sectionLines = buildSchemaYamlDocumentLines(
       filteredValue,
       fields,
       2,
       config.value,
-      globalStore.value
+      globalStore.value,
+      makeSourceContext({ owner: "system", scopeId, tabKey: "core" }),
+      entry.label
     );
     if (!sectionLines.length && !shouldEmitEmptyBlock(fields)) return;
-    lines.push("");
-    lines.push(`${entry.label}:`);
-    lines.push(...sectionLines);
+    pushPreviewLine(lines, "", entry.label, null);
+    pushPreviewLine(lines, `${entry.label}:`, entry.label, sectionOrigin(scopeId, "core", [], { suppressFocus: true }));
+    appendPreviewLines(lines, sectionLines, entry.label);
   });
 
   const automationSchemaMap = automationSchemas.value || {};
   const automationConfig = automationCoreConfig.value || {};
   const generated = generatedAutomation.value || {};
 
-  const buildAutomationListLines = (items, itemFields) => {
+  const buildAutomationListLines = (items, itemFields, entryKey) => {
     const listLines = [];
-    items.forEach((item) => {
-      const objectLines = buildSchemaYaml(
+    items.forEach((item, index) => {
+      const scopeId = `tab:Automation:${entryKey}`;
+      const objectLines = buildSchemaYamlDocumentLines(
         item || {},
         itemFields,
         4,
         config.value,
-        globalStore.value
+        globalStore.value,
+        makeSourceContext({ owner: "automation", scopeId, tabKey: "automation", path: [entryKey, index] }),
+        entryKey
       );
       if (!objectLines.length) {
-        listLines.push("  - {}");
+        listLines.push(createGeneratedYamlLine({ text: "  - {}", blockKey: entryKey, origin: sectionOrigin(scopeId, "automation", [entryKey, index]) }));
         return;
       }
       const prefix = "  - ";
       const firstLine = objectLines[0];
-      listLines.push(`${prefix}${firstLine.slice(4)}`);
+      listLines.push({ ...firstLine, text: `${prefix}${firstLine.text.slice(4)}` });
       objectLines.slice(1).forEach((line) => listLines.push(line));
     });
     return listLines;
@@ -3324,17 +3443,18 @@ const otherConfig = systemConfig.value || {};
     const generatedItems = dedupeAutomationItems(generatedItemsRaw, itemFields, seen);
     const manualItems = dedupeAutomationItems(manualItemsRaw, itemFields, seen);
     if (!generatedItems.length && !manualItems.length) return;
-    lines.push("");
-    lines.push(`${entry.key}:`);
+    const scopeId = `tab:Automation:${entry.key}`;
+    pushPreviewLine(lines, "", entry.key, null);
+    pushPreviewLine(lines, `${entry.key}:`, entry.key, sectionOrigin(scopeId, "automation", [], { suppressFocus: true }));
     if (generatedItems.length) {
-      lines.push("  # Auto-generated");
-      lines.push(...buildAutomationListLines(generatedItems, itemFields));
+      pushPreviewLine(lines, "  # Auto-generated", entry.key, sectionOrigin(scopeId, "automation"));
+      appendPreviewLines(lines, buildAutomationListLines(generatedItems, itemFields, entry.key), entry.key);
     }
     if (manualItems.length) {
       if (generatedItems.length) {
-        lines.push("  # Added by user");
+        pushPreviewLine(lines, "  # Added by user", entry.key, sectionOrigin(scopeId, "automation"));
       }
-      lines.push(...buildAutomationListLines(manualItems, itemFields));
+      appendPreviewLines(lines, buildAutomationListLines(manualItems, itemFields, entry.key), entry.key);
     }
   });
 
@@ -3359,26 +3479,45 @@ const otherConfig = systemConfig.value || {};
       const busValues = getBusInstances(entry.key).map((instance) =>
         filterConfigBySchema(instance || {}, fields)
       );
-      const busBlocks = buildGeneralSchemaListBlock(entry.label, busValues, schema, config.value, globalStore.value);
+      const busBlocks = buildGeneralSchemaListDocumentBlock(
+        entry.label,
+        busValues,
+        schema,
+        config.value,
+        globalStore.value,
+        {
+          ...makeSourceContext({ owner: "bus", scopeId: `tab:Busses:${entry.key}`, tabKey: "busses" }),
+          itemScopeId: (index) => `tab:Busses:${entry.key}:${index}`
+        },
+        { suppressSectionFocus: true }
+      );
       if (!busBlocks.length) return;
       busBlocks.forEach((block) => {
-        lines.push("");
-        lines.push(...block.lines);
+        pushPreviewLine(lines, "", block.key, null);
+        appendPreviewLines(lines, block.documentLines || block.lines, block.key);
       });
       return;
     }
     const busValue = filterConfigBySchema(bussesConfig[entry.key] || {}, fields);
-    const busBlocks = buildGeneralSchemaBlocks(entry.label, busValue, schema, config.value, globalStore.value);
+    const busBlocks = buildGeneralSchemaDocumentBlocks(
+      entry.label,
+      busValue,
+      schema,
+      config.value,
+      globalStore.value,
+      makeSourceContext({ owner: "bus", scopeId: `tab:Busses:${entry.key}`, tabKey: "busses" }),
+      { suppressSectionFocus: true }
+    );
     const primaryBlock = busBlocks[0] || null;
-    const hasPrimaryContent = (primaryBlock?.lines?.length || 0) > 1;
+    const hasPrimaryContent = (primaryBlock?.documentLines?.length || primaryBlock?.lines?.length || 0) > 1;
     if (!hasPrimaryContent && !shouldEmitEmptyBlock(fields)) return;
     busBlocks.forEach((block) => {
-      lines.push("");
-      lines.push(...block.lines);
+      pushPreviewLine(lines, "", block.key, null);
+      appendPreviewLines(lines, block.documentLines || block.lines, block.key);
     });
   });
 
-  const componentLines = buildComponentsYaml(
+  const componentLines = buildComponentsYamlDocumentLines(
     config.value.components,
     componentSchemas.value,
     componentSchemaStatus.value,
@@ -3386,16 +3525,18 @@ const otherConfig = systemConfig.value || {};
     mdiSubstitutions.value
   );
   if (componentLines.length) {
-    lines.push("");
-    lines.push(...componentLines);
+    pushPreviewLine(lines, "", "components", null);
+    appendPreviewLines(lines, componentLines, "components");
   }
 
-  while (lines.length && lines[0].trim() === "") {
+  while (lines.length && String(lines[0]?.text || "").trim() === "") {
     lines.shift();
   }
 
-  return lines.join("\n");
+  return createYamlDocument(lines);
 });
+
+const yamlPreview = computed(() => yamlPreviewDocument.value.text);
 
 const parseYamlBlocks = (yamlText) => {
   const blocks = [];
@@ -3441,7 +3582,55 @@ const parseYamlBlocks = (yamlText) => {
   return blocks;
 };
 
-const yamlBlocks = computed(() => parseYamlBlocks(yamlPreview.value));
+const parseYamlDocumentBlocks = (documentLines = []) => {
+  const blocks = [];
+  let current = null;
+
+  const isTopLevelKey = (line) => {
+    const text = String(line?.text || "");
+    if (!text || /^\s/.test(text)) return false;
+    const trimmed = text.trim();
+    if (!trimmed || trimmed.startsWith("#")) return false;
+    return trimmed.includes(":");
+  };
+
+  const isTopLevelValueLine = (line) => {
+    const text = String(line?.text || "");
+    if (!text || /^\s/.test(text)) return false;
+    const trimmed = text.trim();
+    if (!trimmed || trimmed.startsWith("#")) return false;
+    return !trimmed.includes(":");
+  };
+
+  (documentLines || []).forEach((line) => {
+    const text = String(line?.text || "");
+    if (isTopLevelKey(line)) {
+      if (current) blocks.push(current);
+      const key = text.split(":")[0].trim();
+      current = { key, lines: [text], documentLines: [line] };
+      return;
+    }
+    if (isTopLevelValueLine(line)) {
+      if (!current || current.key !== "__root_misc__") {
+        if (current) blocks.push(current);
+        current = { key: "__root_misc__", lines: [text], documentLines: [line] };
+        return;
+      }
+      current.lines.push(text);
+      current.documentLines.push(line);
+      return;
+    }
+    if (current) {
+      current.lines.push(text);
+      current.documentLines.push(line);
+    }
+  });
+
+  if (current) blocks.push(current);
+  return blocks;
+};
+
+const yamlBlocks = computed(() => parseYamlDocumentBlocks(yamlPreviewDocument.value.lines));
 
 const parseTopLevelKeysFromYamlSnippet = (yamlText) => {
   const keys = [];
@@ -3610,6 +3799,20 @@ const buildPreviewText = (blocks = []) => {
   return parts.join("\n\n").trim();
 };
 
+const buildPreviewLines = (blocks = []) => {
+  const result = [];
+  blocks.forEach((block, index) => {
+    if (index > 0) {
+      pushPreviewLine(result, "", block.key, null);
+    }
+    appendPreviewLines(result, block.documentLines || block.lines || [], block.key);
+  });
+  while (result.length && !String(result[result.length - 1]?.text || "").trim()) {
+    result.pop();
+  }
+  return result;
+};
+
 const previewTabs = computed(() => {
   const blocks = yamlBlocks.value;
   const used = new Set();
@@ -3617,38 +3820,38 @@ const previewTabs = computed(() => {
 
   const coreBlocks = blocks.filter((block) => coreBlockKeys.value.has(block.key));
   if (coreBlocks.length) {
-    tabs.push({ key: "core", label: "Core", blocks: coreBlocks, content: buildPreviewText(coreBlocks) });
+    tabs.push({ key: "core", label: "Core", blocks: coreBlocks, lines: buildPreviewLines(coreBlocks), content: buildPreviewText(coreBlocks) });
     coreBlocks.forEach((block) => used.add(block.key));
   }
 
   const automationBlocks = blocks.filter((block) => automationBlockKeys.has(block.key));
   if (automationBlocks.length) {
-    tabs.push({ key: "automation", label: "Automation", blocks: automationBlocks, content: buildPreviewText(automationBlocks) });
+    tabs.push({ key: "automation", label: "Automation", blocks: automationBlocks, lines: buildPreviewLines(automationBlocks), content: buildPreviewText(automationBlocks) });
     automationBlocks.forEach((block) => used.add(block.key));
   }
 
   const timeBlocks = blocks.filter((block) => timeBlockKeys.has(block.key));
   if (timeBlocks.length) {
-    tabs.push({ key: "time", label: "Time", blocks: timeBlocks, content: buildPreviewText(timeBlocks) });
+    tabs.push({ key: "time", label: "Time", blocks: timeBlocks, lines: buildPreviewLines(timeBlocks), content: buildPreviewText(timeBlocks) });
     timeBlocks.forEach((block) => used.add(block.key));
   }
 
   previewGroups.value.forEach((group) => {
     const groupBlocks = blocks.filter((block) => group.blockKeys.has(block.key));
     if (!groupBlocks.length) return;
-    tabs.push({ key: group.key, label: group.label, blocks: groupBlocks, content: buildPreviewText(groupBlocks) });
+    tabs.push({ key: group.key, label: group.label, blocks: groupBlocks, lines: buildPreviewLines(groupBlocks), content: buildPreviewText(groupBlocks) });
     groupBlocks.forEach((block) => used.add(block.key));
   });
 
   const bussesBlocks = blocks.filter((block) => bussesBlockKeys.value.has(block.key));
   if (bussesBlocks.length) {
-    tabs.push({ key: "busses", label: "Busses", blocks: bussesBlocks, content: buildPreviewText(bussesBlocks) });
+    tabs.push({ key: "busses", label: "Busses", blocks: bussesBlocks, lines: buildPreviewLines(bussesBlocks), content: buildPreviewText(bussesBlocks) });
     bussesBlocks.forEach((block) => used.add(block.key));
   }
 
   const hubsBlocks = blocks.filter((block) => hubDomainsInUse.value.has(block.key));
   if (hubsBlocks.length) {
-    tabs.push({ key: "hubs", label: "Hubs", blocks: hubsBlocks, content: buildPreviewText(hubsBlocks) });
+    tabs.push({ key: "hubs", label: "Hubs", blocks: hubsBlocks, lines: buildPreviewLines(hubsBlocks), content: buildPreviewText(hubsBlocks) });
     hubsBlocks.forEach((block) => used.add(block.key));
   }
 
@@ -3656,13 +3859,13 @@ const previewTabs = computed(() => {
   const displayBlocks = blocks.filter((block) => block.key === "display");
   const combinedDisplayBlocks = [...substitutionsBlocks, ...displayBlocks];
   if (combinedDisplayBlocks.length) {
-    tabs.push({ key: "display", label: "Display", blocks: combinedDisplayBlocks, content: buildPreviewText(combinedDisplayBlocks) });
+    tabs.push({ key: "display", label: "Display", blocks: combinedDisplayBlocks, lines: buildPreviewLines(combinedDisplayBlocks), content: buildPreviewText(combinedDisplayBlocks) });
     combinedDisplayBlocks.forEach((block) => used.add(block.key));
   }
 
   const customBlocks = customPreviewBlocks.value;
   if (customBlocks.length) {
-    tabs.push({ key: "custom", label: "Custom", blocks: customBlocks, content: buildPreviewText(customBlocks) });
+    tabs.push({ key: "custom", label: "Custom", blocks: customBlocks, lines: buildPreviewLines(customBlocks), content: buildPreviewText(customBlocks) });
     customPreviewBlockKeys.value.forEach((key) => used.add(key));
     used.add("__root_misc__");
   }
@@ -3670,7 +3873,7 @@ const previewTabs = computed(() => {
   blocks.forEach((block) => {
     if (used.has(block.key)) return;
     const groupedBlocks = blocks.filter((candidate) => candidate.key === block.key);
-    tabs.push({ key: block.key, label: humanizePreviewKey(block.key), blocks: groupedBlocks, content: buildPreviewText(groupedBlocks) });
+    tabs.push({ key: block.key, label: humanizePreviewKey(block.key), blocks: groupedBlocks, lines: buildPreviewLines(groupedBlocks), content: buildPreviewText(groupedBlocks) });
     used.add(block.key);
   });
 
@@ -3712,6 +3915,119 @@ const resolvePreviewTabKeyFromMain = () => {
 const mainPreviewTargetKey = computed(() => resolvePreviewTabKeyFromMain());
 const displayAutomationHasInterval = computed(() => (generatedAutomation.value?.interval || []).length > 0);
 const hubNoticeDomains = computed(() => Array.from(componentDomainsUsingHubs.value));
+
+let yamlFocusPulseTimer = null;
+let yamlFocusRequestId = 0;
+
+const ensureYamlOriginModeVisible = (modeLevel) => {
+  if (!modeLevel) return;
+  const target = normalizeModeLevel(modeLevel);
+  if (modeLevelRank(target) > modeLevelRank(activeModeLevel.value)) {
+    activeModeLevel.value = target;
+  }
+};
+
+const activateYamlOriginScope = (origin) => {
+  const scopeId = String(origin?.scopeId || "");
+  if (!scopeId) return;
+  if (scopeId.startsWith("component:")) {
+    const index = Number.parseInt(scopeId.slice("component:".length), 10);
+    if (Number.isInteger(index) && index >= 0 && index < (config.value.components || []).length) {
+      openComponentViewer(index);
+    }
+    return;
+  }
+  if (scopeId.startsWith("tab:Busses:")) {
+    activeTab.value = "Busses";
+    const [, , key, index] = scopeId.split(":");
+    if (key) activeBussesKey.value = key;
+    return;
+  }
+  if (scopeId.startsWith("tab:Protocols:")) {
+    activeTab.value = "Protocols";
+    const [, , key] = scopeId.split(":");
+    if (key) activeProtocolKey.value = key;
+    return;
+  }
+  if (scopeId.startsWith("tab:System:")) {
+    activeTab.value = "System";
+    const [, , key] = scopeId.split(":");
+    if (key) activeOtherKey.value = key;
+    return;
+  }
+  if (scopeId.startsWith("tab:Automation:")) {
+    activeTab.value = "Automation";
+    const [, , key] = scopeId.split(":");
+    if (key) activeAutomationKey.value = key;
+    return;
+  }
+  if (scopeId.startsWith("tab:Network")) {
+    activeTab.value = "Network";
+    return;
+  }
+  if (scopeId.startsWith("tab:Platform")) {
+    activeTab.value = "Platform";
+    return;
+  }
+  if (scopeId.startsWith("tab:Core")) {
+    activeTab.value = "Core";
+  }
+};
+
+const findYamlFocusTarget = (scopeId, path = []) => {
+  const encodedPaths = [];
+  for (let length = path.length; length >= 0; length -= 1) {
+    encodedPaths.push(encodeFieldPath(path.slice(0, length)));
+  }
+  const candidates = Array.from(document.querySelectorAll(`[data-schema-scope-id="${scopeId}"]`));
+  for (const encodedPath of encodedPaths) {
+    const match = candidates.find((element) => element.getAttribute("data-schema-field-path") === encodedPath);
+    if (match) return match;
+  }
+  return null;
+};
+
+const waitForYamlFocusTarget = async (scopeId, path = [], requestId, maxFrames = 45) => {
+  for (let attempt = 0; attempt < maxFrames; attempt += 1) {
+    if (requestId !== yamlFocusRequestId) return null;
+    await nextTick();
+    const target = findYamlFocusTarget(scopeId, path);
+    if (target) return target;
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+  }
+  return requestId === yamlFocusRequestId ? findYamlFocusTarget(scopeId, path) : null;
+};
+
+const pulseYamlFocusTarget = (element) => {
+  if (!element) return;
+  if (yamlFocusPulseTimer) {
+    clearTimeout(yamlFocusPulseTimer);
+    yamlFocusPulseTimer = null;
+  }
+  document.querySelectorAll(".schema-field--yaml-focus").forEach((node) => {
+    node.classList.remove("schema-field--yaml-focus");
+  });
+  element.classList.remove("schema-field--yaml-focus");
+  void element.offsetWidth;
+  element.classList.add("schema-field--yaml-focus");
+  element.scrollIntoView({ block: "center", behavior: "smooth" });
+  yamlFocusPulseTimer = setTimeout(() => {
+    element.classList.remove("schema-field--yaml-focus");
+    yamlFocusPulseTimer = null;
+  }, 1100);
+};
+
+const handleYamlLineClick = async (line) => {
+  const origin = line?.origin;
+  if (!origin?.scopeId) return;
+  const requestId = ++yamlFocusRequestId;
+  activateYamlOriginScope(origin);
+  ensureYamlOriginModeVisible(origin.modeLevel);
+  if (origin.suppressFocus) return;
+  const target = await waitForYamlFocusTarget(origin.scopeId, origin.path || [], requestId);
+  if (requestId !== yamlFocusRequestId) return;
+  pulseYamlFocusTarget(target);
+};
 
 onMounted(() => {
   initProjectsUpdatedChannel();
@@ -5917,6 +6233,10 @@ watch(
 
 onBeforeUnmount(() => {
   pendingPulseEntries.clear();
+  if (yamlFocusPulseTimer) {
+    clearTimeout(yamlFocusPulseTimer);
+    yamlFocusPulseTimer = null;
+  }
   Array.from(tabPulseTimers.values()).forEach((timer) => clearTimeout(timer));
   tabPulseTimers.clear();
   window.removeEventListener("keydown", handleBuilderKeydown);

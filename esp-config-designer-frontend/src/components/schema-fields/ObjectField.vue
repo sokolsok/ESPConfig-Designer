@@ -1,5 +1,9 @@
 <template>
-  <div class="schema-group schema-object-group">
+  <div
+    class="schema-group schema-object-group"
+    :data-schema-scope-id="contextScopeId"
+    :data-schema-field-path="encodedFieldFocusPath"
+  >
     <div class="schema-group-title">
       <span>{{ fieldLabel }}</span>
     </div>
@@ -9,6 +13,7 @@
         :key="child.key"
         :field="child"
         :path="fieldPath"
+        :focus-path="fieldFocusPath"
         :value="value"
         :root-value="rootValue || value"
         :mode-level="modeLevel"
@@ -38,6 +43,8 @@ import SchemaField from '../SchemaField.vue';
 defineProps({
   fieldLabel: { type: String, required: true },
   fieldPath: { type: Array, default: () => [] },
+  fieldFocusPath: { type: Array, default: () => [] },
+  encodedFieldFocusPath: { type: String, default: '' },
   visibleObjectFields: { type: Array, default: () => [] },
   value: { type: Object, default: () => ({}) },
   rootValue: { type: Object, default: null },

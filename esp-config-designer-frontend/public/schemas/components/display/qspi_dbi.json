@@ -155,28 +155,31 @@
       "key": "transform",
       "type": "object",
       "required": false,
-      "lvl": "advanced",
+      "lvl": "normal",
       "fields": [
         {
           "key": "swap_xy",
           "type": "boolean",
           "required": false,
           "lvl": "normal",
-          "default": false
+          "default": false,
+		  "emitYAML": "always"
         },
         {
           "key": "mirror_x",
           "type": "boolean",
           "required": false,
           "lvl": "normal",
-          "default": false
+          "default": false,
+		  "emitYAML": "always"
         },
         {
           "key": "mirror_y",
           "type": "boolean",
           "required": false,
           "lvl": "normal",
-          "default": false
+          "default": false,
+		  "emitYAML": "always"
         }
       ]
     },

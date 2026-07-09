@@ -1,0 +1,98 @@
+{
+  "id": "external_components",
+  "domain": "external_components",
+  "platform": "",
+  "renderAs": "root_list",
+  "previewGroup": "misc",
+  "helpUrl": "https://esphome.io/components/external_components/",
+  "fields": [
+    {
+      "key": "source",
+      "type": "object",
+      "required": true,
+      "lvl": "simple",
+      "fields": [
+        {
+          "key": "type",
+          "type": "select",
+          "required": true,
+          "lvl": "simple",
+          "default": "git",
+          "options": [
+            "git",
+            "local"
+          ]
+        },
+        {
+          "key": "url",
+          "type": "text",
+          "required": true,
+          "lvl": "simple",
+          "placeholder": "https://github.com/esphome/esphome",
+          "dependsOn": {
+            "key": "type",
+            "value": "git"
+          }
+        },
+        {
+          "key": "ref",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "dev",
+          "dependsOn": {
+            "key": "type",
+            "value": "git"
+          }
+        },
+        {
+          "key": "username",
+          "type": "text",
+          "required": false,
+          "lvl": "advanced",
+          "dependsOn": {
+            "key": "type",
+            "value": "git"
+          }
+        },
+        {
+          "key": "password",
+          "type": "password",
+          "required": false,
+          "lvl": "advanced",
+          "dependsOn": {
+            "key": "type",
+            "value": "git"
+          }
+        },
+        {
+          "key": "path",
+          "type": "text",
+          "required": false,
+          "lvl": "normal",
+          "placeholder": "components",
+          "note": "For local sources this is the local components path. For git sources this is the path inside the repository."
+        }
+      ]
+    },
+    {
+      "key": "components",
+      "type": "list",
+      "required": false,
+      "lvl": "normal",
+      "item": {
+        "type": "text",
+        "placeholder": "rtttl"
+      }
+    },
+    {
+      "key": "refresh",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "1day",
+      "placeholder": "1day",
+      "note": "Use 0s to check every time or never to disable updates. Has no effect on local sources."
+    }
+  ]
+}

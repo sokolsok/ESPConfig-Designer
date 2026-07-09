@@ -664,6 +664,13 @@
               "schemaPath": "components/sensor/daly_bms.json"
             },
             {
+              "name": "DSMR",
+              "path": "components/sensor/dsmr",
+              "id": "sensor/dsmr",
+              "available": true,
+              "schemaPath": "components/sensor/dsmr.json"
+            },
+            {
               "name": "HLW8012",
               "path": "components/sensor/hlw8012",
               "id": "sensor/hlw8012",
@@ -2358,6 +2365,13 @@
           "id": "climate/midea",
           "available": true,
           "schemaPath": "components/climate/midea.json"
+        },
+        {
+          "name": "Mitsubishi CN105 Climate",
+          "path": "components/climate/mitsubishi_cn105",
+          "id": "climate/mitsubishi_cn105",
+          "available": true,
+          "schemaPath": "components/climate/mitsubishi_cn105.json"
         },
         {
           "name": "PID Controller",
@@ -4188,6 +4202,13 @@
           "schemaPath": "components/miscellaneous/exposure_notifications.json"
         },
         {
+          "name": "External Components",
+          "path": "components/external_components",
+          "id": "external_components",
+          "available": true,
+          "schemaPath": "components/miscellaneous/external_components.json"
+        },
+        {
           "name": "GPS",
           "path": "components/gps",
           "id": "gps",
@@ -4317,6 +4338,7 @@
     "climate/climate_ir",
     "climate/haier",
     "climate/midea",
+    "climate/mitsubishi_cn105",
     "climate/pid",
     "climate/thermostat",
     "climate/tuya",
@@ -4598,6 +4620,7 @@
     "sensor/ct_clamp",
     "sensor/dallas_temp",
     "sensor/daly_bms",
+    "sensor/dsmr",
     "sensor/dht",
     "sensor/dht12",
     "sensor/dps310",

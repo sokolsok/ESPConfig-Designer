@@ -1,5 +1,9 @@
 <template>
-  <div class="schema-renderer">
+  <div
+    class="schema-renderer"
+    :data-schema-scope-id="contextScopeId"
+    data-schema-field-path=""
+  >
     <div v-if="!componentId" class="note">Wybierz komponent z listy, aby go skonfigurowac.</div>
     <div v-else-if="activeSchema" class="schema-levels">
       <template v-for="binding in sharedHubBindings" :key="`shared-hub-${binding.sourceKey}`">
@@ -107,6 +111,7 @@ import { computed, defineAsyncComponent, inject, onBeforeUnmount, ref, watch } f
 import SchemaField from "./SchemaField.vue";
 import { loadComponentSchema, loadSchemaByPath } from "../utils/schemaLoader";
 import { isFieldVisible } from "../utils/schemaVisibility";
+import { fieldModeLevel, isModeLevelVisible, modeLevelRank } from "../utils/schemaModeLevel";
 import {
   buildSeededObjectFromFields,
   buildSharedHubManagedKeys,
@@ -237,19 +242,8 @@ const isLoaded = ref(false);
 const sharedHubSelectionOverrides = ref({});
 let schemaLoadRequestId = 0;
 
-const modeOrder = {
-  simple: 1,
-  normal: 2,
-  advanced: 3
-};
-
-const fieldLevel = (field) => {
-  const lvl = field?.lvl?.toLowerCase();
-  return modeOrder[lvl] ? lvl : "simple";
-};
-
 const activeModeRank = computed(() =>
-  modeOrder[props.modeLevel?.toLowerCase()] ?? modeOrder.simple
+  modeLevelRank(props.modeLevel)
 );
 
 const filteredSchemaFields = computed(() => {
@@ -355,20 +349,20 @@ const dependencyVisibleSchemaFields = computed(() => {
 const visibleSchemaFields = computed(() =>
   dependencyVisibleSchemaFields.value.filter(
     (field) =>
-      modeOrder[fieldLevel(field)] <= activeModeRank.value &&
+      isModeLevelVisible(fieldModeLevel(field), props.modeLevel) &&
       !sharedHubManagedKeys.value.has(field.key)
   )
 );
 
 const nextModeLevel = computed(() => {
-  if (activeModeRank.value >= modeOrder.advanced) return "";
-  if (activeModeRank.value >= modeOrder.normal) return "Advanced";
+  if (activeModeRank.value >= modeLevelRank("Advanced")) return "";
+  if (activeModeRank.value >= modeLevelRank("Normal")) return "Advanced";
   return "Normal";
 });
 
 const showModeUpgrade = computed(() => {
   if (!nextModeLevel.value) return false;
-  const thresholdRank = modeOrder[nextModeLevel.value.toLowerCase()] || modeOrder.advanced;
+  const thresholdRank = modeLevelRank(nextModeLevel.value);
   const busValue = props.componentConfig?.bus;
 
   const hasPromotableFields = (fields = [], valueMap = {}) =>
@@ -377,7 +371,7 @@ const showModeUpgrade = computed(() => {
         return false;
       }
 
-      if (modeOrder[fieldLevel(field)] >= thresholdRank) {
+      if (modeLevelRank(fieldModeLevel(field)) >= thresholdRank) {
         return true;
       }
 

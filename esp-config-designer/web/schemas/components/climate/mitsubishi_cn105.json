@@ -1,0 +1,56 @@
+{
+  "id": "climate.mitsubishi_cn105",
+  "domain": "climate",
+  "platform": "mitsubishi_cn105",
+  "helpUrl": "https://esphome.io/components/climate/mitsubishi_cn105/",
+  "extends": "base_climate.json",
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "uart_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "uart"
+    },
+    {
+      "key": "update_interval",
+      "type": "duration",
+      "required": false,
+      "lvl": "normal",
+      "default": "1s"
+    },
+    {
+      "key": "current_temperature_min_interval",
+      "type": "text",
+      "required": false,
+      "lvl": "normal",
+      "default": "60s",
+      "placeholder": "60s",
+      "note": "Use never to disable room temperature polling."
+    },
+    {
+      "key": "supported_swing_modes",
+      "type": "select",
+      "required": false,
+      "lvl": "normal",
+      "default": "OFF",
+      "options": [
+        "OFF",
+        "VERTICAL",
+        "HORIZONTAL",
+        "BOTH"
+      ]
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced"
+    }
+  ]
+}

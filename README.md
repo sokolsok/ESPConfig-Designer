@@ -1,5 +1,4 @@
-# ESPConfig Designer v.1.3.1
-
+# ESPConfig Designer v.1.3.2
 <a href="https://buymeacoffee.com/smartsolutionsforhome" target="_blank">
 <img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee">
 </a>

@@ -1,5 +1,9 @@
 <template>
-  <div class="schema-fixed-list">
+  <div
+    class="schema-fixed-list"
+    :data-schema-scope-id="contextScopeId"
+    :data-schema-field-path="encodedFieldFocusPath"
+  >
     <div class="schema-list-header">
       <div class="schema-list-title">
         <span>{{ fieldLabel }}</span>
@@ -11,6 +15,7 @@
         :key="index"
         :field="fixedListChildField(index)"
         :path="[]"
+        :focus-path="fixedListItemFocusPath(index)"
         :value="{ value: item }"
         :root-value="rootValue || value"
         :mode-level="modeLevel"
@@ -32,6 +37,8 @@
 
 <script setup>
 import SchemaField from '../SchemaField.vue';
+import { computed } from 'vue';
+import { encodeFieldPath } from '../../utils/yamlDocumentModel';
 
 // FixedListField is the schema-driven answer for tuple-like inputs such as camera
 // data pins: the data model stays an array, but the UI exposes a fixed number of
@@ -40,6 +47,7 @@ import SchemaField from '../SchemaField.vue';
 const props = defineProps({
   fieldLabel: { type: String, required: true },
   fieldPath: { type: Array, default: () => [] },
+  fieldFocusPath: { type: Array, default: () => [] },
   fixedListValue: { type: Array, default: () => [] },
   fixedListChildField: { type: Function, required: true },
   rootValue: { type: Object, default: null },
@@ -57,6 +65,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update', 'open-secrets']);
+const encodedFieldFocusPath = computed(() => encodeFieldPath(props.fieldFocusPath));
+const fixedListItemFocusPath = (index) => [...props.fieldFocusPath, index];
 
 const updateFixedListPrimitive = (index, value) => {
   const next = props.fixedListValue.map((item, itemIndex) => (itemIndex === index ? value : item));

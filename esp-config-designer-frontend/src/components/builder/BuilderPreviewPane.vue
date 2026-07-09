@@ -82,7 +82,14 @@
           </span>
         </div>
         <div ref="previewScrollInner" class="yaml-scroll-inner">
-          <pre><code class="hljs" v-html="highlightedYaml"></code></pre>
+          <pre><code class="hljs yaml-preview-lines"><button
+            v-for="line in highlightedYamlLines"
+            :key="line.id"
+            type="button"
+            class="yaml-preview-line"
+            :class="{ 'yaml-preview-line--clickable': Boolean(line.origin) }"
+            @click="handleYamlLineClick(line)"
+          ><span v-if="line.html" v-html="line.html"></span><span v-else>&nbsp;</span></button></code></pre>
         </div>
       </div>
     </div>
@@ -103,6 +110,10 @@ const props = defineProps({
     default: false
   },
   previewTabs: {
+    type: Array,
+    default: () => []
+  },
+  previewLines: {
     type: Array,
     default: () => []
   },
@@ -132,9 +143,12 @@ const props = defineProps({
   }
 });
 
+const emit = defineEmits(["yaml-line-click"]);
+
 const preview = useBuilderPreview({
   splitPreviewEnabled: toRef(props, "splitPreviewEnabled"),
   previewTabs: toRef(props, "previewTabs"),
+  previewLines: toRef(props, "previewLines"),
   yamlPreview: toRef(props, "yamlPreview"),
   mainPreviewTargetKey: toRef(props, "mainPreviewTargetKey"),
   previewSyncRequest: toRef(props, "previewSyncRequest"),
@@ -149,7 +163,7 @@ const {
   canScrollRight,
   copyLabel,
   handleCopyPreview,
-  highlightedYaml,
+  highlightedYamlLines,
   hasPreviewScrollbar,
   previewScrollInner,
   previewTabList,
@@ -160,4 +174,9 @@ const {
   switchPreviewTab,
   visiblePreviewTabs
 } = preview;
+
+const handleYamlLineClick = (line) => {
+  if (!line?.origin) return;
+  emit("yaml-line-click", line);
+};
 </script>

@@ -1,6 +1,8 @@
 <template>
   <div
     class="schema-field"
+    :data-schema-scope-id="contextScopeId"
+    :data-schema-field-path="encodedFieldFocusPath"
     :class="{
       'schema-field--stacked': hasInlineNote,
       'schema-field--custom-config': field.key === 'custom_config'
@@ -42,6 +44,7 @@
       <SchemaField
         :field="templatableEditorField"
         :path="[]"
+        :focus-path="fieldFocusPath"
         :value="templatableEditorValue"
         :root-value="rootValue || value"
         :mode-level="modeLevel"
@@ -144,6 +147,8 @@ import { ID_REF_EMPTY_OPTION } from '../../utils/schemaIdRefs';
 
 defineProps({
   field: { type: Object, required: true },
+  fieldFocusPath: { type: Array, default: () => [] },
+  encodedFieldFocusPath: { type: String, default: '' },
   fieldLabel: { type: String, required: true },
   hasInlineNote: Boolean,
   inputId: { type: String, required: true },

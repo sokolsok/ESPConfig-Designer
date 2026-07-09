@@ -3,6 +3,8 @@
     v-if="isObjectField"
     :field-label="fieldLabel"
     :field-path="fieldPath"
+    :field-focus-path="fieldFocusPath"
+    :encoded-field-focus-path="encodedFieldFocusPath"
     :visible-object-fields="visibleObjectFields"
     :value="value"
     :root-value="rootValue"
@@ -23,6 +25,7 @@
     v-else-if="isFixedListField"
     :field-label="fieldLabel"
     :field-path="fieldPath"
+    :field-focus-path="fieldFocusPath"
     :fixed-list-value="fixedListValue"
     :fixed-list-child-field="fixedListChildField"
     :root-value="rootValue"
@@ -45,6 +48,7 @@
     :field="field"
     :field-label="fieldLabel"
     :field-path="fieldPath"
+    :field-focus-path="fieldFocusPath"
     :generated-list-value="generatedListValue"
     :has-explicit-value="hasExplicitGeneratedListValue"
     :root-value="rootValue"
@@ -67,6 +71,7 @@
     :field="field"
     :field-label="fieldLabel"
     :field-path="fieldPath"
+    :field-focus-path="fieldFocusPath"
     :value="value"
     :root-value="rootValue"
     :mode-level="modeLevel"
@@ -86,6 +91,8 @@
     v-else
     :field="field"
     :field-label="fieldLabel"
+    :field-focus-path="fieldFocusPath"
+    :encoded-field-focus-path="encodedFieldFocusPath"
     :has-inline-note="hasInlineNote"
     :input-id="inputId"
     :field-notice="fieldNotice"
@@ -190,6 +197,8 @@ import {
   wrapTemplatableValueForField
 } from "../utils/schemaTemplatable";
 import { buildIdRefMenuOptions, buildIdRefOptions, isIdRefEmptyOption } from "../utils/schemaIdRefs";
+import { encodeFieldPath } from "../utils/yamlDocumentModel";
+import { fieldModeLevel, isModeLevelVisible } from "../utils/schemaModeLevel";
 
 defineOptions({ name: "SchemaField" });
 
@@ -203,6 +212,10 @@ const props = defineProps({
     required: true
   },
   path: {
+    type: Array,
+    default: () => []
+  },
+  focusPath: {
     type: Array,
     default: () => []
   },
@@ -279,6 +292,8 @@ const hasInlineNote = computed(() => Boolean(fieldNotice.value));
 
 // Full path for nested fields (used to update config values).
 const fieldPath = computed(() => [...props.path, props.field.key]);
+const fieldFocusPath = computed(() => [...props.focusPath, props.field.key]);
+const encodedFieldFocusPath = computed(() => encodeFieldPath(fieldFocusPath.value));
 
 const getValueAtPath = (target, path) =>
   path.reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), target);
@@ -379,28 +394,12 @@ const fixedListChildField = (index) => ({
   helpUrl: props.field?.item?.helpUrl || props.field?.helpUrl
 });
 
-const modeOrder = {
-  simple: 1,
-  normal: 2,
-  advanced: 3
-};
-
-const fieldLevel = (field) => {
-  const lvl = field?.lvl?.toLowerCase();
-  return modeOrder[lvl] ? lvl : "simple";
-};
-
-const activeModeRank = computed(() =>
-  modeOrder[props.modeLevel?.toLowerCase()] ?? modeOrder.simple
-);
-
 const fieldLabel = computed(() => props.field.label || props.field.key);
 
 const filterVisibleFields = (fields = [], contextValue = null) =>
   fields.filter((field) => {
     if (!isFieldVisible(field, contextValue, fields, props.globalStore)) return false;
-    const lvl = fieldLevel(field);
-    return modeOrder[lvl] <= activeModeRank.value;
+    return isModeLevelVisible(fieldModeLevel(field), props.modeLevel);
   });
 
 const visibleObjectFields = computed(() =>

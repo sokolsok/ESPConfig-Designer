@@ -86,14 +86,16 @@
           "type": "boolean",
           "required": false,
           "lvl": "normal",
-          "default": false
+          "default": false,
+		  "emitYAML": "always"
         },
         {
           "key": "flip_y",
           "type": "boolean",
           "required": false,
           "lvl": "normal",
-          "default": false
+          "default": false,
+		  "emitYAML": "always"
         }
       ]
     },

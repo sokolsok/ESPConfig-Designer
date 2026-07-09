@@ -35,3 +35,14 @@ export const highlightYamlToHtml = async (source) => {
     return highlightYamlFallback(text);
   }
 };
+
+export const highlightYamlLineToHtml = async (source) => {
+  const text = String(source ?? "");
+  if (!text.trim()) return "";
+  try {
+    const hljs = await ensureYamlHighlighter();
+    return hljs.highlight(text, { language: "yaml" }).value;
+  } catch {
+    return escapeHtml(text);
+  }
+};

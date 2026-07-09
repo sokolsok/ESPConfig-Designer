@@ -1,6 +1,8 @@
 <template>
   <div
     class="schema-list"
+    :data-schema-scope-id="contextScopeId"
+    :data-schema-field-path="encodedFieldFocusPath"
     :class="[listLevelClass, { 'is-empty': listValue.length === 0 }, { 'schema-list--compact': isCompactListField }]"
   >
     <div class="schema-list-header">
@@ -13,7 +15,13 @@
       </div>
     </div>
     <div v-if="listValue.length === 0" class="note">No items yet</div>
-    <div v-for="(item, index) in listValue" :key="index" class="schema-list-item">
+    <div
+      v-for="(item, index) in listValue"
+      :key="index"
+      class="schema-list-item"
+      :data-schema-scope-id="contextScopeId"
+      :data-schema-field-path="encodedListItemFocusPath(index)"
+    >
       <template v-if="isCatalogListField">
         <div class="components-header">
           <div class="filter-title-row">
@@ -36,6 +44,7 @@
             :key="child.key"
             :field="child"
             :path="[]"
+            :focus-path="listItemFocusPath(index)"
             :value="item.config || {}"
             :root-value="rootValue || value"
             :mode-level="modeLevel"
@@ -71,6 +80,7 @@
             :key="`${index}-${child.key}`"
             :field="child"
             :path="[]"
+            :focus-path="listItemFocusPath(index)"
             :value="item || {}"
             :root-value="rootValue || value"
             :mode-level="modeLevel"
@@ -163,6 +173,8 @@ import GpioField from './GpioField.vue';
 import SchemaField from '../SchemaField.vue';
 import PickerModal from '../PickerModal.vue';
 import { isFieldVisible } from '../../utils/schemaVisibility';
+import { encodeFieldPath } from '../../utils/yamlDocumentModel';
+import { fieldModeLevel, isModeLevelVisible } from '../../utils/schemaModeLevel';
 import {
   actionIdToSchemaUrl,
   conditionIdToSchemaUrl,
@@ -183,6 +195,7 @@ const props = defineProps({
   field: { type: Object, required: true },
   fieldLabel: { type: String, required: true },
   fieldPath: { type: Array, default: () => [] },
+  fieldFocusPath: { type: Array, default: () => [] },
   value: { type: Object, default: () => ({}) },
   rootValue: { type: Object, default: null },
   modeLevel: { type: String, default: 'Simple' },
@@ -201,20 +214,17 @@ const emit = defineEmits(['update', 'open-secrets']);
 
 const getValueAtPath = (target, path) => path.reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), target);
 const fieldValue = computed(() => getValueAtPath(props.value, props.fieldPath));
+const encodedFieldFocusPath = computed(() => encodeFieldPath(props.fieldFocusPath));
+const listItemFocusPath = (index) => [...props.fieldFocusPath, index];
+const encodedListItemFocusPath = (index) => encodeFieldPath(listItemFocusPath(index));
 const listValue = computed(() => {
   if (Array.isArray(fieldValue.value)) return fieldValue.value;
   if (Array.isArray(props.field.default)) return props.field.default;
   return [];
 });
 
-const modeOrder = { simple: 1, normal: 2, advanced: 3 };
-const fieldLevel = (field) => {
-  const lvl = field?.lvl?.toLowerCase();
-  return modeOrder[lvl] ? lvl : 'simple';
-};
-const activeModeRank = computed(() => modeOrder[props.modeLevel?.toLowerCase()] ?? modeOrder.simple);
 const filterVisibleFields = (fields = [], contextValue = null) =>
-  fields.filter((field) => isFieldVisible(field, contextValue, fields, props.globalStore) && modeOrder[fieldLevel(field)] <= activeModeRank.value);
+  fields.filter((field) => isFieldVisible(field, contextValue, fields, props.globalStore) && isModeLevelVisible(fieldModeLevel(field), props.modeLevel));
 const visibleListItemFields = (itemValue = {}) => filterVisibleFields(props.field.item?.fields || [], itemValue || {});
 
 const listItemType = computed(() => props.field.item?.type || 'text');

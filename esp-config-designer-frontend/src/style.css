@@ -1295,6 +1295,26 @@ button:disabled {
   animation: busTabPulse 3s ease-in-out;
 }
 
+.schema-field--yaml-focus {
+  border-radius: 4px;
+  animation: yamlFieldFocusPulse 0.8s linear;
+}
+
+@keyframes yamlFieldFocusPulse {
+  0% {
+    outline: 0 solid rgba(103, 145, 212, 0);
+    outline-offset: 2px;
+  }
+  20% {
+    outline: 5px solid rgba(103, 145, 212, 0.55);
+    outline-offset: 2px;
+  }
+  100% {
+    outline: 0 solid rgba(103, 145, 212, 0);
+    outline-offset: 2px;
+  }
+}
+
 @keyframes busTabPulse {
   0% {
     box-shadow: 0 0 0 0 rgba(103, 145, 212, 0.7);
@@ -1418,6 +1438,33 @@ button:disabled {
   grid-template-columns: minmax(140px, 220px) minmax(0, 1fr);
   align-items: center;
   gap: 8px;
+}
+
+.yaml-preview-lines {
+  display: block;
+}
+
+.yaml-preview-line {
+  display: block;
+  width: 100%;
+  min-height: 1em;
+  border: 0;
+  margin: 0;
+  padding: 0 4px;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  white-space: pre;
+  background: transparent;
+  cursor: default;
+}
+
+.yaml-preview-line--clickable {
+  cursor: pointer;
+}
+
+.yaml-preview-line--clickable:hover {
+  background: rgba(103, 145, 212, 0.12);
 }
 
 .schema-field--stacked {

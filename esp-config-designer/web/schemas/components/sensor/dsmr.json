@@ -1,0 +1,101 @@
+{
+  "id": "sensor.dsmr",
+  "domain": "sensor",
+  "platform": "dsmr",
+  "helpUrl": "https://esphome.io/components/sensor/dsmr/",
+  "embedded": [
+    {
+      "key": "hub",
+      "domain": "dsmr",
+      "emitAs": "map",
+      "singleton": true,
+      "merge": "first"
+    }
+  ],
+  "requirements": [
+    {
+      "require": "bus:uart"
+    }
+  ],
+  "fields": [
+    {
+      "key": "hub",
+      "label": "DSMR hub",
+      "type": "object",
+      "required": false,
+      "lvl": "simple",
+      "emitYAML": "never",
+      "fields": [
+        { "key": "id", "type": "id", "required": false, "lvl": "normal", "placeholder": "dsmr_id", "idDomain": "dsmr" },
+        { "key": "uart_id", "type": "id_ref", "required": false, "lvl": "normal", "domain": "uart" },
+        { "key": "decryption_key", "type": "password", "required": false, "lvl": "advanced", "placeholder": "00112233445566778899AABBCCDDEEFF", "note": "32 character encryption key, only for encrypted DSMR telegrams." },
+        { "key": "gas_mbus_id", "type": "number", "required": false, "lvl": "normal", "default": 1 },
+        { "key": "water_mbus_id", "type": "number", "required": false, "lvl": "normal", "default": 2 },
+        { "key": "thermal_mbus_id", "type": "number", "required": false, "lvl": "normal", "default": 3 },
+        { "key": "crc_check", "type": "boolean", "required": false, "lvl": "normal", "default": true },
+        { "key": "max_telegram_length", "type": "number", "required": false, "lvl": "advanced", "default": 1500 },
+        { "key": "request_pin", "type": "gpio", "required": false, "lvl": "normal", "placeholder": "GPIOXX" },
+        { "key": "request_interval", "type": "duration", "required": false, "lvl": "normal", "default": "0ms" },
+        { "key": "receive_timeout", "type": "duration", "required": false, "lvl": "advanced", "default": "200ms" }
+      ]
+    },
+    {
+      "key": "dsmr_id",
+      "type": "id_ref",
+      "required": false,
+      "lvl": "normal",
+      "domain": "dsmr",
+      "allowSelfReference": true,
+      "placeholder": "dsmr_id"
+    },
+    {
+      "key": "custom_config",
+      "type": "raw_yaml",
+      "required": false,
+      "lvl": "advanced",
+      "note": "Use for DSMR sensors not explicitly modeled yet."
+    },
+    { "key": "energy_delivered_lux", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "energy_delivered_tariff1", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "energy_delivered_tariff2", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "energy_delivered_tariff3", "type": "object", "required": false, "lvl": "normal", "extends": "base_sensor.json", "fields": [] },
+    { "key": "energy_delivered_tariff4", "type": "object", "required": false, "lvl": "normal", "extends": "base_sensor.json", "fields": [] },
+    { "key": "energy_returned_lux", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "energy_returned_tariff1", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "energy_returned_tariff2", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "energy_returned_tariff3", "type": "object", "required": false, "lvl": "normal", "extends": "base_sensor.json", "fields": [] },
+    { "key": "energy_returned_tariff4", "type": "object", "required": false, "lvl": "normal", "extends": "base_sensor.json", "fields": [] },
+    { "key": "power_delivered", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "power_returned", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "voltage_l1", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "voltage_l2", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "voltage_l3", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "voltage", "type": "object", "required": false, "lvl": "normal", "extends": "base_sensor.json", "fields": [] },
+    { "key": "current_l1", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "current_l2", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "current_l3", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "current", "type": "object", "required": false, "lvl": "normal", "extends": "base_sensor.json", "fields": [] },
+    { "key": "frequency", "type": "object", "required": false, "lvl": "normal", "extends": "base_sensor.json", "fields": [] },
+    { "key": "gas_delivered", "type": "object", "required": false, "lvl": "simple", "extends": "base_sensor.json", "fields": [] },
+    { "key": "gas_delivered_be", "type": "object", "required": false, "lvl": "normal", "extends": "base_sensor.json", "fields": [] },
+    { "key": "water_delivered", "type": "object", "required": false, "lvl": "normal", "extends": "base_sensor.json", "fields": [] },
+    { "key": "thermal_delivered", "type": "object", "required": false, "lvl": "normal", "extends": "base_sensor.json", "fields": [] },
+    { "key": "electricity_failures", "type": "object", "required": false, "lvl": "normal", "extends": "base_sensor.json", "fields": [] },
+    { "key": "electricity_long_failures", "type": "object", "required": false, "lvl": "normal", "extends": "base_sensor.json", "fields": [] },
+    { "key": "electricity_sags_l1", "type": "object", "required": false, "lvl": "advanced", "extends": "base_sensor.json", "fields": [] },
+    { "key": "electricity_sags_l2", "type": "object", "required": false, "lvl": "advanced", "extends": "base_sensor.json", "fields": [] },
+    { "key": "electricity_sags_l3", "type": "object", "required": false, "lvl": "advanced", "extends": "base_sensor.json", "fields": [] },
+    { "key": "electricity_swells_l1", "type": "object", "required": false, "lvl": "advanced", "extends": "base_sensor.json", "fields": [] },
+    { "key": "electricity_swells_l2", "type": "object", "required": false, "lvl": "advanced", "extends": "base_sensor.json", "fields": [] },
+    { "key": "electricity_swells_l3", "type": "object", "required": false, "lvl": "advanced", "extends": "base_sensor.json", "fields": [] },
+    { "key": "power_delivered_l1", "type": "object", "required": false, "lvl": "normal", "extends": "base_sensor.json", "fields": [] },
+    { "key": "power_delivered_l2", "type": "object", "required": false, "lvl": "normal", "extends": "base_sensor.json", "fields": [] },
+    { "key": "power_delivered_l3", "type": "object", "required": false, "lvl": "normal", "extends": "base_sensor.json", "fields": [] },
+    { "key": "power_returned_l1", "type": "object", "required": false, "lvl": "normal", "extends": "base_sensor.json", "fields": [] },
+    { "key": "power_returned_l2", "type": "object", "required": false, "lvl": "normal", "extends": "base_sensor.json", "fields": [] },
+    { "key": "power_returned_l3", "type": "object", "required": false, "lvl": "normal", "extends": "base_sensor.json", "fields": [] },
+    { "key": "reactive_power_delivered", "type": "object", "required": false, "lvl": "advanced", "extends": "base_sensor.json", "fields": [] },
+    { "key": "reactive_power_returned", "type": "object", "required": false, "lvl": "advanced", "extends": "base_sensor.json", "fields": [] },
+    { "key": "power_factor", "type": "object", "required": false, "lvl": "advanced", "extends": "base_sensor.json", "fields": [] }
+  ]
+}

@@ -1,3 +1,14 @@
+## 1.3.2
+
+* Added components:
+  * External Component
+  * DSMR
+  * Mitsubishi CN105
+* Modified the `transform` field for `display` components so that the entire structure is emitted to YAML.
+* Fixed a bug where `id` fields lost focus after entering a single character.
+* Added bidirectional synchronization between the YAML preview and the Builder form, allowing users to click a YAML line to jump to the corresponding configuration section or field.
+
+
 ## 1.3.1
 
 * Updated:

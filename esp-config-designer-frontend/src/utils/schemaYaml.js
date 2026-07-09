@@ -12,6 +12,8 @@ import {
 } from "./schemaTemplatable";
 import { serializeGpioValue } from "./schemaGpio";
 import { parseGoogleFontVariant } from "./displayFonts";
+import { createGeneratedYamlLine } from "./yamlDocumentModel";
+import { fieldModeLevel, maxModeLevel, normalizeModeLevel } from "./schemaModeLevel";
 
 // schemaYaml is the central YAML emission pipeline for the Builder.
 // It converts normalized runtime config plus schema metadata into final ESPHome YAML,
@@ -20,6 +22,91 @@ import { parseGoogleFontVariant } from "./displayFonts";
 
 const componentIdFromEntry = (entry) =>
   typeof entry === "string" ? entry : entry?.id || "";
+
+const yamlLineOrigins = new WeakMap();
+
+const lineOriginList = (lines) => {
+  if (!lines || typeof lines !== "object") return [];
+  if (!yamlLineOrigins.has(lines)) {
+    yamlLineOrigins.set(lines, []);
+  }
+  return yamlLineOrigins.get(lines);
+};
+
+const setLineOrigin = (lines, index, origin) => {
+  if (!origin || index < 0) return;
+  const origins = lineOriginList(lines);
+  origins[index] = origin;
+};
+
+const getLineOrigin = (lines, index) => lineOriginList(lines)[index] || null;
+
+const markNewLines = (lines, startIndex, origin) => {
+  if (!origin) return;
+  const origins = lineOriginList(lines);
+  for (let index = startIndex; index < lines.length; index += 1) {
+    if (!origins[index]) origins[index] = origin;
+  }
+};
+
+const pushYamlLine = (lines, text, origin = null) => {
+  const index = lines.length;
+  lines.push(text);
+  setLineOrigin(lines, index, origin);
+};
+
+const appendYamlLines = (target, source) => {
+  const sourceOrigins = lineOriginList(source);
+  source.forEach((line, index) => {
+    const targetIndex = target.length;
+    target.push(line);
+    if (sourceOrigins[index]) setLineOrigin(target, targetIndex, sourceOrigins[index]);
+  });
+};
+
+const makeSourceOrigin = (context, overrides = {}) => {
+  if (!context) return null;
+  const path = Array.isArray(overrides.path)
+    ? overrides.path
+    : Array.isArray(context.path)
+      ? context.path
+      : [];
+  return {
+    owner: context.owner || "schema",
+    type: overrides.type || "field",
+    scopeId: context.scopeId || "",
+    tabKey: context.tabKey || "",
+    componentIndex: context.componentIndex,
+    componentId: context.componentId || "",
+    path,
+    fieldKey: overrides.fieldKey || path[path.length - 1] || "",
+    modeLevel: normalizeModeLevel(overrides.modeLevel || context.modeLevel || "Simple"),
+    confidence: overrides.confidence || "exact",
+    contentKind: overrides.contentKind || "schema"
+  };
+};
+
+const childSourceContext = (context, path, overrides = {}) => {
+  if (!context) return null;
+  return {
+    ...context,
+    ...overrides,
+    path,
+    modeLevel: normalizeModeLevel(overrides.modeLevel || context.modeLevel || "Simple")
+  };
+};
+
+const linesToGeneratedYamlLines = (lines, blockKey = "") => {
+  const origins = lineOriginList(lines);
+  return lines.map((line, index) =>
+    createGeneratedYamlLine({
+      text: line,
+      blockKey,
+      origin: origins[index] || null,
+      id: `generated:${blockKey || "root"}:${index}:${origins[index]?.scopeId || "none"}`
+    })
+  );
+};
 
 const resolveComponentRenderAs = (schema) => {
   const renderAs = typeof schema?.renderAs === "string" ? schema.renderAs.trim().toLowerCase() : "";
@@ -199,17 +286,26 @@ const normalizeYamlFieldValue = (field, value) => {
   return value;
 };
 
-const renderKeyValueMap = (entries, indent, lines) => {
-  entries.forEach((entry) => {
+const renderKeyValueMap = (entries, indent, lines, sourceContext = null) => {
+  entries.forEach((entry, index) => {
     if (!entry || typeof entry !== "object") return;
     const key = entry.key;
     if (!key || typeof key !== "string") return;
+    const entryOrigin = makeSourceOrigin(sourceContext, {
+      type: "item",
+      path: [...(sourceContext?.path || []), index],
+      fieldKey: String(index),
+      confidence: "exact"
+    });
+    const lineIndex = lines.length;
     const rawValue = entry.value;
     if (rawValue === undefined || rawValue === "") {
       lines.push(`${" ".repeat(indent)}${key}:`);
+      setLineOrigin(lines, lineIndex, entryOrigin);
       return;
     }
     lines.push(`${" ".repeat(indent)}${key}: ${formatYamlAutoValue(rawValue)}`);
+    setLineOrigin(lines, lineIndex, entryOrigin);
   });
 };
 
@@ -606,7 +702,7 @@ const renderAutomationList = (entries, indent, lines, rootValue, globalStore) =>
 };
 
 // Render a schema-defined object into YAML lines.
-const renderYamlObject = (objectValue, schemaFields, indent, lines, rootValue, globalStore) => {
+const renderYamlObject = (objectValue, schemaFields, indent, lines, rootValue, globalStore, sourceContext = null) => {
   const valueMap = objectValue || {};
   const schemaList = Array.isArray(schemaFields) ? schemaFields : [];
   const handledKeys = new Set();
@@ -614,6 +710,16 @@ const renderYamlObject = (objectValue, schemaFields, indent, lines, rootValue, g
   schemaList.forEach((field) => {
     const key = field.key;
     if (!key) return;
+    const fieldPath = [...(sourceContext?.path || []), key];
+    const effectiveModeLevel = maxModeLevel(sourceContext?.modeLevel || "Simple", fieldModeLevel(field));
+    const fieldOrigin = makeSourceOrigin(sourceContext, {
+      path: fieldPath,
+      fieldKey: key,
+      modeLevel: effectiveModeLevel,
+      contentKind: field?.type || "schema"
+    });
+    const fieldSourceContext = childSourceContext(sourceContext, fieldPath, { modeLevel: effectiveModeLevel });
+    const lineStart = lines.length;
     const emitMode = resolveEmitMode(field);
     const alwaysEmit = emitMode === "always";
     if (emitMode === "never") {
@@ -647,6 +753,7 @@ const renderYamlObject = (objectValue, schemaFields, indent, lines, rootValue, g
       if (!field.required && !alwaysEmit) return;
       if (field.type === "yaml") {
         lines.push(`${" ".repeat(indent)}${key}:`);
+        markNewLines(lines, lineStart, fieldOrigin);
         return;
       }
       if (field.default !== undefined) {
@@ -654,29 +761,35 @@ const renderYamlObject = (objectValue, schemaFields, indent, lines, rootValue, g
           lines.push(
             `${" ".repeat(indent)}${key}: ${formatYamlValue(field.default, field)}`
           );
+          markNewLines(lines, lineStart, fieldOrigin);
           return;
         }
         if (Array.isArray(field.default)) {
           lines.push(`${" ".repeat(indent)}${key}:`);
-        renderYamlArray(field.default, field.item, indent + 2, lines, rootValue, globalStore);
+        renderYamlArray(field.default, field.item, indent + 2, lines, rootValue, globalStore, fieldSourceContext);
+        markNewLines(lines, lineStart, fieldOrigin);
         return;
       }
       if (field.type === "object") {
         lines.push(`${" ".repeat(indent)}${key}:`);
-        renderYamlObject(field.default, field.fields, indent + 2, lines, rootValue, globalStore);
+        renderYamlObject(field.default, field.fields, indent + 2, lines, rootValue, globalStore, fieldSourceContext);
+        markNewLines(lines, lineStart, fieldOrigin);
         return;
       }
       }
       if (field.type === "object") {
         lines.push(`${" ".repeat(indent)}${key}:`);
-        renderYamlObject({}, field.fields, indent + 2, lines, rootValue, globalStore);
+        renderYamlObject({}, field.fields, indent + 2, lines, rootValue, globalStore, fieldSourceContext);
+        markNewLines(lines, lineStart, fieldOrigin);
         return;
       }
       if (field.type === "list" || field.type === "generated_list") {
         lines.push(`${" ".repeat(indent)}${key}:`);
+        markNewLines(lines, lineStart, fieldOrigin);
         return;
       }
       lines.push(`${" ".repeat(indent)}${key}:`);
+      markNewLines(lines, lineStart, fieldOrigin);
       return;
     }
 
@@ -686,11 +799,13 @@ const renderYamlObject = (objectValue, schemaFields, indent, lines, rootValue, g
         if (field.required || alwaysEmit) {
           lines.push(`${" ".repeat(indent)}${key}:`);
         }
+        markNewLines(lines, lineStart, fieldOrigin);
         return;
       }
       raw.split(/\r?\n/).forEach((line) => {
         lines.push(`${" ".repeat(indent)}${line}`);
       });
+      markNewLines(lines, lineStart, fieldOrigin);
       return;
     }
 
@@ -700,12 +815,14 @@ const renderYamlObject = (objectValue, schemaFields, indent, lines, rootValue, g
         if (field.required || alwaysEmit) {
           lines.push(`${" ".repeat(indent)}${key}:`);
         }
+        markNewLines(lines, lineStart, fieldOrigin);
         return;
       }
       lines.push(`${" ".repeat(indent)}${key}:`);
       raw.split(/\r?\n/).forEach((line) => {
         lines.push(`${" ".repeat(indent + 2)}${line}`);
       });
+      markNewLines(lines, lineStart, fieldOrigin);
       return;
     }
 
@@ -719,19 +836,23 @@ const renderYamlObject = (objectValue, schemaFields, indent, lines, rootValue, g
       }
       if (state.templatableLambda) {
         renderLambdaAssignment(`${" ".repeat(indent)}${key}`, value, indent + 2, lines, "!lambda");
+        markNewLines(lines, lineStart, fieldOrigin);
         return;
       }
       if (field.type === "lambda" && typeof value === "string") {
         renderLambdaAssignment(`${" ".repeat(indent)}${key}`, value, indent + 2, lines);
+        markNewLines(lines, lineStart, fieldOrigin);
         return;
       }
       lines.push(`${" ".repeat(indent)}${key}: ${formatYamlValue(value, field)}`);
+      markNewLines(lines, lineStart, fieldOrigin);
       return;
     }
 
     if (key === "filters" && Array.isArray(value) && value.some((item) => item?.type)) {
       lines.push(`${" ".repeat(indent)}${key}:`);
       renderFilterEntries(value, indent + 2, lines);
+      markNewLines(lines, lineStart, fieldOrigin);
       return;
     }
 
@@ -740,15 +861,18 @@ const renderYamlObject = (objectValue, schemaFields, indent, lines, rootValue, g
         if (field.required || alwaysEmit) {
           lines.push(`${" ".repeat(indent)}${key}:`);
         }
+        markNewLines(lines, lineStart, fieldOrigin);
         return;
       }
       lines.push(`${" ".repeat(indent)}${key}:`);
       if (field.wrapThen === true) {
         lines.push(`${" ".repeat(indent + 2)}- then:`);
         renderActionEntries(value, indent + 6, lines, rootValue, globalStore);
+        markNewLines(lines, lineStart, fieldOrigin);
         return;
       }
       renderActionEntries(value, indent + 2, lines, rootValue, globalStore);
+      markNewLines(lines, lineStart, fieldOrigin);
       return;
     }
 
@@ -757,10 +881,12 @@ const renderYamlObject = (objectValue, schemaFields, indent, lines, rootValue, g
         if (field.required || alwaysEmit) {
           lines.push(`${" ".repeat(indent)}${key}:`);
         }
+        markNewLines(lines, lineStart, fieldOrigin);
         return;
       }
       lines.push(`${" ".repeat(indent)}${key}:`);
       renderConditionEntries(value, indent + 2, lines, rootValue, globalStore);
+      markNewLines(lines, lineStart, fieldOrigin);
       return;
     }
 
@@ -769,21 +895,25 @@ const renderYamlObject = (objectValue, schemaFields, indent, lines, rootValue, g
         if (field.required || alwaysEmit) {
           lines.push(`${" ".repeat(indent)}${key}:`);
         }
+        markNewLines(lines, lineStart, fieldOrigin);
         return;
       }
       if (field.rawList) {
         lines.push(`${" ".repeat(indent)}${key}:`);
         renderRawList(value, indent + 2, lines);
+        markNewLines(lines, lineStart, fieldOrigin);
         return;
       }
       if (["on_boot", "on_shutdown", "on_loop"].includes(key)) {
         lines.push(`${" ".repeat(indent)}${key}:`);
         renderAutomationList(value, indent + 2, lines, rootValue, globalStore);
+        markNewLines(lines, lineStart, fieldOrigin);
         return;
       }
       if (key === "includes" || key === "includes_c" || key === "libraries") {
         lines.push(`${" ".repeat(indent)}${key}:`);
         renderRawList(value, indent + 2, lines);
+        markNewLines(lines, lineStart, fieldOrigin);
         return;
       }
       if (
@@ -793,28 +923,33 @@ const renderYamlObject = (objectValue, schemaFields, indent, lines, rootValue, g
         field.item.fields.some((itemField) => itemField.key === "value")
       ) {
         lines.push(`${" ".repeat(indent)}${key}:`);
-        renderKeyValueMap(value, indent + 2, lines);
+        setLineOrigin(lines, lineStart, fieldOrigin);
+        renderKeyValueMap(value, indent + 2, lines, fieldSourceContext);
         return;
       }
       if (field.yamlStyle === "flow" && canRenderFlowArray(value)) {
         renderFlowArrayLine(`${" ".repeat(indent)}${key}`, value, field.item, lines);
+        markNewLines(lines, lineStart, fieldOrigin);
         return;
       }
         lines.push(`${" ".repeat(indent)}${key}:`);
-        renderYamlArray(value, field.item, indent + 2, lines, rootValue, globalStore);
+        renderYamlArray(value, field.item, indent + 2, lines, rootValue, globalStore, fieldSourceContext);
+        markNewLines(lines, lineStart, fieldOrigin);
         return;
       }
 
     const nestedLines = [];
-    renderYamlObject(value, field.fields, indent + 2, nestedLines, rootValue, globalStore);
+    renderYamlObject(value, field.fields, indent + 2, nestedLines, rootValue, globalStore, fieldSourceContext);
     if (!nestedLines.length) {
       if (field.required || alwaysEmit) {
         lines.push(`${" ".repeat(indent)}${key}:`);
+        markNewLines(lines, lineStart, fieldOrigin);
       }
       return;
     }
     lines.push(`${" ".repeat(indent)}${key}:`);
-    lines.push(...nestedLines);
+    appendYamlLines(lines, nestedLines);
+    markNewLines(lines, lineStart, fieldOrigin);
   });
 
   Object.entries(valueMap).forEach(([key, value]) => {
@@ -828,11 +963,11 @@ const renderYamlObject = (objectValue, schemaFields, indent, lines, rootValue, g
     if (Array.isArray(value)) {
       if (value.length === 0) return;
       lines.push(`${" ".repeat(indent)}${key}:`);
-      renderYamlArray(value, null, indent + 2, lines, rootValue, globalStore);
+      renderYamlArray(value, null, indent + 2, lines, rootValue, globalStore, childSourceContext(sourceContext, [...(sourceContext?.path || []), key]));
       return;
     }
     lines.push(`${" ".repeat(indent)}${key}:`);
-    renderYamlObject(value, null, indent + 2, lines, rootValue, globalStore);
+    renderYamlObject(value, null, indent + 2, lines, rootValue, globalStore, childSourceContext(sourceContext, [...(sourceContext?.path || []), key]));
   });
 };
 
@@ -849,6 +984,26 @@ export const buildSchemaYaml = (
   return lines;
 };
 
+export const buildSchemaYamlDocumentLines = (
+  value,
+  schemaFields,
+  indent = 0,
+  rootValue = value,
+  globalStore = null,
+  sourceContext = null,
+  blockKey = ""
+) => {
+  const lines = [];
+  renderYamlObject(value, schemaFields, indent, lines, rootValue, globalStore, sourceContext);
+  return linesToGeneratedYamlLines(lines, blockKey);
+};
+
+const blockFromDocumentLines = (key, lines) => ({
+  key,
+  lines: (lines || []).map((line) => line.text),
+  documentLines: lines || []
+});
+
 export const buildGeneralSchemaBlocks = (
   domain,
   configValue,
@@ -863,6 +1018,46 @@ export const buildGeneralSchemaBlocks = (
   const blocks = [];
   const mainLines = buildSchemaYaml(configValue || {}, fields, 2, rootValue, globalStore);
   blocks.push({ key: resolvedDomain, lines: [`${resolvedDomain}:`, ...mainLines] });
+  blocks.push(...buildEmbeddedSchemaBlocks(schema, configValue || {}, globalStore));
+
+  return blocks;
+};
+
+export const buildGeneralSchemaDocumentBlocks = (
+  domain,
+  configValue,
+  schema,
+  rootValue = configValue,
+  globalStore = null,
+  sourceContext = null,
+  options = {}
+) => {
+  const resolvedDomain = String(domain || resolveSchemaDomain(schema, configValue || {})).trim();
+  if (!resolvedDomain || !schema) return [];
+
+  const sectionOrigin = makeSourceOrigin(sourceContext, {
+    type: "section",
+    path: sourceContext?.path || [],
+    confidence: "section"
+  });
+  if (options.suppressSectionFocus && sectionOrigin) {
+    sectionOrigin.suppressFocus = true;
+  }
+  const fields = Array.isArray(schema.fields) ? schema.fields : [];
+  const mainLines = buildSchemaYamlDocumentLines(
+    configValue || {},
+    fields,
+    2,
+    rootValue,
+    globalStore,
+    sourceContext,
+    resolvedDomain
+  );
+  const documentLines = [
+    createGeneratedYamlLine({ text: `${resolvedDomain}:`, blockKey: resolvedDomain, origin: sectionOrigin }),
+    ...mainLines
+  ];
+  const blocks = [blockFromDocumentLines(resolvedDomain, documentLines)];
   blocks.push(...buildEmbeddedSchemaBlocks(schema, configValue || {}, globalStore));
 
   return blocks;
@@ -896,31 +1091,135 @@ export const buildGeneralSchemaListBlock = (
   return [{ key: resolvedDomain, lines }, ...buildEmbeddedSchemaBlocks(schema, values, globalStore)];
 };
 
+export const buildGeneralSchemaListDocumentBlock = (
+  domain,
+  configValues,
+  schema,
+  rootValue = configValues,
+  globalStore = null,
+  sourceContext = null,
+  options = {}
+) => {
+  const resolvedDomain = String(domain || resolveSchemaDomain(schema, {})).trim();
+  const values = Array.isArray(configValues) ? configValues : [];
+  if (!resolvedDomain || !schema || !values.length) return [];
+
+  const sectionOrigin = makeSourceOrigin(sourceContext, {
+    type: "section",
+    path: sourceContext?.path || [],
+    confidence: "section"
+  });
+  if (options.suppressSectionFocus && sectionOrigin) {
+    sectionOrigin.suppressFocus = true;
+  }
+  const fields = Array.isArray(schema.fields) ? schema.fields : [];
+  const lines = [`${resolvedDomain}:`];
+  setLineOrigin(lines, 0, sectionOrigin);
+
+  values.forEach((value, index) => {
+    const itemScopeId = typeof sourceContext?.itemScopeId === "function"
+      ? sourceContext.itemScopeId(index)
+      : sourceContext?.scopeId || "";
+    const itemPath = typeof sourceContext?.itemScopeId === "function"
+      ? sourceContext?.path || []
+      : [...(sourceContext?.path || []), index];
+    const itemContext = childSourceContext({ ...sourceContext, scopeId: itemScopeId }, itemPath);
+    const itemLines = [];
+    renderYamlObject(value || {}, fields, 4, itemLines, rootValue, globalStore, itemContext);
+    const itemOrigin = makeSourceOrigin(itemContext, {
+      type: "item",
+      path: itemContext?.path || [],
+      confidence: "exact"
+    });
+    if (!itemLines.length) {
+      const targetIndex = lines.length;
+      lines.push("  - {}");
+      setLineOrigin(lines, targetIndex, itemOrigin);
+      return;
+    }
+    const [firstLine, ...rest] = itemLines;
+    const firstIndex = lines.length;
+    lines.push(`  - ${firstLine.slice(4)}`);
+    setLineOrigin(lines, firstIndex, getLineOrigin(itemLines, 0) || itemOrigin);
+    rest.forEach((line, lineIndex) => {
+      const targetIndex = lines.length;
+      lines.push(line);
+      setLineOrigin(lines, targetIndex, getLineOrigin(itemLines, lineIndex + 1) || itemOrigin);
+    });
+  });
+
+  return [
+    blockFromDocumentLines(resolvedDomain, linesToGeneratedYamlLines(lines, resolvedDomain)),
+    ...buildEmbeddedSchemaBlocks(schema, values, globalStore)
+  ];
+};
+
+const renderYamlSingleListObject = (payload, itemSchema, indent, lines, rootValue, globalStore, sourceContext = null) => {
+  const objectLines = [];
+  const itemOrigin = makeSourceOrigin(sourceContext, {
+    type: "item",
+    path: sourceContext?.path || [],
+    confidence: "exact"
+  });
+  renderYamlObject(payload || {}, itemSchema?.fields, indent + 2, objectLines, rootValue, globalStore, sourceContext);
+  if (!objectLines.length) {
+    pushYamlLine(lines, `${" ".repeat(indent)}- {}`, itemOrigin);
+    return;
+  }
+  const prefix = `${" ".repeat(indent)}- `;
+  const firstLine = objectLines[0];
+  const firstIndex = lines.length;
+  lines.push(`${prefix}${firstLine.slice(indent + 2)}`);
+  setLineOrigin(lines, firstIndex, getLineOrigin(objectLines, 0) || itemOrigin);
+  objectLines.slice(1).forEach((line, objectIndex) => {
+    const targetIndex = lines.length;
+    lines.push(line);
+    setLineOrigin(lines, targetIndex, getLineOrigin(objectLines, objectIndex + 1) || itemOrigin);
+  });
+};
+
 // Render arrays with optional item schema definitions.
-const renderYamlArray = (arrayValue, itemSchema, indent, lines, rootValue, globalStore) => {
-  arrayValue.forEach((item) => {
+const renderYamlArray = (arrayValue, itemSchema, indent, lines, rootValue, globalStore, sourceContext = null) => {
+  arrayValue.forEach((item, index) => {
+    const itemPath = [...(sourceContext?.path || []), index];
+    const itemOrigin = makeSourceOrigin(sourceContext, {
+      path: itemPath,
+      fieldKey: String(index),
+      confidence: "exact"
+    });
+    const lineStart = lines.length;
     const normalizedItem = normalizeYamlFieldValue(itemSchema, item);
     if (normalizedItem === undefined || normalizedItem === null) return;
     if (isYamlPrimitive(normalizedItem)) {
       lines.push(`${" ".repeat(indent)}- ${formatYamlValue(normalizedItem, itemSchema || itemSchema?.type)}`);
+      markNewLines(lines, lineStart, itemOrigin);
       return;
     }
     if (Array.isArray(normalizedItem)) {
       if (normalizedItem.length === 0) return;
       lines.push(`${" ".repeat(indent)}-`);
-      renderYamlArray(normalizedItem, itemSchema?.item, indent + 2, lines, rootValue, globalStore);
+      renderYamlArray(normalizedItem, itemSchema?.item, indent + 2, lines, rootValue, globalStore, childSourceContext(sourceContext, itemPath));
+      markNewLines(lines, lineStart, itemOrigin);
       return;
     }
     const objectLines = [];
-    renderYamlObject(normalizedItem || {}, itemSchema?.fields, indent + 2, objectLines, rootValue, globalStore);
+    renderYamlObject(normalizedItem || {}, itemSchema?.fields, indent + 2, objectLines, rootValue, globalStore, childSourceContext(sourceContext, itemPath));
     if (objectLines.length === 0) {
       lines.push(`${" ".repeat(indent)}- {}`);
+      markNewLines(lines, lineStart, itemOrigin);
       return;
     }
     const prefix = `${" ".repeat(indent)}- `;
     const firstLine = objectLines[0];
+    const firstIndex = lines.length;
     lines.push(`${prefix}${firstLine.slice(indent + 2)}`);
-    objectLines.slice(1).forEach((line) => lines.push(line));
+    setLineOrigin(lines, firstIndex, getLineOrigin(objectLines, 0) || itemOrigin);
+    objectLines.slice(1).forEach((line, objectIndex) => {
+      const targetIndex = lines.length;
+      lines.push(line);
+      setLineOrigin(lines, targetIndex, getLineOrigin(objectLines, objectIndex + 1) || itemOrigin);
+    });
+    markNewLines(lines, lineStart, itemOrigin);
   });
 };
 
@@ -2215,7 +2514,8 @@ const buildComponentsYamlInternal = (
   componentSchemas = {},
   componentSchemaStates = {},
   globalStore = null,
-  mdiSubstitutions = {}
+  mdiSubstitutions = {},
+  sourceMapped = false
 ) => {
   const displayData = collectDisplayAssets(components, componentSchemas, mdiSubstitutions);
   const textFontIdByKey = buildTextFontIdMap(displayData?.textFontsByKey || new Map());
@@ -2229,10 +2529,21 @@ const buildComponentsYamlInternal = (
   const missingSchemas = [];
   const verbatimRootLines = [];
 
-  (components || []).forEach((entry) => {
+  (components || []).forEach((entry, componentIndex) => {
     const componentId = componentIdFromEntry(entry);
     if (!componentId) return;
     const schema = componentSchemas[componentId];
+    const componentSourceContext = sourceMapped
+      ? {
+          owner: "component",
+          scopeId: `component:${componentIndex}`,
+          componentIndex,
+          componentId,
+          tabKey: "",
+          path: [],
+          modeLevel: ""
+        }
+      : null;
     if (!schema) {
       const schemaState = String(componentSchemaStates?.[componentId] || "").toLowerCase();
       if (!schemaState || schemaState === "idle" || schemaState === "loading") {
@@ -2251,7 +2562,8 @@ const buildComponentsYamlInternal = (
       grouped.get(domain).push({
         type: "custom",
         platform,
-        config: customConfig
+        config: customConfig,
+        sourceContext: componentSourceContext ? { ...componentSourceContext, tabKey: domain } : null
       });
       return;
     }
@@ -2268,11 +2580,20 @@ const buildComponentsYamlInternal = (
       if (verbatimRootLines.length) {
         verbatimRootLines.push("");
       }
-      verbatimRootLines.push(...normalized.split("\n"));
+      normalized.split("\n").forEach((line) => {
+        const index = verbatimRootLines.length;
+        verbatimRootLines.push(line);
+        setLineOrigin(verbatimRootLines, index, makeSourceOrigin(componentSourceContext, {
+          path: [rawField],
+          fieldKey: rawField,
+          contentKind: "raw_yaml"
+        }));
+      });
       return;
     }
     const rawConfig = { ...(entry?.config || {}) };
     const domain = resolveSchemaDomain(schema, rawConfig);
+    const sourceContext = componentSourceContext ? { ...componentSourceContext, tabKey: domain } : null;
     const config = { ...rawConfig };
     const busValue = rawConfig.bus;
     const renderAs = resolveComponentRenderAs(schema);
@@ -2281,7 +2602,7 @@ const buildComponentsYamlInternal = (
         grouped.set(domain, []);
       }
       if (!rootMapByDomain.has(domain)) {
-        grouped.get(domain).push({ type: "root_map", payload: config, schema });
+        grouped.get(domain).push({ type: "root_map", payload: config, schema, sourceContext });
         rootMapByDomain.set(domain, true);
       }
 
@@ -2319,7 +2640,14 @@ const buildComponentsYamlInternal = (
           payload: item.payload,
           fields: item.fields,
           emitAs: item.emitAs,
-          merge: item.merge
+          merge: item.merge,
+          sourceContext: sourceContext
+            ? {
+                ...sourceContext,
+                path: item.sourceKey ? [item.sourceKey] : [],
+                tabKey: item.domain || sourceContext.tabKey
+              }
+            : null
         };
 
         grouped.get(item.domain).push(groupedItem);
@@ -2338,7 +2666,7 @@ const buildComponentsYamlInternal = (
       if (!grouped.has(domain)) {
         grouped.set(domain, []);
       }
-      grouped.get(domain).push({ type: "root_list", payload: config, schema });
+      grouped.get(domain).push({ type: "root_list", payload: config, schema, sourceContext });
 
       const embeddedItems = resolveEmbeddedComponentItems(schema, config, globalStore);
       embeddedItems.forEach((item) => {
@@ -2374,7 +2702,14 @@ const buildComponentsYamlInternal = (
           payload: item.payload,
           fields: item.fields,
           emitAs: item.emitAs,
-          merge: item.merge
+          merge: item.merge,
+          sourceContext: sourceContext
+            ? {
+                ...sourceContext,
+                path: item.sourceKey ? [item.sourceKey] : [],
+                tabKey: item.domain || sourceContext.tabKey
+              }
+            : null
         };
 
         grouped.get(item.domain).push(groupedItem);
@@ -2417,7 +2752,7 @@ const buildComponentsYamlInternal = (
     if (!grouped.has(domain)) {
       grouped.set(domain, []);
     }
-    grouped.get(domain).push({ type: "schema", payload, schema });
+    grouped.get(domain).push({ type: "schema", payload, schema, sourceContext });
 
     const embeddedItems = resolveEmbeddedComponentItems(schema, rawConfig, globalStore);
     embeddedItems.forEach((item) => {
@@ -2453,7 +2788,14 @@ const buildComponentsYamlInternal = (
         payload: item.payload,
         fields: item.fields,
         emitAs: item.emitAs,
-        merge: item.merge
+        merge: item.merge,
+        sourceContext: sourceContext
+          ? {
+              ...sourceContext,
+              path: item.sourceKey ? [item.sourceKey] : [],
+              tabKey: item.domain || sourceContext.tabKey
+            }
+          : null
       };
 
       grouped.get(item.domain).push(groupedItem);
@@ -2493,7 +2835,12 @@ const buildComponentsYamlInternal = (
       (item) => item.type !== "root_map" && item.type !== "root_list" && !(item.type === "embedded" && item.emitAs === "map")
     );
 
-    lines.push(`${domain}:`);
+    const firstMappedItem = items.find((item) => item.sourceContext)?.sourceContext || null;
+    pushYamlLine(lines, `${domain}:`, makeSourceOrigin(firstMappedItem, {
+      type: "section",
+      path: firstMappedItem?.path || [],
+      confidence: items.length === 1 ? "section" : "group"
+    }));
     if (rootMapItems.length) {
       const rootItem = rootMapItems[0];
       const mapLines = [];
@@ -2503,21 +2850,23 @@ const buildComponentsYamlInternal = (
         2,
         mapLines,
         rootItem.payload || {},
-        globalStore
+        globalStore,
+        rootItem.sourceContext || null
       );
-      lines.push(...mapLines);
+      appendYamlLines(lines, mapLines);
       lines.push("");
       return;
     }
     if (rootListItems.length) {
       rootListItems.forEach((item) => {
-        renderYamlArray(
-          [item.payload],
+        renderYamlSingleListObject(
+          item.payload,
           { type: "object", fields: filterSchemaFieldsForYaml(item.schema?.fields || [], item.schema) },
           2,
           lines,
           item.payload || {},
-          globalStore
+          globalStore,
+          item.sourceContext || null
         );
       });
       lines.push("");
@@ -2542,18 +2891,27 @@ const buildComponentsYamlInternal = (
         2,
         mapLines,
         mergedPayload,
-        globalStore
+        globalStore,
+        firstMapItem.sourceContext || null
       );
-      lines.push(...mapLines);
+      appendYamlLines(lines, mapLines);
       lines.push("");
       return;
     }
 
     listItems.forEach((item) => {
       if (item.type === "custom") {
-        lines.push(`  - platform: ${item.platform}`);
+        pushYamlLine(lines, `  - platform: ${item.platform}`, makeSourceOrigin(item.sourceContext, {
+          type: "section",
+          path: [],
+          confidence: "section"
+        }));
         item.config.split(/\r?\n/).forEach((line) => {
-          lines.push(`    ${line}`);
+          pushYamlLine(lines, `    ${line}`, makeSourceOrigin(item.sourceContext, {
+            path: ["custom_config"],
+            fieldKey: "custom_config",
+            contentKind: "raw_yaml"
+          }));
         });
         return;
       }
@@ -2564,7 +2922,8 @@ const buildComponentsYamlInternal = (
           2,
           lines,
           item.payload,
-          globalStore
+          globalStore,
+          item.sourceContext || null
         );
         return;
       }
@@ -2572,13 +2931,14 @@ const buildComponentsYamlInternal = (
         { key: "platform", type: "select" },
         ...(item.schema?.fields || [])
       ];
-      renderYamlArray(
-        [item.payload],
+      renderYamlSingleListObject(
+        item.payload,
         { type: "object", fields: filterSchemaFieldsForYaml(schemaFields, item.schema) },
         2,
         lines,
         item.payload,
-        globalStore
+        globalStore,
+        item.sourceContext || null
       );
     });
     lines.push("");
@@ -2612,3 +2972,21 @@ export const buildComponentsYaml = (
     globalStore,
     mdiSubstitutions
   );
+
+export const buildComponentsYamlDocumentLines = (
+  components,
+  componentSchemas = {},
+  componentSchemaStates = {},
+  globalStore = null,
+  mdiSubstitutions = {}
+) => {
+  const lines = buildComponentsYamlInternal(
+    components,
+    componentSchemas,
+    componentSchemaStates,
+    globalStore,
+    mdiSubstitutions,
+    true
+  );
+  return linesToGeneratedYamlLines(lines, "components");
+};
