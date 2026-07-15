@@ -10,6 +10,11 @@
     :compile-is-reconnecting="compileIsReconnecting"
     :compile-auto-scroll="compileAutoScroll"
     :compile-log-lines="compileLogLines"
+    :serial-ha-selection-open="serialHaSelectionOpen"
+    :serial-ha-selection-busy="serialHaSelectionBusy"
+    :serial-ha-ports="serialHaPorts"
+    :serial-ha-ports-loading="serialHaPortsLoading"
+    :serial-ha-ports-error="serialHaPortsError"
     :can-download-compiled-binary="canDownloadCompiledBinary"
     :can-close-compile="canCloseCompile"
     :set-compile-console-element="setCompileConsoleElement"
@@ -56,6 +61,8 @@
     @cancel-remove-project="cancelRemoveProject"
     @toggle-compile-autoscroll="toggleCompileAutoscroll"
     @download-binary="downloadBinary"
+    @refresh-ha-serial-ports="loadHaSerialPorts"
+    @select-ha-serial-port="selectHaSerialPort"
     @close-compile-modal="closeCompileModal"
     @edit-project-from-menu="requestOpenProjectInBuilderFromMenu"
     @validate-project-from-menu="handleProjectMenuValidate"
@@ -1931,6 +1938,14 @@ const {
   toggleCompileAutoscroll,
   closeCompileModal,
   handleInstallSerialPort,
+  handleInstallHaSerialPort,
+  serialHaSelectionOpen,
+  serialHaSelectionBusy,
+  serialHaPorts,
+  serialHaPortsLoading,
+  serialHaPortsError,
+  loadHaSerialPorts,
+  selectHaSerialPort,
   handleInstallOta,
   startLogs,
   startValidate,
@@ -1969,6 +1984,10 @@ const handleTopbarInstallOption = (event) => {
   }
   if (mode === "download") {
     handleInstallDownload();
+    return;
+  }
+  if (mode === "serial-ha") {
+    handleInstallHaSerialPort();
     return;
   }
   handleInstallSerialPort();
@@ -2231,7 +2250,7 @@ const ensureSelectedProjectSavedBeforeInstall = async () => {
 };
 
 const registerSelectedProjectAfterInstallSuccess = async ({ action, yaml } = {}) => {
-  if (!["ota", "flash", "download"].includes(String(action || ""))) {
+  if (!["ota", "flash", "serial", "download"].includes(String(action || ""))) {
     return;
   }
   const yamlPayload = String(yaml || "").trim();

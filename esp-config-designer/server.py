@@ -136,6 +136,7 @@ VALID_YAML = re.compile(r"^[A-Za-z0-9_.-]+\.yaml$")
 VALID_DEVICE = re.compile(r"^[A-Za-z0-9._-]+$")
 VALID_COMPONENT_TOKEN = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 ANSI_ESCAPE = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+SERIAL_PORT_PREFIXES = ("/dev/ttyUSB", "/dev/ttyACM", "/dev/serial/by-id/")
 
 
 def utc_now() -> str:
@@ -175,6 +176,49 @@ def normalize_device(value: str) -> str:
     if not VALID_DEVICE.match(name):
         return ""
     return name
+
+
+def is_allowed_serial_port(path: str) -> bool:
+    normalized = str(path or "").strip()
+    if re.fullmatch(r"COM[0-9]+", normalized, re.IGNORECASE):
+        return True
+    return normalized.startswith(SERIAL_PORT_PREFIXES)
+
+
+def list_host_serial_ports() -> List[dict]:
+    try:
+        from serial.tools.list_ports import comports
+    except ImportError as exc:
+        raise RuntimeError("pyserial is not available") from exc
+
+    ports = []
+    seen = set()
+    for port in comports(include_links=True):
+        path = str(getattr(port, "device", "") or "").strip()
+        if not path or path in seen or not is_allowed_serial_port(path):
+            continue
+        seen.add(path)
+        ports.append(
+            {
+                "path": path,
+                "description": str(getattr(port, "description", "") or ""),
+                "vid": getattr(port, "vid", None),
+                "pid": getattr(port, "pid", None),
+                "serial_number": getattr(port, "serial_number", None),
+            }
+        )
+    ports.sort(key=lambda item: item["path"])
+    return ports
+
+
+def validate_host_serial_port(path: str) -> str:
+    normalized = str(path or "").strip()
+    if not normalized or not is_allowed_serial_port(normalized):
+        raise ValueError("Invalid serial port")
+    available = {port["path"] for port in list_host_serial_ports()}
+    if normalized not in available:
+        raise ValueError("Serial port is not available")
+    return normalized
 
 
 def is_same_filesystem_path(first: str, second: str) -> bool:
@@ -1560,6 +1604,7 @@ class Job:
         yaml_name: str,
         action: str,
         device: str,
+        serial_port: str = "",
         state: str = "queued",
         created_at: Optional[str] = None,
         started_at: Optional[str] = None,
@@ -1571,6 +1616,7 @@ class Job:
         self.yaml_name = yaml_name
         self.action = action
         self.device = device
+        self.serial_port = serial_port
         self.state = state
         self.created_at = created_at or utc_now()
         self.started_at = started_at
@@ -1597,6 +1643,7 @@ class Job:
             yaml_name=data.get("yaml", ""),
             action=data.get("action", ""),
             device=data.get("device", ""),
+            serial_port=data.get("serial_port", ""),
             state=data.get("state", "queued"),
             created_at=data.get("created_at"),
             started_at=data.get("started_at"),
@@ -1617,6 +1664,7 @@ class Job:
             "yaml": self.yaml_name,
             "action": self.action,
             "device": self.device,
+            "serial_port": self.serial_port,
         }
 
     def save_status(self) -> None:
@@ -1676,6 +1724,8 @@ class JobManager:
     def __init__(self) -> None:
         self.jobs = {}
         self.lock = threading.Lock()
+        self.serial_locks = {}
+        self.serial_locks_lock = threading.Lock()
         self.queue = queue.Queue()
         os.makedirs(JOB_DIR, exist_ok=True)
         self._load_jobs()
@@ -1696,9 +1746,9 @@ class JobManager:
             except Exception:
                 continue
 
-    def submit(self, yaml_name: str, action: str, device: str) -> Job:
+    def submit(self, yaml_name: str, action: str, device: str, serial_port: str = "") -> Job:
         job_id = uuid.uuid4().hex
-        job = Job(job_id, yaml_name, action, device)
+        job = Job(job_id, yaml_name, action, device, serial_port=serial_port)
         with self.lock:
             self.jobs[job.id] = job
         os.makedirs(JOB_DIR, exist_ok=True)
@@ -1737,7 +1787,16 @@ class JobManager:
             job = self.queue.get()
             if job.state == "canceled":
                 continue
-            self._run_job(job)
+            serial_lock = None
+            if job.action == "serial" and job.serial_port:
+                with self.serial_locks_lock:
+                    serial_lock = self.serial_locks.setdefault(job.serial_port, threading.Lock())
+                serial_lock.acquire()
+            try:
+                self._run_job(job)
+            finally:
+                if serial_lock is not None:
+                    serial_lock.release()
 
     def _run_job(self, job: Job) -> None:
         job.state = "running"
@@ -1751,6 +1810,23 @@ class JobManager:
             exit_code = self._run_esphome(job, ["config", yaml_path])
         elif job.action == "clean":
             exit_code = self._run_esphome(job, ["clean", yaml_path])
+        elif job.action == "serial":
+            try:
+                serial_port = validate_host_serial_port(job.serial_port)
+            except (RuntimeError, ValueError) as exc:
+                message = str(exc)
+                job.push_log(f"ERROR {message}")
+                job.last_log_line = message
+                job.error_summary = message
+                exit_code = 1
+            else:
+                exit_code = self._run_esphome(job, ["config", yaml_path])
+                if exit_code == 0 and not job.cancel_requested:
+                    exit_code = self._run_esphome(job, ["compile", yaml_path])
+                if exit_code == 0 and not job.cancel_requested:
+                    exit_code = self._run_esphome(
+                        job, ["upload", yaml_path, "--device", serial_port]
+                    )
         else:
             exit_code = self._run_esphome(job, ["config", yaml_path])
 
@@ -3452,6 +3528,18 @@ def api_device_status():
     return jsonify({"status": "ok", "device": build_device_response(target, checks=checks)})
 
 
+@app.route("/api/serial/ports", methods=["GET"])
+def api_serial_ports():
+    access = check_access()
+    if access:
+        return access
+    try:
+        ports = list_host_serial_ports()
+    except RuntimeError as exc:
+        return jsonify({"status": "error", "message": str(exc)}), 503
+    return jsonify({"status": "ok", "ports": ports})
+
+
 @app.route("/api/install", methods=["POST", "OPTIONS"])
 def api_install():
     if request.method == "OPTIONS":
@@ -3467,7 +3555,7 @@ def api_install():
         return jsonify({"status": "error", "message": "Invalid yaml"}), 400
 
     action = str(payload.get("action", "")).strip().lower()
-    if action not in ("compile", "ota", "logs", "validate", "clean"):
+    if action not in ("compile", "serial", "ota", "logs", "validate", "clean"):
         return jsonify({"status": "error", "message": "Invalid action"}), 400
 
     device = ""
@@ -3476,11 +3564,18 @@ def api_install():
         if not device:
             return jsonify({"status": "error", "message": "Invalid device"}), 400
 
+    serial_port = ""
+    if action == "serial":
+        try:
+            serial_port = validate_host_serial_port(str(payload.get("port", "")))
+        except (RuntimeError, ValueError) as exc:
+            return jsonify({"status": "error", "message": str(exc)}), 400
+
     yaml_path = os.path.join(TARGET_DIR, yaml_name)
     if not os.path.isfile(yaml_path):
         return jsonify({"status": "error", "message": "YAML not found"}), 404
 
-    job = job_manager.submit(yaml_name, action, device)
+    job = job_manager.submit(yaml_name, action, device, serial_port=serial_port)
     return jsonify({"status": "ok", "job_id": job.id, "job": job.to_dict()})
 
 

@@ -36,6 +36,9 @@ export const useInstallConsoleFlow = (options) => {
   const compileTailCheckpoint = ref(0);
   const installPlanMode = ref("");
   const installPlanSerialPort = ref(null);
+  const serialHaPorts = ref([]);
+  const serialHaPortsLoading = ref(false);
+  const serialHaPortsError = ref("");
   const installPlanDownloadReady = ref(false);
   const consoleSessionTitle = ref("");
   const compileYamlName = ref("");
@@ -83,6 +86,12 @@ export const useInstallConsoleFlow = (options) => {
   );
   const canCloseCompile = computed(
     () => Boolean(compileModalOpen.value) && !localFlashRunning.value
+  );
+  const serialHaSelectionOpen = computed(
+    () => compileModalOpen.value && installPlanMode.value === "serial-ha" && !compileJobId.value
+  );
+  const serialHaSelectionBusy = computed(
+    () => serialHaPortsLoading.value || compileIsActive.value
   );
   const terminalTitle = computed(() => consoleSessionTitle.value || "Compile Console");
   const compileStateLabel = computed(() => {
@@ -297,6 +306,9 @@ export const useInstallConsoleFlow = (options) => {
   const resetInstallPlan = () => {
     installPlanMode.value = "";
     installPlanSerialPort.value = null;
+    serialHaPorts.value = [];
+    serialHaPortsLoading.value = false;
+    serialHaPortsError.value = "";
     installPlanDownloadReady.value = false;
   };
 
@@ -502,7 +514,13 @@ export const useInstallConsoleFlow = (options) => {
     }
   };
 
-  const startInstallJob = async ({ action, device = "", resetConsole = true, introLine = "" }) => {
+  const startInstallJob = async ({
+    action,
+    device = "",
+    serialPort = "",
+    resetConsole = true,
+    introLine = ""
+  }) => {
     const isAllowed =
       action === "logs"
         ? canLogs.value
@@ -523,6 +541,8 @@ export const useInstallConsoleFlow = (options) => {
       consoleSessionTitle.value = "Clean Console";
     } else if (action === "ota") {
       consoleSessionTitle.value = "OTA Console";
+    } else if (action === "serial") {
+      consoleSessionTitle.value = "HA Server Serial Console";
     } else if (installPlanMode.value === "serial") {
       consoleSessionTitle.value = "WebSerial Console";
     } else {
@@ -574,7 +594,8 @@ export const useInstallConsoleFlow = (options) => {
         body: JSON.stringify({
           yaml: yamlName,
           action,
-          ...(device ? { device } : {})
+          ...(device ? { device } : {}),
+          ...(serialPort ? { port: serialPort } : {})
         })
       });
       if (!response.ok) {
@@ -736,11 +757,14 @@ export const useInstallConsoleFlow = (options) => {
     if (finishedAction === "ota") {
       await notifyInstallSuccess("ota", successContext);
     }
+    if (finishedAction === "serial") {
+      await notifyInstallSuccess("serial", { yaml: successContext.yaml, host: "" });
+    }
     if (finishedAction === "flash") {
       await notifyInstallSuccess("flash", successContext);
     }
 
-    if (finishedAction === "ota" || finishedAction === "flash") {
+    if (finishedAction === "ota" || finishedAction === "serial" || finishedAction === "flash") {
       resetInstallPlan();
     }
     compileActiveAction.value = "";
@@ -803,6 +827,54 @@ export const useInstallConsoleFlow = (options) => {
     });
   };
 
+  const loadHaSerialPorts = async () => {
+    serialHaPortsLoading.value = true;
+    serialHaPortsError.value = "";
+    try {
+      const response = await addonFetch("api/serial/ports");
+      if (!response.ok) {
+        throw new Error(await parseResponseMessage(response, "Failed to load HA Server serial ports"));
+      }
+      const payload = await response.json();
+      serialHaPorts.value = Array.isArray(payload?.ports) ? payload.ports : [];
+    } catch (error) {
+      serialHaPorts.value = [];
+      serialHaPortsError.value = error instanceof Error ? error.message : "Failed to load HA Server serial ports";
+    } finally {
+      serialHaPortsLoading.value = false;
+    }
+  };
+
+  const prepareHaSerialInstall = async () => {
+    if (!canInstall.value || compileIsActive.value || localFlashRunning.value) return;
+    clearError();
+    installPlanMode.value = "serial-ha";
+    installPlanSerialPort.value = null;
+    installPlanDownloadReady.value = false;
+    compileModalOpen.value = true;
+    compileJobId.value = "";
+    compileJobState.value = "";
+    backendJobState.value = "";
+    compileJobError.value = "";
+    compileActiveAction.value = "";
+    consoleSessionTitle.value = "Select HA Server Serial Port";
+    resetCompileConsole();
+    await loadHaSerialPorts();
+  };
+
+  const selectHaSerialPort = async (port) => {
+    const selectedPort = String(port || "").trim();
+    if (!selectedPort || serialHaPortsLoading.value || !serialHaPorts.value.some((item) => item?.path === selectedPort)) {
+      return;
+    }
+    installPlanSerialPort.value = selectedPort;
+    await startInstallJob({
+      action: "serial",
+      serialPort: selectedPort,
+      introLine: `INFO Selected ${selectedPort}. Starting compile for ${getYamlName()}`
+    });
+  };
+
   const downloadBinary = async () => {
     clearError();
     try {
@@ -836,6 +908,10 @@ export const useInstallConsoleFlow = (options) => {
 
   const handleInstallSerialPort = async () => {
     await prepareSerialInstall();
+  };
+
+  const handleInstallHaSerialPort = async () => {
+    await prepareHaSerialInstall();
   };
 
   const handleInstallOta = async () => {
@@ -912,6 +988,11 @@ export const useInstallConsoleFlow = (options) => {
     compileLogLines,
     compileIsReconnecting,
     installPlanDownloadReady,
+    serialHaSelectionOpen,
+    serialHaSelectionBusy,
+    serialHaPorts,
+    serialHaPortsLoading,
+    serialHaPortsError,
     localFlashRunning,
     compileIsActive,
     canDownloadCompiledBinary,
@@ -922,6 +1003,9 @@ export const useInstallConsoleFlow = (options) => {
     toggleCompileAutoscroll,
     closeCompileModal,
     handleInstallSerialPort,
+    handleInstallHaSerialPort,
+    loadHaSerialPorts,
+    selectHaSerialPort,
     handleInstallOta,
     startLogs,
     startValidate,

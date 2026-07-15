@@ -11,6 +11,10 @@ docker compose up -d
 
 The default `compose.yaml` uses `network_mode: host` for reliable ESPHome mDNS, logs, OTA, and online/offline status behavior.
 
+The Compose examples also pass `/dev/ttyUSB0` and `/dev/ttyACM0` into the container
+for the `Install -> Serial port (HA Server)` flow. Add any additional host serial
+device mappings required by your hardware before starting the container.
+
 Open the UI at:
 
 ```text

@@ -17,6 +17,7 @@
   "panel_icon": "mdi:home-automation",
   "panel_title": "ESPConfig Designer",
   "map": ["config:rw"],
+  "devices": ["/dev/ttyUSB0", "/dev/ttyACM0"],
   "options": {
     "use_esphome_shared_path": false
   },

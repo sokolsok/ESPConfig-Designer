@@ -116,6 +116,7 @@ ESPConfig Designer provides:
 - a Display Configurator for display-oriented components
 - an Asset Manager for images, fonts, and audio
 - integrated validate / clean / compile / OTA / logs workflows
+- host-side serial flashing through a USB-UART device connected to Home Assistant
 - project persistence, secrets editing, and device status tracking
 
 The backend owns storage, files, jobs, and firmware artifacts.
@@ -247,6 +248,11 @@ Important files:
 - save project and YAML
 - validate / compile / OTA / serial flash / logs
 
+The `Install -> Serial port (HA Server)` option enumerates serial devices visible to
+the add-on and runs the ESPHome upload process on the Home Assistant host. This is
+separate from the existing browser Web Serial option. The add-on must be granted
+access to the host serial devices before this option can be used.
+
 ### Display workflow
 - create text/icon/image/shape/graph/animation elements
 - resolve fonts/images/animations into generated YAML assets
@@ -337,6 +343,8 @@ Add-on runtime state:
 
 ### Jobs and firmware
 - `POST /api/install` (`validate`, `clean`, `compile`, `ota`, `logs`)
+- `GET /api/serial/ports`
+- `POST /api/install` with `action: serial` and a selected `port`
 - `GET /api/jobs/<job_id>`
 - `GET /api/jobs/<job_id>/stream`
 - `GET /api/jobs/<job_id>/tail-wait`

@@ -20,7 +20,7 @@ services:
       - ./build:/build
       - /etc/localtime:/etc/localtime:ro
 
-    # Optional: only needed if backend-side USB flashing is used.
-    # devices:
-    #   - /dev/ttyUSB0:/dev/ttyUSB0
-    #   - /dev/ttyACM0:/dev/ttyACM0
+    # Required for the "Serial port (HA Server)" install mode.
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+      - /dev/ttyACM0:/dev/ttyACM0

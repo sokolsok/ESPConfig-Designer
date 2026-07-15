@@ -27,11 +27,18 @@
     :compile-is-reconnecting="compileIsReconnecting"
     :compile-auto-scroll="compileAutoScroll"
     :compile-log-lines="compileLogLines"
+    :serial-ha-selection-open="serialHaSelectionOpen"
+    :serial-ha-selection-busy="serialHaSelectionBusy"
+    :serial-ha-ports="serialHaPorts"
+    :serial-ha-ports-loading="serialHaPortsLoading"
+    :serial-ha-ports-error="serialHaPortsError"
     :can-download-compiled-binary="canDownloadCompiledBinary"
     :can-close-compile="canCloseCompile"
     :on-console-ref="setCompileConsoleElement"
     @toggle-autoscroll="emit('toggle-compile-autoscroll')"
     @download="emit('download-binary')"
+    @refresh-ha-serial-ports="emit('refresh-ha-serial-ports')"
+    @select-ha-serial-port="emit('select-ha-serial-port', $event)"
     @close-compile="emit('close-compile-modal')"
   />
 
@@ -196,6 +203,11 @@ defineProps({
   compileIsReconnecting: Boolean,
   compileAutoScroll: Boolean,
   compileLogLines: { type: Array, default: () => [] },
+  serialHaSelectionOpen: Boolean,
+  serialHaSelectionBusy: Boolean,
+  serialHaPorts: { type: Array, default: () => [] },
+  serialHaPortsLoading: Boolean,
+  serialHaPortsError: { type: String, default: '' },
   canDownloadCompiledBinary: Boolean,
   canCloseCompile: Boolean,
   setCompileConsoleElement: { type: Function, default: null },
@@ -256,6 +268,8 @@ const emit = defineEmits([
   'customize-project-from-menu',
   'delete-project-from-menu',
   'download-binary',
+  'refresh-ha-serial-ports',
+  'select-ha-serial-port',
   'edit-project-from-menu',
   'export-project-from-menu',
   'logs-project-from-menu',

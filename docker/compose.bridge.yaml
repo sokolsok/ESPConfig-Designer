@@ -22,3 +22,8 @@ services:
       - ./data:/data
       - ./build:/build
       - /etc/localtime:/etc/localtime:ro
+
+    # Required for the "Serial port (HA Server)" install mode.
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+      - /dev/ttyACM0:/dev/ttyACM0

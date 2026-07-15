@@ -77,7 +77,12 @@
             Install
           </button>
           <div v-if="installMenuOpen" class="topbar-action-dropdown" role="menu" aria-label="Install options">
-            <button type="button" role="menuitem" @click="selectInstallOption('serial')">Serial Port</button>
+            <button type="button" role="menuitem" @click="selectInstallOption('serial')">
+              Serial (this computer)
+            </button>
+            <button type="button" role="menuitem" @click="selectInstallOption('serial-ha')">
+              Serial (HA server)
+            </button>
             <button
               type="button"
               role="menuitem"

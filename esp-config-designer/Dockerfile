@@ -6,7 +6,9 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 RUN python3 -m venv /opt/designer-venv \
     && /opt/designer-venv/bin/python -m pip install --no-cache-dir -U pip \
-    && /opt/designer-venv/bin/python -m pip install --no-cache-dir flask==3.1.2
+    && /opt/designer-venv/bin/python -m pip install --no-cache-dir \
+       flask==3.1.2 \
+       pyserial==3.5
 
 COPY server.py /server.py
 COPY run.sh /run.sh

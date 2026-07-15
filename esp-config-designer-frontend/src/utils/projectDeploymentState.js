@@ -136,7 +136,7 @@ export const computePostInstallDeploymentUpdate = ({ action, currentState, nextI
     pending: normalizeIdentity(currentState?.pending)
   };
   const next = normalizeIdentity(nextIdentity);
-  if (!next || !["flash", "ota", "download"].includes(normalizedAction)) {
+  if (!next || !["flash", "serial", "ota", "download"].includes(normalizedAction)) {
     return {
       state: current,
       register: null,

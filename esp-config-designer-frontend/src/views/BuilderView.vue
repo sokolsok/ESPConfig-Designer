@@ -35,6 +35,11 @@
       :compile-is-reconnecting="compileIsReconnecting"
       :compile-auto-scroll="compileAutoScroll"
       :compile-log-lines="compileLogLines"
+      :serial-ha-selection-open="serialHaSelectionOpen"
+      :serial-ha-selection-busy="serialHaSelectionBusy"
+      :serial-ha-ports="serialHaPorts"
+      :serial-ha-ports-loading="serialHaPortsLoading"
+      :serial-ha-ports-error="serialHaPortsError"
       :can-download-compiled-binary="canDownloadCompiledBinary"
       :can-close-compile="canCloseCompile"
       :set-compile-console-element="setCompileConsoleElement"
@@ -52,6 +57,8 @@
       @close-import-summary="importSummaryModalOpen = false"
       @toggle-compile-autoscroll="toggleCompileAutoscroll"
       @download-binary="downloadBinary"
+      @refresh-ha-serial-ports="loadHaSerialPorts"
+      @select-ha-serial-port="selectHaSerialPort"
       @close-compile-modal="closeCompileModal"
     />
     <div class="builder-shell">
@@ -4668,7 +4675,7 @@ const fetchDeviceStatusBySelector = async ({ deviceKey = "", yamlName = "", refr
 };
 
 const persistDeploymentAfterInstallSuccess = async ({ action, yaml } = {}) => {
-  if (!["ota", "flash", "download"].includes(String(action || ""))) {
+  if (!["ota", "flash", "serial", "download"].includes(String(action || ""))) {
     return;
   }
   const yamlName = String(yaml || projectFilename.value || "").trim();
@@ -4907,6 +4914,14 @@ const {
   toggleCompileAutoscroll,
   closeCompileModal,
   handleInstallSerialPort,
+  handleInstallHaSerialPort,
+  serialHaSelectionOpen,
+  serialHaSelectionBusy,
+  serialHaPorts,
+  serialHaPortsLoading,
+  serialHaPortsError,
+  loadHaSerialPorts,
+  selectHaSerialPort,
   handleInstallOta,
   startLogs,
   startValidate,
@@ -4947,6 +4962,10 @@ const handleAppInstallOption = (event) => {
   }
   if (mode === "download") {
     handleInstallDownload();
+    return;
+  }
+  if (mode === "serial-ha") {
+    handleInstallHaSerialPort();
     return;
   }
   handleInstallSerialPort();
