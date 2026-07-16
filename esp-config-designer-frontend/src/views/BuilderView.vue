@@ -3180,27 +3180,33 @@ const yamlPreviewDocument = computed(() => {
         const frameworkField = detailFields.find((field) => field.key === "framework_config");
         const advancedField = detailFields.find((field) => field.key === "advanced");
         const componentsField = detailFields.find((field) => field.key === "components");
-        const frameworkFields = [
-          ...(frameworkField?.fields || []),
-          ...(advancedField ? [advancedField] : []),
-          ...(componentsField ? [componentsField] : [])
-        ];
-        const frameworkValue = {
-          ...frameworkConfig,
-          ...(hasAdvanced ? { advanced } : {}),
-          ...(hasComponents ? { components } : {})
+        const appendFrameworkFields = (value, fields, formPath = []) => {
+          if (!Array.isArray(fields) || !fields.length) return;
+          const frameworkLines = buildSchemaYamlDocumentLines(
+            value || {},
+            fields,
+            4,
+            config.value,
+            globalStore.value,
+            makeSourceContext({
+              owner: "platform",
+              scopeId: platformDetailScopeId,
+              tabKey: "core",
+              path: formPath
+            }),
+            platformName
+          );
+          if (frameworkLines.length) {
+            appendPreviewLines(lines, frameworkLines, platformName);
+          }
         };
-        const frameworkLines = buildSchemaYamlDocumentLines(
-          frameworkValue,
-          frameworkFields,
-          4,
-          config.value,
-          globalStore.value,
-          makeSourceContext({ owner: "platform", scopeId: platformDetailScopeId, tabKey: "core", path: ["framework"] }),
-          platformName
-        );
-        if (frameworkLines.length) {
-          appendPreviewLines(lines, frameworkLines, platformName);
+
+        appendFrameworkFields(frameworkConfig, frameworkField?.fields, ["framework_config"]);
+        if (hasAdvanced) {
+          appendFrameworkFields({ advanced }, [advancedField], []);
+        }
+        if (hasComponents) {
+          appendFrameworkFields({ components }, [componentsField], []);
         }
       }
     } else {
@@ -3296,7 +3302,10 @@ const yamlPreviewDocument = computed(() => {
       const otaPasswordEnabled = otaConfig?.use_password ?? true;
       const otaPassword = otaConfig?.password?.trim();
       if (otaEnabled) {
-        const otaOrigin = sectionOrigin(networkOtaScopeId, "core");
+        const otaField = networkCoreFields.find((field) => field.key === "ota");
+        const otaOrigin = sectionOrigin(networkOtaScopeId, "core", [], {
+          modeLevel: normalizeModeLevel(otaField?.lvl || "Simple")
+        });
         pushPreviewLine(lines, "", "ota", null);
         pushPreviewLine(lines, "ota:", "ota", otaOrigin);
         pushPreviewLine(lines, "  - platform: esphome", "ota", otaOrigin);
@@ -3305,7 +3314,7 @@ const yamlPreviewDocument = computed(() => {
             type: "field",
             scopeId: networkOtaScopeId,
             tabKey: "core",
-            path: ["password"],
+            path: ["ota", "password"],
             fieldKey: "password"
           }));
         }
@@ -3981,31 +3990,51 @@ const activateYamlOriginScope = (origin) => {
   }
 };
 
-const findYamlFocusTarget = (scopeId, path = []) => {
-  const encodedPaths = [];
-  for (let length = path.length; length >= 0; length -= 1) {
-    encodedPaths.push(encodeFieldPath(path.slice(0, length)));
-  }
+const findYamlFocusTarget = (scopeId, path = [], { allowAncestorFallback = true } = {}) => {
+  const encodedPath = encodeFieldPath(path);
   const candidates = Array.from(document.querySelectorAll(`[data-schema-scope-id="${scopeId}"]`));
-  for (const encodedPath of encodedPaths) {
-    const match = candidates.find((element) => element.getAttribute("data-schema-field-path") === encodedPath);
-    if (match) return match;
+  const exactMatch = candidates.find((element) => element.getAttribute("data-schema-field-path") === encodedPath);
+  if (exactMatch || !allowAncestorFallback) return exactMatch || null;
+
+  for (let length = path.length - 1; length >= 0; length -= 1) {
+    const ancestorPath = encodeFieldPath(path.slice(0, length));
+    const ancestorMatch = candidates.find((element) => element.getAttribute("data-schema-field-path") === ancestorPath);
+    if (ancestorMatch) return ancestorMatch;
   }
   return null;
 };
+
+const findYamlSectionTarget = (scopeId) =>
+  document.querySelector(`[data-schema-scope-id="${scopeId}"][data-schema-target="scope"]`);
+
+const findYamlRawTarget = (scopeId) =>
+  document.querySelector(`[data-schema-scope-id="${scopeId}"][data-schema-target="custom-config"]`);
 
 const waitForYamlFocusTarget = async (scopeId, path = [], requestId, maxFrames = 45) => {
   for (let attempt = 0; attempt < maxFrames; attempt += 1) {
     if (requestId !== yamlFocusRequestId) return null;
     await nextTick();
-    const target = findYamlFocusTarget(scopeId, path);
+    // The renderer container exists before its schema fields. Do not pulse that
+    // container while waiting for the exact field after a tab switch.
+    const target = findYamlFocusTarget(scopeId, path, { allowAncestorFallback: false });
     if (target) return target;
     await new Promise((resolve) => requestAnimationFrame(resolve));
   }
   return requestId === yamlFocusRequestId ? findYamlFocusTarget(scopeId, path) : null;
 };
 
-const pulseYamlFocusTarget = (element) => {
+const waitForYamlTarget = async (findTarget, requestId, maxFrames = 45) => {
+  for (let attempt = 0; attempt < maxFrames; attempt += 1) {
+    if (requestId !== yamlFocusRequestId) return null;
+    await nextTick();
+    const target = findTarget();
+    if (target) return target;
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+  }
+  return requestId === yamlFocusRequestId ? findTarget() : null;
+};
+
+const pulseYamlFocusTarget = (element, { scrollBehavior = "smooth" } = {}) => {
   if (!element) return;
   if (yamlFocusPulseTimer) {
     clearTimeout(yamlFocusPulseTimer);
@@ -4017,7 +4046,7 @@ const pulseYamlFocusTarget = (element) => {
   element.classList.remove("schema-field--yaml-focus");
   void element.offsetWidth;
   element.classList.add("schema-field--yaml-focus");
-  element.scrollIntoView({ block: "center", behavior: "smooth" });
+  element.scrollIntoView({ block: "center", behavior: scrollBehavior });
   yamlFocusPulseTimer = setTimeout(() => {
     element.classList.remove("schema-field--yaml-focus");
     yamlFocusPulseTimer = null;
@@ -4031,9 +4060,13 @@ const handleYamlLineClick = async (line) => {
   activateYamlOriginScope(origin);
   ensureYamlOriginModeVisible(origin.modeLevel);
   if (origin.suppressFocus) return;
-  const target = await waitForYamlFocusTarget(origin.scopeId, origin.path || [], requestId);
+  const target = origin.type === "section"
+    ? await waitForYamlTarget(() => findYamlSectionTarget(origin.scopeId), requestId)
+    : origin.contentKind === "raw_yaml"
+      ? await waitForYamlTarget(() => findYamlRawTarget(origin.scopeId), requestId)
+      : await waitForYamlFocusTarget(origin.scopeId, origin.path || [], requestId);
   if (requestId !== yamlFocusRequestId) return;
-  pulseYamlFocusTarget(target);
+  pulseYamlFocusTarget(target, { scrollBehavior: origin.type === "section" ? "auto" : "smooth" });
 };
 
 onMounted(() => {

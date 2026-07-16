@@ -712,8 +712,13 @@ const renderYamlObject = (objectValue, schemaFields, indent, lines, rootValue, g
     if (!key) return;
     const fieldPath = [...(sourceContext?.path || []), key];
     const effectiveModeLevel = maxModeLevel(sourceContext?.modeLevel || "Simple", fieldModeLevel(field));
+    const originType = field?.originType || "field";
+    const originPath = originType === "section"
+      ? (Array.isArray(sourceContext?.path) ? sourceContext.path : [])
+      : fieldPath;
     const fieldOrigin = makeSourceOrigin(sourceContext, {
-      path: fieldPath,
+      type: originType,
+      path: originPath,
       fieldKey: key,
       modeLevel: effectiveModeLevel,
       contentKind: field?.type || "schema"
@@ -2928,7 +2933,7 @@ const buildComponentsYamlInternal = (
         return;
       }
       const schemaFields = [
-        { key: "platform", type: "select" },
+        { key: "platform", type: "select", originType: "section" },
         ...(item.schema?.fields || [])
       ];
       renderYamlSingleListObject(

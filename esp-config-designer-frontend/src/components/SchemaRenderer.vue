@@ -2,6 +2,7 @@
   <div
     class="schema-renderer"
     :data-schema-scope-id="contextScopeId"
+    data-schema-target="scope"
     data-schema-field-path=""
   >
     <div v-if="!componentId" class="note">Wybierz komponent z listy, aby go skonfigurowac.</div>
@@ -97,6 +98,7 @@
       <label for="customConfigInput">custom config</label>
       <textarea
         id="customConfigInput"
+        data-schema-target="custom-config"
         :value="customConfig"
         rows="4"
         wrap="off"
