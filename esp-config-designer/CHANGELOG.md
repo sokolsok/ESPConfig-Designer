@@ -1,3 +1,11 @@
+## 1.3.3
+
+* Added support for flashing devices connected directly to the Home Assistant server, including HTTP-based wired flashing.
+* Improved YAML preview navigation to reliably locate the corresponding form fields.
+* Added a significantly more comprehensive version of the documentation explaining how to create a schema.
+* Fixed several minor bugs.
+
+
 ## 1.3.2
 
 * Added components:
