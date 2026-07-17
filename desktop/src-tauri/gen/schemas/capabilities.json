@@ -1,0 +1,1 @@
+{"main-capability":{"identifier":"main-capability","description":"Minimal desktop shell permissions.","local":true,"windows":["main"],"permissions":["core:default","dialog:default"]}}

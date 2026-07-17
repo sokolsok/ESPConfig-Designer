@@ -1,4 +1,5 @@
 import base64
+import ctypes
 import hmac
 import json
 import mimetypes
@@ -11,18 +12,32 @@ import subprocess
 import shutil
 import threading
 import uuid
-import pty
 import time
 import socket
 import shlex
 import posixpath
 import zipfile
 from collections import deque
+from ctypes import wintypes
 from datetime import datetime
+from pathlib import Path
 from typing import List, Optional, Tuple
 from urllib.parse import quote
 
 from flask import Flask, Response, jsonify, make_response, request, send_file, send_from_directory
+from runtime_config import (
+    CAPABILITIES_VERSION,
+    build_runtime_capabilities,
+    is_local_runtime_mode,
+    normalize_runtime_mode,
+    workspace_status,
+)
+from runtime_manifest import refresh_cache_manifest
+
+try:
+    import pty
+except ImportError:
+    pty = None
 
 try:
     from zeroconf import IPVersion, Zeroconf
@@ -37,16 +52,11 @@ def is_truthy(value: str) -> bool:
     return str(value or "").strip().lower() in TRUTHY_VALUES
 
 
-def normalize_runtime_mode(value: str) -> str:
-    mode = str(value or "").strip().lower()
-    if mode in ("addon", "standalone"):
-        return mode
-    return "addon"
-
-
 ECD_MODE = normalize_runtime_mode(os.environ.get("ECD_MODE", "addon"))
 ESPHOME_IS_HA_ADDON = is_truthy(os.environ.get("ESPHOME_IS_HA_ADDON", "true" if ECD_MODE == "addon" else "false"))
 ECD_STORAGE_MODE = os.environ.get("ECD_STORAGE_MODE", "").strip()
+ECD_WORKSPACE_DIR = os.environ.get("ECD_WORKSPACE_DIR", "").strip()
+ECD_APP_DATA_DIR = os.environ.get("ECD_APP_DATA_DIR", "").strip()
 ECD_VERSION = os.environ.get("ECD_VERSION", "").strip()
 ECD_AUTH_MODE = os.environ.get("ECD_AUTH_MODE", "none").strip().lower()
 ECD_AUTH_USERNAME = os.environ.get("ECD_AUTH_USERNAME", "").strip()
@@ -57,12 +67,16 @@ ECD_STATUS_USE_PING = is_truthy(os.environ.get("ECD_STATUS_USE_PING", "false"))
 TARGET_DIR = os.environ.get("TARGET_DIR", "/config/esphome").strip()
 PROJECT_DIR = os.environ.get("PROJECT_DIR", "/config/esphome/esp_projects").strip()
 PORT = int(os.environ.get("PORT", "8099"))
+HOST = os.environ.get("HOST", "0.0.0.0").strip() or "0.0.0.0"
 
 JOB_DIR = os.environ.get("JOB_DIR", "/data/jobs").strip()
 ESPHOME_BIN = os.environ.get("ESPHOME_BIN", "esphome").strip()
 ESPHOME_CONFIG_DIR = os.environ.get("ESPHOME_CONFIG_DIR", "/config/esphome").strip()
 ESPHOME_DATA_DIR = os.environ.get("ESPHOME_DATA_DIR", "/data/esphome").strip()
 ESPHOME_BUILD_PATH = os.environ.get("ESPHOME_BUILD_PATH", "").strip()
+PLATFORMIO_ROOT = os.environ.get("ECD_PLATFORMIO_DIR", "").strip()
+RUNTIME_MANIFEST_PATH = os.environ.get("ECD_RUNTIME_MANIFEST_PATH", "").strip()
+CACHE_MANIFEST_PATH = os.environ.get("ECD_CACHE_MANIFEST_PATH", "").strip()
 WEB_ROOT = os.environ.get("WEB_ROOT", "/web").strip()
 DEVICES_PATH = os.environ.get("DEVICES_PATH", "/data/devices.json").strip()
 PING_PORT = int(os.environ.get("PING_PORT", "3232"))
@@ -225,6 +239,25 @@ def is_same_filesystem_path(first: str, second: str) -> bool:
     if not first or not second:
         return False
     return os.path.normcase(os.path.abspath(first)) == os.path.normcase(os.path.abspath(second))
+
+
+def parse_esphome_command(value: str) -> List[str]:
+    """Preserve an absolute Windows executable path that contains spaces."""
+    raw_value = str(value or "").strip()
+    if os.name == "nt":
+        candidate = raw_value
+        remainder = ""
+        if candidate.startswith(('"', "'")):
+            quote = candidate[0]
+            closing_quote = candidate.find(quote, 1)
+            if closing_quote > 0:
+                remainder = candidate[closing_quote + 1 :].strip()
+                candidate = candidate[1:closing_quote]
+        elif " " not in candidate:
+            remainder = ""
+        if os.path.isfile(candidate):
+            return [candidate] + (shlex.split(remainder) if remainder else [])
+    return shlex.split(raw_value)
 
 
 
@@ -1534,7 +1567,31 @@ def resolve_secrets_path() -> str:
 
 
 def is_standalone_mode() -> bool:
-    return ECD_MODE == "standalone"
+    return is_local_runtime_mode(ECD_MODE)
+
+
+def runtime_capabilities() -> dict:
+    return build_runtime_capabilities(ECD_MODE, ECD_STORAGE_MODE)
+
+
+def capability_error(capability: str):
+    return (
+        jsonify(
+            {
+                "status": "error",
+                "code": "CAPABILITY_UNAVAILABLE",
+                "capability": capability,
+                "message": f"Capability '{capability}' is not available in {ECD_MODE} mode",
+            }
+        ),
+        403,
+    )
+
+
+def require_capability(capability: str):
+    if runtime_capabilities().get(capability) is not True:
+        return capability_error(capability)
+    return None
 
 
 def read_auth_password() -> str:
@@ -1633,6 +1690,7 @@ class Job:
         self.seq_buffer = deque(maxlen=2000)
         self.line_seq = 0
         self.process: Optional[subprocess.Popen] = None
+        self.process_controller: Optional["_ProcessTreeController"] = None
         self.cancel_requested = False
         self.last_log_line = ""
 
@@ -1720,6 +1778,130 @@ class Job:
             return self.line_seq
 
 
+class _ProcessTreeController:
+    """Owns a subprocess and, on Windows, all descendants in a Job Object."""
+
+    _JOB_OBJECT_EXTENDED_LIMIT_INFORMATION = 9
+    _JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE = 0x2000
+    _PROCESS_TERMINATE = 0x0001
+    _PROCESS_SET_QUOTA = 0x0100
+
+    def __init__(self, process: subprocess.Popen) -> None:
+        self.process = process
+        self._job_handle = None
+        self._lock = threading.Lock()
+
+    def attach(self) -> None:
+        if os.name != "nt":
+            return
+
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        handle_type = wintypes.HANDLE
+
+        class BasicLimitInformation(ctypes.Structure):
+            _fields_ = [
+                ("PerProcessUserTimeLimit", ctypes.c_longlong),
+                ("PerJobUserTimeLimit", ctypes.c_longlong),
+                ("LimitFlags", wintypes.DWORD),
+                ("MinimumWorkingSetSize", ctypes.c_size_t),
+                ("MaximumWorkingSetSize", ctypes.c_size_t),
+                ("ActiveProcessLimit", wintypes.DWORD),
+                ("Affinity", ctypes.c_void_p),
+                ("PriorityClass", wintypes.DWORD),
+                ("SchedulingClass", wintypes.DWORD),
+            ]
+
+        class IoCounters(ctypes.Structure):
+            _fields_ = [(name, ctypes.c_ulonglong) for name in (
+                "ReadOperationCount",
+                "WriteOperationCount",
+                "OtherOperationCount",
+                "ReadTransferCount",
+                "WriteTransferCount",
+                "OtherTransferCount",
+            )]
+
+        class ExtendedLimitInformation(ctypes.Structure):
+            _fields_ = [
+                ("BasicLimitInformation", BasicLimitInformation),
+                ("IoInfo", IoCounters),
+                ("ProcessMemoryLimit", ctypes.c_size_t),
+                ("JobMemoryLimit", ctypes.c_size_t),
+                ("PeakProcessMemoryUsed", ctypes.c_size_t),
+                ("PeakJobMemoryUsed", ctypes.c_size_t),
+            ]
+
+        kernel32.CreateJobObjectW.argtypes = [ctypes.c_void_p, wintypes.LPCWSTR]
+        kernel32.CreateJobObjectW.restype = handle_type
+        kernel32.SetInformationJobObject.argtypes = [
+            handle_type,
+            wintypes.INT,
+            ctypes.c_void_p,
+            wintypes.DWORD,
+        ]
+        kernel32.SetInformationJobObject.restype = wintypes.BOOL
+        kernel32.OpenProcess.argtypes = [
+            wintypes.DWORD,
+            wintypes.BOOL,
+            wintypes.DWORD,
+        ]
+        kernel32.OpenProcess.restype = handle_type
+        kernel32.AssignProcessToJobObject.argtypes = [handle_type, handle_type]
+        kernel32.AssignProcessToJobObject.restype = wintypes.BOOL
+        kernel32.CloseHandle.argtypes = [handle_type]
+        kernel32.CloseHandle.restype = wintypes.BOOL
+
+        job_handle = kernel32.CreateJobObjectW(None, None)
+        if not job_handle:
+            raise ctypes.WinError(ctypes.get_last_error())
+
+        try:
+            limits = ExtendedLimitInformation()
+            limits.BasicLimitInformation.LimitFlags = self._JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
+            if not kernel32.SetInformationJobObject(
+                job_handle,
+                self._JOB_OBJECT_EXTENDED_LIMIT_INFORMATION,
+                ctypes.byref(limits),
+                ctypes.sizeof(limits),
+            ):
+                raise ctypes.WinError(ctypes.get_last_error())
+
+            process_handle = kernel32.OpenProcess(
+                self._PROCESS_TERMINATE | self._PROCESS_SET_QUOTA,
+                False,
+                self.process.pid,
+            )
+            if not process_handle:
+                raise ctypes.WinError(ctypes.get_last_error())
+            try:
+                if not kernel32.AssignProcessToJobObject(job_handle, process_handle):
+                    raise ctypes.WinError(ctypes.get_last_error())
+            finally:
+                kernel32.CloseHandle(process_handle)
+        except Exception:
+            kernel32.CloseHandle(job_handle)
+            raise
+
+        with self._lock:
+            self._job_handle = job_handle
+
+    def terminate(self) -> None:
+        with self._lock:
+            job_handle = self._job_handle
+            self._job_handle = None
+        if job_handle:
+            ctypes.WinDLL("kernel32", use_last_error=True).CloseHandle(job_handle)
+        elif self.process.poll() is None:
+            self.process.terminate()
+
+    def close(self) -> None:
+        with self._lock:
+            job_handle = self._job_handle
+            self._job_handle = None
+        if job_handle:
+            ctypes.WinDLL("kernel32", use_last_error=True).CloseHandle(job_handle)
+
+
 class JobManager:
     def __init__(self) -> None:
         self.jobs = {}
@@ -1762,10 +1944,22 @@ class JobManager:
         with self.lock:
             return self.jobs.get(job_id)
 
+    def active_jobs(self) -> List[dict]:
+        with self.lock:
+            jobs = list(self.jobs.values())
+        active = []
+        for job in jobs:
+            with job.lock:
+                if job.state in ("queued", "running"):
+                    active.append(job.to_dict())
+        return active
+
     def cancel(self, job_id: str) -> Optional[Job]:
         job = self.get(job_id)
         if not job:
             return None
+        process = None
+        process_controller = None
         with job.lock:
             if job.state in ("success", "failed", "canceled"):
                 return job
@@ -1779,7 +1973,12 @@ class JobManager:
                 job.notify_done()
                 return job
             if job.state == "running" and job.process:
-                job.process.terminate()
+                process = job.process
+                process_controller = job.process_controller
+        if process_controller:
+            process_controller.terminate()
+        elif process and process.poll() is None:
+            process.terminate()
         return job
 
     def _worker(self) -> None:
@@ -1838,6 +2037,24 @@ class JobManager:
                 upload_cmd = ["upload", yaml_path, "--device", job.device]
                 exit_code = self._run_esphome(job, upload_cmd)
 
+        if (
+            exit_code == 0
+            and not job.cancel_requested
+            and ECD_MODE == "desktop"
+            and job.action in {"compile", "ota", "serial"}
+        ):
+            try:
+                refresh_cache_manifest(
+                    Path(RUNTIME_MANIFEST_PATH),
+                    Path(CACHE_MANIFEST_PATH),
+                    Path(PLATFORMIO_ROOT),
+                )
+            except Exception as exc:
+                message = f"Cache manifest update failed: {exc}"
+                job.push_log(message)
+                job.last_log_line = message
+                job.error_summary = message
+                exit_code = 1
 
         if job.cancel_requested:
             job.state = "canceled"
@@ -1858,7 +2075,7 @@ class JobManager:
 
     def _run_esphome(self, job: Job, args: List[str]) -> int:
         try:
-            cmd_prefix = shlex.split(ESPHOME_BIN)
+            cmd_prefix = parse_esphome_command(ESPHOME_BIN)
         except ValueError as exc:
             message = f"Invalid ESPHOME_BIN: {exc}"
             job.push_log(message)
@@ -1887,6 +2104,8 @@ class JobManager:
         env.setdefault("PYTHONIOENCODING", "utf-8")
         if extra_env:
             env.update(extra_env)
+        process = None
+        process_controller = None
         try:
             open_pty = getattr(pty, "openpty", None)
             use_pty = os.name == "posix" and open_pty is not None
@@ -1910,17 +2129,31 @@ class JobManager:
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
                     text=True,
+                    encoding="utf-8",
+                    errors="replace",
                     bufsize=1,
                     env=env,
                 )
+            process_controller = _ProcessTreeController(process)
+            process_controller.attach()
         except Exception as exc:
+            if process_controller:
+                process_controller.close()
+            if process and process.poll() is None:
+                process.kill()
+                process.wait()
             message = f"Failed to start: {exc}"
             job.push_log(message)
             job.last_log_line = message
             job.error_summary = message
             return 1
 
-        job.process = process
+        with job.lock:
+            job.process = process
+            job.process_controller = process_controller
+            cancel_requested = job.cancel_requested
+        if cancel_requested and process_controller:
+            process_controller.terminate()
         with open(job.log_path, "a", encoding="utf-8") as log_handle:
             if use_pty and master_fd is not None:
                 buffer = ""
@@ -1954,7 +2187,7 @@ class JobManager:
                                 job.last_log_line = clean_line
                             job.push_log(clean_line)
                         if job.cancel_requested:
-                            process.terminate()
+                            self._terminate_process(job)
                             break
                     if process.poll() is not None:
                         break
@@ -1970,7 +2203,37 @@ class JobManager:
                 except OSError:
                     pass
             elif process.stdout:
-                for line in process.stdout:
+                output_queue = queue.Queue()
+                output_reader_done = threading.Event()
+
+                def read_process_output() -> None:
+                    try:
+                        assert process.stdout is not None
+                        for output_line in process.stdout:
+                            output_queue.put(output_line)
+                    finally:
+                        output_reader_done.set()
+
+                output_reader = threading.Thread(target=read_process_output, daemon=True)
+                output_reader.start()
+                while output_reader.is_alive() or not output_queue.empty():
+                    try:
+                        line = output_queue.get(timeout=0.2)
+                    except queue.Empty:
+                        if job.cancel_requested:
+                            self._terminate_process(job)
+                        if process.poll() is not None and output_reader.is_alive():
+                            # A descendant can inherit stdout after the parent exits.
+                            # Closing our read end prevents a completed job from waiting for that EOF.
+                            try:
+                                process.stdout.close()
+                            except OSError:
+                                pass
+                            output_reader.join(timeout=1)
+                            if output_reader.is_alive():
+                                break
+                        continue
+
                     raw_line = (
                         line.rstrip("\n")
                         if isinstance(line, str)
@@ -1985,14 +2248,28 @@ class JobManager:
                         job.last_log_line = clean_line
                     job.push_log(clean_line)
                     if job.cancel_requested:
-                        process.terminate()
-                        break
+                        self._terminate_process(job)
+                output_reader.join(timeout=1)
 
         process.wait()
-        job.process = None
+        if process_controller:
+            process_controller.close()
+        with job.lock:
+            job.process = None
+            job.process_controller = None
         if job.cancel_requested:
             return 1
         return process.returncode or 0
+
+    @staticmethod
+    def _terminate_process(job: Job) -> None:
+        with job.lock:
+            process = job.process
+            process_controller = job.process_controller
+        if process_controller:
+            process_controller.terminate()
+        elif process and process.poll() is None:
+            process.terminate()
 
 
 bootstrap_storage()
@@ -2025,6 +2302,7 @@ def api_runtime():
         "authMode": ECD_AUTH_MODE,
         "version": ECD_VERSION,
         "port": PORT,
+        "capabilities": runtime_capabilities(),
     }
 
     debug = is_truthy(request.args.get("debug", ""))
@@ -2042,6 +2320,27 @@ def api_runtime():
         )
 
     return jsonify(payload)
+
+
+@app.route("/api/workspace", methods=["GET"])
+def api_workspace():
+    access = check_access()
+    if access:
+        return access
+
+    workspace_path = ECD_WORKSPACE_DIR or TARGET_DIR
+    app_data_path = ECD_APP_DATA_DIR or ""
+    return jsonify(
+        {
+            "status": "ok",
+            "version": CAPABILITIES_VERSION,
+            "workspace": workspace_status(
+                Path(workspace_path),
+                Path(app_data_path) if app_data_path else None,
+            ),
+            "storageMode": ECD_STORAGE_MODE,
+        }
+    )
 
 
 @app.route("/api/component-catalog", methods=["GET", "OPTIONS"])
@@ -2746,6 +3045,10 @@ def import_yaml_candidates():
     if access:
         return access
 
+    capability = require_capability("yamlImport")
+    if capability:
+        return capability
+
     if not os.path.isdir(ESPHOME_CONFIG_DIR):
         return jsonify({"status": "ok", "items": []})
 
@@ -2824,6 +3127,10 @@ def import_yaml_load():
     if access:
         return access
 
+    capability = require_capability("yamlImport")
+    if capability:
+        return capability
+
     filename = normalize_yaml_filename(str(request.args.get("name") or request.args.get("filename") or ""))
     if not filename or filename.lower() == SECRETS_FILENAME:
         return jsonify({"status": "error", "message": "Invalid name"}), 400
@@ -2875,6 +3182,9 @@ def import_project_bundle():
         source_yaml_name = normalize_yaml_filename(str(payload.get("sourceYamlName") or ""))
         if not source_yaml_name or source_yaml_name.lower() == SECRETS_FILENAME:
             return jsonify({"status": "error", "message": "Invalid sourceYamlName"}), 400
+        capability = require_capability("yamlImport")
+        if capability:
+            return capability
 
     import_report = payload.get("importReport")
     if import_report is not None and not isinstance(import_report, dict):
@@ -3533,6 +3843,9 @@ def api_serial_ports():
     access = check_access()
     if access:
         return access
+    capability = require_capability("serverSerialFlash")
+    if capability:
+        return capability
     try:
         ports = list_host_serial_ports()
     except RuntimeError as exc:
@@ -3566,6 +3879,9 @@ def api_install():
 
     serial_port = ""
     if action == "serial":
+        capability = require_capability("serverSerialFlash")
+        if capability:
+            return capability
         try:
             serial_port = validate_host_serial_port(str(payload.get("port", "")))
         except (RuntimeError, ValueError) as exc:
@@ -3581,6 +3897,14 @@ def api_install():
 
 
 
+@app.route("/api/jobs/active", methods=["GET"])
+def api_active_jobs():
+    access = check_access()
+    if access:
+        return access
+    return jsonify({"status": "ok", "jobs": job_manager.active_jobs()})
+
+
 @app.route("/api/jobs/<job_id>", methods=["GET"])
 def api_job_status(job_id):
     access = check_access()
@@ -3592,6 +3916,7 @@ def api_job_status(job_id):
         return jsonify({"status": "error", "message": "Not found"}), 404
 
     return jsonify({"status": "ok", "job": job.to_dict()})
+
 
 
 @app.route("/api/jobs/<job_id>/tail", methods=["GET"])
@@ -3832,4 +4157,4 @@ def serve_ui(path):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=PORT)
+    app.run(host=HOST, port=PORT)

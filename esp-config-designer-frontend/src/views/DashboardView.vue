@@ -210,6 +210,7 @@ import {
   loadSchemaByPath
 } from "../utils/schemaLoader";
 import { importYamlToProjectConfig } from "../utils/yamlProjectImport";
+import { isRuntimeCapabilityEnabled } from "../utils/runtimeCapabilities";
 
 // DashboardView coordinates explorer state, shared top-bar actions, and modal flows.
 // Rendering details, tree logic, and device status polling are delegated to focused
@@ -1591,6 +1592,11 @@ const normalizeYamlImportCandidate = (item) => {
 };
 
 const loadBuilderYamlImportCandidates = async () => {
+  if (!isRuntimeCapabilityEnabled("yamlImport")) {
+    builderYamlImportItems.value = [];
+    builderYamlImportError.value = "Import from existing ESPHome storage is not available in this runtime.";
+    return;
+  }
   const requestId = ++builderYamlImportRequestId;
   builderYamlImportLoading.value = true;
   builderYamlImportError.value = "";
@@ -1616,6 +1622,7 @@ const loadBuilderYamlImportCandidates = async () => {
 };
 
 const openBuilderYamlImportModal = () => {
+  if (!isRuntimeCapabilityEnabled("yamlImport")) return;
   dashboardActionError.value = "";
   builderYamlImportModalOpen.value = true;
   builderYamlImportError.value = "";
@@ -1671,6 +1678,7 @@ const beginYamlImport = ({ fileName, content, sourceYamlName = "", canReturnToSo
 };
 
 const handleBuilderYamlImportSelect = async (item) => {
+  if (!isRuntimeCapabilityEnabled("yamlImport")) return;
   const name = String(item?.name || "").trim();
   if (!isYamlImportCandidateName(name) || builderYamlImportLoadingName.value) return;
   builderYamlImportLoadingName.value = name;
@@ -1802,6 +1810,10 @@ const handleYamlImportBackToSourceList = () => {
 const handleYamlImportConfirm = async () => {
   const analysis = yamlImportAnalysis.value;
   if (!analysis?.projectData || yamlImportSaving.value) return;
+  if (yamlImportSourceName.value && !isRuntimeCapabilityEnabled("yamlImport")) {
+    yamlImportSaveError.value = "Import from existing ESPHome storage is not available in this runtime.";
+    return;
+  }
   yamlImportSaving.value = true;
   yamlImportSaveError.value = "";
   try {
@@ -1857,10 +1869,12 @@ const handleYamlImportFileSelected = async (event) => {
 const handleTopbarImportOption = (event) => {
   const detail = event?.detail && typeof event.detail === "object" ? event.detail : {};
   if (detail.source === "yaml-file") {
+    if (!isRuntimeCapabilityEnabled("localYamlImport")) return;
     openYamlFilePicker();
     return;
   }
   if (detail.source === "esphome-builder") {
+    if (!isRuntimeCapabilityEnabled("yamlImport")) return;
     openBuilderYamlImportModal();
   }
 };
@@ -1889,14 +1903,21 @@ const isSelectedProjectOnline = computed(() => isProjectOnline(selectedProjectNa
 
 const canDashboardEdit = computed(() => Boolean(String(selectedProjectName.value || "").trim()));
 const canDashboardExport = computed(() => canDashboardEdit.value);
-const canDashboardInstall = computed(() => canDashboardEdit.value);
-const canDashboardLogs = computed(() => canDashboardEdit.value && isSelectedProjectOnline.value);
-const canOpenProjectMenuLogs = computed(() => isProjectOnline(openProjectMenuName.value));
+const canDashboardInstall = computed(() => canDashboardEdit.value && isRuntimeCapabilityEnabled("compile"));
+const canDashboardValidate = computed(() => canDashboardInstall.value && isRuntimeCapabilityEnabled("validate"));
+const canDashboardLogs = computed(
+  () => canDashboardEdit.value && isRuntimeCapabilityEnabled("logs") && isSelectedProjectOnline.value
+);
+const canOpenProjectMenuLogs = computed(
+  () => isRuntimeCapabilityEnabled("logs") && isProjectOnline(openProjectMenuName.value)
+);
 const selectedYamlName = computed(() => projectYamlName(selectedProjectName.value));
 const selectedHost = computed(() => {
   return projectStatusHost(selectedProjectName.value);
 });
-const canDashboardOta = computed(() => canDashboardInstall.value && isSelectedProjectOnline.value && Boolean(selectedHost.value));
+const canDashboardOta = computed(
+  () => canDashboardInstall.value && isRuntimeCapabilityEnabled("ota") && isSelectedProjectOnline.value && Boolean(selectedHost.value)
+);
 const projectMenuStyle = computed(() => ({
   top: `${projectMenuPosition.value.top}px`,
   left: `${projectMenuPosition.value.left}px`,
@@ -1905,7 +1926,7 @@ const projectMenuStyle = computed(() => ({
 
 const installFlow = useInstallConsoleFlow({
   canInstall: () => canDashboardInstall.value,
-  canValidate: () => canDashboardInstall.value,
+  canValidate: () => canDashboardValidate.value,
   canUseOta: () => canDashboardOta.value,
   canLogs: () => canDashboardLogs.value,
   getYamlName: () => selectedYamlName.value,
@@ -1962,7 +1983,7 @@ const emitDashboardActionsState = () => {
     new CustomEvent("app:dashboard-actions-state", {
       detail: {
         canInstall: canDashboardInstall.value,
-        canValidate: canDashboardInstall.value,
+        canValidate: canDashboardValidate.value,
         canUseOta: canDashboardOta.value,
         canLogs: canDashboardLogs.value,
         canEdit: canDashboardEdit.value,
@@ -1987,6 +2008,7 @@ const handleTopbarInstallOption = (event) => {
     return;
   }
   if (mode === "serial-ha") {
+    if (!isRuntimeCapabilityEnabled("serverSerialFlash")) return;
     handleInstallHaSerialPort();
     return;
   }
@@ -2000,7 +2022,7 @@ const handleTopbarLogs = () => {
 };
 
 const handleTopbarValidate = () => {
-  if (!canDashboardInstall.value) return;
+  if (!canDashboardValidate.value) return;
   dashboardActionError.value = "";
   startValidate();
 };
@@ -2308,6 +2330,7 @@ const registerSelectedProjectAfterInstallSuccess = async ({ action, yaml } = {})
 watch(
   () => [
     canDashboardInstall.value,
+    canDashboardValidate.value,
     canDashboardLogs.value,
     canDashboardEdit.value,
     compileIsActive.value,

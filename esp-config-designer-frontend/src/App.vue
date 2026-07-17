@@ -37,7 +37,7 @@
       </div>
 
       <div class="app-topbar-actions">
-        <div v-if="isDashboardRoute" ref="importMenuRef" class="topbar-action-menu">
+        <div v-if="isDashboardRoute && canLocalYamlImport" ref="importMenuRef" class="topbar-action-menu">
           <button
             class="btn-standard action-import"
             :disabled="topbarBusy"
@@ -46,7 +46,7 @@
             Import
           </button>
           <div v-if="importMenuOpen" class="topbar-action-dropdown" role="menu" aria-label="Import options">
-            <button type="button" role="menuitem" @click="selectImportOption('esphome-builder')">
+            <button v-if="canYamlImport" type="button" role="menuitem" @click="selectImportOption('esphome-builder')">
               ESPHome Builder
             </button>
             <button type="button" role="menuitem" @click="selectImportOption('yaml-file')">YAML file</button>
@@ -80,7 +80,7 @@
             <button type="button" role="menuitem" @click="selectInstallOption('serial')">
               Serial (this computer)
             </button>
-            <button type="button" role="menuitem" @click="selectInstallOption('serial-ha')">
+            <button v-if="canServerSerialFlash" type="button" role="menuitem" @click="selectInstallOption('serial-ha')">
               Serial (HA server)
             </button>
             <button
@@ -91,7 +91,12 @@
             >
               Wireless (OTA)
             </button>
-            <button type="button" role="menuitem" @click="selectInstallOption('download')">Download Binary</button>
+            <button
+              v-if="canFirmwareDownload"
+              type="button"
+              role="menuitem"
+              @click="selectInstallOption('download')"
+            >Download Binary</button>
           </div>
         </div>
         <button
@@ -123,6 +128,11 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { RouterView, useRoute, useRouter } from "vue-router";
 import UnsavedChangesModal from "./components/UnsavedChangesModal.vue";
+import {
+  isRuntimeCapabilityEnabled,
+  loadRuntimeCapabilities,
+  runtimeCapabilities
+} from "./utils/runtimeCapabilities";
 
 const appVersion = __APP_VERSION__;
 const socialLinks = [
@@ -153,6 +163,10 @@ const router = useRouter();
 const isBuilderRoute = computed(() => route.name === "builder");
 const isDashboardRoute = computed(() => route.name === "dashboard");
 const showActionButtons = computed(() => isBuilderRoute.value || isDashboardRoute.value);
+const canYamlImport = computed(() => runtimeCapabilities.yamlImport === true);
+const canLocalYamlImport = computed(() => runtimeCapabilities.localYamlImport === true);
+const canServerSerialFlash = computed(() => runtimeCapabilities.serverSerialFlash === true);
+const canFirmwareDownload = computed(() => runtimeCapabilities.firmwareDownload === true);
 const builderCanInstall = ref(false);
 const builderCanValidate = ref(false);
 const builderCanUseOta = ref(false);
@@ -214,6 +228,7 @@ const handleDashboardActionsState = (event) => {
 };
 
 onMounted(() => {
+  void loadRuntimeCapabilities();
   window.addEventListener("app:builder-compile-state", handleCompileState);
   window.addEventListener("app:dashboard-actions-state", handleDashboardActionsState);
   window.addEventListener("app:route-switch-request", handleRouteSwitchRequest);
@@ -245,7 +260,7 @@ const closeTopbarMenus = () => {
 };
 
 const toggleImportMenu = () => {
-  if (topbarBusy.value) return;
+  if (topbarBusy.value || !canLocalYamlImport.value) return;
   closeInstallMenu();
   importMenuOpen.value = !importMenuOpen.value;
 };
@@ -257,11 +272,15 @@ const toggleInstallMenu = () => {
 };
 
 const selectImportOption = (source) => {
+  if (source === "esphome-builder" && !isRuntimeCapabilityEnabled("yamlImport")) return;
+  if (source === "yaml-file" && !isRuntimeCapabilityEnabled("localYamlImport")) return;
   closeImportMenu();
   window.dispatchEvent(new CustomEvent("app:import-option", { detail: { source } }));
 };
 
 const selectInstallOption = (mode) => {
+  if (mode === "serial-ha" && !isRuntimeCapabilityEnabled("serverSerialFlash")) return;
+  if (mode === "download" && !isRuntimeCapabilityEnabled("firmwareDownload")) return;
   closeInstallMenu();
   window.dispatchEvent(new CustomEvent("app:install-option", { detail: { mode } }));
 };

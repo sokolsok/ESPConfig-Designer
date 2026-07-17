@@ -8,6 +8,14 @@ tests/
 !esp-config-designer/tests/**
 esp-config-designer/tests/**/__pycache__/
 esp-config-designer/tests/**/*.pyc
+desktop/node_modules/
+desktop/src-tauri/target/
+desktop/resources/*
+!desktop/resources/ecd-app/
+desktop/resources/ecd-app/*
+!desktop/resources/ecd-app/README.txt
 scripts/
 .github/workflows/validate.yml
 R&D/
+!desktop/scripts/
+!desktop/scripts/**

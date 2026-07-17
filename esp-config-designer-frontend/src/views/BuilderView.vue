@@ -409,7 +409,7 @@
             </div>
             <div class="components-actions">
               <button
-                v-if="isComponentPickerOpen"
+                v-if="isComponentPickerOpen && canUseCustomComponents"
                 type="button"
                 class="secondary compact btn-standard"
                 :disabled="isComponentsImporting"
@@ -604,6 +604,7 @@ import {
 } from "../utils/displayImageEncoding";
 import { deriveGoogleFontStyle as deriveVariantStyle } from "../utils/displayFonts";
 import { isDevOffline } from "../utils/devFlags";
+import { isRuntimeCapabilityEnabled } from "../utils/runtimeCapabilities";
 
 // BuilderView is now mainly the orchestration shell for the schema-driven editor.
 // UI-heavy sections, preview logic, catalog flow, schema loading, and validation are
@@ -620,6 +621,7 @@ const confirmOpen = ref(false);
 const pendingRemoveIndex = ref(null);
 const isSavingCustomComponent = ref(false);
 const customComponentSaveError = ref("");
+const canUseCustomComponents = computed(() => isRuntimeCapabilityEnabled("customComponents"));
 const confirmAction = ref(null);
 const modeLevels = MODE_LEVELS;
 const nextModeLevelByMode = {
@@ -1497,7 +1499,7 @@ const {
   deleteSavedCustomComponent,
   deletingCustomComponentId,
   filteredCategories,
-  handleComponentsZipSelected,
+  handleComponentsZipSelected: handleComponentsZipSelectedRaw,
   hasUnavailableCatalogComponents,
   importSummaryModalMessage,
   importSummaryModalOpen,
@@ -1508,7 +1510,7 @@ const {
   isComponentsImporting,
   isResolvingComponentSelection,
   isSavedCustomComponentItem,
-  openComponentsZipPicker,
+  openComponentsZipPicker: openComponentsZipPickerRaw,
   openComponentViewer,
   pendingDeleteCustomItem,
   refreshComponentCatalog,
@@ -1526,6 +1528,16 @@ const {
   localComponentCatalogUrl: () => localComponentCatalogUrl,
   customComponentSaveError
 });
+
+const openComponentsZipPicker = () => {
+  if (!canUseCustomComponents.value) return;
+  openComponentsZipPickerRaw();
+};
+
+const handleComponentsZipSelected = (...args) => {
+  if (!canUseCustomComponents.value) return;
+  return handleComponentsZipSelectedRaw(...args);
+};
 
 const { componentSchemas, componentSchemaStatus, ensureComponentSchema } = useBuilderSchemaCatalog({
   config,
@@ -1739,6 +1751,7 @@ const isSavedCustomComponentActive = computed(
 );
 const showSaveCustomComponentAction = computed(
   () =>
+    canUseCustomComponents.value &&
     Boolean(activeCustomComponentId.value) &&
     activeComponentSchema.value?.renderStrategy === "verbatim_root"
 );
@@ -4296,6 +4309,7 @@ const validateCurrentProjectAssetReferences = () => {
 };
 
 const refreshAssets = async (refresh = false, validateProject = false) => {
+  if (!isRuntimeCapabilityEnabled("assets")) return;
   assetsError.value = "";
   assetsLoading.value = true;
   try {
@@ -4331,6 +4345,7 @@ const refreshAssets = async (refresh = false, validateProject = false) => {
 };
 
 const openAssetManager = () => {
+  if (!isRuntimeCapabilityEnabled("assets")) return;
   assetManagerOpen.value = true;
 };
 
@@ -4404,6 +4419,7 @@ const handleSecretsSave = async (content) => {
 };
 
 const handleAssetUpload = async ({ kind, file }) => {
+  if (!isRuntimeCapabilityEnabled("assets")) return;
   const normalizedKind = ["images", "fonts", "audio"].includes(String(kind || "").toLowerCase())
     ? String(kind).toLowerCase()
     : "";
@@ -4424,6 +4440,7 @@ const handleAssetUpload = async ({ kind, file }) => {
 };
 
 const handleAssetRename = async ({ kind, from, to }) => {
+  if (!isRuntimeCapabilityEnabled("assets")) return;
   const normalizedKind = ["images", "fonts", "audio"].includes(String(kind || "").toLowerCase())
     ? String(kind).toLowerCase()
     : "";
@@ -4444,6 +4461,7 @@ const handleAssetRename = async ({ kind, from, to }) => {
 };
 
 const handleAssetDelete = async ({ kind, file }) => {
+  if (!isRuntimeCapabilityEnabled("assets")) return;
   const normalizedKind = ["images", "fonts", "audio"].includes(String(kind || "").toLowerCase())
     ? String(kind).toLowerCase()
     : "";
@@ -4885,14 +4903,14 @@ const handleBuilderVisibilityChange = () => {
 const canInstallProject = computed(() => {
   const currentName = String(projectFilename.value || "").trim();
   const currentYaml = String(yamlPreview.value || "").trim();
-  return Boolean(currentName && currentYaml);
+  return isRuntimeCapabilityEnabled("compile") && Boolean(currentName && currentYaml);
 });
 const canUseOtaInstall = computed(
-  () => projectDeviceStatus.value === "online" && Boolean(activeConnectionHost.value)
+  () => isRuntimeCapabilityEnabled("ota") && projectDeviceStatus.value === "online" && Boolean(activeConnectionHost.value)
 );
 
 const canLogsForCurrentDevice = computed(
-  () => projectDeviceStatus.value === "online"
+  () => isRuntimeCapabilityEnabled("logs") && projectDeviceStatus.value === "online"
 );
 const builderDeviceStatusLabel = computed(() => {
   if (projectDeviceStatus.value === "online") return "Online";
@@ -4968,7 +4986,7 @@ const emitCompileState = () => {
     new CustomEvent("app:builder-compile-state", {
       detail: {
         canInstall: canInstallProject.value,
-        canValidate: canInstallProject.value,
+        canValidate: canInstallProject.value && isRuntimeCapabilityEnabled("validate"),
         canUseOta: canUseOtaInstall.value,
         canLogs: canLogsForCurrentDevice.value,
         canExport: true,
@@ -4998,6 +5016,7 @@ const handleAppInstallOption = (event) => {
     return;
   }
   if (mode === "serial-ha") {
+    if (!isRuntimeCapabilityEnabled("serverSerialFlash")) return;
     handleInstallHaSerialPort();
     return;
   }
@@ -5009,7 +5028,13 @@ const handleAppLogs = () => {
 };
 
 const handleAppValidate = () => {
-  if (!canInstallProject.value || compileIsActive.value || localFlashRunning.value || isProjectSaving.value) return;
+  if (
+    !canInstallProject.value ||
+    !isRuntimeCapabilityEnabled("validate") ||
+    compileIsActive.value ||
+    localFlashRunning.value ||
+    isProjectSaving.value
+  ) return;
   if (formErrors.value.length) {
     formErrorsModalOpen.value = true;
     return;
@@ -5788,7 +5813,7 @@ const handleCustomConfigUpdate = (value) => {
 };
 
 const saveCustomComponentTemplate = async () => {
-  if (!canSaveCustomComponent.value) return;
+  if (!canUseCustomComponents.value || !canSaveCustomComponent.value) return;
   const isUpdate = isSavedCustomComponentActive.value;
   const activeSlot = activeComponentSlot.value;
   const submittedName = activeCustomComponentName.value;
@@ -5844,6 +5869,7 @@ const saveCustomComponentTemplate = async () => {
 };
 
 const requestDeleteSavedCustomComponentWithConfirm = (item) => {
+  if (!canUseCustomComponents.value) return;
   requestDeleteSavedCustomComponent(item);
   if (!pendingDeleteCustomItem.value) return;
   confirmAction.value = "delete-custom";

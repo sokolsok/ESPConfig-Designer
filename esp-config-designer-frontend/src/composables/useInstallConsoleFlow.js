@@ -1,4 +1,5 @@
 import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
+import { isRuntimeCapabilityEnabled } from "../utils/runtimeCapabilities";
 
 let esptoolModule = null;
 let esptoolModulePromise = null;
@@ -64,13 +65,17 @@ export const useInstallConsoleFlow = (options) => {
   let compileLogScrollHandle = null;
   const compileLogQueue = [];
 
-  const canInstall = computed(() => Boolean(options.canInstall?.value ?? options.canInstall?.() ?? false));
+  const optionAllowed = (name) => Boolean(options[name]?.value ?? options[name]?.() ?? false);
+  const capabilityAllowed = (name) => isRuntimeCapabilityEnabled(name);
+  const canInstall = computed(() => capabilityAllowed("compile") && optionAllowed("canInstall"));
   const canValidate = computed(() => {
-    const fallbackInstall = options.canInstall?.value ?? options.canInstall?.() ?? false;
-    return Boolean(options.canValidate?.value ?? options.canValidate?.() ?? fallbackInstall);
+    const fallbackInstall = optionAllowed("canInstall");
+    return capabilityAllowed("validate") && Boolean(options.canValidate?.value ?? options.canValidate?.() ?? fallbackInstall);
   });
-  const canUseOta = computed(() => Boolean(options.canUseOta?.value ?? options.canUseOta?.() ?? false));
-  const canLogs = computed(() => Boolean(options.canLogs?.value ?? options.canLogs?.() ?? false));
+  const canUseOta = computed(() => capabilityAllowed("ota") && optionAllowed("canUseOta"));
+  const canLogs = computed(() => capabilityAllowed("logs") && optionAllowed("canLogs"));
+  const canLocalSerialFlash = computed(() => capabilityAllowed("localSerialFlash"));
+  const canServerSerialFlash = computed(() => capabilityAllowed("serverSerialFlash"));
 
   const compileIsActive = computed(() => ["queued", "running"].includes(compileJobState.value));
   const backendJobIsActive = computed(() => ["queued", "running"].includes(backendJobState.value));
@@ -81,6 +86,7 @@ export const useInstallConsoleFlow = (options) => {
     () =>
       compileModalOpen.value &&
       installPlanMode.value === "download" &&
+      capabilityAllowed("firmwareDownload") &&
       installPlanDownloadReady.value &&
       compileJobState.value === "success"
   );
@@ -521,13 +527,23 @@ export const useInstallConsoleFlow = (options) => {
     resetConsole = true,
     introLine = ""
   }) => {
+    const actionCapability =
+      action === "logs"
+        ? "logs"
+        : action === "validate"
+          ? "validate"
+          : action === "ota"
+            ? "ota"
+            : action === "serial"
+              ? "serverSerialFlash"
+              : "compile";
     const isAllowed =
       action === "logs"
         ? canLogs.value
         : action === "validate"
           ? canValidate.value
           : canInstall.value;
-    if (!isAllowed || compileIsActive.value || localFlashRunning.value) return;
+    if (!isAllowed || !capabilityAllowed(actionCapability) || compileIsActive.value || localFlashRunning.value) return;
     const yamlName = getYamlName();
     if (!yamlName) return;
     compileYamlName.value = yamlName;
@@ -793,7 +809,7 @@ export const useInstallConsoleFlow = (options) => {
   );
 
   const prepareSerialInstall = async () => {
-    if (!canInstall.value || compileIsActive.value || localFlashRunning.value) return;
+    if (!canLocalSerialFlash.value || !canInstall.value || compileIsActive.value || localFlashRunning.value) return;
     if (!serialSupported.value) {
       setError("Your browser does not support Web Serial.");
       return;
@@ -828,6 +844,11 @@ export const useInstallConsoleFlow = (options) => {
   };
 
   const loadHaSerialPorts = async () => {
+    if (!canServerSerialFlash.value) {
+      serialHaPorts.value = [];
+      serialHaPortsError.value = "Server serial is not available in this runtime.";
+      return;
+    }
     serialHaPortsLoading.value = true;
     serialHaPortsError.value = "";
     try {
@@ -846,7 +867,7 @@ export const useInstallConsoleFlow = (options) => {
   };
 
   const prepareHaSerialInstall = async () => {
-    if (!canInstall.value || compileIsActive.value || localFlashRunning.value) return;
+    if (!canServerSerialFlash.value || !canInstall.value || compileIsActive.value || localFlashRunning.value) return;
     clearError();
     installPlanMode.value = "serial-ha";
     installPlanSerialPort.value = null;
@@ -863,6 +884,7 @@ export const useInstallConsoleFlow = (options) => {
   };
 
   const selectHaSerialPort = async (port) => {
+    if (!canServerSerialFlash.value) return;
     const selectedPort = String(port || "").trim();
     if (!selectedPort || serialHaPortsLoading.value || !serialHaPorts.value.some((item) => item?.path === selectedPort)) {
       return;
@@ -876,6 +898,7 @@ export const useInstallConsoleFlow = (options) => {
   };
 
   const downloadBinary = async () => {
+    if (!capabilityAllowed("firmwareDownload")) return;
     clearError();
     try {
       const yamlName = getYamlName();
@@ -952,6 +975,7 @@ export const useInstallConsoleFlow = (options) => {
   };
 
   const handleInstallDownload = async () => {
+    if (!capabilityAllowed("firmwareDownload")) return;
     installPlanMode.value = "download";
     installPlanDownloadReady.value = false;
     await startInstallJob({

@@ -1,0 +1,17 @@
+{
+  "name": "esp-config-designer-desktop",
+  "private": true,
+  "version": "1.3.3",
+  "scripts": {
+    "build:frontend": "npm --prefix ../esp-config-designer-frontend run build",
+    "package:resources": "powershell -ExecutionPolicy Bypass -File scripts/package-resources.ps1",
+    "verify:resources": "powershell -ExecutionPolicy Bypass -File scripts/verify-resources.ps1",
+    "dev": "npm run build:frontend && tauri dev",
+    "tauri": "tauri",
+    "build:dev": "npm run build:frontend && tauri build --debug --no-bundle",
+    "build:package:dev": "npm run build:frontend && npm run package:resources && npm run verify:resources && tauri build --debug --bundles nsis"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.5.0"
+  }
+}
