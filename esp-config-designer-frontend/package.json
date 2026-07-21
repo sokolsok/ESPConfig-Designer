@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "generate:actions": "node scripts/generate-action-definitions.js",
+    "check:actions": "node scripts/generate-action-definitions.js --check",
+    "test": "npm run check:actions && node --test --test-concurrency=1 --import=./tests/register-extensionless-js-loader.mjs",
     "test:capabilities": "node --test tests/runtimeCapabilities.test.mjs",
     "test:diagnostics": "node --test tests/runtimeDiagnostics.test.mjs",
     "dev": "vite",

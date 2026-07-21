@@ -11,12 +11,20 @@
       "lvl": "normal"
     },
     {
-      "key": "eq",
-      "label": "Eq",
-      "type": "text",
+      "key": "eq_preset",
+      "label": "EQ preset",
+      "type": "select",
       "templatable": true,
       "required": true,
-      "lvl": "normal"
+      "lvl": "normal",
+      "options": [
+        "NORMAL",
+        "POP",
+        "ROCK",
+        "JAZZ",
+        "CLASSIC",
+        "BASS"
+      ]
     }
   ]
 }

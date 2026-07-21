@@ -15,11 +15,6 @@ htmlcov/
 /esp-config-designer-frontend/dist/
 /esp-config-designer-frontend/runtime/
 
-# Legacy local frontend tests are audited in Stage 2.
-/esp-config-designer-frontend/tests/*
-!/esp-config-designer-frontend/tests/runtimeCapabilities.test.mjs
-!/esp-config-designer-frontend/tests/runtimeDiagnostics.test.mjs
-
 # Desktop build and packaged resources
 /desktop/src-tauri/target/
 /desktop/resources/*

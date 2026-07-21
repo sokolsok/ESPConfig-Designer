@@ -13,10 +13,14 @@
     {
       "key": "device",
       "label": "Device",
-      "type": "text",
-      "templatable": true,
+      "type": "select",
+      "templatable": false,
       "required": true,
-      "lvl": "normal"
+      "lvl": "normal",
+      "options": [
+        "USB",
+        "TF_CARD"
+      ]
     }
   ]
 }

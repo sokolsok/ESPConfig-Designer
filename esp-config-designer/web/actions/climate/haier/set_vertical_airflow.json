@@ -12,11 +12,19 @@
     },
     {
       "key": "vertical_airflow",
-      "label": "Vertical Airflow",
-      "type": "text",
+      "label": "Vertical airflow",
+      "type": "select",
       "templatable": true,
       "required": true,
-      "lvl": "normal"
+      "lvl": "normal",
+      "options": [
+        "HEALTH_UP",
+        "MAX_UP",
+        "UP",
+        "CENTER",
+        "DOWN",
+        "HEALTH_DOWN"
+      ]
     }
   ]
 }

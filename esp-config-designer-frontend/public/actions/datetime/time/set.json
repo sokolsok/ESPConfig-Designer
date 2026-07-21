@@ -3,11 +3,11 @@
   "fields": [
     {
       "key": "id",
-      "label": "Time",
+      "label": "Datetime",
       "type": "id_ref",
       "required": true,
-      "placeholder": "time_id",
-      "domain": "time",
+      "placeholder": "datetime_id",
+      "domain": "datetime",
       "lvl": "normal"
     },
     {

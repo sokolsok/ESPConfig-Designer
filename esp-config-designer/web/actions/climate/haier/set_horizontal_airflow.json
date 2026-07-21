@@ -12,11 +12,18 @@
     },
     {
       "key": "horizontal_airflow",
-      "label": "Horizontal Airflow",
-      "type": "text",
+      "label": "Horizontal airflow",
+      "type": "select",
       "templatable": true,
       "required": true,
-      "lvl": "normal"
+      "lvl": "normal",
+      "options": [
+        "MAX_LEFT",
+        "LEFT",
+        "CENTER",
+        "RIGHT",
+        "MAX_RIGHT"
+      ]
     }
   ]
 }

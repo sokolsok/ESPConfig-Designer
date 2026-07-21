@@ -75,6 +75,10 @@ Important implications for schema authors:
 - action generator entrypoint: `scripts/generate-action-definitions.js`
 - generator notes: `scripts/README.md`
 
+Run `npm run check:actions` to verify all generated definitions without writing
+files. Run `npm run generate:actions` only when intentionally synchronizing the
+complete generated tree.
+
 ### Typical examples
 
 - `binary_sensor/gpio` -> `public/schemas/components/binary_sensor/gpio.json`
