@@ -1,5 +1,16 @@
 # Runtime Diagnostics Implementation Plan
 
+**Status:** Implemented
+
+**Implemented by:** `f4e1b8a`
+
+**Last reviewed:** 2026-07-21
+
+> Historical context: The task list below is preserved as the implementation
+> plan. The shared backend endpoint, frontend view, packaging rules, and tracked
+> regression tests are present; current behavior is documented in
+> `esp-config-designer/windows/README.md`.
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Add bounded, non-invasive runtime and device diagnostics to the shared backend and present actionable, capability-aware results in the shared Vue frontend.

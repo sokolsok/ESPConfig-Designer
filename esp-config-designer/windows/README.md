@@ -4,9 +4,9 @@ This document is the current technical reference for the Windows desktop
 variant of ESPConfig Designer. It describes the implemented architecture,
 runtime, storage, packaging, diagnostics, verified gates, known limitations and
 release boundaries. Historical plans under `docs/plans/` and private notes
-under ignored `R&D/` are not authoritative for current behavior.
+preserve implementation context but are not authoritative for current behavior.
 
-Last updated: 2026-07-19.
+Last updated: 2026-07-21.
 
 ## Current Status
 
@@ -26,7 +26,7 @@ desktop/src-tauri/target/debug/bundle/nsis/ESPConfig Designer_1.3.3_x64-setup.ex
 SHA-256:
 
 ```text
-A8C165760706CEECCEB001F58114124B2E9019F5B9C539F5103517300608BFE0
+58F2D336B89E9A1C12F96CD2C16CD44DB0127B2ED28FEC84E034529BD038A851
 ```
 
 Authenticode status: `NotSigned`.
@@ -37,8 +37,7 @@ Verified automated state:
 
 - backend `unittest`: 77 tests;
 - Rust/Tauri: 6 tests;
-- frontend capabilities: 6 tests;
-- frontend diagnostics: 4 tests;
+- frontend `npm test`: 173 tests, including capabilities and diagnostics;
 - frontend production build: pass;
 - Cargo check: pass;
 - workspace contract: pass;
@@ -112,7 +111,8 @@ esp-config-designer/windows/git-manifest.json
 
 These are build-machine and gate inputs for the Windows desktop runtime. They
 are not Flask production logic. A future repository cleanup may move them under
-`desktop/windows/`; all script-relative paths must be updated together.
+`desktop/platforms/windows/`; all script-relative paths must be updated
+together.
 
 ### Tauri shell
 
@@ -610,10 +610,12 @@ release, not independently mix frontend, backend and runtime versions.
 
 ## Build Commands
 
-Cargo may not be in the tool session PATH. The current executable is:
+Cargo may not be in the tool session `PATH`. Add its standard per-user install
+directory when necessary:
 
-```text
-C:\Users\Sebastian\.cargo\bin\cargo.exe
+```powershell
+$env:PATH = "$env:USERPROFILE\.cargo\bin;$env:PATH"
+cargo --version
 ```
 
 Prepare runtime:
@@ -641,14 +643,14 @@ npm run verify:resources
 Build debug executable without installer:
 
 ```powershell
-$env:PATH = "C:\Users\Sebastian\.cargo\bin;$env:PATH"
+$env:PATH = "$env:USERPROFILE\.cargo\bin;$env:PATH"
 npm run build:dev
 ```
 
 Build unsigned debug NSIS:
 
 ```powershell
-$env:PATH = "C:\Users\Sebastian\.cargo\bin;$env:PATH"
+$env:PATH = "$env:USERPROFILE\.cargo\bin;$env:PATH"
 npm run build:package:dev
 ```
 
@@ -671,8 +673,7 @@ Frontend:
 
 ```powershell
 cd esp-config-designer-frontend
-npm run test:capabilities
-npm run test:diagnostics
+npm test
 npm run build
 ```
 
@@ -680,8 +681,8 @@ Rust:
 
 ```powershell
 cd desktop\src-tauri
-C:\Users\Sebastian\.cargo\bin\cargo.exe check
-C:\Users\Sebastian\.cargo\bin\cargo.exe test
+cargo check
+cargo test
 ```
 
 Desktop gates:
@@ -801,13 +802,11 @@ Current detailed Windows desktop reference:
 esp-config-designer/windows/README.md
 ```
 
-Implementation plans currently live under:
+Implementation plans live under:
 
 ```text
-esp-config-designer-frontend/docs/plans/
+docs/plans/
 ```
 
-This is a known organizational issue. The private ignored
-`R&D/folder_structure.md` contains the safe cleanup plan. Root `README.md` is
-the public GitHub document and is intentionally deferred until desktop release
-positioning is decided.
+Root `README.md` is the public GitHub document and is intentionally deferred
+until desktop release positioning and repository paths are stable.

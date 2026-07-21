@@ -1,5 +1,16 @@
 # Capabilities And Workspace Contract Implementation Plan
 
+**Status:** Implemented
+
+**Implemented by:** `c339a42` (runtime contract and UI) and `f4e1b8a` (tracked regression tests)
+
+**Last reviewed:** 2026-07-21
+
+> Historical context: The task list below is the original implementation plan.
+> Tauri and installer work later expanded the product scope without replacing
+> the capability or workspace contracts. Current Windows procedures live in
+> `esp-config-designer/windows/README.md`.
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Add a versioned runtime capabilities contract and a neutral desktop workspace status contract without creating Tauri or an installer.
@@ -40,9 +51,9 @@
 ### Task 3: Add the shared frontend normalizer
 
 **Files:**
-- Create: `src/utils/runtimeCapabilities.js`
-- Create: `tests/runtimeCapabilities.test.mjs`
-- Modify: `package.json`
+- Create: `esp-config-designer-frontend/src/utils/runtimeCapabilities.js`
+- Create: `esp-config-designer-frontend/tests/runtimeCapabilities.test.mjs`
+- Modify: `esp-config-designer-frontend/package.json`
 
 **Steps:**
 1. Implement a pure normalizer accepting current, missing, malformed, and older payloads. Unknown backends must deny HA-dependent capabilities and retain only safe local/core defaults.
@@ -53,10 +64,10 @@
 ### Task 4: Guard shared frontend actions and UI
 
 **Files:**
-- Modify: `src/App.vue`
-- Modify: `src/composables/useInstallConsoleFlow.js`
-- Modify: `src/views/DashboardView.vue`
-- Modify: `src/views/BuilderView.vue`
+- Modify: `esp-config-designer-frontend/src/App.vue`
+- Modify: `esp-config-designer-frontend/src/composables/useInstallConsoleFlow.js`
+- Modify: `esp-config-designer-frontend/src/views/DashboardView.vue`
+- Modify: `esp-config-designer-frontend/src/views/BuilderView.vue`
 
 **Steps:**
 1. Load runtime capabilities once when `App.vue` mounts and hide existing-ESPHome import and server serial menu entries when unavailable.
@@ -73,4 +84,4 @@
 1. Run the exact Python `py_compile` command from the request.
 2. Run `py -3.13 -m unittest discover -s tests -v`.
 3. Run the frontend capability tests and `npm run build`.
-4. Execute the Windows launcher procedure from `R&D/Tauri.md` section 24.6 where the prepared runtime is available, then run the offline replay after cache download. Report any unavailable or unperformed gate explicitly.
+4. Follow the build and test procedures in `esp-config-designer/windows/README.md`, then run `esp-config-designer/windows/clean-machine-gate.ps1` for the online/offline replay where the prepared runtime is available. Report any unavailable or unperformed gate explicitly.

@@ -1,5 +1,15 @@
 # Default Desktop Workspace Implementation Plan
 
+**Status:** Implemented
+
+**Implemented by:** `f4e1b8a`, building on the workspace lifecycle from `c339a42`
+
+**Last reviewed:** 2026-07-21
+
+> Historical context: This plan replaced the mandatory first-start picker and
+> visible native workspace menu from the earlier Tauri packaging plan. The
+> fallback picker and guarded `change_workspace` command remain implemented.
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Start a clean Windows desktop installation without a workspace prompt by creating `%USERPROFILE%\Documents\ecd_workspace` automatically.

@@ -1,5 +1,16 @@
 # Offline Portable Runtime Replay Implementation Plan
 
+**Status:** Implemented
+
+**Implemented by:** `c339a42` (desktop environment isolation) and `f4e1b8a` (tracked regression and launcher hardening)
+
+**Last reviewed:** 2026-07-21
+
+> Historical context: The task list and outcome below preserve the original
+> investigation. Tauri packaging and subsequent Desktop gates are now complete;
+> current replay commands and remaining release blockers are documented in
+> `esp-config-designer/windows/README.md`.
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Identify and repair the root cause that prevents an offline ESPHome 2026.6.4 compile from replaying successfully on the prepared Windows portable runtime.
@@ -89,8 +100,9 @@ package instead of the editable package in its own `penv`, which forced
 needed a missing isolated build dependency and timed out.
 
 `runtime_config.py` now removes inherited `PYTHONPATH` for desktop child
-processes. The regression test in `tests/test_runtime_config.py` verifies that
-the desktop environment does not expose it. Online compile, cache replay,
+processes. The regression test in
+`esp-config-designer/tests/test_runtime_config.py` verifies that the desktop
+environment does not expose it. Online compile, cache replay,
 restart replay, offline replay, cancellation and process cleanup all passed.
 
 The next release gates are clean-machine validation, runtime/cache artifact

@@ -1,5 +1,18 @@
 # Tauri Packaging And Workspace Implementation Plan
 
+**Status:** Implemented
+
+**Implemented by:** `c339a42` (resource packaging and Tauri workspace lifecycle) and `f4e1b8a` (current first-start policy and gates)
+
+**Superseded by:** `docs/plans/2026-07-19-default-desktop-workspace.md` (mandatory first-start picker and visible native workspace menu only)
+
+**Last reviewed:** 2026-07-21
+
+> Historical context: Resource packaging, persistence, active-job protection,
+> restart, and rollback remain implemented. The original normal-path picker and
+> its next-agent gate are historical; clean first start now creates the default
+> workspace automatically and uses the picker only as a fallback.
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Package the shared backend, built Vue web root, embedded Windows runtime and licenses as immutable Tauri resources, then require and persist a validated user workspace before starting the backend.
@@ -61,7 +74,7 @@
 **Files:**
 - Modify: `esp-config-designer/server.py`
 - Modify: `esp-config-designer/tests/test_process_control.py` or a new focused test
-- Modify: `esp-config-designer-frontend/docs/plans/2026-07-17-tauri-packaging-workspace.md`
+- Modify: `docs/plans/2026-07-17-tauri-packaging-workspace.md`
 
 **Steps:**
 1. Add `GET /api/jobs/active`, returning only queued/running jobs and no secrets.

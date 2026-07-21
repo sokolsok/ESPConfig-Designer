@@ -1,5 +1,17 @@
 # Runtime Update And Cache Recovery Implementation Plan
 
+**Status:** Implemented
+
+**Implemented by:** `c339a42` (manifest, recovery, and immutable update transaction) and `f4e1b8a` (tracked tests and isolation hardening)
+
+**Last reviewed:** 2026-07-21
+
+> Historical context: The plan and recorded outcomes below describe the
+> implementation gate. `runtime_update.py` remains an experimental immutable
+> payload transaction, not a public updater or replacement for Tauri/NSIS.
+> Later Desktop stages completed the stale next-agent handoff; current behavior
+> and release blockers are documented in `esp-config-designer/windows/README.md`.
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement the plan task-by-task.
 
 **Goal:** Add verifiable Windows runtime update transactions and manifest-gated PlatformIO cache recovery without changing the existing backend/frontend architecture or user data.
@@ -101,7 +113,7 @@ Expected: PASS.
 **Files:**
 - Modify: `esp-config-designer/windows/README.md`
 - Modify: `esp-config-designer/windows/clean-machine-gate.ps1` only for orchestration/reporting if required
-- Modify: `esp-config-designer-frontend/docs/plans/2026-07-17-runtime-update-cache-recovery.md` with outcome
+- Modify: `docs/plans/2026-07-17-runtime-update-cache-recovery.md` with outcome
 
 **Step 1: Add the manual clean-VM procedure**
 
@@ -158,7 +170,7 @@ npm run build -> OK
 
 The new update/recovery tests use user-writable temporary directories and do
 not modify workspace, `p/`, `b/`, `d/`, or `j/` outside their fixtures. The
-isolated `C:\ECDTest` artifact passed the manifest/update unit gate, online
+isolated temporary artifact passed the manifest/update unit gate, online
 compile, cache replay, backend restart replay, offline replay, cancel/process
 cleanup, and a real `1.0.0 -> 1.2.0 -> rollback` pointer sequence. Workspace
 and mutable-data marker hashes were unchanged. This run used a system-only

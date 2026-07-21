@@ -1,5 +1,19 @@
 # Desktop Development Package Gate Implementation Plan
 
+**Status:** Implemented
+
+**Implemented by:** `c339a42` (NSIS development packaging) and `f4e1b8a` (package, workspace, and smoke gates)
+
+**Last reviewed:** 2026-07-21
+
+> Historical context: The execution directive and task list below describe the
+> original development gate. The current worktree is no longer the dirty
+> implementation worktree referenced by that directive. The latest reviewed
+> unsigned installer was rebuilt after `b1c73cc`, has SHA-256
+> `58F2D336B89E9A1C12F96CD2C16CD44DB0127B2ED28FEC84E034529BD038A851`,
+> and passed the user's installation and application check on 2026-07-21.
+> Generated installers remain ignored and are not release artifacts.
+
 > **For OpenCode:** Execute this plan task-by-task in the current dirty worktree. Do not commit, sign, publish, or classify the output as a release.
 
 **Goal:** Produce an unsigned NSIS development/test installer and prove that install, uninstall, and reinstall preserve workspace and application data without writing mutable data into the installation or resource root.
