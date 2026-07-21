@@ -5,7 +5,7 @@
       :busy="leaveModalBusy"
       :error-message="leaveModalError"
       title="Unsaved project"
-      message="Current Builder project has unsaved changes. Save before opening Dashboard?"
+      message="Current Builder project has unsaved changes. Save before leaving Builder?"
       save-text="Save"
       discard-text="Discard"
       cancel-text="Cancel"
@@ -37,6 +37,20 @@
       </div>
 
       <div class="app-topbar-actions">
+        <button
+          v-if="isDiagnosticsRoute"
+          class="btn-standard secondary"
+          @click="requestRouteChange('dashboard')"
+        >
+          Dashboard
+        </button>
+        <button
+          v-else
+          class="btn-standard secondary"
+          @click="requestRouteChange('diagnostics')"
+        >
+          Diagnostics
+        </button>
         <div v-if="isDashboardRoute && canLocalYamlImport" ref="importMenuRef" class="topbar-action-menu">
           <button
             class="btn-standard action-import"
@@ -162,6 +176,7 @@ const route = useRoute();
 const router = useRouter();
 const isBuilderRoute = computed(() => route.name === "builder");
 const isDashboardRoute = computed(() => route.name === "dashboard");
+const isDiagnosticsRoute = computed(() => route.name === "diagnostics");
 const showActionButtons = computed(() => isBuilderRoute.value || isDashboardRoute.value);
 const canYamlImport = computed(() => runtimeCapabilities.yamlImport === true);
 const canLocalYamlImport = computed(() => runtimeCapabilities.localYamlImport === true);
@@ -402,7 +417,7 @@ const requestRouteChange = async (routeName) => {
   const targetRouteName = typeof routeName === "string" && routeName ? routeName : "";
   if (!targetRouteName) return;
   if (route.name === targetRouteName) return;
-  if (isBuilderRoute.value && targetRouteName === "dashboard" && builderHasUnsavedChanges.value) {
+  if (isBuilderRoute.value && targetRouteName !== "builder" && builderHasUnsavedChanges.value) {
     pendingSwitchRouteName.value = targetRouteName;
     leaveModalError.value = "";
     leaveModalBusy.value = false;

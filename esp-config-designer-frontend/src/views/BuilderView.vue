@@ -441,6 +441,7 @@
               :components-available-only="componentsAvailableOnly"
               :component-catalog-error="componentCatalogError"
               :components-import-error="customComponentSaveError"
+              :component-selection-error="componentSelectionError"
               :filtered-categories="filteredCategories"
               :notices="componentPickerNotices"
               :selected-component-keys="selectedComponentKeys"
@@ -621,6 +622,7 @@ const confirmOpen = ref(false);
 const pendingRemoveIndex = ref(null);
 const isSavingCustomComponent = ref(false);
 const customComponentSaveError = ref("");
+const componentSelectionError = ref("");
 const canUseCustomComponents = computed(() => isRuntimeCapabilityEnabled("customComponents"));
 const confirmAction = ref(null);
 const modeLevels = MODE_LEVELS;
@@ -2568,6 +2570,7 @@ const selectComponent = async (item) => {
   if (activeComponentSlot.value === null) return;
   if (!isComponentAvailable(item)) return;
   if (isResolvingComponentSelection.value) return;
+  componentSelectionError.value = "";
   isResolvingComponentSelection.value = true;
   try {
     const index = activeComponentSlot.value;
@@ -2582,7 +2585,11 @@ const selectComponent = async (item) => {
           ? JSON.parse(JSON.stringify(item.prefillConfig))
           : null;
     const schemaResolution = await ensureComponentSchema(item.id, normalizeSchemaPath(item.schemaPath));
-    if (schemaResolution.status !== "ready") return;
+    if (schemaResolution.status !== "ready") {
+      componentSelectionError.value =
+        schemaResolution.message || "Component schema could not be loaded. Retry or check the backend logs.";
+      return;
+    }
     if (getRootMapConflictDomain(item.id, index)) return;
     const nextEntry = {
       id: item.id,

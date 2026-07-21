@@ -44,6 +44,34 @@ def catalog_with_items(items):
 
 
 class ComponentCatalogTests(unittest.TestCase):
+    def test_component_schema_route_serves_nested_schema_paths_on_windows(self):
+        original_mode = server.ECD_MODE
+        original_auth_mode = server.ECD_AUTH_MODE
+        original_web_root = server.WEB_ROOT
+        try:
+            with tempfile.TemporaryDirectory() as temp_dir:
+                web_root = pathlib.Path(temp_dir) / "web"
+                schema_path = web_root / "schemas" / "components" / "display" / "mipi_rgb.json"
+                schema_path.parent.mkdir(parents=True)
+                schema_path.write_text('{"id":"display/mipi_rgb","fields":[]}', encoding="utf-8")
+                server.ECD_MODE = "desktop"
+                server.ECD_AUTH_MODE = "none"
+                server.WEB_ROOT = str(web_root)
+
+                response = server.app.test_client().get(
+                    "/api/component-schemas/components/display/mipi_rgb.json"
+                )
+
+                try:
+                    self.assertEqual(200, response.status_code, response.get_data(as_text=True))
+                    self.assertEqual("display/mipi_rgb", response.json["id"])
+                finally:
+                    response.close()
+        finally:
+            server.ECD_MODE = original_mode
+            server.ECD_AUTH_MODE = original_auth_mode
+            server.WEB_ROOT = original_web_root
+
     def test_zip_member_validation_allows_only_root_license_markdown(self):
         self.assertEqual("LICENSE.md", server.safe_zip_component_package_member_path("LICENSE.md"))
         self.assertEqual("", server.safe_zip_component_package_member_path("license.md"))
@@ -310,6 +338,36 @@ class RuntimeAccessTests(unittest.TestCase):
 
         self.assertEqual(200, response.status_code)
         self.assertEqual("standalone", response.json["mode"])
+
+    def test_desktop_mode_allows_api_without_ingress_headers(self):
+        server.ECD_MODE = "desktop"
+        server.ECD_AUTH_MODE = "none"
+
+        response = self.client.get("/api/runtime")
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual("desktop", response.json["mode"])
+        self.assertEqual(1, response.json["capabilities"]["version"])
+        self.assertFalse(response.json["capabilities"]["yamlImport"])
+        self.assertFalse(response.json["capabilities"]["serverSerialFlash"])
+        self.assertTrue(response.json["capabilities"]["ota"])
+
+    def test_workspace_endpoint_reports_runtime_workspace(self):
+        server.ECD_MODE = "desktop"
+        server.ECD_AUTH_MODE = "none"
+        original_workspace = server.ECD_WORKSPACE_DIR
+        original_app_data = server.ECD_APP_DATA_DIR
+        try:
+            server.ECD_WORKSPACE_DIR = server.TARGET_DIR
+            server.ECD_APP_DATA_DIR = server.JOB_DIR
+            response = self.client.get("/api/workspace")
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(1, response.json["version"])
+            self.assertIn("ready", response.json["workspace"])
+            self.assertTrue(response.json["workspace"]["separateAppData"])
+        finally:
+            server.ECD_WORKSPACE_DIR = original_workspace
+            server.ECD_APP_DATA_DIR = original_app_data
 
     def test_standalone_basic_auth_rejects_missing_credentials(self):
         server.ECD_MODE = "standalone"

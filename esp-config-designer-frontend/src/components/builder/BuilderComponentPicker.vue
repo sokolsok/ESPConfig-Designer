@@ -28,6 +28,9 @@
       <div v-if="componentsImportError" class="notice notice--error components-error">
         {{ componentsImportError }}
       </div>
+      <div v-if="componentSelectionError" class="notice notice--error components-error" role="alert">
+        {{ componentSelectionError }}
+      </div>
       <div v-if="notices.length" class="components-picker-notices">
         <section
           v-for="notice in notices"
@@ -138,6 +141,7 @@ const props = defineProps({
   componentsQuery: { type: String, default: "" },
   componentCatalogError: { type: [Object, String], default: null },
   componentsImportError: { type: String, default: "" },
+  componentSelectionError: { type: String, default: "" },
   componentsAvailableOnly: { type: Boolean, default: false },
   filteredCategories: { type: Array, default: () => [] },
   notices: { type: Array, default: () => [] },

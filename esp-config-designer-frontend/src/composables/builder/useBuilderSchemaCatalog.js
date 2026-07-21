@@ -22,7 +22,7 @@ export const useBuilderSchemaCatalog = ({
 
   const ensureComponentSchema = async (componentId, schemaPath = "") => {
     if (!componentId) {
-      return { status: "error", schema: null };
+      return { status: "error", schema: null, message: "Component identifier is missing." };
     }
     const normalizedSchemaPath = normalizeSchemaPath(schemaPath || catalogSchemaPathById(componentId));
     if (!normalizedSchemaPath) {
@@ -30,7 +30,13 @@ export const useBuilderSchemaCatalog = ({
         ...componentSchemaStatus.value,
         [componentId]: isComponentCatalogReady.value ? "error" : "waiting_catalog"
       };
-      return { status: isComponentCatalogReady.value ? "error" : "waiting_catalog", schema: null };
+      return {
+        status: isComponentCatalogReady.value ? "error" : "waiting_catalog",
+        schema: null,
+        message: isComponentCatalogReady.value
+          ? "The component catalog does not provide a schema path."
+          : "The component catalog is still loading."
+      };
     }
     if (componentSchemas.value[componentId]) {
       componentSchemaStatus.value = {
@@ -62,7 +68,7 @@ export const useBuilderSchemaCatalog = ({
         };
         return { status: "ready", schema };
       })
-      .catch(() => {
+      .catch((error) => {
         componentSchemas.value = {
           ...componentSchemas.value,
           [componentId]: null
@@ -71,7 +77,12 @@ export const useBuilderSchemaCatalog = ({
           ...componentSchemaStatus.value,
           [componentId]: "error"
         };
-        return { status: "error", schema: null };
+        const reason = error instanceof Error && error.message ? ` ${error.message}` : "";
+        return {
+          status: "error",
+          schema: null,
+          message: `Component schema could not be loaded.${reason}`
+        };
       })
       .finally(() => {
         componentSchemaLoadPromises.delete(componentId);

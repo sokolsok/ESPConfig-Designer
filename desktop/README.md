@@ -15,12 +15,13 @@ and port as launcher arguments. The shell waits for a desktop-mode
 `GET /api/health` response before creating the webview at
 `http://127.0.0.1:<port>/`.
 
-Before Flask starts, the shell reads `%LOCALAPPDATA%\ECD\workspace.json`. If it
-does not contain a valid workspace, a native folder picker is shown. The
-selected directory must be writable and must not overlap app-data; the shell
-creates `esp_projects`, `esp_assets\fonts`, `esp_assets\images` and
-`esp_assets\audio`. Canceling the picker shows an error and leaves the backend
-stopped. Workspace data is never written to the installation/resource tree.
+Before Flask starts, the shell reads `%LOCALAPPDATA%\ECD\workspace.json`. A
+valid existing selection is preserved. On a clean first start the shell creates
+`%USERPROFILE%\Documents\ecd_workspace` automatically, validates it, creates
+`esp_projects`, `esp_assets\fonts`, `esp_assets\images` and `esp_assets\audio`,
+then persists the path in `workspace.json`. The native folder picker is used
+only if the default workspace cannot be created or validated. Workspace data is
+never written to the installation/resource tree.
 
 On Windows the backend process is assigned to a Job Object with
 `KILL_ON_JOB_CLOSE`. Closing the Tauri app closes that Job Object and then
@@ -45,7 +46,7 @@ The default Windows paths are:
 ```text
 runtime:  %LOCALAPPDATA%\ECD\runtime
 app data: %LOCALAPPDATA%\ECD
-workspace: %USERPROFILE%\ESPConfig Designer\workspace
+workspace: %USERPROFILE%\Documents\ecd_workspace
 port: 8099
 health timeout: 300 seconds
 ```
@@ -108,9 +109,27 @@ No certificate, signing command or timestamp service is configured. Real code
 signing with a trusted timestamp, Authenticode verification and post-signing
 integrity manifests remain mandatory before publication.
 
-The native `Change Workspace` menu queries `/api/jobs/active` and refuses to
-switch while a queued or running job exists. It never migrates or deletes the
-old workspace.
+The current development installer is a single file:
+
+```text
+desktop/src-tauri/target/debug/bundle/nsis/ESPConfig Designer_1.3.3_x64-setup.exe
+```
+
+It contains the Tauri shell, shared Vue bundle, shared Flask backend, portable
+Python, ESPHome and MinGit. The verified Stage 6 artifact had SHA-256
+`E4F4CD4442B6B6E27F8627541CE6198B51A144282EE19022ACFFFC9F8FB06F17`
+and Authenticode status `NotSigned`. Rebuilding changes the hash.
+
+"Single installer file" does not currently mean "fully offline on every
+Windows machine". Tauri uses the WebView2 download bootstrapper by default if
+WebView2 is missing, and a fresh PlatformIO cache can require network access on
+the first compile. Windows 11 normally includes WebView2, but the release gate
+must not rely on that assumption without a clean-machine test.
+
+The native `Change Workspace` menu is intentionally hidden from the basic UI.
+The Tauri `change_workspace` command, native picker, `/api/jobs/active` guard,
+backend restart and rollback remain implemented for a future advanced setting.
+The command never migrates or deletes the old workspace.
 
 ## Stage 6 gate
 
@@ -133,9 +152,53 @@ resource-root write isolation are already covered by the automated smoke
 tests. The installer and debug executable remain unsigned and are not release
 artifacts.
 
-## Next stage
+## Stage 7 diagnostics gate
 
-Etap 7 adds runtime diagnostics: writable workspace/cache checks, ESPHome and
-PlatformIO runtime checks, cache health, DNS/mDNS checks, OTA/log diagnostics
-and user-facing error messages. Release signing remains out of scope until a
-later stage.
+Etap 7 is implemented in the shared Python backend. `GET /api/diagnostics`
+checks the writable workspace plus PlatformIO cache, ESPHome build/data and job
+roots; exact ESPHome `2026.6.4` and PlatformIO `6.1.19` versions; and read-only
+cache manifest compatibility. The desktop resource packager now includes and
+verifies `runtime_diagnostics.py`; Tauri contains no diagnostic policy.
+
+Without a device selector the network checks are `not_applicable`. Passing the
+`yaml` or `name` of a saved device enables bounded DNS, mDNS, OTA-port and
+native-API/log-port probes. The endpoint never compiles, uploads firmware or
+starts a log job. The Vue Diagnostics view keeps capability-unavailable checks
+visible without presenting them as runtime failures and gives an action for
+warning/error results.
+
+The Stage 7 automated gate passed 77 backend tests, 6 frontend capability tests,
+4 frontend diagnostics tests, the production frontend build, resource packaging
+and resource verification. These checks do not replace a clean-machine release
+gate and do not make the unsigned debug installer a public release.
+
+The first external-PC install exposed inherited Python user/global paths before
+runtime manifest validation. Tauri now removes `PYTHONHOME` and `PYTHONPATH`,
+sets `PYTHONNOUSERSITE=1`, and the Python launcher filters `sys.path` before it
+inspects package metadata. Dependency validation also rejects any pinned package
+loaded outside the embedded runtime. This keeps the manifest independent from
+Python installations already present on the target account.
+
+The external-PC gate then passed per-user install without elevation, workspace
+creation, runtime diagnostics, validate, compile, restart/cache replay, OTA,
+logs, firmware download, process cleanup, uninstall/reinstall data retention and
+same-version repair/replace behavior. DNS and mDNS reported bounded warnings on
+that network, while the direct OTA and native API ports were reachable.
+
+That gate exposed a Windows-only component-schema route defect: converting a
+validated catalog path to backslashes caused Werkzeug to reject every nested
+schema with HTTP 404. The backend now preserves the POSIX relative path,
+frontend selection failures are visible, resource verification checks every
+available catalog schema, and packaged smoke requests a real schema. The latest
+workspace gate additionally verifies unattended default creation, restart reuse
+and preservation of an existing custom selection. The latest unsigned debug
+installer containing these fixes has SHA-256
+`A8C165760706CEECCEB001F58114124B2E9019F5B9C539F5103517300608BFE0`.
+It supersedes earlier Stage 7 test builds and remains a development artifact.
+
+After Etap 7, the distribution/release gate must decide whether the one-file
+installer is online-assisted or fully offline, build a non-debug NSIS package,
+test it on clean supported Windows versions, sign the installer and installed
+PE files with a real trusted certificate and timestamp, verify
+Authenticode/SmartScreen behavior, and publish final hashes. Self-signed or
+simulated signing is not acceptable.

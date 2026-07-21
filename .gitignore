@@ -6,6 +6,10 @@ esp-config-designer-frontend/runtime/
 tests/
 !esp-config-designer/tests/
 !esp-config-designer/tests/**
+!esp-config-designer-frontend/tests/
+esp-config-designer-frontend/tests/*
+!esp-config-designer-frontend/tests/runtimeCapabilities.test.mjs
+!esp-config-designer-frontend/tests/runtimeDiagnostics.test.mjs
 esp-config-designer/tests/**/__pycache__/
 esp-config-designer/tests/**/*.pyc
 desktop/node_modules/
@@ -19,3 +23,5 @@ scripts/
 R&D/
 !desktop/scripts/
 !desktop/scripts/**
+!desktop/tests/
+!desktop/tests/**

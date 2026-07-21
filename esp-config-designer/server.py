@@ -32,6 +32,7 @@ from runtime_config import (
     normalize_runtime_mode,
     workspace_status,
 )
+from runtime_diagnostics import MDNS_TIMEOUT_MS, build_runtime_diagnostics
 from runtime_manifest import refresh_cache_manifest
 
 try:
@@ -1399,9 +1400,10 @@ def build_device_response(device: dict, checks: Optional[dict] = None) -> dict:
 
 
 class MDNSProbe:
-    def __init__(self) -> None:
+    def __init__(self, timeout_ms: int = MDNS_TIMEOUT_MS) -> None:
         self.cache = {}
         self.zc = None
+        self.timeout_ms = max(100, int(timeout_ms))
         if Zeroconf is None:
             return
         try:
@@ -1433,7 +1435,7 @@ class MDNSProbe:
         for service_type in ("_esphomelib._tcp.local.", "_esphome._tcp.local."):
             service_name = f"{node}.{service_type}"
             try:
-                info = self.zc.get_service_info(service_type, service_name, timeout=1200)
+                info = self.zc.get_service_info(service_type, service_name, timeout=self.timeout_ms)
             except Exception:
                 info = None
             if info is not None:
@@ -2343,6 +2345,64 @@ def api_workspace():
     )
 
 
+@app.route("/api/diagnostics", methods=["GET"])
+def api_diagnostics():
+    access = check_access()
+    if access:
+        return access
+
+    raw_yaml = str(request.args.get("yaml", ""))
+    raw_name = str(request.args.get("name", ""))
+    yaml_query = normalize_yaml_filename(raw_yaml)
+    key_query = normalize_device_key(raw_name)
+    if (raw_yaml.strip() and not yaml_query) or (raw_name.strip() and not key_query):
+        return jsonify({"status": "error", "message": "Invalid device selector"}), 400
+
+    devices = load_devices()
+    available_devices = []
+    for device in devices:
+        device_yaml = normalize_yaml_filename(str(device.get("yaml") or ""))
+        device_key = canonical_device_key(device)
+        if not device_key:
+            continue
+        host = str(device.get("host") or "").strip() or f"{device_key}.local"
+        available_devices.append({"name": device_key, "yaml": device_yaml, "host": host})
+
+    selected_device = None
+    if yaml_query or key_query:
+        for device in available_devices:
+            if (yaml_query and device["yaml"] and device["yaml"].lower() == yaml_query.lower()) or (key_query and device["name"] == key_query):
+                selected_device = device
+                break
+        if selected_device is None:
+            return jsonify({"status": "error", "message": "Saved device not found"}), 404
+
+    mdns_probe = MDNSProbe() if selected_device else None
+    try:
+        payload = build_runtime_diagnostics(
+            mode=ECD_MODE,
+            capabilities=runtime_capabilities(),
+            workspace_path=ECD_WORKSPACE_DIR or TARGET_DIR,
+            app_data_path=ECD_APP_DATA_DIR,
+            cache_path=PLATFORMIO_ROOT,
+            build_path=ESPHOME_BUILD_PATH,
+            data_path=ESPHOME_DATA_DIR,
+            jobs_path=JOB_DIR,
+            runtime_manifest_path=RUNTIME_MANIFEST_PATH,
+            cache_manifest_path=CACHE_MANIFEST_PATH,
+            esphome_command=[*parse_esphome_command(ESPHOME_BIN), "version"],
+            platformio_command=[shutil.which("pio") or "pio", "--version"],
+            device=selected_device,
+            mdns_available=mdns_probe is not None and mdns_probe.zc is not None,
+            mdns_probe=mdns_probe.is_online if mdns_probe else (lambda _host: False),
+        )
+    finally:
+        if mdns_probe:
+            mdns_probe.close()
+    payload["devices"] = available_devices
+    return jsonify(payload)
+
+
 @app.route("/api/component-catalog", methods=["GET", "OPTIONS"])
 def api_component_catalog():
     if request.method == "OPTIONS":
@@ -2377,11 +2437,11 @@ def api_component_schema(relpath):
 
     runtime_candidate = resolve_component_schema_path(runtime_base, schema_relpath)
     if runtime_candidate and os.path.isfile(runtime_candidate):
-        return send_from_directory(runtime_base, schema_relpath.replace("/", os.sep), mimetype="application/json")
+        return send_from_directory(runtime_base, schema_relpath, mimetype="application/json")
 
     base_candidate = resolve_component_schema_path(base_base, schema_relpath)
     if base_candidate and os.path.isfile(base_candidate):
-        return send_from_directory(base_base, schema_relpath.replace("/", os.sep), mimetype="application/json")
+        return send_from_directory(base_base, schema_relpath, mimetype="application/json")
 
     return json_error("Schema not found", "COMPONENTS_SCHEMA_NOT_FOUND", 404)
 

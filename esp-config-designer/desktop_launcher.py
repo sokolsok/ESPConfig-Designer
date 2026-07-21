@@ -8,8 +8,13 @@ import sys
 
 os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
 
-# The embedded distribution's *_pth file intentionally has a minimal sys.path.
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+# The launcher must not inherit user/global packages before manifest validation.
+launcher_backend_root = Path(__file__).resolve().parent
+sys.path.insert(0, str(launcher_backend_root))
+
+from runtime_config import isolate_embedded_python
+
+isolate_embedded_python(Path(sys.executable).resolve().parent, launcher_backend_root)
 
 from runtime_config import (
     DesktopRuntimePaths,
@@ -36,7 +41,7 @@ def parse_args(argv=None):
     parser = argparse.ArgumentParser(description="Run the shared ESPConfig Designer backend in desktop mode.")
     parser.add_argument("--runtime-root", type=Path, default=app_data_root / "runtime")
     parser.add_argument("--app-data-root", type=Path, default=app_data_root)
-    parser.add_argument("--workspace", type=Path, default=Path.home() / "ESPConfig Designer" / "workspace")
+    parser.add_argument("--workspace", type=Path, default=Path.home() / "Documents" / "ecd_workspace")
     parser.add_argument("--backend-root", type=Path, default=backend_root)
     parser.add_argument("--web-root", type=Path, default=None)
     parser.add_argument("--application-store", type=Path, default=None)
@@ -67,7 +72,7 @@ def prepare_runtime(args):
             "Launcher must be started with the selected embedded Python: "
             f"{runtime_python}"
         )
-    validate_runtime_dependencies()
+    validate_runtime_dependencies(runtime_root)
     paths = DesktopRuntimePaths(
         backend_root=backend_root,
         runtime_root=runtime_root,

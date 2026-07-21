@@ -4,7 +4,7 @@ ENV LANG=C.UTF-8
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
-RUN python3 -m venv /opt/designer-venv \
+RUN python3 -m venv --system-site-packages /opt/designer-venv \
     && /opt/designer-venv/bin/python -m pip install --no-cache-dir -U pip \
     && /opt/designer-venv/bin/python -m pip install --no-cache-dir \
        flask==3.1.2 \
@@ -13,6 +13,7 @@ RUN python3 -m venv /opt/designer-venv \
 COPY server.py /server.py
 COPY runtime_config.py /runtime_config.py
 COPY runtime_manifest.py /runtime_manifest.py
+COPY runtime_diagnostics.py /runtime_diagnostics.py
 COPY run.sh /run.sh
 COPY seed_esphome /seed_esphome
 COPY logo.png /logo.png

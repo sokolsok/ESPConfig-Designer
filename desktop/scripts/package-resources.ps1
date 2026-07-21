@@ -26,6 +26,7 @@ foreach ($requiredPath in @(
     (Join-Path $backendSource "desktop_launcher.py"),
     (Join-Path $backendSource "runtime_config.py"),
     (Join-Path $backendSource "runtime_manifest.py"),
+    (Join-Path $backendSource "runtime_diagnostics.py"),
     (Join-Path $backendSource "runtime_update.py"),
     (Join-Path $backendSource "seed_esphome"),
     (Join-Path $frontendDist "index.html"),
@@ -46,7 +47,7 @@ if (Test-Path -LiteralPath $OutputRoot) {
 New-Item -ItemType Directory -Path $backendOutput -Force | Out-Null
 New-Item -ItemType Directory -Path $runtimeOutput -Force | Out-Null
 
-foreach ($fileName in @("server.py", "desktop_launcher.py", "runtime_config.py", "runtime_manifest.py", "runtime_update.py")) {
+foreach ($fileName in @("server.py", "desktop_launcher.py", "runtime_config.py", "runtime_manifest.py", "runtime_diagnostics.py", "runtime_update.py")) {
     Copy-Item -LiteralPath (Join-Path $backendSource $fileName) -Destination (Join-Path $backendOutput $fileName)
 }
 Copy-Item -LiteralPath (Join-Path $backendSource "seed_esphome") -Destination $backendOutput -Recurse

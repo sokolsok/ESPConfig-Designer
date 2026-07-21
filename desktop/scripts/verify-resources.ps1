@@ -17,6 +17,7 @@ foreach ($requiredPath in @(
     (Join-Path $backendRoot "desktop_launcher.py"),
     (Join-Path $backendRoot "runtime_config.py"),
     (Join-Path $backendRoot "runtime_manifest.py"),
+    (Join-Path $backendRoot "runtime_diagnostics.py"),
     (Join-Path $backendRoot "runtime_update.py"),
     (Join-Path $backendRoot "web\index.html"),
     (Join-Path $runtimeRoot "python.exe"),
@@ -36,6 +37,26 @@ if ($layout.mutableDataPolicy -ne "app-data-only") {
 }
 if ($layout.workspacePolicy -ne "user-selected-outside-app-data") {
     throw "Resource layout has an invalid workspace policy"
+}
+
+$catalogPath = Join-Path $backendRoot "web\components_list\components_list.json"
+if (-not (Test-Path -LiteralPath $catalogPath -PathType Leaf)) {
+    throw "Packaged component catalog is missing: $catalogPath"
+}
+$catalog = Get-Content -LiteralPath $catalogPath -Raw | ConvertFrom-Json
+$catalogItems = @()
+foreach ($category in @($catalog.categories)) {
+    $catalogItems += @($category.items)
+    foreach ($subcategory in @($category.subcategories)) {
+        $catalogItems += @($subcategory.items)
+    }
+}
+foreach ($item in $catalogItems) {
+    if ($item.available -eq $false -or -not $item.schemaPath) { continue }
+    $schemaPath = Join-Path (Join-Path $backendRoot "web\schemas") ($item.schemaPath -replace '/', '\')
+    if (-not (Test-Path -LiteralPath $schemaPath -PathType Leaf)) {
+        throw "Packaged component schema is missing: $($item.schemaPath)"
+    }
 }
 
 $generatedFiles = Get-ChildItem -LiteralPath $ResourcesRoot -Recurse -Force -File |

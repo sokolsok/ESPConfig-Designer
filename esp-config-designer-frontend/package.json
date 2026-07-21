@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "generate:actions": "node scripts/generate-action-definitions.js",
+    "test:capabilities": "node --test tests/runtimeCapabilities.test.mjs",
+    "test:diagnostics": "node --test tests/runtimeDiagnostics.test.mjs",
     "dev": "vite",
     "serve": "vite",
     "build": "vite build",

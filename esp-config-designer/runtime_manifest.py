@@ -119,21 +119,22 @@ def collect_platformio_inventory(platformio_root: Path) -> dict[str, list[dict[s
     """Collect versioned PlatformIO platform and tool/package descriptors."""
     root = Path(platformio_root)
     inventories: dict[str, list[dict[str, Any]]] = {"platforms": [], "packages": []}
-    for category, directory_name, manifest_name in (
-        ("platforms", "f", "platform.json"),
-        ("packages", "k", "package.json"),
+    for category, directory_names, manifest_name in (
+        ("platforms", ("f", "platforms"), "platform.json"),
+        ("packages", ("k", "packages"), "package.json"),
     ):
-        directory = root / directory_name
-        if not directory.is_dir():
-            continue
-        for manifest_path in sorted(directory.rglob(manifest_name)):
-            try:
-                payload = json.loads(manifest_path.read_text(encoding="utf-8"))
-            except (OSError, UnicodeError, json.JSONDecodeError) as exc:
-                raise ManifestError(f"Invalid PlatformIO manifest: {manifest_path}") from exc
-            if not isinstance(payload, dict):
-                raise ManifestError(f"Invalid PlatformIO manifest object: {manifest_path}")
-            inventories[category].append(_manifest_entry(manifest_path, root, payload))
+        for directory_name in directory_names:
+            directory = root / directory_name
+            if not directory.is_dir():
+                continue
+            for manifest_path in sorted(directory.rglob(manifest_name)):
+                try:
+                    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+                except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+                    raise ManifestError(f"Invalid PlatformIO manifest: {manifest_path}") from exc
+                if not isinstance(payload, dict):
+                    raise ManifestError(f"Invalid PlatformIO manifest object: {manifest_path}")
+                inventories[category].append(_manifest_entry(manifest_path, root, payload))
     return inventories
 
 
@@ -206,6 +207,39 @@ class CacheRecoveryResult:
     reason: str
     quarantined_path: Optional[Path] = None
     manifest_path: Path = Path()
+
+
+def inspect_cache_compatibility(
+    platformio_root: Path,
+    runtime_manifest_path: Path,
+    cache_manifest_path: Path,
+) -> dict[str, Any]:
+    """Inspect cache inventory and manifests without writing or quarantining data."""
+    root = Path(platformio_root)
+    inventory = collect_platformio_inventory(root)
+    counts = {name: len(entries) for name, entries in inventory.items()}
+    runtime_path = Path(runtime_manifest_path)
+    cache_path = Path(cache_manifest_path)
+    if not runtime_path.is_file():
+        return {"compatible": None, "reason": "runtime-manifest-missing", "inventory": counts}
+    if not cache_path.is_file():
+        return {"compatible": None, "reason": "cache-manifest-missing", "inventory": counts}
+
+    try:
+        runtime_manifest = _read_manifest(runtime_path)
+        if runtime_manifest.get("kind") != "runtime":
+            raise ManifestError(f"Not a runtime manifest: {runtime_path}")
+        cache_manifest = _read_manifest(cache_path)
+        expected = build_cache_manifest(runtime_manifest, root)
+    except ManifestError:
+        return {"compatible": False, "reason": "invalid-manifest", "inventory": counts}
+
+    compatible = cache_manifest == expected
+    return {
+        "compatible": compatible,
+        "reason": "compatible" if compatible else "manifest-mismatch",
+        "inventory": counts,
+    }
 
 
 def ensure_cache_compatible(

@@ -54,6 +54,18 @@ class YamlImportEndpointTests(unittest.TestCase):
         self.assertEqual("living_room.json", item["projectName"])
         self.assertTrue(item["projectExists"])
 
+    def test_desktop_rejects_import_from_existing_esphome_storage(self):
+        original_mode = server.ECD_MODE
+        try:
+            server.ECD_MODE = "desktop"
+            response = self.client.get("/api/import/yaml-candidates")
+
+            self.assertEqual(403, response.status_code)
+            self.assertEqual("CAPABILITY_UNAVAILABLE", response.json["code"])
+            self.assertEqual("yamlImport", response.json["capability"])
+        finally:
+            server.ECD_MODE = original_mode
+
     def test_import_yaml_load_reads_esphome_config_dir(self):
         (self.target_dir / "ecd_only.yaml").write_text("esphome:\n  name: ecd_only\n", encoding="utf-8")
         (self.esphome_config_dir / "living_room.yaml").write_text("esphome:\n  name: living_room\n", encoding="utf-8")
@@ -111,6 +123,47 @@ class YamlImportEndpointTests(unittest.TestCase):
         self.assertEqual("ok", response.json["status"])
         self.assertTrue((self.project_dir / "living_room.json").is_file())
         self.assertEqual(yaml_text, (self.target_dir / "living_room.yaml").read_text(encoding="utf-8"))
+
+    def test_desktop_rejects_source_yaml_import_but_allows_local_bundle_shape(self):
+        original_mode = server.ECD_MODE
+        try:
+            server.ECD_MODE = "desktop"
+            payload = {
+                "projectName": "living_room.json",
+                "yamlName": "living_room.yaml",
+                "sourceYamlName": "existing.yaml",
+                "projectData": {"schemaVersion": 1},
+                "yaml": "esphome:\n  name: living_room\n",
+                "overwrite": False,
+            }
+
+            response = self.client.post("/api/import/project", json=payload)
+
+            self.assertEqual(403, response.status_code)
+            self.assertEqual("yamlImport", response.json["capability"])
+        finally:
+            server.ECD_MODE = original_mode
+
+    def test_desktop_allows_browser_local_yaml_bundle_import(self):
+        original_mode = server.ECD_MODE
+        try:
+            server.ECD_MODE = "desktop"
+            response = self.client.post(
+                "/api/import/project",
+                json={
+                    "projectName": "local.json",
+                    "yamlName": "local.yaml",
+                    "projectData": {"schemaVersion": 1},
+                    "yaml": "esphome:\n  name: local\n",
+                    "overwrite": False,
+                },
+            )
+
+            self.assertEqual(200, response.status_code, response.get_data(as_text=True))
+            self.assertTrue((self.project_dir / "local.json").is_file())
+            self.assertTrue((self.target_dir / "local.yaml").is_file())
+        finally:
+            server.ECD_MODE = original_mode
 
     def test_import_project_keeps_project_conflict_for_existing_source_yaml(self):
         yaml_text = "esphome:\n  name: living_room\n"

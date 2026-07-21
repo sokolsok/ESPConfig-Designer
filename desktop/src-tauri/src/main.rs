@@ -11,7 +11,6 @@ use std::sync::Mutex;
 use std::thread;
 use std::time::{Duration, Instant};
 use serde::{Deserialize, Serialize};
-use tauri::menu::{MenuBuilder, MenuItemBuilder};
 use tauri::{AppHandle, Manager, RunEvent, State, WebviewUrl, WebviewWindowBuilder};
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 
@@ -127,8 +126,11 @@ impl BackendConfig {
             .env("HOST", "127.0.0.1")
             .env("PORT", self.port.to_string())
             .env("PYTHONDONTWRITEBYTECODE", "1")
+            .env("PYTHONNOUSERSITE", "1")
             .env("PYTHONUTF8", "1")
             .env("PYTHONIOENCODING", "utf-8")
+            .env_remove("PYTHONHOME")
+            .env_remove("PYTHONPATH")
             .stdin(Stdio::null())
             .stdout(Stdio::inherit())
             .stderr(Stdio::inherit());
@@ -339,6 +341,23 @@ fn read_saved_workspace(app_data_root: &PathBuf) -> Option<PathBuf> {
     Some(PathBuf::from(record.workspace))
 }
 
+fn default_workspace(profile: &PathBuf) -> PathBuf {
+    profile.join("Documents").join("ecd_workspace")
+}
+
+fn prepare_default_workspace(app_data_root: &PathBuf) -> Result<PathBuf, String> {
+    let workspace = default_workspace(&home_dir());
+    fs::create_dir_all(&workspace).map_err(|error| {
+        format!(
+            "Could not create the default workspace '{}': {error}",
+            workspace.display()
+        )
+    })?;
+    let workspace = prepare_workspace(&workspace, app_data_root)?;
+    save_workspace(app_data_root, &workspace)?;
+    Ok(workspace)
+}
+
 fn show_workspace_error(app: &AppHandle, message: &str) {
     app.dialog()
         .message(message)
@@ -358,6 +377,14 @@ fn pick_workspace(app: &AppHandle, app_data_root: &PathBuf) -> Result<PathBuf, S
         if let Ok(workspace) = prepare_workspace(&saved, app_data_root) {
             return Ok(workspace);
         }
+    }
+
+    match prepare_default_workspace(app_data_root) {
+        Ok(workspace) => return Ok(workspace),
+        Err(error) => show_workspace_error(
+            app,
+            &format!("{error}\n\nChoose another workspace directory to continue."),
+        ),
     }
 
     pick_workspace_from_dialog(app, app_data_root)
@@ -640,27 +667,6 @@ fn main() {
                 process: Mutex::new(Some(backend)),
                 config: Mutex::new(config),
             });
-            let workspace_item = MenuItemBuilder::with_id("change-workspace", "Change Workspace")
-                .build(app)
-                .map_err(|error| Box::<dyn std::error::Error>::from(format!("Could not create workspace menu: {error}")))?;
-            let menu = MenuBuilder::new(app)
-                .items(&[&workspace_item])
-                .build()
-                .map_err(|error| Box::<dyn std::error::Error>::from(format!("Could not create application menu: {error}")))?;
-            app.set_menu(menu)
-                .map_err(|error| Box::<dyn std::error::Error>::from(format!("Could not install application menu: {error}")))?;
-            app.on_menu_event(|app, event| {
-                if event.id().as_ref() != "change-workspace" {
-                    return;
-                }
-                if let Some(controller) = app.try_state::<BackendController>() {
-                    if let Err(error) = change_workspace_inner(app, controller.inner()) {
-                        show_workspace_error(app, &error);
-                    } else if let Some(window) = app.get_webview_window("main") {
-                        let _ = window.eval("window.location.reload()");
-                    }
-                }
-            });
             Ok(())
         });
     match builder.build(tauri::generate_context!()) {
@@ -708,6 +714,16 @@ mod tests {
         assert!(workspace.join("esp_assets/images").is_dir());
         assert!(workspace.join("esp_assets/audio").is_dir());
         let _ = fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn default_workspace_uses_documents_directory() {
+        let profile = PathBuf::from(r"C:\Users\Workspace User żółć");
+
+        assert_eq!(
+            default_workspace(&profile),
+            profile.join("Documents").join("ecd_workspace")
+        );
     }
 
     #[test]
@@ -769,6 +785,15 @@ mod tests {
 
         assert_eq!(python_utf8, Some(OsStr::new("1")));
         assert_eq!(python_io_encoding, Some(OsStr::new("utf-8")));
+        assert!(command
+            .get_envs()
+            .any(|(name, value)| name == OsStr::new("PYTHONPATH") && value.is_none()));
+        assert!(command
+            .get_envs()
+            .any(|(name, value)| name == OsStr::new("PYTHONHOME") && value.is_none()));
+        assert!(command
+            .get_envs()
+            .any(|(name, value)| name == OsStr::new("PYTHONNOUSERSITE") && value == Some(OsStr::new("1"))));
         assert_eq!(arguments.first().copied(), Some(OsStr::new("-B")));
         assert_eq!(arguments.get(1).copied(), Some(config.script.as_os_str()));
     }

@@ -1,67 +1,636 @@
-# Windows Portable Runtime Prototype
+# ESPConfig Designer Windows Desktop
 
-This directory contains the pre-Tauri Windows runtime prototype. It starts
-the shared `server.py`; it does not contain a second backend or frontend.
+This document is the current technical reference for the Windows desktop
+variant of ESPConfig Designer. It describes the implemented architecture,
+runtime, storage, packaging, diagnostics, verified gates, known limitations and
+release boundaries. Historical plans under `docs/plans/` and private notes
+under ignored `R&D/` are not authoritative for current behavior.
 
-## Decision
+Last updated: 2026-07-19.
 
-The selected packaging direction is the official Python 3.13.9 portable
-distribution (NuGet package, including `venv` and `ensurepip`) with pinned
-Python packages:
+## Current Status
 
-- ESPHome `2026.6.4`
-- PlatformIO `6.1.19`
-- Flask `3.1.2`
-- pyserial `3.5`
+The Windows desktop application is functional as an unsigned development build.
+It has passed installation and application tests on another ordinary-user PC,
+including workspace creation, validation, compilation, cache replay, OTA, logs,
+firmware download, process cleanup, uninstall/reinstall and same-version repair.
 
-Git is supplied separately as official Git for Windows MinGit:
+Current source/application version: `1.3.3`.
 
-- version `2.55.0.windows.3` (release tag `v2.55.0.windows.3`)
-- archive `MinGit-2.55.0.3-64-bit.zip`
-- source: `https://github.com/git-for-windows/git/releases/download/v2.55.0.windows.3/MinGit-2.55.0.3-64-bit.zip`
-- SHA-256: `f48e2d2dc74a24454adc6d8fd0ac25bf9c2386f19cfb06202b9465aaad4f9f05`
-- the official release tag has a verified Git for Windows maintainer signature
-
-PlatformIO platforms, packages and its download cache are not shipped in the
-runtime. They are downloaded lazily on the first compile and kept in the
-user's application data directory.
-
-The desktop launcher removes inherited `PYTHONPATH` from the child environment.
-PlatformIO 6.1.19 installs its local `tool-esptoolpy` package with
-`uv --force-reinstall` only when its provenance check requires it; keeping the
-PlatformIO `penv` import path isolated prevents the base runtime's same-named
-`esptool` package from forcing that reinstall on every replay.
-
-PyInstaller is not the primary option. ESPHome uses dynamic imports and
-PlatformIO starts additional tools and owns large data trees. A PyInstaller
-build would need maintained hidden-import/data rules and still would not
-remove the need for PlatformIO toolchain downloads. The existing Windows
-spike proved a real compile with the normal Python distribution, but did not
-prove a PyInstaller executable.
-
-## Layout
-
-The launcher keeps immutable application files, runtime files and mutable
-user data separate:
+Latest unsigned debug NSIS:
 
 ```text
-<application>/esp-config-designer/     server.py, web/, seed_esphome/
-%LOCALAPPDATA%\ECD\runtime\           embedded Python and Python packages
-%LOCALAPPDATA%\ECD\runtime\git\       immutable bundled MinGit and licenses
-%LOCALAPPDATA%\ECD\p\                 PlatformIO core/platforms/packages/cache
-%LOCALAPPDATA%\ECD\b\                 ESPHome build root
-%LOCALAPPDATA%\ECD\d\                 ESPHome data
-%LOCALAPPDATA%\ECD\j\                 backend job status and logs
-<workspace>\                           esp_projects, esp_assets, YAML, secrets
+desktop/src-tauri/target/debug/bundle/nsis/ESPConfig Designer_1.3.3_x64-setup.exe
 ```
 
-The compact `p/f`, `p/k`, and `p/c` directories are intentional. They keep
-PlatformIO command lines short without using `subst` or a mapped drive.
+SHA-256:
 
-## Tauri Resource Assembly
+```text
+A8C165760706CEECCEB001F58114124B2E9019F5B9C539F5103517300608BFE0
+```
 
-The production-like Tauri resource layout is generated from the shared source
-tree and a prepared portable runtime. From `desktop/` run:
+Authenticode status: `NotSigned`.
+
+This artifact is for development and testing only. It is not a public release.
+
+Verified automated state:
+
+- backend `unittest`: 77 tests;
+- Rust/Tauri: 6 tests;
+- frontend capabilities: 6 tests;
+- frontend diagnostics: 4 tests;
+- frontend production build: pass;
+- Cargo check: pass;
+- workspace contract: pass;
+- automatic first-start workspace gate: pass;
+- packaged resource verification: pass;
+- packaged Tauri smoke: pass.
+
+No release signing, trusted timestamp, public updater or clean Windows 10 gate
+has been completed.
+
+## Architecture Principles
+
+The product has three deployment variants:
+
+1. Home Assistant Add-on.
+2. Standalone Docker.
+3. Tauri desktop.
+
+All variants share one frontend and one backend:
+
+```text
+esp-config-designer-frontend/   Vue 3 + Vite source
+esp-config-designer/server.py   shared Flask backend
+desktop/                        thin Tauri shell and package target
+```
+
+The desktop target does not contain a second application or business backend.
+Tauri owns native window, workspace bootstrap, process lifecycle, resource
+resolution and packaging. The Python backend owns projects, assets, devices,
+jobs, ESPHome execution, diagnostics and firmware artifacts.
+
+Do not move ESPHome business logic, diagnostics or job orchestration into Rust
+or PowerShell. Do not copy the Vue application into `desktop/` as source.
+
+## Repository Ownership
+
+### Shared backend
+
+```text
+esp-config-designer/server.py
+esp-config-designer/runtime_config.py
+esp-config-designer/runtime_manifest.py
+esp-config-designer/runtime_diagnostics.py
+esp-config-designer/tests/
+```
+
+`runtime_config.py` currently contains both shared capability/path helpers and
+desktop runtime setup. This mixed responsibility is known and should only be
+split in a dedicated refactor with import and Docker regression coverage.
+
+### Desktop Python bootstrap
+
+```text
+esp-config-designer/desktop_launcher.py
+esp-config-designer/runtime_update.py
+```
+
+These files are desktop-oriented but remain beside the backend so the packaged
+payload can import and execute the one `server.py`. Their source placement is
+historical and may be reorganized later without creating a second backend.
+
+### Windows runtime preparation
+
+```text
+esp-config-designer/windows/prepare-runtime.ps1
+esp-config-designer/windows/launch.ps1
+esp-config-designer/windows/clean-machine-gate.ps1
+esp-config-designer/windows/requirements-runtime.txt
+esp-config-designer/windows/git-manifest.json
+```
+
+These are build-machine and gate inputs for the Windows desktop runtime. They
+are not Flask production logic. A future repository cleanup may move them under
+`desktop/windows/`; all script-relative paths must be updated together.
+
+### Tauri shell
+
+```text
+desktop/package.json
+desktop/scripts/package-resources.ps1
+desktop/scripts/verify-resources.ps1
+desktop/tests/
+desktop/src-tauri/Cargo.toml
+desktop/src-tauri/Cargo.lock
+desktop/src-tauri/tauri.conf.json
+desktop/src-tauri/capabilities/default.json
+desktop/src-tauri/src/main.rs
+```
+
+### Generated and ignored data
+
+```text
+esp-config-designer-frontend/dist/
+desktop/resources/ecd-app/
+desktop/src-tauri/target/
+desktop/node_modules/
+esp-config-designer-frontend/node_modules/
+```
+
+`desktop/resources/ecd-app/README.txt` is the tracked marker for the generated
+resource boundary. Generated payload, target output and installers must not be
+committed.
+
+## Pinned Runtime
+
+The Windows desktop runtime is intentionally reproducible and version-pinned:
+
+| Dependency | Version |
+|---|---:|
+| Python NuGet portable | `3.13.9` |
+| ESPHome | `2026.6.4` |
+| PlatformIO Core | `6.1.19` |
+| Flask | `3.1.2` |
+| pyserial | `3.5` |
+| setuptools | `82.0.0` |
+| wheel | `0.47.0` |
+| MinGit | `2.55.0.windows.3` |
+| Tauri CLI | `2.5.0` |
+
+The Rust dependency graph is controlled by `desktop/src-tauri/Cargo.lock`.
+
+Do not upgrade ESPHome, PlatformIO, Python, Git or runtime packages as part of
+an unrelated change. A runtime change requires a new manifest, cache
+compatibility validation, compile/cache/offline gates and a rebuilt installer.
+
+## Runtime Preparation
+
+The build-machine runtime is prepared at:
+
+```text
+%LOCALAPPDATA%\ECD\runtime
+```
+
+Run from the backend directory:
+
+```powershell
+.\windows\prepare-runtime.ps1
+```
+
+The script:
+
+1. Downloads Python NuGet `3.13.9`.
+2. Installs exact dependencies from `requirements-runtime.txt`.
+3. Downloads the MinGit archive described by `git-manifest.json`.
+4. Verifies the MinGit SHA-256 and exact version.
+5. Builds `runtime-manifest.json`.
+
+The prepared runtime is a packaging input. End users do not install Python,
+ESPHome, PlatformIO or Git separately.
+
+## Packaged Resource Layout
+
+`desktop/scripts/package-resources.ps1` assembles:
+
+```text
+desktop/resources/ecd-app/
+├── backend/
+│   ├── server.py
+│   ├── desktop_launcher.py
+│   ├── runtime_config.py
+│   ├── runtime_manifest.py
+│   ├── runtime_diagnostics.py
+│   ├── runtime_update.py
+│   ├── seed_esphome/
+│   └── web/
+├── runtime/
+│   ├── python.exe
+│   ├── runtime-manifest.json
+│   ├── git-manifest.json
+│   └── git/
+└── resource-layout.json
+```
+
+The package script copies:
+
+- shared backend modules from `esp-config-designer/`;
+- the single frontend build from `esp-config-designer-frontend/dist/`;
+- the prepared portable runtime from `%LOCALAPPDATA%\ECD\runtime`.
+
+It removes generated `__pycache__`, `.pyc` and `.pyo` files from immutable
+resources.
+
+`desktop/scripts/verify-resources.ps1` verifies required backend/runtime files,
+resource policy, absence of generated bytecode, component catalog presence and
+that every available catalog item has a packaged schema.
+
+## Installation and Storage
+
+### Installation root
+
+The current NSIS install is per-user and normally uses:
+
+```text
+%LOCALAPPDATA%\ESPConfig Designer
+```
+
+It contains the Tauri executable, uninstaller and immutable `ecd-app` resource
+tree. It must not contain workspace, cache, builds, job logs, mutable manifests
+or generated Python bytecode.
+
+### App data
+
+Mutable machine-local data uses:
+
+```text
+%LOCALAPPDATA%\ECD
+```
+
+Layout:
+
+```text
+ECD/
+├── workspace.json       selected workspace pointer
+├── devices.json         saved device registry, created when needed
+├── p/                   active PlatformIO cache
+│   ├── f/               platform descriptors
+│   ├── k/               packages/toolchains
+│   ├── c/               downloads/cache
+│   └── cache-manifest.json
+├── b/                   ESPHome project builds and firmware
+├── d/                   ESPHome data
+├── g/                   ESPHome config data
+├── h/                   isolated HOME
+├── j/                   job JSON state and logs
+└── cache-recovery/      quarantined incompatible PlatformIO caches
+```
+
+Short directory names are intentional. PlatformIO and ESP-IDF create deep
+paths, and short stable roots reduce Windows command-line/path-length failures.
+
+The build-machine may also contain `%LOCALAPPDATA%\ECD\runtime`; a normal
+installed desktop user uses the packaged runtime under the installation root.
+
+### Workspace
+
+On a clean first start Tauri automatically creates:
+
+```text
+%USERPROFILE%\Documents\ecd_workspace
+```
+
+Layout:
+
+```text
+ecd_workspace/
+├── esp_projects/
+├── esp_assets/
+│   ├── fonts/
+│   ├── images/
+│   └── audio/
+├── esp_components/      custom component data when used
+├── *.yaml
+└── secrets.yaml         when created by the user/application
+```
+
+Workspace resolution order:
+
+1. `ECD_TAURI_WORKSPACE` development/test override.
+2. Valid `%LOCALAPPDATA%\ECD\workspace.json` selection.
+3. Automatic `%USERPROFILE%\Documents\ecd_workspace` creation.
+4. Native folder picker only if the default cannot be created or validated.
+
+An existing valid custom workspace is never migrated or replaced. The default
+is only created for a user with no valid saved selection.
+
+The native `Change Workspace` menu is hidden from the basic UI. The Tauri
+`change_workspace` command, picker, active-job check, backend restart and
+rollback remain implemented for a future advanced Vue setting.
+
+The workspace must be writable and separate from `%LOCALAPPDATA%\ECD`. It must
+never be placed inside the installation/resource root.
+
+## Desktop Startup Sequence
+
+The Tauri setup flow is:
+
+1. Resolve/create `%LOCALAPPDATA%\ECD`.
+2. Resolve the workspace using the order above.
+3. Resolve packaged `ecd-app/backend`, `ecd-app/runtime` and backend web root.
+4. Build the backend command using packaged `python.exe` and
+   `desktop_launcher.py`.
+5. Remove inherited `PYTHONHOME` and `PYTHONPATH`.
+6. Set `PYTHONNOUSERSITE=1`, UTF-8 and no-bytecode environment.
+7. Start the backend on `127.0.0.1`.
+8. Assign it to a Windows Job Object.
+9. Wait for `GET /api/health` in desktop mode.
+10. Open the webview at `http://127.0.0.1:<port>/`.
+
+Default port: `8099`.
+
+Default startup health timeout: 300 seconds. This intentionally permits first
+runtime/cache preparation on slower systems.
+
+The relevant environment overrides are:
+
+```text
+ECD_TAURI_RESOURCE_ROOT
+ECD_TAURI_APP_DATA_ROOT
+ECD_TAURI_WORKSPACE
+ECD_TAURI_RUNTIME_ROOT
+ECD_TAURI_BACKEND_ROOT
+ECD_TAURI_WEB_ROOT
+ECD_TAURI_PORT
+ECD_TAURI_HEALTH_TIMEOUT_MS
+ECD_TAURI_APPLICATION_STORE
+```
+
+These are development/gate controls, not normal user configuration.
+
+## Embedded Python Isolation
+
+An external-PC test exposed a startup failure where existing Python 3.13 user
+or global paths changed `importlib.metadata` package selection and caused a
+runtime manifest mismatch.
+
+The fix is applied at both launch layers:
+
+- Tauri clears `PYTHONHOME` and `PYTHONPATH` before starting Python;
+- Tauri sets `PYTHONNOUSERSITE=1`;
+- `desktop_launcher.py` filters `sys.path` to packaged backend/runtime roots;
+- dependency validation rejects a pinned distribution loaded outside the
+  embedded runtime.
+
+The packaged isolation gate passes even with deliberately hostile external
+`PYTHONPATH` and `PYTHONUSERBASE` values.
+
+## Backend Runtime Environment
+
+`DesktopRuntimePaths.environment()` passes the shared backend:
+
+```text
+ECD_MODE=desktop
+ECD_STORAGE_MODE=independent_ecd
+TARGET_DIR=<workspace>
+PROJECT_DIR=<workspace>\esp_projects
+ASSET_ROOT=<workspace>\esp_assets
+JOB_DIR=%LOCALAPPDATA%\ECD\j
+ECD_PLATFORMIO_DIR=%LOCALAPPDATA%\ECD\p
+ESPHOME_BUILD_PATH=%LOCALAPPDATA%\ECD\b
+ESPHOME_DATA_DIR=%LOCALAPPDATA%\ECD\d
+ESPHOME_CONFIG_DIR=%LOCALAPPDATA%\ECD\g
+HOME=%LOCALAPPDATA%\ECD\h
+HOST=127.0.0.1
+```
+
+The backend is not exposed to the LAN.
+
+## Capabilities
+
+`GET /api/runtime` returns capability contract version `1`.
+
+| Capability | Desktop | Add-on | Standalone |
+|---|---:|---:|---:|
+| Existing ESPHome YAML import | no | yes | yes |
+| Local YAML file import | yes | yes | yes |
+| Shared ESPHome path | no | config-dependent | config-dependent |
+| Serial through backend/server | no | yes | yes |
+| Local browser WebSerial | yes | yes | yes |
+| Home Assistant host access | no | yes | no |
+| Supervisor ingress | no | yes | no |
+| Assets | yes | yes | yes |
+| Custom components | yes | yes | yes |
+| Validate | yes | yes | yes |
+| Compile | yes | yes | yes |
+| OTA | yes | yes | yes |
+| Logs | yes | yes | yes |
+| Firmware download | yes | yes | yes |
+
+The frontend loads this contract once through
+`src/utils/runtimeCapabilities.js`. Unsupported operations are hidden or
+disabled in Vue and must also be rejected at backend boundaries.
+
+Desktop serial flash uses browser-local WebSerial and `esptool-js`. It is
+different from server serial flash exposed in Add-on/standalone modes.
+
+## Shared Frontend
+
+The same Vue build is used by all variants. Current routes are:
+
+```text
+/#/              Dashboard
+/#/builder       Builder
+/#/diagnostics   Diagnostics
+```
+
+The desktop does not have a copied frontend source tree. Packaged `web/` is a
+generated copy of `esp-config-designer-frontend/dist/`.
+
+Important frontend modules:
+
+```text
+src/App.vue                                  shared shell/top bar
+src/views/DashboardView.vue                  project dashboard
+src/views/BuilderView.vue                    schema-driven editor
+src/views/DiagnosticsView.vue                runtime/device diagnostics
+src/composables/useInstallConsoleFlow.js      validate/compile/OTA/logs/serial
+src/utils/runtimeCapabilities.js              capability contract
+src/utils/runtimeDiagnostics.js               diagnostics response contract
+src/utils/schemaLoader.js                     component schema loading
+```
+
+## Component Catalog and Schemas
+
+The component catalog is served through:
+
+```text
+GET /api/component-catalog
+GET /api/component-schemas/<catalog schemaPath>
+```
+
+The catalog is the single source of component `schemaPath` values. Available
+catalog schemas are verified during resource packaging.
+
+A Windows-only defect previously converted the validated relative schema path
+to backslashes before passing it to Werkzeug. Werkzeug rejected the alternate
+separator, all nested schema requests returned HTTP 404, and component picker
+clicks appeared inert. The route now preserves the normalized POSIX path.
+
+Regression coverage includes:
+
+- a backend nested schema route test on Windows;
+- package verification for every available schema;
+- packaged Tauri smoke requesting a real component schema;
+- a visible frontend error instead of a silent selection no-op.
+
+## Jobs, ESPHome and Process Cleanup
+
+The shared `JobManager` owns:
+
+- validate;
+- clean build;
+- compile;
+- OTA;
+- logs;
+- backend serial in supported modes;
+- cancellation;
+- JSON job state and log files;
+- SSE and long-poll log delivery.
+
+On Windows every ESPHome process tree is assigned to a Windows Job Object with
+`JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE`. The Tauri-owned backend is also assigned
+to a Job Object. Closing the app, canceling a job or failing startup must not
+leave Python, ESPHome, PlatformIO, SCons, Ninja or toolchain descendants.
+
+Do not replace this with `taskkill` or test cleanup based on `Process.Kill`.
+
+OTA executes validation, compile and upload. It must never be used as a passive
+diagnostic probe. Logs are a long-running job until canceled/disconnected.
+
+## Runtime and Cache Manifests
+
+`runtime_manifest.py` provides:
+
+- immutable runtime manifest generation and validation;
+- package fingerprints;
+- PlatformIO descriptor inventory;
+- cache compatibility IDs;
+- cache manifest refresh after successful jobs;
+- incompatible cache quarantine.
+
+Desktop startup validates `runtime-manifest.json` read-only. It never repairs or
+writes the immutable runtime root.
+
+PlatformIO cache policy:
+
+1. Compare active cache inventory with runtime/cache manifests.
+2. Reuse only a compatible cache.
+3. Move an incompatible cache under
+   `%LOCALAPPDATA%\ECD\cache-recovery\<timestamp-id>\p`.
+4. Preserve workspace, builds, ESPHome data and jobs.
+5. Refresh cache metadata only after a successful job.
+
+Known limitation: recovery directories are not currently pruned. Development
+testing produced multiple complete recovery copies and demonstrated that this
+directory can grow above 15 GB. Storage management and a retention policy are
+required before public release. Do not automatically delete the active `p/`
+cache because it is required for fast and offline replay.
+
+Builds under `b/` are generated and reproducible, but retaining them enables
+incremental compilation, firmware download and more reliable offline use.
+
+## Diagnostics
+
+`GET /api/diagnostics` is implemented by the shared Python backend and uses the
+same authentication/ingress boundary as other APIs.
+
+The response contract is version `1` and returns:
+
+```json
+{
+  "status": "ok",
+  "version": 1,
+  "mode": "desktop",
+  "overall": "ok",
+  "generatedAt": "UTC timestamp",
+  "device": null,
+  "devices": [],
+  "timeouts": {
+    "commandMs": 3000,
+    "dnsMs": 1000,
+    "mdnsPerServiceMs": 600,
+    "tcpMs": 800
+  },
+  "checks": []
+}
+```
+
+Check states:
+
+```text
+ok
+warning
+error
+unavailable
+not_applicable
+```
+
+Groups:
+
+- storage: workspace, PlatformIO cache, build, ESPHome data and jobs roots;
+- runtime: pinned ESPHome/PlatformIO versions and cache health;
+- network: DNS, mDNS, OTA TCP 3232 and native API/log TCP 6053.
+
+Without a selected saved device, network checks are `not_applicable`. The
+endpoint accepts only saved `yaml` or `name` selectors; it is not an arbitrary
+host/port scanner.
+
+Diagnostics are passive. They do not compile, upload or start logs. Successful
+TCP probes prove reachability only, not authentication or protocol correctness.
+
+The Diagnostics route currently exists in the shared frontend and is visible in
+all variants. Product discussion recommends eventually moving it from the main
+top bar into Help/Advanced troubleshooting while retaining the backend feature.
+
+## Relevant Desktop APIs
+
+```text
+GET  /api/health
+GET  /api/runtime
+GET  /api/workspace
+GET  /api/diagnostics
+GET  /api/component-catalog
+GET  /api/component-schemas/<path>
+GET  /api/devices/list
+GET  /api/devices/status
+POST /api/install
+GET  /api/jobs/active
+GET  /api/jobs/<id>
+GET  /api/jobs/<id>/tail
+GET  /api/jobs/<id>/tail-wait
+GET  /api/jobs/<id>/stream
+POST /api/jobs/<id>/cancel
+GET  /api/firmware
+```
+
+`GET /api/workspace` reports existence, writability, readiness and separation
+from app-data. Workspace selection itself is owned by Tauri.
+
+## Runtime Update Module Versus Public Updater
+
+`runtime_update.py` supports immutable payload staging, activation, active and
+previous pointers, integrity verification and rollback. It was validated for
+runtime payload experiments.
+
+It is not a complete public desktop updater. It does not replace Tauri/NSIS,
+update shell registration, provide GitHub release discovery or implement public
+release signing. A future public updater should update a complete compatible
+release, not independently mix frontend, backend and runtime versions.
+
+## Build Commands
+
+Cargo may not be in the tool session PATH. The current executable is:
+
+```text
+C:\Users\Sebastian\.cargo\bin\cargo.exe
+```
+
+Prepare runtime:
+
+```powershell
+cd esp-config-designer
+.\windows\prepare-runtime.ps1
+```
+
+Install desktop dependencies:
+
+```powershell
+cd desktop
+npm install
+```
+
+Build frontend and generated resources:
 
 ```powershell
 npm run build:frontend
@@ -69,378 +638,176 @@ npm run package:resources
 npm run verify:resources
 ```
 
-The generated `desktop/resources/ecd-app/` contains:
+Build debug executable without installer:
+
+```powershell
+$env:PATH = "C:\Users\Sebastian\.cargo\bin;$env:PATH"
+npm run build:dev
+```
+
+Build unsigned debug NSIS:
+
+```powershell
+$env:PATH = "C:\Users\Sebastian\.cargo\bin;$env:PATH"
+npm run build:package:dev
+```
+
+The debug build intentionally shows a console. `main.rs` already selects the
+Windows GUI subsystem for non-debug builds, but the Python child still needs an
+explicit no-window launch and durable app-data logging before the release build
+can be considered complete.
+
+## Test Commands
+
+Backend:
+
+```powershell
+cd esp-config-designer
+py -3.13 -m unittest discover -s tests -v
+py -3.13 -m py_compile runtime_config.py runtime_manifest.py runtime_diagnostics.py desktop_launcher.py server.py
+```
+
+Frontend:
+
+```powershell
+cd esp-config-designer-frontend
+npm run test:capabilities
+npm run test:diagnostics
+npm run build
+```
+
+Rust:
+
+```powershell
+cd desktop\src-tauri
+C:\Users\Sebastian\.cargo\bin\cargo.exe check
+C:\Users\Sebastian\.cargo\bin\cargo.exe test
+```
+
+Desktop gates:
+
+```powershell
+cd desktop
+npm run test:workspace
+npm run package:resources
+npm run verify:resources
+npm run test:tauri-first-start-default
+npm run test:tauri-smoke
+```
+
+Tests must close Tauri gracefully through repeated `Alt+F4`/window close. Do not
+use `taskkill` or `Process.Kill` as cleanup mechanisms.
+
+## Verified Gates
+
+The following have been verified during development:
+
+- native ESPHome first compile on Windows;
+- second compile/cache replay;
+- backend restart replay;
+- offline replay with prepared cache;
+- compile cancellation and descendant cleanup;
+- short cache/build paths without `subst`;
+- spaces and Unicode workspace paths;
+- independent Windows 11 VM without global Python/Git/PlatformIO;
+- runtime/cache manifest recovery;
+- immutable payload activation and rollback;
+- Tauri packaged resource smoke;
+- per-user NSIS install without elevation;
+- uninstall/reinstall and same-version repair/replace flow;
+- app-data and workspace persistence across uninstall;
+- serial WebSerial flash;
+- OTA;
+- logs;
+- firmware download;
+- Stage 7 diagnostics;
+- hostile external Python path isolation;
+- Windows nested component schema serving;
+- automatic default workspace without first-start picker;
+- reuse of default workspace after restart;
+- preservation of an existing custom workspace;
+- graceful application/backend/process-tree shutdown.
+
+The external-PC diagnostic network gate observed DNS and mDNS warnings on that
+network while direct OTA and native API/log ports succeeded. These warnings are
+non-blocking and demonstrate why direct connectivity is reported separately.
+
+## Known Limitations and Release Blockers
+
+1. The current NSIS is debug and unsigned.
+2. Authenticode and trusted timestamp are not configured.
+3. SmartScreen behavior has not been verified with a trusted publisher.
+4. Windows 10 clean-machine testing is incomplete.
+5. The installer may need Internet to bootstrap WebView2 when it is absent.
+6. A fresh PlatformIO cache may need Internet during the first compile.
+7. There is no public GitHub/Tauri updater or update notification.
+8. The debug console remains visible; release child-process logging is not done.
+9. Cache recovery has no retention/size policy.
+10. Diagnostics is too prominent for ordinary users and needs final UX placement.
+11. The shared backend currently runs Flask's built-in local server.
+12. macOS and Linux runtime/package gates have not started.
+13. HA Add-on and standalone Docker need final regression after desktop changes.
+
+Do not present the current installer as a release.
+
+## Future Release Sequence
+
+Recommended order:
+
+1. Finalize basic UI placement for workspace, Diagnostics and future Settings.
+2. Add hidden-console Python launch and persistent backend startup logs.
+3. Decide online-assisted versus fully offline distribution.
+4. Decide WebView2 distribution strategy.
+5. Add storage management/retention for cache recovery and builds.
+6. Verify Add-on and standalone Docker regression.
+7. Set the next version consistently across manifests.
+8. Build an unsigned non-debug release candidate.
+9. Test Windows 10/11 clean machines and upgrade from the previous version.
+10. Obtain a real code-signing certificate.
+11. Sign installed PE files, then package and sign NSIS with trusted timestamp.
+12. Configure separately signed Tauri updater metadata if automatic updates are enabled.
+13. Re-test the exact signed artifact and publish final hashes.
+
+Self-signed or simulated certificates are not acceptable for public release.
+
+## Non-Negotiable Constraints
+
+- Keep one backend in `esp-config-designer/server.py`.
+- Keep one Vue frontend in `esp-config-designer-frontend/`.
+- Keep Tauri as a thin shell/package target.
+- Do not move business or diagnostic logic into Rust or PowerShell.
+- Do not use `subst`.
+- Do not use `taskkill`.
+- Do not use `Process.Kill` for test cleanup.
+- Keep Windows Job Object cleanup.
+- Do not change ESPHome `2026.6.4` casually.
+- Do not change PlatformIO `6.1.19` casually.
+- Do not change HA/Docker images as part of unrelated desktop work.
+- Do not write mutable data into the installation/resource root.
+- Do not delete workspace or app-data during ordinary update/uninstall.
+- Do not simulate release signing.
+
+## Documentation Map
+
+Current desktop summary:
 
 ```text
-backend/   shared server.py, desktop launcher, runtime modules, seed files, web/
-runtime/   Python 3.13.9, pinned packages, ESPHome, MinGit and licenses
+desktop/README.md
 ```
 
-The launcher validates the prebuilt `runtime-manifest.json` read-only. It never
-writes the immutable resource tree. PlatformIO cache, ESPHome build/data,
-job state/logs and workspace remain in the user app-data/workspace roots.
-Generated resources are development/package inputs and are ignored by Git.
-
-## Prepare And Start
-
-Preparation is a developer/build-machine operation. An end user receives the
-prepared runtime and does not install Python, ESPHome or PlatformIO.
-
-```powershell
-.\windows\prepare-runtime.ps1
-.\windows\launch.ps1 -CheckRuntime
-.\windows\launch.ps1 -Workspace "$env:USERPROFILE\ESPConfig Designer\workspace"
-```
-
-For an isolated developer runtime:
-
-```powershell
-.\windows\launch.ps1 `
-  -RuntimeRoot "$env:LOCALAPPDATA\ECD\runtime" `
-  -AppDataRoot "$env:LOCALAPPDATA\ECD" `
-  -Workspace "$env:TEMP\ECD Workspace żółć"
-```
-
-The launcher rejects a missing or incomplete runtime, including bundled Git,
-before Flask starts. It also rejects invocation through global Python and runs ESPHome as:
-`"<runtime>\python.exe" -m esphome`.
-
-The repeatable clean-machine orchestration script is
-`windows\clean-machine-gate.ps1`. It expects a prepared artifact with `app`,
-`runtime`, `workspace` and empty `appdata` directories under one root, for
-example `C:\ECDTest`, and writes job state and logs to the selected app-data root.
-
-## Gate Procedure
-
-Start the launcher, then use the backend API for the compile gate:
-
-```powershell
-$body = @{ yaml = "test.yaml"; action = "compile" } | ConvertTo-Json
-$job = Invoke-RestMethod http://127.0.0.1:8099/api/install -Method Post `
-  -ContentType "application/json" -Body $body
-Invoke-RestMethod "http://127.0.0.1:8099/api/jobs/$($job.job_id)"
-```
-
-Record separately:
-
-1. `--check-runtime` and `GET /api/health`.
-2. `esphome version` through the runtime.
-3. `git --version` through the bundled runtime Git, never global PATH.
-4. `config` through `POST /api/install`.
-5. First compile with an empty `p/` and `b/`.
-6. Second compile with the same workspace and cache.
-7. Workspace containing spaces and Unicode.
-8. Cancel during compile and verify no child process remains.
-9. Disconnect the network after downloading all required packages and repeat.
-10. Restart the backend and repeat using the same workspace and cache.
-
-The existing backend test suite covers path construction, desktop access and
-Windows process cleanup. The clean embedded-runtime compile, cache reuse,
-restart replay, offline replay and cancel/process cleanup have been verified on
-Windows. The independent clean-machine result is recorded in the section below;
-artifact signing and independent VM update verification remain release gates
-before release, not prerequisites for development Tauri.
-
-The offline replay fix removes inherited `PYTHONPATH` in
-`runtime_config.py`. Without that fix, PlatformIO's esptool provenance check
-selected the base runtime package and repeatedly invoked `uv --force-reinstall`
-for `tool-esptoolpy`; with the fix, the PlatformIO `penv` package is selected
-and the same cached build replays offline without the uv install step.
-
-## Release Gate Snapshot
-
-The 2026-07-17 clean-environment attempt removed global Python, ESPHome and
-PlatformIO from `PATH` while using the prepared portable runtime, existing
-workspace and existing application-data cache. `--check-runtime`, health,
-runtime and workspace endpoints passed. The first compile failed with:
-`Git not found in PATH, please install Git`. This is a real distribution
-requirement of the current ESPHome/PlatformIO profile, not a backend failure.
-
-With Git explicitly supplied in the isolated process `PATH`, the following
-jobs passed:
-
-- `ac9a35f4688a4b4aa1f2e6ae66e2b093` - compile, 14 seconds;
-- `7a46ce9138e04f399bcf3eab008a4ae7` - compile with cache, 14 seconds;
-- `e2a30730f3f9427894276b1a50d84b38` - compile after backend restart, 14 seconds;
-- `047a70a6e39848b49b4e9eb0c035fea8` - offline compile with an unavailable proxy, 25 seconds;
-- `a611531207304a16a81850f59b030dbf` - cancel, `canceled`, `exit_code=-1`.
-
-After cancel, no `esphome`, `pio`, `uv`, `scons`, `cmake` or `ninja` process
-remained. The host still has global developer installations, so this historical
-host test was not an independent clean-machine pass. A user's global Git
-installation is not an acceptable release dependency, and the launcher must
-not silently depend on it. The launcher now removes inherited PATH entries and
-supplies only bundled Git directories plus the embedded runtime and Windows
-system directories.
-
-After adding MinGit to a freshly prepared runtime and starting with PATH limited
-to Windows system directories, the replay produced these additional job IDs:
-
-- `8211bf69daea4208a786e43e0fd361b2` - compile, `success`, `exit_code=0`;
-- `bc3c8ba1c1644fcca38cd92446822e3a` - cache compile, `success`, `exit_code=0`;
-- `5fa9f86252e74abb8a06638d946ba5e5` - compile after backend restart, `success`, `exit_code=0`;
-- `c1ddb096d6de41b5b88c4bf05605ed8d` - offline compile with unavailable proxy, `success`, `exit_code=0`;
-- `c7e1863a25024c9cba37d15424cda2e8` - cancel, `canceled`, `exit_code=-1`.
-
-The complete logs are in `%LOCALAPPDATA%\ECD\j\<job-id>.log`. The successful
-logs contain no `uv pip install`, `TimeoutExpired`, `FAILED` or `Git not found`
-lines. The cancel replay left no `esphome`, `pio`, `uv`, `scons`, `cmake` or
-`ninja` processes. This verifies bundled-Git integration on the current host,
-but is not the independent clean-machine gate.
-
-## Clean-Machine Gate
-
-On 2026-07-17 the complete prepared artifact was copied to a Windows 11 VM
-(`10.0.26200.8875`) with no global Python, Git, PlatformIO, ESPHome, Node.js or
-Docker available on PATH. The gate was run with an empty application-data
-cache and the workspace at `C:\ECDTest\workspace`:
-
-- `064d584c1055447cbfb0290e32f8cc29` - first online compile, `success`, `exit_code=0`;
-- `25571cd81efd48ea8fd953fd011aeb23` - cache replay, `success`, `exit_code=0`;
-- `a590d8fc49034d5b8ff2bc7872dde8b4` - backend restart replay, `success`, `exit_code=0`;
-- `f795c60e76524b39b9a13fec51529712` - offline replay with unavailable proxy, `success`, `exit_code=0`;
-- `199c70b7092e427ca3008ef709456e3c` - cancel, `canceled`, `exit_code=-1`.
-
-The VM reported `--check-runtime`, health, runtime and workspace success. The
-workspace hash was unchanged, cache/build remained outside the workspace, and
-no `esphome`, `pio`, `uv`, `scons`, `cmake` or `ninja` process remained after
-cancel. Complete logs were retained in the VM under
-`C:\ECDTest\appdata\j\<job-id>.log` and copied to the test archive.
-
-The clean-machine gate exposed and fixed a Windows locale issue in the shared
-log reader: child process output is now decoded as UTF-8 with replacement for
-invalid bytes, instead of using the host `cp1252` default.
-
-The current application-data measurement is a working-tree snapshot, not a
-final installer size:
-
-| Area | Size |
-|---|---:|
-| embedded Python runtime | 214.29 MiB |
-| bundled MinGit archive | 36.99 MiB |
-| bundled MinGit extracted | 89.53 MiB |
-| backend/application directory | 6.64 MiB |
-| immutable application data (backend + runtime + extracted Git) | 310.46 MiB |
-| PlatformIO `p/` total | 4.38 GiB |
-| `p/penv` | 146.04 MiB |
-| `p/f` platforms | 24.92 MiB |
-| `p/k` packages and toolchains | 2.04 GiB |
-| `p/c` download cache | 79.62 MiB |
-| ESPHome `b/` builds | 228.59 MiB |
-| example workspace | 2.77 MiB |
-
-Distribution requirements and current status:
-
-- Immutable and signed: application/backend files, web bundle, seed data,
-  launcher, portable Python and pinned Python packages, plus the supported Git
-  runtime/helper. The Git version, source, SHA-256 and release-tag signature
-  are recorded in `windows/git-manifest.json`; the archive's `LICENSE.txt` and
-  component licenses remain in the immutable runtime. Installer code signing is
-  still a release gate and has not been independently verified.
-- Portable Git integration: implemented in `runtime_config.py`,
-  `desktop_launcher.py` and `windows/prepare-runtime.ps1`. The launcher adds
-  only bundled Git directories to the child process PATH. `--check-runtime`
-  fails clearly when Git is missing, incomplete or the version is wrong; it
-  cannot fall back to a global Git installation.
-- Lazy and mutable: PlatformIO `p/f`, `p/k` and `p/c`; ESPHome `b/`; job state
-  and logs. These remain under `%LOCALAPPDATA%\ECD`, never in the workspace.
-- User data: the selected workspace must survive application and runtime
-  updates unchanged. It must not be used as a cache or build directory.
-- Updates: replace immutable files atomically, preserve workspace and mutable
-  data, and record the runtime/ESPHome/PlatformIO compatibility versions. The
-  local isolated artifact passed `1.0.0 -> 1.2.0 -> rollback`, including active
-  payload backend restart.
-- Cache recovery: reuse `p/` only when its versions and package/toolchain
-  manifest match the runtime; otherwise keep user data and lazily rebuild the
-  cache outside the workspace. The local clean-like gate passed manifest tests,
-  online compile, cache replay, restart replay, offline replay and cancel. It
-  preserved the workspace hash and left no child processes.
-
-The `C:\ECDTest` run used system-only PATH for backend execution but was on the
-current host, not the independent Windows 11 VM. At that historical point Tauri
-was postponed until the same update/recovery procedure passed on the VM and
-real installer signing was verified. The current policy allows development
-Tauri before release signing.
-
-## Update And Cache-Recovery Gate
-
-The portable runtime now has two standard-library owners for distribution state:
-
-- `runtime_manifest.py` creates the immutable runtime manifest and the
-  PlatformIO cache manifest;
-- `runtime_update.py` stages, verifies, activates, and rolls back immutable
-  `backend/` plus `runtime/` payloads.
-
-The runtime manifest records the embedded Python version, ESPHome, PlatformIO,
-Flask, pyserial, setuptools and wheel versions, package `RECORD` hashes, and
-the pinned MinGit version. Its compatibility ID is derived from those values.
-The cache manifest additionally records every discovered PlatformIO
-`platform.json` and `package.json`, including platform/toolchain versions and
-descriptor SHA-256 hashes.
-
-At desktop startup, `p/` is reused only when its cache manifest exactly matches
-the current runtime and PlatformIO inventory. A missing, malformed, or
-incompatible manifest moves the complete cache to
-`%LOCALAPPDATA%\ECD\cache-recovery\<timestamp-id>\p`, writes a recovery record,
-and creates a new empty `p/`. The workspace and `b/`, `d/`, and `j/` are never
-removed or used as recovery locations. A successful compile records the new
-cache inventory; failed and canceled jobs do not.
-
-Immutable updates use a versioned store with this shape:
+Current detailed Windows desktop reference:
 
 ```text
-<application-store>/
-├── active.json
-├── previous.json
-└── versions/
-    ├── <version-1>/{backend,runtime}/
-    └── <version-2>/{backend,runtime}/
+esp-config-designer/windows/README.md
 ```
 
-The update flow copies to `.staging`, verifies SHA-256 file manifests, renames
-the staged version, and atomically replaces `active.json`. Rollback replaces
-the pointer with `previous.json`; it does not touch the workspace or mutable
-application data. The launcher accepts `-ApplicationStoreRoot` and re-executes
-through the active embedded Python before starting the shared `server.py`.
+Implementation plans currently live under:
 
-Example developer commands from the backend directory:
-
-```powershell
-& "$env:LOCALAPPDATA\ECD\runtime\python.exe" -m runtime_update install `
-  --store "$env:LOCALAPPDATA\ECD\application" `
-  --payload "C:\ECDUpdate\payload" --version "1.3.4"
-& "$env:LOCALAPPDATA\ECD\runtime\python.exe" -m runtime_update rollback `
-  --store "$env:LOCALAPPDATA\ECD\application"
+```text
+esp-config-designer-frontend/docs/plans/
 ```
 
-The update tests use only user-writable temporary directories and verify
-staging, integrity failure before activation, atomic pointer activation,
-rollback, backend/runtime selection after restart, and preservation of
-workspace plus mutable data. The clean Windows VM gate must repeat those
-checks with global Python, Git, PlatformIO, ESPHome, Node.js and Docker absent
-from `PATH`, and with a non-administrator user.
-
-`windows\clean-machine-gate.ps1` now runs the manifest/update unit gate with
-the embedded `runtime\python.exe` before the online/cache/restart/offline/cancel
-compile sequence. This is test orchestration only; update and cache policy
-remain implemented in Python.
-
-Installer code signing is not implemented or simulated. A real signing
-certificate, verification command, and SmartScreen result remain release
-blockers. The application/runtime update tests therefore verify SHA-256
-integrity and atomic rollback only; they do not claim authenticity or signing.
-
-## Latest Update Gate Result
-
-On 2026-07-17 a complete local artifact was prepared under `C:\ECDTest` with
-Python 3.13.9, ESPHome 2026.6.4, PlatformIO 6.1.19 and bundled MinGit
-2.55.0.windows.3. Backend execution used only `C:\Windows\System32;C:\Windows`
-on `PATH`.
-
-The final gate passed:
-
-- manifest/update tests: 11 passed;
-- first online compile: `330461adf70143c5abfa796df5de11e1`, success;
-- cache replay: `c7f82a83c6624056b92a642e5febc65b`, success;
-- backend restart replay: `7b01c7c8e5d7487ebb947ed447649625`, success;
-- offline replay: `b2501cc320a5486fbc2edfa5ef034c40`, success;
-- cancel: `5be06b473cd34ab1b10d095b09a1f330`, canceled, exit code `-1`;
-- workspace hash unchanged and no ESPHome/PlatformIO/tool child processes remained.
-
-The real immutable payload sequence `1.0.0 -> 1.2.0 -> rollback` also passed.
-The active updated payload restarted the backend successfully. Marker hashes in
-the workspace and `p/`, `b/`, `d/`, `j/` were unchanged.
-
-The gate exposed and fixed two implementation defects: a missing
-`refresh_cache_manifest` import caused successful compiles to be reported as
-failed, and generated Python `.pyc` files made a previously staged payload fail
-integrity verification. The manifest now excludes generated bytecode and
-accepts older payload manifests containing it.
-
-This was a clean-like run on the current host, not the independent Windows 11
-VM. It does not close the VM release gate or installer-signing gate. Tauri may
-be developed and tested with unsigned artifacts, but those artifacts must not
-be distributed as a release. A real code-signing certificate and verified
-Authenticode/SmartScreen behavior remain release requirements.
-
-## Runtime Capabilities And Workspace
-
-`GET /api/runtime` returns a versioned `capabilities` object. Version `1` uses
-these keys:
-
-| Capability | Desktop | Add-on | Standalone |
-|---|---:|---:|---:|
-| `yamlImport` (existing ESPHome storage) | no | yes | yes |
-| `localYamlImport` | yes | yes | yes |
-| `sharedEsphomePath` | no | config-dependent | config-dependent |
-| `serverSerialFlash` | no | yes | yes |
-| `localSerialFlash` | yes | yes | yes |
-| `haHost` | no | yes | no |
-| `supervisorIngress` | no | yes | no |
-| `assets` | yes | yes | yes |
-| `customComponents` | yes | yes | yes |
-| `validate`, `compile`, `ota`, `logs`, `firmwareDownload` | yes | yes | yes |
-
-Desktop rejects unavailable backend operations with HTTP 403 and
-`code=CAPABILITY_UNAVAILABLE`; the frontend must not be the only enforcement
-layer. `GET /api/workspace` reports whether the configured workspace exists,
-is a directory, is writable, ready, and separate from application data. The
-Tauri shell provides native first-start selection and `Change Workspace`.
-
-## Independent Windows 11 VM Gate
-
-On 2026-07-17 the complete artifact was executed on an independent Windows 11
-VM (build `10.0.26200.8875`). The test account was not an administrator (`net
-session` returned access denied). With the child
-process `PATH` restricted to `C:\Windows\System32;C:\Windows`, `python`, `git`,
-`pio`, `esphome`, `node` and `docker` were not found. The artifact contained
-the backend/web tree, Python 3.13.9 runtime, bundled MinGit, test workspace and
-empty app-data.
-
-The manifest/update unit gate ran 11 tests and passed. The compile gate passed
-first online compile, cache replay, backend restart replay, offline replay and
-cancellation.
-
-Workspace hash was unchanged, cache/build/data remained outside the workspace,
-and the gate reported no remaining ESPHome/PlatformIO/uv/scons/cmake/ninja
-processes. A synchronous cache recovery test then moved a deliberately
-corrupted cache under `cache-recovery`, preserved the sentinel and wrote
-`recovery.json`.
-
-The immutable payload sequence `1.0.0 -> 1.2.0 -> rollback` passed on the VM.
-Both payload manifests verified, the active v2 backend restarted successfully,
-rollback restored v1, and the final pointers were active `1.0.0` with previous
-`1.2.0`. Marker SHA-256 values for workspace, `p/`, `b/`, `d/` and `j/` were
-identical before and after the sequence.
-
-The VM gate exposed a Windows path-length failure while quarantining the large
-PlatformIO cache. Recovery IDs now use an 8-character UUID suffix, preserving
-uniqueness while keeping the immutable cache-recovery path short. The fix was
-verified by the local manifest suite (`12 tests, OK`) and the VM recovery gate.
-
-VM job logs and gate output were retained outside the repository for audit.
-
-Installer code signing was not performed. No real certificate, Authenticode
-verification or SmartScreen result is available, so release distribution
-remains deferred. Development builds are allowed, but are not release
-artifacts.
-
-## Release Gate: Real Code Signing
-
-The Windows VM and update/cache-recovery gates are closed. Development may
-continue before signing. The following steps are mandatory before release:
-
-1. Obtain a real trusted Windows code-signing certificate and private key.
-2. Sign the actual distributable PE files with a trusted timestamp authority.
-3. Verify the certificate chain, Authenticode signature and SHA-256 hashes with
-   `Get-AuthenticodeSignature` and `signtool verify /pa /all /tw`.
-4. Record the certificate subject, thumbprint, timestamp, signed file hashes
-   and verification output outside the source tree.
-5. Do not use self-signed, demo or simulated signatures.
-
-Unsigned `desktop/`, Rust, Cargo, Tauri capabilities, installer, NSIS and
-sidecar artifacts may be created for development and testing only. They must
-not be published. After signing changes PE hashes, regenerate the applicable
-payload/integrity manifests and rerun the relevant artifact verification. Do
-not claim a release is signed when the certificate or verification result is
-missing.
+This is a known organizational issue. The private ignored
+`R&D/folder_structure.md` contains the safe cleanup plan. Root `README.md` is
+the public GitHub document and is intentionally deferred until desktop release
+positioning is decided.

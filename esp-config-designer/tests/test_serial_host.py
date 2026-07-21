@@ -49,6 +49,21 @@ class SerialHostTests(unittest.TestCase):
             server.ECD_MODE = original_mode
             server.ECD_AUTH_MODE = original_auth
 
+    def test_desktop_rejects_server_serial_capability(self):
+        original_mode = server.ECD_MODE
+        original_auth = server.ECD_AUTH_MODE
+        try:
+            server.ECD_MODE = "desktop"
+            server.ECD_AUTH_MODE = "none"
+            response = server.app.test_client().get("/api/serial/ports")
+
+            self.assertEqual(403, response.status_code)
+            self.assertEqual("CAPABILITY_UNAVAILABLE", response.json["code"])
+            self.assertEqual("serverSerialFlash", response.json["capability"])
+        finally:
+            server.ECD_MODE = original_mode
+            server.ECD_AUTH_MODE = original_auth
+
     def test_install_serial_requires_a_backend_enumerated_port(self):
         original_mode = server.ECD_MODE
         original_auth = server.ECD_AUTH_MODE
@@ -62,6 +77,23 @@ class SerialHostTests(unittest.TestCase):
                 )
             self.assertEqual(400, response.status_code)
             self.assertEqual("Serial port is not available", response.json["message"])
+        finally:
+            server.ECD_MODE = original_mode
+            server.ECD_AUTH_MODE = original_auth
+
+    def test_desktop_rejects_server_serial_install_before_port_validation(self):
+        original_mode = server.ECD_MODE
+        original_auth = server.ECD_AUTH_MODE
+        try:
+            server.ECD_MODE = "desktop"
+            server.ECD_AUTH_MODE = "none"
+            response = server.app.test_client().post(
+                "/api/install",
+                json={"yaml": "device.yaml", "action": "serial", "port": "/dev/ttyUSB0"},
+            )
+
+            self.assertEqual(403, response.status_code)
+            self.assertEqual("serverSerialFlash", response.json["capability"])
         finally:
             server.ECD_MODE = original_mode
             server.ECD_AUTH_MODE = original_auth

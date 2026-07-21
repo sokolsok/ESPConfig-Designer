@@ -70,6 +70,37 @@ def is_local_runtime_mode(value: str) -> bool:
     return normalize_runtime_mode(value) in {"standalone", "desktop"}
 
 
+def isolated_python_paths(runtime_root: Path, backend_root: Path, paths=None) -> list[str]:
+    """Keep imports inside the embedded runtime and packaged backend."""
+    allowed_roots = (Path(runtime_root).resolve(), Path(backend_root).resolve())
+    isolated = []
+    for raw_path in paths if paths is not None else sys.path:
+        if not raw_path:
+            continue
+        try:
+            candidate = Path(raw_path).resolve()
+            allowed = any(
+                os.path.commonpath((str(candidate), str(root))) == str(root)
+                for root in allowed_roots
+            )
+        except (OSError, ValueError):
+            allowed = False
+        if allowed and str(candidate) not in isolated:
+            isolated.append(str(candidate))
+    backend = str(allowed_roots[1])
+    if backend in isolated:
+        isolated.remove(backend)
+    return [backend, *isolated]
+
+
+def isolate_embedded_python(runtime_root: Path, backend_root: Path) -> None:
+    """Remove user/global Python inputs before inspecting packaged distributions."""
+    os.environ.pop("PYTHONHOME", None)
+    os.environ.pop("PYTHONPATH", None)
+    os.environ["PYTHONNOUSERSITE"] = "1"
+    sys.path[:] = isolated_python_paths(runtime_root, backend_root)
+
+
 @dataclass(frozen=True)
 class DesktopRuntimePaths:
     """Stable separation of application, user data, workspace and caches."""
@@ -209,9 +240,14 @@ def workspace_status(workspace: Path, app_data_root: Optional[Path] = None) -> d
     """Inspect a workspace without creating or modifying it."""
     configured_path = str(workspace or "").strip()
     path = Path(configured_path).expanduser() if configured_path else Path()
-    exists = bool(configured_path) and path.exists()
-    is_directory = exists and path.is_dir()
-    writable = is_directory and _is_writable(path)
+    directory = directory_status(path) if configured_path else {
+        "exists": False,
+        "isDirectory": False,
+        "writable": False,
+    }
+    exists = directory["exists"]
+    is_directory = directory["isDirectory"]
+    writable = directory["writable"]
     app_data = Path(app_data_root).expanduser() if app_data_root else None
     separate_app_data = True
     if app_data is not None and configured_path:
@@ -224,6 +260,19 @@ def workspace_status(workspace: Path, app_data_root: Optional[Path] = None) -> d
         "writable": writable,
         "ready": is_directory and writable,
         "separateAppData": separate_app_data,
+    }
+
+
+def directory_status(directory: Path) -> dict:
+    """Inspect and transiently probe a mutable directory without retaining data."""
+    path = Path(directory).expanduser()
+    exists = path.exists()
+    is_directory = exists and path.is_dir()
+    writable = is_directory and _is_writable(path)
+    return {
+        "exists": exists,
+        "isDirectory": is_directory,
+        "writable": writable,
     }
 
 
@@ -245,7 +294,7 @@ def ensure_workspace(workspace: Path) -> None:
 def _is_writable(directory: Path) -> bool:
     try:
         _check_writable(directory)
-    except OSError:
+    except (OSError, RuntimeError):
         return False
     return True
 
@@ -358,7 +407,7 @@ def build_esphome_command(python_executable: Path) -> str:
     return f'"{python_executable}" -m esphome'
 
 
-def validate_runtime_dependencies() -> None:
+def validate_runtime_dependencies(runtime_root: Optional[Path] = None) -> None:
     actual_python = sys.version_info[:3]
     if actual_python != RUNTIME_PYTHON_VERSION:
         expected = ".".join(str(part) for part in RUNTIME_PYTHON_VERSION)
@@ -368,11 +417,22 @@ def validate_runtime_dependencies() -> None:
     missing_or_wrong = []
     for package, expected in RUNTIME_PACKAGES.items():
         try:
-            actual = importlib.metadata.version(package)
+            distribution = importlib.metadata.distribution(package)
+            actual = distribution.version
         except importlib.metadata.PackageNotFoundError:
             actual = "missing"
         if actual != expected:
             missing_or_wrong.append(f"{package}=={expected} (found {actual})")
+            continue
+        if runtime_root is not None:
+            package_root = Path(distribution.locate_file("")).resolve()
+            expected_root = Path(runtime_root).resolve()
+            try:
+                packaged = os.path.commonpath((str(package_root), str(expected_root))) == str(expected_root)
+            except (OSError, ValueError):
+                packaged = False
+            if not packaged:
+                missing_or_wrong.append(f"{package}=={expected} (loaded outside embedded runtime)")
     if missing_or_wrong:
         raise RuntimeError(
             "Portable runtime dependencies are incomplete: " + ", ".join(missing_or_wrong)
@@ -396,6 +456,7 @@ def verify_esphome_cli(python_executable: Path, environment: Mapping[str, str], 
     output = "\n".join(part for part in (result.stdout, result.stderr) if part).strip()
     if result.returncode != 0:
         raise RuntimeError(f"Portable ESPHome CLI check failed with exit code {result.returncode}: {output}")
-    if "2026.6.4" not in output:
-        raise RuntimeError(f"ESPHome version mismatch: expected 2026.6.4, found: {output}")
+    expected = RUNTIME_PACKAGES["esphome"]
+    if expected not in output:
+        raise RuntimeError(f"ESPHome version mismatch: expected {expected}, found: {output}")
     return output
