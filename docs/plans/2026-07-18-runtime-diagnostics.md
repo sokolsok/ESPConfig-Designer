@@ -9,7 +9,7 @@
 > Historical context: The task list below is preserved as the implementation
 > plan. The shared backend endpoint, frontend view, packaging rules, and tracked
 > regression tests are present; current behavior is documented in
-> `esp-config-designer/windows/README.md`.
+> `desktop/platforms/windows/README.md`.
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
@@ -73,7 +73,7 @@
 - Modify: `desktop/scripts/package-resources.ps1`
 - Modify: `desktop/scripts/verify-resources.ps1`
 - Modify: `desktop/README.md`
-- Modify: `esp-config-designer/windows/README.md`
+- Modify: `desktop/platforms/windows/README.md`
 
 **Steps:**
 1. Include and verify `runtime_diagnostics.py` in the immutable desktop backend payload.

@@ -32,7 +32,7 @@ No `taskkill` fallback is used.
 
 Rust, Cargo and the Tauri CLI are required. They are intentionally not
 vendored in this repository. Prepare the portable runtime first using
-`esp-config-designer/windows/prepare-runtime.ps1`, then install the desktop
+`desktop/platforms/windows/prepare-runtime.ps1`, then install the desktop
 CLI dependencies:
 
 ```powershell
@@ -191,10 +191,11 @@ schema with HTTP 404. The backend now preserves the POSIX relative path,
 frontend selection failures are visible, resource verification checks every
 available catalog schema, and packaged smoke requests a real schema. The latest
 workspace gate additionally verifies unattended default creation, restart reuse
-and preservation of an existing custom selection. The latest unsigned debug
-installer containing these fixes has SHA-256
-`A8C165760706CEECCEB001F58114124B2E9019F5B9C539F5103517300608BFE0`.
-It supersedes earlier Stage 7 test builds and remains a development artifact.
+and preservation of an existing custom selection. The Stage 4 repository
+relocation gate rebuilt the unsigned debug installer from a fresh isolated
+runtime; the standard build output has SHA-256
+`B35D2D8E113381D8645E6F702D3CD432072DA77E6C5D75990744120207414045`.
+It supersedes earlier test builds and remains a development artifact.
 
 After Etap 7, the distribution/release gate must decide whether the one-file
 installer is online-assisted or fully offline, build a non-debug NSIS package,

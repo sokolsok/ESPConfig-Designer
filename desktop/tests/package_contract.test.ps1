@@ -12,8 +12,23 @@ function Assert-True {
 }
 
 $desktopRoot = Split-Path -Parent $PSScriptRoot
+$repoRoot = Split-Path -Parent $desktopRoot
 $configPath = Join-Path $desktopRoot "src-tauri\tauri.conf.json"
 $config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
+
+$windowsPlatformRoot = Join-Path $desktopRoot "platforms\windows"
+$legacyWindowsRoot = Join-Path (Join-Path $repoRoot "esp-config-designer") "windows"
+foreach ($fileName in @(
+    "prepare-runtime.ps1",
+    "launch.ps1",
+    "clean-machine-gate.ps1",
+    "requirements-runtime.txt",
+    "git-manifest.json",
+    "README.md"
+)) {
+    Assert-True (Test-Path -LiteralPath (Join-Path $windowsPlatformRoot $fileName) -PathType Leaf) "Windows platform tool is missing: $fileName"
+}
+Assert-True (-not (Test-Path -LiteralPath $legacyWindowsRoot -PathType Container)) "Windows platform tools remain under the shared backend"
 
 Assert-True ($config.bundle.active -eq $true) "Desktop bundle must be active"
 $targets = @($config.bundle.targets)

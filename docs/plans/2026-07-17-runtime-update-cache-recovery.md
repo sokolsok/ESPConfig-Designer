@@ -10,7 +10,7 @@
 > implementation gate. `runtime_update.py` remains an experimental immutable
 > payload transaction, not a public updater or replacement for Tauri/NSIS.
 > Later Desktop stages completed the stale next-agent handoff; current behavior
-> and release blockers are documented in `esp-config-designer/windows/README.md`.
+> and release blockers are documented in `desktop/platforms/windows/README.md`.
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement the plan task-by-task.
 
@@ -86,7 +86,7 @@ Expected: PASS.
 - Create: `esp-config-designer/runtime_update.py`
 - Test: `esp-config-designer/tests/test_runtime_update.py`
 - Modify: `esp-config-designer/desktop_launcher.py`
-- Modify: `esp-config-designer/windows/launch.ps1`
+- Modify: `desktop/platforms/windows/launch.ps1`
 
 **Step 1: Write failing update tests**
 
@@ -111,8 +111,8 @@ Expected: PASS.
 ### Task 4: Document and execute the Windows update gate
 
 **Files:**
-- Modify: `esp-config-designer/windows/README.md`
-- Modify: `esp-config-designer/windows/clean-machine-gate.ps1` only for orchestration/reporting if required
+- Modify: `desktop/platforms/windows/README.md`
+- Modify: `desktop/platforms/windows/clean-machine-gate.ps1` only for orchestration/reporting if required
 - Modify: `docs/plans/2026-07-17-runtime-update-cache-recovery.md` with outcome
 
 **Step 1: Add the manual clean-VM procedure**
@@ -157,7 +157,7 @@ Cargo, an installer, or a second backend/frontend:
 - `runtime_update.py` stages `backend/` and `runtime/` payloads outside the
   active version, verifies SHA-256 file manifests, atomically replaces the
   active pointer, and supports rollback.
-- `windows/clean-machine-gate.ps1` runs the update/recovery tests through the
+- `desktop/platforms/windows/clean-machine-gate.ps1` runs the update/recovery tests through the
   embedded Python before the existing compile replay sequence.
 
 Automated verification in the development environment:

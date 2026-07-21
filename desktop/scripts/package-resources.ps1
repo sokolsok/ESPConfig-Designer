@@ -8,6 +8,7 @@ $ErrorActionPreference = "Stop"
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $backendSource = Join-Path $repoRoot "esp-config-designer"
 $frontendDist = Join-Path $repoRoot "esp-config-designer-frontend\dist"
+$windowsPlatformSource = Join-Path $repoRoot "desktop\platforms\windows"
 
 if (-not $OutputRoot) {
     $OutputRoot = Join-Path $PSScriptRoot "..\resources\ecd-app"
@@ -30,6 +31,7 @@ foreach ($requiredPath in @(
     (Join-Path $backendSource "runtime_update.py"),
     (Join-Path $backendSource "seed_esphome"),
     (Join-Path $frontendDist "index.html"),
+    (Join-Path $windowsPlatformSource "git-manifest.json"),
     (Join-Path $RuntimeRoot "python.exe"),
     (Join-Path $RuntimeRoot "runtime-manifest.json"),
     (Join-Path $RuntimeRoot "git\LICENSE.txt")
@@ -55,7 +57,7 @@ New-Item -ItemType Directory -Path (Join-Path $backendOutput "web") -Force | Out
 Copy-Item -Path (Join-Path $frontendDist "*") -Destination (Join-Path $backendOutput "web") -Recurse -Force
 
 Copy-Item -Path (Join-Path $RuntimeRoot "*") -Destination $runtimeOutput -Recurse -Force
-Copy-Item -LiteralPath (Join-Path $backendSource "windows\git-manifest.json") -Destination (Join-Path $runtimeOutput "git-manifest.json")
+Copy-Item -LiteralPath (Join-Path $windowsPlatformSource "git-manifest.json") -Destination (Join-Path $runtimeOutput "git-manifest.json")
 
 foreach ($immutableRoot in @($backendOutput, $runtimeOutput)) {
     Get-ChildItem -LiteralPath $immutableRoot -Recurse -Force -Directory -Filter "__pycache__" |

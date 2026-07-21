@@ -9,7 +9,7 @@
 > Historical context: The task list and outcome below preserve the original
 > investigation. Tauri packaging and subsequent Desktop gates are now complete;
 > current replay commands and remaining release blockers are documented in
-> `esp-config-designer/windows/README.md`.
+> `desktop/platforms/windows/README.md`.
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
@@ -44,7 +44,7 @@ Run the existing launcher against the same app-data and workspace paths with the
 
 **Files:**
 - Test: `esp-config-designer/tests/test_runtime_config.py` or a focused runtime test module
-- Modify: `esp-config-designer/windows/README.md` only if the diagnostic procedure changes
+- Modify: `desktop/platforms/windows/README.md` only if the diagnostic procedure changes
 
 **Step 1: Encode the discovered runtime invariant.**
 

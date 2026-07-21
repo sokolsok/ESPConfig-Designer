@@ -26,7 +26,7 @@ desktop/src-tauri/target/debug/bundle/nsis/ESPConfig Designer_1.3.3_x64-setup.ex
 SHA-256:
 
 ```text
-58F2D336B89E9A1C12F96CD2C16CD44DB0127B2ED28FEC84E034529BD038A851
+B35D2D8E113381D8645E6F702D3CD432072DA77E6C5D75990744120207414045
 ```
 
 Authenticode status: `NotSigned`.
@@ -102,17 +102,16 @@ historical and may be reorganized later without creating a second backend.
 ### Windows runtime preparation
 
 ```text
-esp-config-designer/windows/prepare-runtime.ps1
-esp-config-designer/windows/launch.ps1
-esp-config-designer/windows/clean-machine-gate.ps1
-esp-config-designer/windows/requirements-runtime.txt
-esp-config-designer/windows/git-manifest.json
+desktop/platforms/windows/prepare-runtime.ps1
+desktop/platforms/windows/launch.ps1
+desktop/platforms/windows/clean-machine-gate.ps1
+desktop/platforms/windows/requirements-runtime.txt
+desktop/platforms/windows/git-manifest.json
 ```
 
 These are build-machine and gate inputs for the Windows desktop runtime. They
-are not Flask production logic. A future repository cleanup may move them under
-`desktop/platforms/windows/`; all script-relative paths must be updated
-together.
+are not Flask production logic. Shared Python backend and runtime modules remain
+under `esp-config-designer/`.
 
 ### Tauri shell
 
@@ -172,10 +171,10 @@ The build-machine runtime is prepared at:
 %LOCALAPPDATA%\ECD\runtime
 ```
 
-Run from the backend directory:
+Run from the desktop directory:
 
 ```powershell
-.\windows\prepare-runtime.ps1
+.\platforms\windows\prepare-runtime.ps1
 ```
 
 The script:
@@ -621,8 +620,8 @@ cargo --version
 Prepare runtime:
 
 ```powershell
-cd esp-config-designer
-.\windows\prepare-runtime.ps1
+cd desktop
+.\platforms\windows\prepare-runtime.ps1
 ```
 
 Install desktop dependencies:
@@ -799,7 +798,7 @@ desktop/README.md
 Current detailed Windows desktop reference:
 
 ```text
-esp-config-designer/windows/README.md
+desktop/platforms/windows/README.md
 ```
 
 Implementation plans live under:

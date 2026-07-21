@@ -5,6 +5,11 @@ param(
 
 $ErrorActionPreference = "Stop"
 $PythonVersion = "3.13.9"
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
+$runtimeManifestScript = Join-Path $repoRoot "esp-config-designer\runtime_manifest.py"
+if (-not (Test-Path -LiteralPath $runtimeManifestScript -PathType Leaf)) {
+    throw "Runtime manifest generator is missing: $runtimeManifestScript"
+}
 $gitManifestPath = Join-Path $PSScriptRoot "git-manifest.json"
 if (-not (Test-Path -LiteralPath $gitManifestPath -PathType Leaf)) {
     throw "Bundled Git manifest is missing: $gitManifestPath"
@@ -85,7 +90,7 @@ try {
     if ($LASTEXITCODE -ne 0 -or $gitVersionOutput -notmatch [regex]::Escape("git version $GitVersion")) {
         throw "Bundled Git verification failed: $gitVersionOutput"
     }
-    & $pythonPath (Join-Path $PSScriptRoot "..\runtime_manifest.py") `
+    & $pythonPath $runtimeManifestScript `
         --runtime-root $OutputRoot --git-root $gitRoot
     if ($LASTEXITCODE -ne 0) {
         throw "Runtime compatibility manifest generation failed"

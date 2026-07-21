@@ -3,14 +3,19 @@ param(
     [string]$RuntimeRoot = "",
     [string]$Workspace = "",
     [string]$AppDataRoot = "",
+    [string]$BackendRoot = "",
     [string]$ApplicationStoreRoot = "",
     [int]$Port = 8099,
     [switch]$CheckRuntime
 )
 
 $ErrorActionPreference = "Stop"
-$backendRoot = Split-Path -Parent $PSScriptRoot
-$launcher = Join-Path $backendRoot "desktop_launcher.py"
+if (-not $BackendRoot) {
+    $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
+    $BackendRoot = Join-Path $repoRoot "esp-config-designer"
+}
+$BackendRoot = [System.IO.Path]::GetFullPath($BackendRoot)
+$launcher = Join-Path $BackendRoot "desktop_launcher.py"
 
 if (-not $RuntimeRoot) {
     $RuntimeRoot = Join-Path $env:LOCALAPPDATA "ECD\runtime"
@@ -39,7 +44,7 @@ $launcherArgs = @(
     "--runtime-root", $RuntimeRoot,
     "--app-data-root", $AppDataRoot,
     "--workspace", $Workspace,
-    "--backend-root", $backendRoot,
+    "--backend-root", $BackendRoot,
     "--port", $Port.ToString()
 )
 if ($CheckRuntime) {

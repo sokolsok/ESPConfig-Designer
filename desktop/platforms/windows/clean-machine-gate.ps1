@@ -5,11 +5,16 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$Root = [System.IO.Path]::GetFullPath($Root)
 $runtime = Join-Path $Root "runtime"
 $appData = Join-Path $Root "appdata"
 $workspace = Join-Path $Root "workspace"
 $backend = Join-Path $Root "app"
 $yaml = Join-Path $workspace "test.yaml"
+$launchScript = Join-Path $PSScriptRoot "launch.ps1"
+if (-not (Test-Path -LiteralPath $launchScript -PathType Leaf)) {
+    throw "Windows launcher is missing: $launchScript"
+}
 $results = [System.Collections.Generic.List[object]]::new()
 $serverJob = $null
 
@@ -33,7 +38,7 @@ function Run-UpdateRecoveryTests {
 
 function Start-Backend([bool]$Offline) {
     $script = {
-        param($RuntimePath, $AppDataPath, $WorkspacePath, $BackendPath, $ServerPort, $IsOffline)
+        param($RuntimePath, $AppDataPath, $WorkspacePath, $BackendPath, $LaunchScriptPath, $ServerPort, $IsOffline)
         $env:PATH = "C:\Windows\System32;C:\Windows"
         if ($IsOffline) {
             $proxy = "http://127.0.0.1:9"
@@ -45,11 +50,12 @@ function Start-Backend([bool]$Offline) {
             $env:all_proxy = $proxy
         }
         & "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" `
-            -NoProfile -ExecutionPolicy Bypass -File (Join-Path $BackendPath "windows\launch.ps1") `
-            -RuntimeRoot $RuntimePath -AppDataRoot $AppDataPath -Workspace $WorkspacePath -Port $ServerPort
+            -NoProfile -ExecutionPolicy Bypass -File $LaunchScriptPath `
+            -RuntimeRoot $RuntimePath -AppDataRoot $AppDataPath -Workspace $WorkspacePath `
+            -BackendRoot $BackendPath -Port $ServerPort
     }
     $script:serverJob = Start-Job -ScriptBlock $script -ArgumentList `
-        $runtime, $appData, $workspace, $backend, $Port, $Offline
+        $runtime, $appData, $workspace, $backend, $launchScript, $Port, $Offline
     for ($index = 0; $index -lt 90; $index++) {
         Start-Sleep -Seconds 1
         try {

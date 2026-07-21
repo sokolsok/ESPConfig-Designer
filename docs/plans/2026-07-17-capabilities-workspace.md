@@ -9,7 +9,7 @@
 > Historical context: The task list below is the original implementation plan.
 > Tauri and installer work later expanded the product scope without replacing
 > the capability or workspace contracts. Current Windows procedures live in
-> `esp-config-designer/windows/README.md`.
+> `desktop/platforms/windows/README.md`.
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
@@ -84,4 +84,4 @@
 1. Run the exact Python `py_compile` command from the request.
 2. Run `py -3.13 -m unittest discover -s tests -v`.
 3. Run the frontend capability tests and `npm run build`.
-4. Follow the build and test procedures in `esp-config-designer/windows/README.md`, then run `esp-config-designer/windows/clean-machine-gate.ps1` for the online/offline replay where the prepared runtime is available. Report any unavailable or unperformed gate explicitly.
+4. Follow the build and test procedures in `desktop/platforms/windows/README.md`, then run `desktop/platforms/windows/clean-machine-gate.ps1` for the online/offline replay where the prepared runtime is available. Report any unavailable or unperformed gate explicitly.
