@@ -1,0 +1,24 @@
+* text=auto eol=lf
+
+# Native Windows scripts
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Unix and container entry points must remain executable-friendly
+*.sh text eol=lf
+Dockerfile* text eol=lf
+
+# Binary assets
+*.7z binary
+*.exe binary
+*.gif binary
+*.ico binary
+*.jpeg binary
+*.jpg binary
+*.pdf binary
+*.png binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.zip binary
