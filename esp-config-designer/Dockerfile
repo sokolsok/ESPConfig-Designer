@@ -1,3 +1,13 @@
+FROM node:22-alpine AS frontend-build
+
+WORKDIR /frontend
+
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+
+COPY frontend/ ./
+RUN npm run build
+
 FROM ghcr.io/esphome/esphome-hassio:2026.6.4
 
 ENV LANG=C.UTF-8
@@ -17,7 +27,7 @@ COPY runtime_diagnostics.py /runtime_diagnostics.py
 COPY run.sh /run.sh
 COPY seed_esphome /seed_esphome
 COPY logo.png /logo.png
-COPY web /web
+COPY --from=frontend-build /frontend/dist/ /web/
 RUN chmod a+x /run.sh
 
 ENTRYPOINT ["/run.sh"]

@@ -1,9 +1,0 @@
-{
-  "id": "modbus_controller",
-  "domain": "modbus_controller",
-  "platform": "",
-  "renderAs": "root_list",
-  "previewGroup": "misc",
-  "helpUrl": "https://esphome.io/components/modbus_controller/",
-  "extends": "hub_modbus_controller.json"
-}

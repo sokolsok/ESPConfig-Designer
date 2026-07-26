@@ -456,7 +456,7 @@ fn development_resource_paths() -> (PathBuf, PathBuf) {
     if let Ok(executable) = env::current_exe() {
         for ancestor in executable.ancestors() {
             let backend = ancestor.join("esp-config-designer");
-            let frontend = ancestor.join("esp-config-designer-frontend").join("dist");
+            let frontend = backend.join("frontend").join("dist");
             if backend.join("server.py").is_file() {
                 return (backend, frontend);
             }
@@ -464,7 +464,7 @@ fn development_resource_paths() -> (PathBuf, PathBuf) {
     }
     (
         PathBuf::from("esp-config-designer"),
-        PathBuf::from("esp-config-designer-frontend").join("dist"),
+        PathBuf::from("esp-config-designer").join("frontend").join("dist"),
     )
 }
 

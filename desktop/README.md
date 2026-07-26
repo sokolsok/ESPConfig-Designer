@@ -59,7 +59,7 @@ $env:ECD_TAURI_APP_DATA_ROOT = "$env:LOCALAPPDATA\ECD"
 $env:ECD_TAURI_RUNTIME_ROOT = "$env:LOCALAPPDATA\ECD\runtime"
 $env:ECD_TAURI_PORT = "8099"
 $env:ECD_TAURI_HEALTH_TIMEOUT_MS = "300000"
-$env:ECD_TAURI_WEB_ROOT = "C:\path\to\esp-config-designer\web"
+$env:ECD_TAURI_WEB_ROOT = "C:\path\to\esp-config-designer\frontend\dist"
 npm run dev
 ```
 
@@ -69,7 +69,7 @@ be used later when the executable itself is a packaged launcher. The current
 stage does not implement that packaging.
 
 The web root can point directly at
-`esp-config-designer-frontend/dist`. Nothing is copied into `desktop/` or the
+`esp-config-designer/frontend/dist`. Nothing is copied into `desktop/` or the
 backend by the Tauri shell.
 
 ## Production-like resources

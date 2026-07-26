@@ -59,7 +59,7 @@ The product has three deployment variants:
 All variants share one frontend and one backend:
 
 ```text
-esp-config-designer-frontend/   Vue 3 + Vite source
+esp-config-designer/frontend/   Vue 3 + Vite source
 esp-config-designer/server.py   shared Flask backend
 desktop/                        thin Tauri shell and package target
 ```
@@ -130,11 +130,11 @@ desktop/src-tauri/src/main.rs
 ### Generated and ignored data
 
 ```text
-esp-config-designer-frontend/dist/
+esp-config-designer/frontend/dist/
 desktop/resources/ecd-app/
 desktop/src-tauri/target/
 desktop/node_modules/
-esp-config-designer-frontend/node_modules/
+esp-config-designer/frontend/node_modules/
 ```
 
 `desktop/resources/ecd-app/README.txt` is the tracked marker for the generated
@@ -214,7 +214,7 @@ desktop/resources/ecd-app/
 The package script copies:
 
 - shared backend modules from `esp-config-designer/`;
-- the single frontend build from `esp-config-designer-frontend/dist/`;
+- the single frontend build from `esp-config-designer/frontend/dist/`;
 - the prepared portable runtime from `%LOCALAPPDATA%\ECD\runtime`.
 
 It removes generated `__pycache__`, `.pyc` and `.pyo` files from immutable
@@ -424,7 +424,7 @@ The same Vue build is used by all variants. Current routes are:
 ```
 
 The desktop does not have a copied frontend source tree. Packaged `web/` is a
-generated copy of `esp-config-designer-frontend/dist/`.
+generated copy of `esp-config-designer/frontend/dist/`.
 
 Important frontend modules:
 
@@ -671,7 +671,7 @@ py -3.13 -m py_compile runtime_config.py runtime_manifest.py runtime_diagnostics
 Frontend:
 
 ```powershell
-cd esp-config-designer-frontend
+cd esp-config-designer\frontend
 npm test
 npm run build
 ```
@@ -773,7 +773,7 @@ Self-signed or simulated certificates are not acceptable for public release.
 ## Non-Negotiable Constraints
 
 - Keep one backend in `esp-config-designer/server.py`.
-- Keep one Vue frontend in `esp-config-designer-frontend/`.
+- Keep one Vue frontend in `esp-config-designer/frontend/`.
 - Keep Tauri as a thin shell/package target.
 - Do not move business or diagnostic logic into Rust or PowerShell.
 - Do not use `subst`.

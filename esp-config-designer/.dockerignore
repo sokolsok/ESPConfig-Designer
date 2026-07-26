@@ -1,3 +1,8 @@
 __pycache__/
 *.pyc
 tests/
+frontend/node_modules/
+frontend/dist/
+frontend/runtime/
+frontend/.env.local
+web/

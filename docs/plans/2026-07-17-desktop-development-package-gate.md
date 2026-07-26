@@ -18,7 +18,7 @@
 
 **Goal:** Produce an unsigned NSIS development/test installer and prove that install, uninstall, and reinstall preserve workspace and application data without writing mutable data into the installation or resource root.
 
-**Architecture:** Keep Vue in `esp-config-designer-frontend/`, the shared backend in `esp-config-designer/server.py`, and Tauri as a packaging shell. Bundle the existing generated `desktop/resources/ecd-app` tree as immutable resources; continue storing mutable data under `%LOCALAPPDATA%\ECD` and the selected external workspace.
+**Architecture:** Keep Vue in `esp-config-designer/frontend/`, the shared backend in `esp-config-designer/server.py`, and Tauri as a packaging shell. Bundle the existing generated `desktop/resources/ecd-app` tree as immutable resources; continue storing mutable data under `%LOCALAPPDATA%\ECD` and the selected external workspace.
 
 **Tech Stack:** Tauri 2, Rust, NSIS, PowerShell 5.1, Vue/Vite, embedded Python runtime.
 

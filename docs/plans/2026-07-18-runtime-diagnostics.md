@@ -54,11 +54,11 @@
 ### Task 3: Add the shared diagnostics view
 
 **Files:**
-- Create: `esp-config-designer-frontend/src/utils/runtimeDiagnostics.js`
-- Create: `esp-config-designer-frontend/src/views/DiagnosticsView.vue`
-- Modify: `esp-config-designer-frontend/src/router/index.js`
-- Modify: `esp-config-designer-frontend/src/App.vue`
-- Test: `esp-config-designer-frontend/tests/runtimeDiagnostics.test.mjs`
+- Create: `esp-config-designer/frontend/src/utils/runtimeDiagnostics.js`
+- Create: `esp-config-designer/frontend/src/views/DiagnosticsView.vue`
+- Modify: `esp-config-designer/frontend/src/router/index.js`
+- Modify: `esp-config-designer/frontend/src/App.vue`
+- Test: `esp-config-designer/frontend/tests/runtimeDiagnostics.test.mjs`
 
 **Steps:**
 1. Normalize diagnostics schema version 1 and reject unsupported payloads visibly.

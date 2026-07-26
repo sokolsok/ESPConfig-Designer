@@ -51,9 +51,9 @@
 ### Task 3: Add the shared frontend normalizer
 
 **Files:**
-- Create: `esp-config-designer-frontend/src/utils/runtimeCapabilities.js`
-- Create: `esp-config-designer-frontend/tests/runtimeCapabilities.test.mjs`
-- Modify: `esp-config-designer-frontend/package.json`
+- Create: `esp-config-designer/frontend/src/utils/runtimeCapabilities.js`
+- Create: `esp-config-designer/frontend/tests/runtimeCapabilities.test.mjs`
+- Modify: `esp-config-designer/frontend/package.json`
 
 **Steps:**
 1. Implement a pure normalizer accepting current, missing, malformed, and older payloads. Unknown backends must deny HA-dependent capabilities and retain only safe local/core defaults.
@@ -64,10 +64,10 @@
 ### Task 4: Guard shared frontend actions and UI
 
 **Files:**
-- Modify: `esp-config-designer-frontend/src/App.vue`
-- Modify: `esp-config-designer-frontend/src/composables/useInstallConsoleFlow.js`
-- Modify: `esp-config-designer-frontend/src/views/DashboardView.vue`
-- Modify: `esp-config-designer-frontend/src/views/BuilderView.vue`
+- Modify: `esp-config-designer/frontend/src/App.vue`
+- Modify: `esp-config-designer/frontend/src/composables/useInstallConsoleFlow.js`
+- Modify: `esp-config-designer/frontend/src/views/DashboardView.vue`
+- Modify: `esp-config-designer/frontend/src/views/BuilderView.vue`
 
 **Steps:**
 1. Load runtime capabilities once when `App.vue` mounts and hide existing-ESPHome import and server serial menu entries when unavailable.
