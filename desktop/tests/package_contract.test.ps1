@@ -16,6 +16,24 @@ $repoRoot = Split-Path -Parent $desktopRoot
 $configPath = Join-Path $desktopRoot "src-tauri\tauri.conf.json"
 $config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
 
+$applicationRoot = Join-Path $repoRoot "esp-config-designer"
+$backendSource = Join-Path $applicationRoot "backend"
+foreach ($relativePath in @(
+    "server.py",
+    "desktop_launcher.py",
+    "runtime_config.py",
+    "runtime_manifest.py",
+    "runtime_diagnostics.py",
+    "runtime_update.py",
+    "seed_esphome\secrets.yaml",
+    "tests\test_runtime_config.py"
+)) {
+    Assert-True (Test-Path -LiteralPath (Join-Path $backendSource $relativePath)) "Canonical backend source is missing: $relativePath"
+}
+foreach ($legacyFile in @("server.py", "desktop_launcher.py", "runtime_config.py", "runtime_manifest.py", "runtime_diagnostics.py", "runtime_update.py")) {
+    Assert-True (-not (Test-Path -LiteralPath (Join-Path $applicationRoot $legacyFile) -PathType Leaf)) "Legacy backend source remains at application root: $legacyFile"
+}
+
 $windowsPlatformRoot = Join-Path $desktopRoot "platforms\windows"
 $legacyWindowsRoot = Join-Path (Join-Path $repoRoot "esp-config-designer") "windows"
 foreach ($fileName in @(

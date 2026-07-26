@@ -4,7 +4,7 @@ use std::env;
 use std::fs;
 use std::io::{Read, Write};
 use std::net::{SocketAddr, TcpStream};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
@@ -452,19 +452,34 @@ fn packaged_resource_paths(app: &AppHandle) -> Result<(Option<PathBuf>, Option<P
     Ok((None, None, None))
 }
 
+fn development_resource_paths_from_repo(repo_root: &Path) -> Option<(PathBuf, PathBuf)> {
+    let application = repo_root.join("esp-config-designer");
+    let backend = application.join("backend");
+    let frontend = application.join("frontend").join("dist");
+    if backend.join("server.py").is_file()
+        && backend.join("desktop_launcher.py").is_file()
+        && frontend.join("index.html").is_file()
+    {
+        return Some((backend, frontend));
+    }
+    None
+}
+
 fn development_resource_paths() -> (PathBuf, PathBuf) {
+    let manifest_repo = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("..").join("..");
+    if let Some(paths) = development_resource_paths_from_repo(&manifest_repo) {
+        return paths;
+    }
     if let Ok(executable) = env::current_exe() {
         for ancestor in executable.ancestors() {
-            let backend = ancestor.join("esp-config-designer");
-            let frontend = backend.join("frontend").join("dist");
-            if backend.join("server.py").is_file() {
-                return (backend, frontend);
+            if let Some(paths) = development_resource_paths_from_repo(ancestor) {
+                return paths;
             }
         }
     }
     (
-        PathBuf::from("esp-config-designer"),
-        PathBuf::from("esp-config-designer").join("frontend").join("dist"),
+        manifest_repo.join("esp-config-designer").join("backend"),
+        manifest_repo.join("esp-config-designer").join("frontend").join("dist"),
     )
 }
 
@@ -796,6 +811,25 @@ mod tests {
             .any(|(name, value)| name == OsStr::new("PYTHONNOUSERSITE") && value == Some(OsStr::new("1"))));
         assert_eq!(arguments.first().copied(), Some(OsStr::new("-B")));
         assert_eq!(arguments.get(1).copied(), Some(config.script.as_os_str()));
+    }
+
+    #[test]
+    fn development_resources_use_canonical_backend_and_sibling_frontend() {
+        let root = test_root("development-resources");
+        let backend = root.join("esp-config-designer").join("backend");
+        let frontend = root.join("esp-config-designer").join("frontend").join("dist");
+        fs::create_dir_all(&backend).expect("create backend");
+        fs::create_dir_all(&frontend).expect("create frontend");
+        fs::write(backend.join("server.py"), b"").expect("write server");
+        fs::write(backend.join("desktop_launcher.py"), b"").expect("write launcher");
+        fs::write(frontend.join("index.html"), b"").expect("write frontend");
+
+        let (resolved_backend, resolved_frontend) =
+            development_resource_paths_from_repo(&root).expect("discover source resources");
+
+        assert_eq!(resolved_backend, backend);
+        assert_eq!(resolved_frontend, frontend);
+        let _ = fs::remove_dir_all(root);
     }
 
     #[cfg(windows)]

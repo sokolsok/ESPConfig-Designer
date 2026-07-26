@@ -6,7 +6,7 @@ runtime, storage, packaging, diagnostics, verified gates, known limitations and
 release boundaries. Historical plans under `docs/plans/` and private notes
 preserve implementation context but are not authoritative for current behavior.
 
-Last updated: 2026-07-21.
+Last updated: 2026-07-26.
 
 ## Current Status
 
@@ -36,8 +36,8 @@ This artifact is for development and testing only. It is not a public release.
 Verified automated state:
 
 - backend `unittest`: 77 tests;
-- Rust/Tauri: 6 tests;
-- frontend `npm test`: 173 tests, including capabilities and diagnostics;
+- Rust/Tauri: 7 tests;
+- frontend `npm test`: 188 tests, including capabilities and diagnostics;
 - frontend production build: pass;
 - Cargo check: pass;
 - workspace contract: pass;
@@ -60,7 +60,7 @@ All variants share one frontend and one backend:
 
 ```text
 esp-config-designer/frontend/   Vue 3 + Vite source
-esp-config-designer/server.py   shared Flask backend
+esp-config-designer/backend/    shared Flask backend and temporary adapters
 desktop/                        thin Tauri shell and package target
 ```
 
@@ -77,11 +77,11 @@ or PowerShell. Do not copy the Vue application into `desktop/` as source.
 ### Shared backend
 
 ```text
-esp-config-designer/server.py
-esp-config-designer/runtime_config.py
-esp-config-designer/runtime_manifest.py
-esp-config-designer/runtime_diagnostics.py
-esp-config-designer/tests/
+esp-config-designer/backend/server.py
+esp-config-designer/backend/runtime_config.py
+esp-config-designer/backend/runtime_manifest.py
+esp-config-designer/backend/runtime_diagnostics.py
+esp-config-designer/backend/tests/
 ```
 
 `runtime_config.py` currently contains both shared capability/path helpers and
@@ -91,13 +91,14 @@ split in a dedicated refactor with import and Docker regression coverage.
 ### Desktop Python bootstrap
 
 ```text
-esp-config-designer/desktop_launcher.py
-esp-config-designer/runtime_update.py
+esp-config-designer/backend/desktop_launcher.py
+esp-config-designer/backend/runtime_update.py
 ```
 
-These files are desktop-oriented but remain beside the backend so the packaged
-payload can import and execute the one `server.py`. Their source placement is
-historical and may be reorganized later without creating a second backend.
+These files are desktop-oriented but remain temporarily beside the backend so
+the packaged payload can import and execute the one `server.py`. Separating
+them into `desktop/python/` is explicitly deferred to repository restructure
+Stage 7 and must not create a second backend.
 
 ### Windows runtime preparation
 
@@ -213,7 +214,8 @@ desktop/resources/ecd-app/
 
 The package script copies:
 
-- shared backend modules from `esp-config-designer/`;
+- shared backend modules and temporary adapters from
+  `esp-config-designer/backend/`;
 - the single frontend build from `esp-config-designer/frontend/dist/`;
 - the prepared portable runtime from `%LOCALAPPDATA%\ECD\runtime`.
 
@@ -663,9 +665,9 @@ can be considered complete.
 Backend:
 
 ```powershell
-cd esp-config-designer
-py -3.13 -m unittest discover -s tests -v
-py -3.13 -m py_compile runtime_config.py runtime_manifest.py runtime_diagnostics.py desktop_launcher.py server.py
+cd esp-config-designer\backend
+C:\Users\Sebastian\AppData\Local\ECD\runtime\python.exe -m unittest discover -s tests -v
+C:\Users\Sebastian\AppData\Local\ECD\runtime\python.exe -m py_compile runtime_config.py runtime_manifest.py runtime_diagnostics.py runtime_update.py desktop_launcher.py server.py
 ```
 
 Frontend:
@@ -772,7 +774,7 @@ Self-signed or simulated certificates are not acceptable for public release.
 
 ## Non-Negotiable Constraints
 
-- Keep one backend in `esp-config-designer/server.py`.
+- Keep one canonical backend source in `esp-config-designer/backend/`.
 - Keep one Vue frontend in `esp-config-designer/frontend/`.
 - Keep Tauri as a thin shell/package target.
 - Do not move business or diagnostic logic into Rust or PowerShell.

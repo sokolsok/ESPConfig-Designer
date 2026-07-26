@@ -6,7 +6,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
-$backendSource = Join-Path $repoRoot "esp-config-designer"
+$backendSource = Join-Path $repoRoot "esp-config-designer\backend"
 $frontendDist = Join-Path $repoRoot "esp-config-designer\frontend\dist"
 $windowsPlatformSource = Join-Path $repoRoot "desktop\platforms\windows"
 

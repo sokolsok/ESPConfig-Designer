@@ -10,6 +10,7 @@ import {
 import {
   createDevBackendEnvironment,
   parseDevBackendTarget,
+  resolveDevBackendRoot,
   resolveDevPythonExecutable,
   waitForDevBackend
 } from "../scripts/dev-server-config.js";
@@ -107,10 +108,20 @@ test("prefers the prepared ECD Python on Windows", () => {
   );
 });
 
+test("resolves the canonical backend beside the frontend", () => {
+  const frontendRoot = path.resolve("repo", "esp-config-designer", "frontend");
+
+  assert.equal(
+    resolveDevBackendRoot(frontendRoot),
+    path.resolve("repo", "esp-config-designer", "backend")
+  );
+});
+
 test("configures one runtime root for all development backend data", () => {
   const runtimeRoot = path.resolve("runtime fixture");
-  const backendRoot = path.resolve("esp-config-designer");
-  const frontendRoot = path.join(backendRoot, "frontend");
+  const applicationRoot = path.resolve("esp-config-designer");
+  const backendRoot = path.join(applicationRoot, "backend");
+  const frontendRoot = path.join(applicationRoot, "frontend");
   const environment = createDevBackendEnvironment({
     baseEnv: { Path: "existing-path", ECD_AUTH_MODE: "basic" },
     runtimeRoot,

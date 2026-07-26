@@ -20,12 +20,12 @@ RUN python3 -m venv --system-site-packages /opt/designer-venv \
        flask==3.1.2 \
        pyserial==3.5
 
-COPY server.py /server.py
-COPY runtime_config.py /runtime_config.py
-COPY runtime_manifest.py /runtime_manifest.py
-COPY runtime_diagnostics.py /runtime_diagnostics.py
+COPY backend/server.py /server.py
+COPY backend/runtime_config.py /runtime_config.py
+COPY backend/runtime_manifest.py /runtime_manifest.py
+COPY backend/runtime_diagnostics.py /runtime_diagnostics.py
 COPY run.sh /run.sh
-COPY seed_esphome /seed_esphome
+COPY backend/seed_esphome /seed_esphome
 COPY logo.png /logo.png
 COPY --from=frontend-build /frontend/dist/ /web/
 RUN chmod a+x /run.sh

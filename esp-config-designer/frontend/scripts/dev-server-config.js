@@ -3,6 +3,9 @@ import path from "node:path";
 
 const LOCAL_BACKEND_HOSTS = new Set(["127.0.0.1", "localhost", "[::1]"]);
 
+export const resolveDevBackendRoot = (frontendRoot) =>
+  path.join(path.resolve(frontendRoot, ".."), "backend");
+
 export const parseDevBackendTarget = (value) => {
   let url;
   try {

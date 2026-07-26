@@ -31,6 +31,13 @@ foreach ($requiredPath in @(
     }
 }
 
+if (Test-Path -LiteralPath (Join-Path $backendRoot "backend") -PathType Container) {
+    throw "Packaged resources contain a nested backend source root"
+}
+if (Test-Path -LiteralPath (Join-Path $backendRoot "tests") -PathType Container) {
+    throw "Backend tests must not be included in packaged resources"
+}
+
 $layout = Get-Content -LiteralPath (Join-Path $ResourcesRoot "resource-layout.json") -Raw | ConvertFrom-Json
 if ($layout.mutableDataPolicy -ne "app-data-only") {
     throw "Resource layout allows mutable data outside app-data"

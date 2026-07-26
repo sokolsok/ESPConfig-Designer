@@ -2,7 +2,9 @@
 
 This directory is the Tauri target for the existing Vue frontend and the
 existing Flask backend. It does not contain a second backend or a source copy
-of the frontend.
+of the frontend. The canonical backend source is
+`esp-config-designer/backend/`; packaging keeps the existing flat
+`ecd-app/backend/` runtime layout.
 
 ## Runtime flow
 

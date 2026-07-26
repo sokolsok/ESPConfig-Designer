@@ -4,6 +4,7 @@ param(
     [string]$Workspace = "",
     [string]$AppDataRoot = "",
     [string]$BackendRoot = "",
+    [string]$WebRoot = "",
     [string]$ApplicationStoreRoot = "",
     [int]$Port = 8099,
     [switch]$CheckRuntime
@@ -12,9 +13,13 @@ param(
 $ErrorActionPreference = "Stop"
 if (-not $BackendRoot) {
     $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
-    $BackendRoot = Join-Path $repoRoot "esp-config-designer"
+    $BackendRoot = Join-Path $repoRoot "esp-config-designer\backend"
+    if (-not $WebRoot) {
+        $WebRoot = Join-Path $repoRoot "esp-config-designer\frontend\dist"
+    }
 }
 $BackendRoot = [System.IO.Path]::GetFullPath($BackendRoot)
+$WebRoot = [System.IO.Path]::GetFullPath($(if ($WebRoot) { $WebRoot } else { Join-Path $BackendRoot "web" }))
 $launcher = Join-Path $BackendRoot "desktop_launcher.py"
 
 if (-not $RuntimeRoot) {
@@ -40,11 +45,13 @@ if (-not (Test-Path -LiteralPath $launcher -PathType Leaf)) {
 }
 
 $launcherArgs = @(
+    "-B",
     $launcher,
     "--runtime-root", $RuntimeRoot,
     "--app-data-root", $AppDataRoot,
     "--workspace", $Workspace,
     "--backend-root", $BackendRoot,
+    "--web-root", $WebRoot,
     "--port", $Port.ToString()
 )
 if ($CheckRuntime) {

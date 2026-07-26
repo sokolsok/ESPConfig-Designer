@@ -7,13 +7,14 @@ import { loadEnv } from "vite";
 import {
   createDevBackendEnvironment,
   parseDevBackendTarget,
+  resolveDevBackendRoot,
   resolveDevPythonExecutable,
   waitForDevBackend
 } from "./dev-server-config.js";
 import { resolveDevProxyTarget, resolveRuntimeRoot } from "../vite.config.helpers.js";
 
 const frontendRoot = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
-const backendRoot = path.resolve(frontendRoot, "..");
+const backendRoot = resolveDevBackendRoot(frontendRoot);
 const loadedEnv = loadEnv("development", frontendRoot, "");
 const devEnv = { ...loadedEnv, ...process.env };
 const runtimeRoot = resolveRuntimeRoot({ frontendRoot, env: devEnv });

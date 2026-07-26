@@ -1,6 +1,6 @@
 __pycache__/
 *.pyc
-tests/
+backend/tests/
 frontend/node_modules/
 frontend/dist/
 frontend/runtime/

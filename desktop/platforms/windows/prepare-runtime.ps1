@@ -6,7 +6,7 @@ param(
 $ErrorActionPreference = "Stop"
 $PythonVersion = "3.13.9"
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
-$runtimeManifestScript = Join-Path $repoRoot "esp-config-designer\runtime_manifest.py"
+$runtimeManifestScript = Join-Path $repoRoot "esp-config-designer\backend\runtime_manifest.py"
 if (-not (Test-Path -LiteralPath $runtimeManifestScript -PathType Leaf)) {
     throw "Runtime manifest generator is missing: $runtimeManifestScript"
 }
