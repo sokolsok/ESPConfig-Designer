@@ -7,6 +7,8 @@ import types
 import unittest
 
 
+BACKEND_ROOT = pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(BACKEND_ROOT))
 SERVER_PATH = pathlib.Path(__file__).resolve().parents[1] / "server.py"
 sys.modules.setdefault("pty", types.SimpleNamespace(openpty=lambda: (_ for _ in ()).throw(NotImplementedError())))
 SPEC = importlib.util.spec_from_file_location("ecd_server_import_tests", SERVER_PATH)

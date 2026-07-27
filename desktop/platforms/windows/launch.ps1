@@ -4,6 +4,7 @@ param(
     [string]$Workspace = "",
     [string]$AppDataRoot = "",
     [string]$BackendRoot = "",
+    [string]$LauncherPath = "",
     [string]$WebRoot = "",
     [string]$ApplicationStoreRoot = "",
     [int]$Port = 8099,
@@ -20,7 +21,16 @@ if (-not $BackendRoot) {
 }
 $BackendRoot = [System.IO.Path]::GetFullPath($BackendRoot)
 $WebRoot = [System.IO.Path]::GetFullPath($(if ($WebRoot) { $WebRoot } else { Join-Path $BackendRoot "web" }))
-$launcher = Join-Path $BackendRoot "desktop_launcher.py"
+if (-not $LauncherPath) {
+    $flatLauncher = Join-Path $BackendRoot "desktop_launcher.py"
+    if (Test-Path -LiteralPath $flatLauncher -PathType Leaf) {
+        $LauncherPath = $flatLauncher
+    } else {
+        $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
+        $LauncherPath = Join-Path $repoRoot "desktop\python\desktop_launcher.py"
+    }
+}
+$launcher = [System.IO.Path]::GetFullPath($LauncherPath)
 
 if (-not $RuntimeRoot) {
     $RuntimeRoot = Join-Path $env:LOCALAPPDATA "ECD\runtime"
@@ -45,6 +55,7 @@ if (-not (Test-Path -LiteralPath $launcher -PathType Leaf)) {
 }
 
 $launcherArgs = @(
+    "-I",
     "-B",
     $launcher,
     "--runtime-root", $RuntimeRoot,
@@ -65,5 +76,9 @@ if ($ApplicationStoreRoot) {
 Write-Host "[info] Starting ESPConfig Designer desktop runtime"
 Write-Host "[info] Runtime root: $RuntimeRoot"
 Write-Host "[info] Workspace: $Workspace"
+foreach ($name in @("PYTHONHOME", "PYTHONPATH", "PYTHONUSERBASE", "VIRTUAL_ENV")) {
+    Remove-Item -LiteralPath "Env:$name" -ErrorAction SilentlyContinue
+}
+$env:PYTHONNOUSERSITE = "1"
 & $pythonPath @launcherArgs
 exit $LASTEXITCODE

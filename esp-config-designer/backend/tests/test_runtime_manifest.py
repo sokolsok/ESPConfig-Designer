@@ -1,7 +1,11 @@
 import json
 import pathlib
+import sys
 import tempfile
 import unittest
+
+BACKEND_ROOT = pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(BACKEND_ROOT))
 
 import runtime_manifest
 
@@ -9,6 +13,8 @@ import runtime_manifest
 def runtime_fixture(package_hash="hash-a"):
     return runtime_manifest.build_runtime_manifest(
         pathlib.Path("runtime"),
+        python_version="3.13.9",
+        git_version="2.55.0.windows.3",
         package_entries={
             "esphome": {"version": "2026.6.4", "filesHash": package_hash, "fileCount": 2},
             "platformio": {"version": "6.1.19", "filesHash": "hash-platformio", "fileCount": 2},

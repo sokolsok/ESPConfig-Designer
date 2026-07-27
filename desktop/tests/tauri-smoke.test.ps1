@@ -43,6 +43,9 @@ $suffix = [guid]::NewGuid().ToString("N")
 $appDataRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("ecd-tauri-smoke-appdata-" + $suffix)
 $unicodeName = "ECD Smoke Workspace " + [string][char]0x017C + [char]0x00F3 + [char]0x0142 + [char]0x0107 + "-" + $suffix
 $workspace = Join-Path ([System.IO.Path]::GetTempPath()) $unicodeName
+$hostilePythonRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("ecd-hostile-python-" + $suffix)
+$hostileUserBase = Join-Path ([System.IO.Path]::GetTempPath()) ("ecd-hostile-userbase-" + $suffix)
+$hostileUserSite = Join-Path $hostileUserBase "Python313\site-packages"
 $port = 18000 + (Get-Random -Minimum 1 -Maximum 400)
 
 if (-not (Test-Path -LiteralPath $Executable -PathType Leaf)) {
@@ -56,6 +59,11 @@ $layoutManifestPath = Join-Path $resourceRoot "resource-layout.json"
 $runtimeManifestHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $runtimeManifestPath).Hash
 $layoutManifestHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $layoutManifestPath).Hash
 New-Item -ItemType Directory -Path $workspace -Force | Out-Null
+New-Item -ItemType Directory -Path $hostilePythonRoot, $hostileUserSite -Force | Out-Null
+foreach ($moduleName in @("desktop_runtime", "runtime_contract", "runtime_manifest", "runtime_update")) {
+    "raise RuntimeError('hostile Python import used')" | Set-Content -LiteralPath (Join-Path $hostilePythonRoot "$moduleName.py") -Encoding ASCII
+    "raise RuntimeError('hostile user-site import used')" | Set-Content -LiteralPath (Join-Path $hostileUserSite "$moduleName.py") -Encoding ASCII
+}
 
 $startInfo = New-Object System.Diagnostics.ProcessStartInfo
 $startInfo.FileName = $Executable
@@ -66,6 +74,8 @@ $startInfo.EnvironmentVariables["ECD_TAURI_APP_DATA_ROOT"] = $appDataRoot
 $startInfo.EnvironmentVariables["ECD_TAURI_WORKSPACE"] = $workspace
 $startInfo.EnvironmentVariables["ECD_TAURI_PORT"] = $port.ToString()
 $startInfo.EnvironmentVariables["ECD_TAURI_HEALTH_TIMEOUT_MS"] = "120000"
+$startInfo.EnvironmentVariables["PYTHONPATH"] = $hostilePythonRoot
+$startInfo.EnvironmentVariables["PYTHONUSERBASE"] = $hostileUserBase
 
 $process = $null
 try {
@@ -105,5 +115,10 @@ try {
     }
     if (Test-Path -LiteralPath $workspace) {
         Remove-Item -LiteralPath $workspace -Recurse -Force
+    }
+    foreach ($path in @($hostilePythonRoot, $hostileUserBase)) {
+        if (Test-Path -LiteralPath $path) {
+            Remove-Item -LiteralPath $path -Recurse -Force
+        }
     }
 }

@@ -35,8 +35,9 @@ This artifact is for development and testing only. It is not a public release.
 
 Verified automated state:
 
-- backend `unittest`: 77 tests;
-- Rust/Tauri: 7 tests;
+- shared backend `unittest`: 61 tests;
+- Desktop Python adapter `unittest`: 18 tests (79 aggregate);
+- Rust/Tauri: 8 tests;
 - frontend `npm test`: 188 tests, including capabilities and diagnostics;
 - frontend production build: pass;
 - Cargo check: pass;
@@ -60,7 +61,8 @@ All variants share one frontend and one backend:
 
 ```text
 esp-config-designer/frontend/   Vue 3 + Vite source
-esp-config-designer/backend/    shared Flask backend and temporary adapters
+esp-config-designer/backend/    shared Flask backend and runtime contracts
+desktop/python/                 Desktop Python bootstrap and runtime adapter
 desktop/                        thin Tauri shell and package target
 ```
 
@@ -78,27 +80,28 @@ or PowerShell. Do not copy the Vue application into `desktop/` as source.
 
 ```text
 esp-config-designer/backend/server.py
-esp-config-designer/backend/runtime_config.py
+esp-config-designer/backend/runtime_contract.py
 esp-config-designer/backend/runtime_manifest.py
 esp-config-designer/backend/runtime_diagnostics.py
 esp-config-designer/backend/tests/
 ```
 
-`runtime_config.py` currently contains both shared capability/path helpers and
-desktop runtime setup. This mixed responsibility is known and should only be
-split in a dedicated refactor with import and Docker regression coverage.
+`runtime_contract.py` owns deployment modes, capabilities, shared tool versions,
+and workspace/directory status. It has no dependency on Desktop Python, Windows
+PATH, embedded Python or MinGit.
 
 ### Desktop Python bootstrap
 
 ```text
-esp-config-designer/backend/desktop_launcher.py
-esp-config-designer/backend/runtime_update.py
+desktop/python/desktop_launcher.py
+desktop/python/desktop_runtime.py
+desktop/python/runtime_update.py
 ```
 
-These files are desktop-oriented but remain temporarily beside the backend so
-the packaged payload can import and execute the one `server.py`. Separating
-them into `desktop/python/` is explicitly deferred to repository restructure
-Stage 7 and must not create a second backend.
+These files own source-root bootstrap, embedded Python isolation, Windows
+runtime paths/PATH, MinGit validation and immutable Desktop payload updates.
+They import the shared backend through an explicit backend root. There is no
+second `server.py`.
 
 ### Windows runtime preparation
 
@@ -198,7 +201,8 @@ desktop/resources/ecd-app/
 ├── backend/
 │   ├── server.py
 │   ├── desktop_launcher.py
-│   ├── runtime_config.py
+│   ├── desktop_runtime.py
+│   ├── runtime_contract.py
 │   ├── runtime_manifest.py
 │   ├── runtime_diagnostics.py
 │   ├── runtime_update.py
@@ -212,10 +216,10 @@ desktop/resources/ecd-app/
 └── resource-layout.json
 ```
 
-The package script copies:
+The package script merges:
 
-- shared backend modules and temporary adapters from
-  `esp-config-designer/backend/`;
+- shared backend modules from `esp-config-designer/backend/`;
+- Desktop adapter modules from `desktop/python/`;
 - the single frontend build from `esp-config-designer/frontend/dist/`;
 - the prepared portable runtime from `%LOCALAPPDATA%\ECD\runtime`.
 
@@ -319,9 +323,9 @@ The Tauri setup flow is:
 1. Resolve/create `%LOCALAPPDATA%\ECD`.
 2. Resolve the workspace using the order above.
 3. Resolve packaged `ecd-app/backend`, `ecd-app/runtime` and backend web root.
-4. Build the backend command using packaged `python.exe` and
-   `desktop_launcher.py`.
-5. Remove inherited `PYTHONHOME` and `PYTHONPATH`.
+4. Build the backend command using packaged `python.exe` and the source or flat
+   packaged `desktop_launcher.py`.
+5. Remove inherited `PYTHONHOME`, `PYTHONPATH`, `PYTHONUSERBASE` and virtualenv.
 6. Set `PYTHONNOUSERSITE=1`, UTF-8 and no-bytecode environment.
 7. Start the backend on `127.0.0.1`.
 8. Assign it to a Windows Job Object.
@@ -357,9 +361,11 @@ runtime manifest mismatch.
 
 The fix is applied at both launch layers:
 
-- Tauri clears `PYTHONHOME` and `PYTHONPATH` before starting Python;
+- Tauri starts Python in isolated mode and clears `PYTHONHOME`, `PYTHONPATH`
+  and `PYTHONUSERBASE` before starting Python;
 - Tauri sets `PYTHONNOUSERSITE=1`;
-- `desktop_launcher.py` filters `sys.path` to packaged backend/runtime roots;
+- `desktop_launcher.py` filters `sys.path` to the embedded runtime plus the
+  explicit shared-backend and Desktop-adapter roots;
 - dependency validation rejects a pinned distribution loaded outside the
   embedded runtime.
 
@@ -368,7 +374,7 @@ The packaged isolation gate passes even with deliberately hostile external
 
 ## Backend Runtime Environment
 
-`DesktopRuntimePaths.environment()` passes the shared backend:
+`desktop_runtime.DesktopRuntimePaths.environment()` passes the shared backend:
 
 ```text
 ECD_MODE=desktop
@@ -667,7 +673,15 @@ Backend:
 ```powershell
 cd esp-config-designer\backend
 C:\Users\Sebastian\AppData\Local\ECD\runtime\python.exe -m unittest discover -s tests -v
-C:\Users\Sebastian\AppData\Local\ECD\runtime\python.exe -m py_compile runtime_config.py runtime_manifest.py runtime_diagnostics.py runtime_update.py desktop_launcher.py server.py
+C:\Users\Sebastian\AppData\Local\ECD\runtime\python.exe -m py_compile runtime_contract.py runtime_manifest.py runtime_diagnostics.py server.py
+```
+
+Desktop Python adapter:
+
+```powershell
+cd desktop
+C:\Users\Sebastian\AppData\Local\ECD\runtime\python.exe -m unittest discover -s tests\python -v
+C:\Users\Sebastian\AppData\Local\ECD\runtime\python.exe -m py_compile python\desktop_runtime.py python\runtime_update.py python\desktop_launcher.py
 ```
 
 Frontend:

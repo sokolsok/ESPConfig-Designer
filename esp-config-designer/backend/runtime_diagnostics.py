@@ -10,7 +10,7 @@ import subprocess
 import threading
 from typing import Any, Callable, Mapping, Optional, Sequence
 
-from runtime_config import RUNTIME_PACKAGES, directory_status, workspace_status
+from runtime_contract import RUNTIME_TOOL_VERSIONS, directory_status, workspace_status
 from runtime_manifest import ManifestError, collect_platformio_inventory, inspect_cache_compatibility
 
 
@@ -86,7 +86,7 @@ def _version_check(
     package: str,
     runner: Callable[[Sequence[str], float], tuple[str, str]],
 ) -> dict[str, Any]:
-    expected = RUNTIME_PACKAGES[package]
+    expected = RUNTIME_TOOL_VERSIONS[package]
     result, output = runner(command, COMMAND_TIMEOUT_SECONDS)
     if result == "timeout":
         return _check(check_id, "runtime", label, "error", "The version command timed out.", "Restart the runtime and try again.", {"expectedVersion": expected})

@@ -13,10 +13,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 import shutil
 import tempfile
-from typing import Any, Mapping, Optional
+from typing import Any, Iterable, Mapping, Optional
 import uuid
-
-from runtime_config import GIT_VERSION, RUNTIME_PACKAGES, RUNTIME_PYTHON_VERSION
 
 
 MANIFEST_SCHEMA_VERSION = 1
@@ -81,22 +79,23 @@ def build_runtime_manifest(
     runtime_root: Path,
     git_root: Optional[Path] = None,
     *,
-    python_version: Optional[str] = None,
+    python_version: str,
+    package_names: Iterable[str] = (),
     package_entries: Optional[Mapping[str, Mapping[str, Any]]] = None,
-    git_version: str = GIT_VERSION,
+    git_version: str,
 ) -> dict[str, Any]:
     """Build the immutable compatibility contract for the selected runtime."""
     del runtime_root, git_root
     packages = (
         package_entries
         if package_entries is not None
-        else {name: _package_fingerprint(name) for name in RUNTIME_PACKAGES}
+        else {name: _package_fingerprint(name) for name in package_names}
     )
     core = {
         "schemaVersion": MANIFEST_SCHEMA_VERSION,
         "kind": "runtime",
         "python": {
-            "version": python_version or ".".join(str(part) for part in RUNTIME_PYTHON_VERSION),
+            "version": python_version,
         },
         "packages": _normalise_package_entries(packages),
         "git": {"version": git_version},
@@ -303,9 +302,18 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser = argparse.ArgumentParser(description="Create the portable runtime compatibility manifest.")
     parser.add_argument("--runtime-root", type=Path, required=True)
     parser.add_argument("--git-root", type=Path, required=True)
+    parser.add_argument("--python-version", required=True)
+    parser.add_argument("--git-version", required=True)
+    parser.add_argument("--package", action="append", dest="packages", required=True)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args(argv)
-    manifest = build_runtime_manifest(args.runtime_root, args.git_root)
+    manifest = build_runtime_manifest(
+        args.runtime_root,
+        args.git_root,
+        python_version=args.python_version,
+        package_names=args.packages,
+        git_version=args.git_version,
+    )
     output = args.output or (args.runtime_root / RUNTIME_MANIFEST_FILENAME)
     ensure_runtime_manifest(args.runtime_root, manifest)
     if output != args.runtime_root / RUNTIME_MANIFEST_FILENAME:

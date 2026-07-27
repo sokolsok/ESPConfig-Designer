@@ -5,6 +5,11 @@ param(
 
 $ErrorActionPreference = "Stop"
 $PythonVersion = "3.13.9"
+$RuntimePackages = @("esphome", "platformio", "Flask", "pyserial", "setuptools", "wheel")
+foreach ($name in @("PYTHONHOME", "PYTHONPATH", "PYTHONUSERBASE", "VIRTUAL_ENV")) {
+    Remove-Item -LiteralPath "Env:$name" -ErrorAction SilentlyContinue
+}
+$env:PYTHONNOUSERSITE = "1"
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
 $runtimeManifestScript = Join-Path $repoRoot "esp-config-designer\backend\runtime_manifest.py"
 if (-not (Test-Path -LiteralPath $runtimeManifestScript -PathType Leaf)) {
@@ -90,8 +95,17 @@ try {
     if ($LASTEXITCODE -ne 0 -or $gitVersionOutput -notmatch [regex]::Escape("git version $GitVersion")) {
         throw "Bundled Git verification failed: $gitVersionOutput"
     }
-    & $pythonPath $runtimeManifestScript `
-        --runtime-root $OutputRoot --git-root $gitRoot
+    $manifestArgs = @(
+        "-I", "-B", $runtimeManifestScript,
+        "--runtime-root", $OutputRoot,
+        "--git-root", $gitRoot,
+        "--python-version", $PythonVersion,
+        "--git-version", $GitVersion
+    )
+    foreach ($packageName in $RuntimePackages) {
+        $manifestArgs += @("--package", $packageName)
+    }
+    & $pythonPath @manifestArgs
     if ($LASTEXITCODE -ne 0) {
         throw "Runtime compatibility manifest generation failed"
     }

@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
     [string]$Root = "C:\ECDTest",
+    [string]$RepositoryRoot = "",
     [int]$Port = 8099
 )
 
@@ -12,6 +13,12 @@ $workspace = Join-Path $Root "workspace"
 $backend = Join-Path $Root "app"
 $yaml = Join-Path $workspace "test.yaml"
 $launchScript = Join-Path $PSScriptRoot "launch.ps1"
+if (-not $RepositoryRoot) {
+    $RepositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
+}
+$RepositoryRoot = [System.IO.Path]::GetFullPath($RepositoryRoot)
+$backendSource = Join-Path $RepositoryRoot "esp-config-designer\backend"
+$desktopTests = Join-Path $RepositoryRoot "desktop\tests\python"
 if (-not (Test-Path -LiteralPath $launchScript -PathType Leaf)) {
     throw "Windows launcher is missing: $launchScript"
 }
@@ -25,10 +32,15 @@ function Run-UpdateRecoveryTests {
     }
     $previousLocation = Get-Location
     try {
-        Set-Location -LiteralPath $backend
-        & $python -m unittest tests.test_runtime_manifest tests.test_runtime_update -v
+        Set-Location -LiteralPath $backendSource
+        & $python -I -B -m unittest discover -s tests -p "test_runtime_manifest.py" -v
         if ($LASTEXITCODE -ne 0) {
-            throw "Runtime update/cache recovery tests failed with exit code $LASTEXITCODE"
+            throw "Runtime manifest tests failed with exit code $LASTEXITCODE"
+        }
+        Set-Location -LiteralPath $RepositoryRoot
+        & $python -I -B -m unittest discover -s $desktopTests -p "test_runtime_update.py" -v
+        if ($LASTEXITCODE -ne 0) {
+            throw "Runtime update tests failed with exit code $LASTEXITCODE"
         }
     }
     finally {
@@ -40,6 +52,8 @@ function Start-Backend([bool]$Offline) {
     $script = {
         param($RuntimePath, $AppDataPath, $WorkspacePath, $BackendPath, $LaunchScriptPath, $ServerPort, $IsOffline)
         $env:PATH = "C:\Windows\System32;C:\Windows"
+        $env:PYTHONPATH = "C:\HostilePythonPath"
+        $env:PYTHONUSERBASE = "C:\HostilePythonUserBase"
         if ($IsOffline) {
             $proxy = "http://127.0.0.1:9"
             $env:HTTP_PROXY = $proxy

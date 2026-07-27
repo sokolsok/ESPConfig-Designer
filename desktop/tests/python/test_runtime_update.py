@@ -1,8 +1,12 @@
 import hashlib
 import pathlib
+import sys
 import tempfile
 import unittest
 from unittest import mock
+
+DESKTOP_ROOT = pathlib.Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(DESKTOP_ROOT / "python"))
 
 import runtime_update
 

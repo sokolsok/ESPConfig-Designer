@@ -1,9 +1,4 @@
-"""Portable desktop runtime paths and environment.
-
-This module is intentionally independent from Flask and the frontend.  The
-Windows launcher uses it before importing ``server.py`` so the backend keeps
-one implementation for every deployment mode.
-"""
+"""Embedded runtime and environment policy for the Desktop adapter."""
 
 from dataclasses import dataclass
 import importlib.metadata
@@ -12,67 +7,35 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
-from typing import Dict, Mapping, Optional
+from typing import Dict, Iterable, Mapping, Optional
+
+from runtime_contract import RUNTIME_TOOL_VERSIONS, ensure_workspace, workspace_status
 
 
 RUNTIME_PYTHON_VERSION = (3, 13, 9)
 RUNTIME_PACKAGES = {
-    "esphome": "2026.6.4",
-    "platformio": "6.1.19",
+    **RUNTIME_TOOL_VERSIONS,
     "Flask": "3.1.2",
     "pyserial": "3.5",
     "setuptools": "82.0.0",
     "wheel": "0.47.0",
 }
-
 GIT_VERSION = "2.55.0.windows.3"
 
-CAPABILITIES_VERSION = 1
 
-
-def build_runtime_capabilities(mode: str, storage_mode: str = "") -> dict:
-    """Return the public feature contract for a runtime mode."""
-    raw_mode = str(mode or "").strip().lower()
-    known_mode = raw_mode in {"addon", "standalone", "desktop"}
-    normalized_mode = normalize_runtime_mode(mode)
-    normalized_storage = str(storage_mode or "").strip().lower()
-    is_desktop = normalized_mode == "desktop"
-    is_addon = normalized_mode == "addon"
-    restricted = is_desktop or not known_mode
-    return {
-        "version": CAPABILITIES_VERSION,
-        "mode": normalized_mode,
-        "yamlImport": not restricted,
-        "localYamlImport": True,
-        "sharedEsphomePath": not restricted and normalized_storage == "shared_esphome",
-        "serverSerialFlash": not restricted,
-        "localSerialFlash": True,
-        "haHost": is_addon and not restricted,
-        "supervisorIngress": is_addon and not restricted,
-        "assets": True,
-        "customComponents": True,
-        "validate": True,
-        "compile": True,
-        "ota": True,
-        "logs": True,
-        "firmwareDownload": True,
-    }
-
-
-def normalize_runtime_mode(value: str) -> str:
-    mode = str(value or "").strip().lower()
-    if mode in {"addon", "standalone", "desktop"}:
-        return mode
-    return "addon"
-
-
-def is_local_runtime_mode(value: str) -> bool:
-    return normalize_runtime_mode(value) in {"standalone", "desktop"}
-
-
-def isolated_python_paths(runtime_root: Path, backend_root: Path, paths=None) -> list[str]:
-    """Keep imports inside the embedded runtime and packaged backend."""
-    allowed_roots = (Path(runtime_root).resolve(), Path(backend_root).resolve())
+def isolated_python_paths(
+    runtime_root: Path,
+    trusted_source_roots: Iterable[Path],
+    paths=None,
+) -> list[str]:
+    """Keep imports inside the embedded runtime and explicit source roots."""
+    runtime = Path(runtime_root).resolve()
+    source_roots = []
+    for root in trusted_source_roots:
+        resolved = Path(root).resolve()
+        if resolved not in source_roots:
+            source_roots.append(resolved)
+    allowed_roots = (runtime, *source_roots)
     isolated = []
     for raw_path in paths if paths is not None else sys.path:
         if not raw_path:
@@ -87,18 +50,16 @@ def isolated_python_paths(runtime_root: Path, backend_root: Path, paths=None) ->
             allowed = False
         if allowed and str(candidate) not in isolated:
             isolated.append(str(candidate))
-    backend = str(allowed_roots[1])
-    if backend in isolated:
-        isolated.remove(backend)
-    return [backend, *isolated]
+    trusted = [str(root) for root in source_roots]
+    return [*trusted, *(path for path in isolated if path not in trusted)]
 
 
-def isolate_embedded_python(runtime_root: Path, backend_root: Path) -> None:
+def isolate_embedded_python(runtime_root: Path, trusted_source_roots: Iterable[Path]) -> None:
     """Remove user/global Python inputs before inspecting packaged distributions."""
-    os.environ.pop("PYTHONHOME", None)
-    os.environ.pop("PYTHONPATH", None)
+    for name in ("PYTHONHOME", "PYTHONPATH", "PYTHONUSERBASE"):
+        os.environ.pop(name, None)
     os.environ["PYTHONNOUSERSITE"] = "1"
-    sys.path[:] = isolated_python_paths(runtime_root, backend_root)
+    sys.path[:] = isolated_python_paths(runtime_root, trusted_source_roots)
 
 
 @dataclass(frozen=True)
@@ -155,7 +116,6 @@ class DesktopRuntimePaths:
         base_environment: Optional[Mapping[str, str]] = None,
     ) -> Dict[str, str]:
         """Build the complete desktop environment consumed by ``server.py``."""
-
         project_dir = self.workspace / "esp_projects"
         asset_root = self.workspace / "esp_assets"
         environment = dict(base_environment or os.environ)
@@ -192,19 +152,18 @@ class DesktopRuntimePaths:
                 "PYTHONUTF8": "1",
                 "PYTHONIOENCODING": "utf-8",
                 "PYTHONDONTWRITEBYTECODE": "1",
+                "PYTHONNOUSERSITE": "1",
             }
         )
-
         environment["PATH"] = build_runtime_path(
             runtime_root=self.runtime_root,
             git_root=self.git_root,
             base_environment=environment,
         )
         environment["GIT_EXEC_PATH"] = str(self.git_root / "mingw64" / "libexec" / "git-core")
-        # Keep PlatformIO's penv ahead of any user/global Python path.  Its
-        # esptool provenance check must see the local tool package, not the
-        # same-named package from the embedded runtime.
-        environment.pop("PYTHONPATH", None)
+        # PlatformIO's penv must resolve its own packages, never user/global Python.
+        for name in ("PYTHONHOME", "PYTHONPATH", "PYTHONUSERBASE", "VIRTUAL_ENV"):
+            environment.pop(name, None)
         return environment
 
 
@@ -236,93 +195,20 @@ def ensure_desktop_directories(paths: DesktopRuntimePaths) -> None:
     ensure_workspace(paths.workspace)
 
 
-def workspace_status(workspace: Path, app_data_root: Optional[Path] = None) -> dict:
-    """Inspect a workspace without creating or modifying it."""
-    configured_path = str(workspace or "").strip()
-    path = Path(configured_path).expanduser() if configured_path else Path()
-    directory = directory_status(path) if configured_path else {
-        "exists": False,
-        "isDirectory": False,
-        "writable": False,
-    }
-    exists = directory["exists"]
-    is_directory = directory["isDirectory"]
-    writable = directory["writable"]
-    app_data = Path(app_data_root).expanduser() if app_data_root else None
-    separate_app_data = True
-    if app_data is not None and configured_path:
-        separate_app_data = not _paths_overlap(path, app_data)
-    return {
-        "path": str(path) if configured_path else "",
-        "configured": bool(configured_path),
-        "exists": exists,
-        "isDirectory": is_directory,
-        "writable": writable,
-        "ready": is_directory and writable,
-        "separateAppData": separate_app_data,
-    }
-
-
-def directory_status(directory: Path) -> dict:
-    """Inspect and transiently probe a mutable directory without retaining data."""
-    path = Path(directory).expanduser()
-    exists = path.exists()
-    is_directory = exists and path.is_dir()
-    writable = is_directory and _is_writable(path)
-    return {
-        "exists": exists,
-        "isDirectory": is_directory,
-        "writable": writable,
-    }
-
-
-def ensure_workspace(workspace: Path) -> None:
-    """Create the user-owned workspace layout and verify every directory."""
-    root = Path(workspace).expanduser()
-    directories = (
-        root,
-        root / "esp_projects",
-        root / "esp_assets" / "fonts",
-        root / "esp_assets" / "images",
-        root / "esp_assets" / "audio",
-    )
-    for directory in directories:
-        directory.mkdir(parents=True, exist_ok=True)
-        _check_writable(directory)
-
-
-def _is_writable(directory: Path) -> bool:
-    try:
-        _check_writable(directory)
-    except (OSError, RuntimeError):
-        return False
-    return True
-
-
-def _paths_overlap(first: Path, second: Path) -> bool:
-    try:
-        first_path = os.path.normcase(os.path.abspath(os.fspath(first)))
-        second_path = os.path.normcase(os.path.abspath(os.fspath(second)))
-        common = os.path.commonpath((first_path, second_path))
-    except (OSError, ValueError):
-        return False
-    return common in {first_path, second_path}
-
-
 def _check_writable(directory: Path) -> None:
-    probe_path = None
+    probe = None
     try:
         with tempfile.NamedTemporaryFile(
             mode="w", encoding="utf-8", dir=directory, prefix=".ecd-write-", delete=False
         ) as handle:
             handle.write("ok\n")
-            probe_path = Path(handle.name)
+            probe = Path(handle.name)
     except OSError as exc:
         raise RuntimeError(f"Directory is not writable: {directory} ({exc})") from exc
     finally:
-        if probe_path is not None:
+        if probe is not None:
             try:
-                probe_path.unlink()
+                probe.unlink()
             except OSError:
                 pass
 
@@ -413,7 +299,6 @@ def validate_runtime_dependencies(runtime_root: Optional[Path] = None) -> None:
         expected = ".".join(str(part) for part in RUNTIME_PYTHON_VERSION)
         actual = ".".join(str(part) for part in actual_python)
         raise RuntimeError(f"Portable Python version mismatch: expected {expected}, found {actual}")
-
     missing_or_wrong = []
     for package, expected in RUNTIME_PACKAGES.items():
         try:
@@ -434,9 +319,7 @@ def validate_runtime_dependencies(runtime_root: Optional[Path] = None) -> None:
             if not packaged:
                 missing_or_wrong.append(f"{package}=={expected} (loaded outside embedded runtime)")
     if missing_or_wrong:
-        raise RuntimeError(
-            "Portable runtime dependencies are incomplete: " + ", ".join(missing_or_wrong)
-        )
+        raise RuntimeError("Portable runtime dependencies are incomplete: " + ", ".join(missing_or_wrong))
 
 
 def verify_esphome_cli(python_executable: Path, environment: Mapping[str, str], cwd: Path) -> str:

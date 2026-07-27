@@ -7,6 +7,8 @@ import unittest
 from unittest.mock import patch
 
 
+BACKEND_ROOT = pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(BACKEND_ROOT))
 SERVER_PATH = pathlib.Path(__file__).resolve().parents[1] / "server.py"
 sys.modules.setdefault(
     "pty", types.SimpleNamespace(openpty=lambda: (_ for _ in ()).throw(NotImplementedError()))

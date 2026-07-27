@@ -3,14 +3,16 @@
 This directory is the Tauri target for the existing Vue frontend and the
 existing Flask backend. It does not contain a second backend or a source copy
 of the frontend. The canonical backend source is
-`esp-config-designer/backend/`; packaging keeps the existing flat
+`esp-config-designer/backend/`; Desktop bootstrap code is owned by
+`desktop/python/`. Packaging merges both source roots into the existing flat
 `ecd-app/backend/` runtime layout.
 
 ## Runtime flow
 
 The Rust shell resolves packaged resources from Tauri's resource directory and
-mutable data from `%LOCALAPPDATA%\ECD`. It starts the existing
-`desktop_launcher.py` with the portable Python runtime. The launcher starts the
+mutable data from `%LOCALAPPDATA%\ECD`. It starts
+`desktop/python/desktop_launcher.py` in source builds, or the flat packaged
+`backend/desktop_launcher.py`, with the portable Python runtime. The launcher starts the
 shared `server.py` with `ECD_MODE=desktop`; Rust also sets `HOST=127.0.0.1` and
 passes the selected workspace, application-data root, runtime root, web root
 and port as launcher arguments. The shell waits for a desktop-mode
@@ -88,7 +90,7 @@ npm run verify:resources
 The generated, non-source layout is `desktop/resources/ecd-app/`:
 
 ```text
-ecd-app/backend/       shared server.py, launcher, runtime modules, seed, web/
+ecd-app/backend/       shared backend plus flattened Desktop adapter, seed, web/
 ecd-app/runtime/       Python 3.13.9, pinned packages, ESPHome, MinGit, licenses
 ```
 

@@ -15,7 +15,8 @@ foreach ($requiredPath in @(
     (Join-Path $ResourcesRoot "resource-layout.json"),
     (Join-Path $backendRoot "server.py"),
     (Join-Path $backendRoot "desktop_launcher.py"),
-    (Join-Path $backendRoot "runtime_config.py"),
+    (Join-Path $backendRoot "desktop_runtime.py"),
+    (Join-Path $backendRoot "runtime_contract.py"),
     (Join-Path $backendRoot "runtime_manifest.py"),
     (Join-Path $backendRoot "runtime_diagnostics.py"),
     (Join-Path $backendRoot "runtime_update.py"),
@@ -36,6 +37,9 @@ if (Test-Path -LiteralPath (Join-Path $backendRoot "backend") -PathType Containe
 }
 if (Test-Path -LiteralPath (Join-Path $backendRoot "tests") -PathType Container) {
     throw "Backend tests must not be included in packaged resources"
+}
+if (Test-Path -LiteralPath (Join-Path $backendRoot "runtime_config.py") -PathType Leaf) {
+    throw "Packaged resources contain the obsolete mixed runtime_config.py"
 }
 
 $layout = Get-Content -LiteralPath (Join-Path $ResourcesRoot "resource-layout.json") -Raw | ConvertFrom-Json

@@ -1,4 +1,4 @@
-"""Developer and packaging launcher for the Windows desktop backend."""
+"""Developer and packaged launcher for the Windows Desktop adapter."""
 
 import argparse
 import os
@@ -8,16 +8,85 @@ import sys
 
 os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
 
-# The launcher must not inherit user/global packages before manifest validation.
-launcher_backend_root = Path(__file__).resolve().parent
+
+def _bootstrap_options(argv=None):
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--backend-root", type=Path)
+    parser.add_argument("--application-store", type=Path)
+    return parser.parse_known_args(sys.argv[1:] if argv is None else argv)[0]
+
+
+def _replace_option(arguments, name: str, value: Path) -> list[str]:
+    updated = list(arguments)
+    for index, argument in enumerate(updated):
+        if argument == name and index + 1 < len(updated):
+            updated[index + 1] = str(value)
+            return updated
+        if argument.startswith(name + "="):
+            updated[index] = f"{name}={value}"
+            return updated
+    return [*updated, name, str(value)]
+
+
+def _active_payload_bootstrap(launcher_root: Path, argv=None):
+    arguments = list(sys.argv[1:] if argv is None else argv)
+    known = _bootstrap_options(arguments)
+    if known.application_store is None:
+        return arguments, None
+
+    sys.path.insert(0, str(launcher_root))
+    from runtime_update import resolve_active_payload
+
+    active = resolve_active_payload(known.application_store.resolve())
+    active_launcher = active.backend_root / "desktop_launcher.py"
+    active_web = active.backend_root / "web"
+    active_python = active.runtime_root / "python.exe"
+    if not active_python.is_file():
+        active_python = active.runtime_root / "Scripts" / "python.exe"
+    for required in (active_launcher, active_web / "index.html", active_python):
+        if not required.is_file():
+            raise RuntimeError(f"Active application payload is incomplete: {required}")
+
+    arguments = _replace_option(arguments, "--backend-root", active.backend_root)
+    arguments = _replace_option(arguments, "--runtime-root", active.runtime_root)
+    arguments = _replace_option(arguments, "--web-root", active_web)
+    sys.argv[1:] = arguments
+    if Path(__file__).resolve() != active_launcher.resolve() or Path(sys.executable).resolve() != active_python.resolve():
+        os.execv(
+            str(active_python),
+            [str(active_python), "-I", "-B", str(active_launcher), *arguments],
+        )
+    return arguments, active
+
+
+def _bootstrap_backend_root(launcher_root: Path, argv=None) -> Path:
+    """Resolve the shared backend before importing either source root."""
+    known = _bootstrap_options(argv)
+    if known.backend_root is not None:
+        return known.backend_root.resolve()
+    if (launcher_root / "server.py").is_file():
+        return launcher_root
+    return (launcher_root.parent.parent / "esp-config-designer" / "backend").resolve()
+
+
+launcher_root = Path(__file__).resolve().parent
+bootstrap_arguments, _ = _active_payload_bootstrap(launcher_root)
+launcher_backend_root = _bootstrap_backend_root(launcher_root, bootstrap_arguments)
 sys.path.insert(0, str(launcher_backend_root))
+sys.path.insert(0, str(launcher_root))
 
-from runtime_config import isolate_embedded_python
+from desktop_runtime import isolate_embedded_python
 
-isolate_embedded_python(Path(sys.executable).resolve().parent, launcher_backend_root)
+isolate_embedded_python(
+    Path(sys.executable).resolve().parent,
+    (launcher_root, launcher_backend_root),
+)
 
-from runtime_config import (
+from desktop_runtime import (
     DesktopRuntimePaths,
+    GIT_VERSION,
+    RUNTIME_PACKAGES,
+    RUNTIME_PYTHON_VERSION,
     default_local_app_data,
     ensure_desktop_directories,
     resolve_runtime_python,
@@ -31,18 +100,14 @@ from runtime_manifest import (
     ensure_cache_compatible,
     validate_runtime_manifest,
 )
-from runtime_update import resolve_active_payload
-
-
 def parse_args(argv=None):
-    backend_root = Path(__file__).resolve().parent
     local_app_data = default_local_app_data()
     app_data_root = local_app_data / "ECD"
     parser = argparse.ArgumentParser(description="Run the shared ESPConfig Designer backend in desktop mode.")
     parser.add_argument("--runtime-root", type=Path, default=app_data_root / "runtime")
     parser.add_argument("--app-data-root", type=Path, default=app_data_root)
     parser.add_argument("--workspace", type=Path, default=Path.home() / "Documents" / "ecd_workspace")
-    parser.add_argument("--backend-root", type=Path, default=backend_root)
+    parser.add_argument("--backend-root", type=Path, default=launcher_backend_root)
     parser.add_argument("--web-root", type=Path, default=None)
     parser.add_argument("--application-store", type=Path, default=None)
     parser.add_argument("--port", type=int, default=int(os.environ.get("PORT", "8099")))
@@ -55,10 +120,6 @@ def prepare_runtime(args):
     runtime_root = args.runtime_root.resolve()
     app_data_root = args.app_data_root.resolve()
     workspace = args.workspace.resolve()
-    if args.application_store is not None:
-        active_payload = resolve_active_payload(args.application_store.resolve())
-        backend_root = active_payload.backend_root
-        runtime_root = active_payload.runtime_root
     if not (backend_root / "server.py").is_file():
         raise RuntimeError(f"Backend server.py is missing: {backend_root / 'server.py'}")
     web_root = (args.web_root or (backend_root / "web")).resolve()
@@ -84,29 +145,22 @@ def prepare_runtime(args):
     bundled_git = resolve_bundled_git(paths.git_root)
     environment = paths.environment(python_executable=runtime_python, port=args.port)
     git_output = verify_bundled_git(paths.git_root, environment, paths.backend_root)
-    runtime_manifest = build_runtime_manifest(runtime_root, paths.git_root)
+    runtime_manifest = build_runtime_manifest(
+        runtime_root,
+        paths.git_root,
+        python_version=".".join(str(part) for part in RUNTIME_PYTHON_VERSION),
+        package_names=RUNTIME_PACKAGES,
+        git_version=GIT_VERSION,
+    )
     validate_runtime_manifest(runtime_root, runtime_manifest)
     ensure_cache_compatible(paths.platformio_root, runtime_manifest, app_data_root)
     os.environ.update(environment)
     return paths, runtime_python, bundled_git, git_output, environment
 
 
-def relaunch_for_active_payload(args) -> None:
-    """Use the active immutable runtime before validating or starting Flask."""
-    if args.application_store is None:
-        return
-    active_payload = resolve_active_payload(args.application_store.resolve())
-    active_python = resolve_runtime_python(active_payload.runtime_root)
-    if Path(sys.executable).resolve() == active_python.resolve():
-        return
-    os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
-    os.execv(str(active_python), [str(active_python), str(Path(__file__).resolve()), *sys.argv[1:]])
-
-
 def main(argv=None) -> int:
     args = parse_args(argv)
     try:
-        relaunch_for_active_payload(args)
         paths, runtime_python, bundled_git, git_output, environment = prepare_runtime(args)
         version_output = verify_esphome_cli(runtime_python, environment, paths.backend_root)
         print(f"[info] Portable Python: {sys.version.split()[0]}", flush=True)

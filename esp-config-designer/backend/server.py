@@ -25,7 +25,7 @@ from typing import List, Optional, Tuple
 from urllib.parse import quote
 
 from flask import Flask, Response, jsonify, make_response, request, send_file, send_from_directory
-from runtime_config import (
+from runtime_contract import (
     CAPABILITIES_VERSION,
     build_runtime_capabilities,
     is_local_runtime_mode,

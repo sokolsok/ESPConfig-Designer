@@ -123,7 +123,11 @@ test("configures one runtime root for all development backend data", () => {
   const backendRoot = path.join(applicationRoot, "backend");
   const frontendRoot = path.join(applicationRoot, "frontend");
   const environment = createDevBackendEnvironment({
-    baseEnv: { Path: "existing-path", ECD_AUTH_MODE: "basic" },
+    baseEnv: {
+      Path: "existing-path",
+      ECD_AUTH_MODE: "basic",
+      PYTHONUSERBASE: "C:\\HostileUserBase"
+    },
     runtimeRoot,
     backendRoot,
     frontendRoot,
@@ -153,6 +157,7 @@ test("configures one runtime root for all development backend data", () => {
   assert.equal(environment.PYTHONNOUSERSITE, "1");
   assert.equal(environment.PYTHONHOME, undefined);
   assert.equal(environment.PYTHONPATH, undefined);
+  assert.equal(environment.PYTHONUSERBASE, undefined);
   assert.equal(environment.Path, undefined);
   assert.match(environment.PATH, /existing-path$/);
   assert.match(environment.PATH, new RegExp(`git[\\\\/]cmd${path.delimiter.replace(";", "\\;")}`));

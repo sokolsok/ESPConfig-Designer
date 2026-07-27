@@ -21,7 +21,7 @@ RUN python3 -m venv --system-site-packages /opt/designer-venv \
        pyserial==3.5
 
 COPY backend/server.py /server.py
-COPY backend/runtime_config.py /runtime_config.py
+COPY backend/runtime_contract.py /runtime_contract.py
 COPY backend/runtime_manifest.py /runtime_manifest.py
 COPY backend/runtime_diagnostics.py /runtime_diagnostics.py
 COPY run.sh /run.sh

@@ -107,6 +107,7 @@ export const createDevBackendEnvironment = ({
 
   delete environment.PYTHONHOME;
   delete environment.PYTHONPATH;
+  delete environment.PYTHONUSERBASE;
   delete environment.VIRTUAL_ENV;
 
   if (path.isAbsolute(pythonExecutable)) {
