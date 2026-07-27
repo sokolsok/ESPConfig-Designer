@@ -145,7 +145,11 @@ test("configures one runtime root for all development backend data", () => {
   assert.equal(environment.PROJECT_DIR, path.join(runtimeRoot, "esp_projects"));
   assert.equal(environment.ASSET_ROOT, path.join(runtimeRoot, "esp_assets"));
   assert.equal(environment.JOB_DIR, path.join(runtimeRoot, ".ecd", "jobs"));
-  assert.equal(environment.WEB_ROOT, path.join(frontendRoot, "public"));
+  assert.equal(environment.WEB_ROOT, path.join(frontendRoot, "dist"));
+  assert.equal(
+    environment.SCHEMA_CATALOG_ROOT,
+    path.join(applicationRoot, "shared", "schema-catalog")
+  );
   assert.equal(environment.SEED_ROOT, path.join(backendRoot, "seed_esphome"));
   assert.match(environment.ESPHOME_BIN, /python\.exe" -m esphome$/);
   assert.equal(environment.HOME, path.join(runtimeRoot, ".ecd", "home"));

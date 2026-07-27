@@ -18,6 +18,7 @@ $config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
 
 $applicationRoot = Join-Path $repoRoot "esp-config-designer"
 $backendSource = Join-Path $applicationRoot "backend"
+$schemaCatalogSource = Join-Path $applicationRoot "shared\schema-catalog"
 foreach ($relativePath in @(
     "server.py",
     "runtime_contract.py",
@@ -29,17 +30,19 @@ foreach ($relativePath in @(
     Assert-True (Test-Path -LiteralPath (Join-Path $backendSource $relativePath)) "Canonical backend source is missing: $relativePath"
 }
 $desktopPythonSource = Join-Path $desktopRoot "python"
-foreach ($fileName in @("desktop_launcher.py", "desktop_runtime.py", "runtime_update.py")) {
+foreach ($fileName in @("desktop_launcher.py", "desktop_runtime.py", "application_payload.py", "runtime_update.py")) {
     Assert-True (Test-Path -LiteralPath (Join-Path $desktopPythonSource $fileName) -PathType Leaf) "Desktop Python adapter is missing: $fileName"
 }
 foreach ($fileName in @("test_desktop_runtime.py", "test_runtime_update.py")) {
     Assert-True (Test-Path -LiteralPath (Join-Path $desktopRoot "tests\python\$fileName") -PathType Leaf) "Desktop Python test is missing: $fileName"
 }
-foreach ($desktopFile in @("desktop_launcher.py", "desktop_runtime.py", "runtime_update.py")) {
+foreach ($desktopFile in @("desktop_launcher.py", "desktop_runtime.py", "application_payload.py", "runtime_update.py")) {
     Assert-True (-not (Test-Path -LiteralPath (Join-Path $backendSource $desktopFile) -PathType Leaf)) "Desktop adapter remains under the shared backend: $desktopFile"
 }
+Assert-True (Test-Path -LiteralPath (Join-Path $schemaCatalogSource "components_list\components_list.json") -PathType Leaf) "Canonical schema catalog is missing"
+Assert-True (-not (Test-Path -LiteralPath (Join-Path $applicationRoot "frontend\public") -PathType Container)) "Tracked frontend catalog source remains"
 Assert-True (-not (Test-Path -LiteralPath (Join-Path $backendSource "runtime_config.py") -PathType Leaf)) "Mixed runtime_config.py remains under the shared backend"
-foreach ($legacyFile in @("server.py", "desktop_launcher.py", "desktop_runtime.py", "runtime_config.py", "runtime_contract.py", "runtime_manifest.py", "runtime_diagnostics.py", "runtime_update.py")) {
+foreach ($legacyFile in @("server.py", "desktop_launcher.py", "desktop_runtime.py", "application_payload.py", "runtime_config.py", "runtime_contract.py", "runtime_manifest.py", "runtime_diagnostics.py", "runtime_update.py")) {
     Assert-True (-not (Test-Path -LiteralPath (Join-Path $applicationRoot $legacyFile) -PathType Leaf)) "Legacy backend source remains at application root: $legacyFile"
 }
 
@@ -107,13 +110,16 @@ if ($null -ne $windowsBundle) {
 if ($InstallRoot) {
     $resolvedInstallRoot = [System.IO.Path]::GetFullPath($InstallRoot)
     Assert-True (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\backend\server.py") -PathType Leaf) "Installed shared backend is missing"
-    foreach ($fileName in @("desktop_launcher.py", "desktop_runtime.py", "runtime_contract.py", "runtime_manifest.py", "runtime_diagnostics.py", "runtime_update.py")) {
+    foreach ($fileName in @("desktop_launcher.py", "desktop_runtime.py", "application_payload.py", "runtime_contract.py", "runtime_manifest.py", "runtime_diagnostics.py", "runtime_update.py")) {
         Assert-True (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\backend\$fileName") -PathType Leaf) "Installed flat backend module is missing: $fileName"
     }
     Assert-True (-not (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\backend\backend") -PathType Container)) "Installed resources contain backend/backend"
     Assert-True (-not (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\backend\tests") -PathType Container)) "Installed resources contain tests"
     Assert-True (-not (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\backend\runtime_config.py") -PathType Leaf)) "Installed resources contain obsolete runtime_config.py"
     Assert-True (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\backend\web\index.html") -PathType Leaf) "Installed frontend bundle is missing"
+    Assert-True (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\backend\schema-catalog\components_list\components_list.json") -PathType Leaf) "Installed schema catalog is missing"
+    Assert-True (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\backend\schema-catalog-manifest.json") -PathType Leaf) "Installed schema catalog manifest is missing"
+    Assert-True (-not (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\backend\schema-catalog\schema-catalog") -PathType Container)) "Installed resources contain nested schema-catalog"
     Assert-True (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\runtime\python.exe") -PathType Leaf) "Installed embedded Python is missing"
     Assert-True (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\runtime\git\cmd\git.exe") -PathType Leaf) "Installed MinGit is missing"
     Assert-True (-not (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\workspace.json"))) "Workspace config was written to installed resources"

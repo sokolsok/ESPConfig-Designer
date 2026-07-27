@@ -10,9 +10,12 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 import shutil
+import subprocess
 import tempfile
 from typing import Any, Mapping, Optional
 import uuid
+
+from application_payload import validate_application_payload
 
 
 UPDATE_SCHEMA_VERSION = 1
@@ -21,6 +24,9 @@ PREVIOUS_POINTER_FILENAME = "previous.json"
 VERSIONS_DIRNAME = "versions"
 STAGING_DIRNAME = ".staging"
 PAYLOAD_MANIFEST_FILENAME = "payload-manifest.json"
+RUNTIME_USABILITY_TIMEOUT_SECONDS = 120
+RUNTIME_USABILITY_ERROR_LIMIT = 4000
+PYTHON_PROBE_TOKEN = "ecd-embedded-python-ok"
 
 
 class UpdateError(RuntimeError):
@@ -82,7 +88,7 @@ def _file_manifest(root: Path) -> list[dict[str, str]]:
     for directory_name in ("backend", "runtime"):
         directory = root / directory_name
         for path in sorted(directory.rglob("*")):
-            if path.is_file() and path.suffix != ".pyc" and "__pycache__" not in path.parts:
+            if path.is_file():
                 entries.append(
                     {
                         "path": path.relative_to(root).as_posix(),
@@ -106,16 +112,10 @@ def _expected_files(expected_manifest: Mapping[str, Any]) -> dict[str, str]:
             if not isinstance(entry, Mapping) or not entry.get("path") or not entry.get("sha256"):
                 raise UpdateError("Invalid expected update file manifest")
             path = str(entry["path"])
-            if Path(path).suffix == ".pyc" or "__pycache__" in Path(path).parts:
-                continue
             result[path] = str(entry["sha256"])
         return result
     if isinstance(raw_files, Mapping):
-        return {
-            str(path): str(digest)
-            for path, digest in raw_files.items()
-            if Path(str(path)).suffix != ".pyc" and "__pycache__" not in Path(str(path)).parts
-        }
+        return {str(path): str(digest) for path, digest in raw_files.items()}
     raise UpdateError("Invalid expected update file manifest")
 
 
@@ -138,9 +138,10 @@ def stage_application_update(
     store = Path(store_root)
     source = Path(payload_root)
     version = _validate_version(version)
-    for required in (source / "backend", source / "runtime"):
-        if not required.is_dir():
-            raise UpdateError(f"Application payload is incomplete: {required}")
+    try:
+        validate_application_payload(source)
+    except RuntimeError as exc:
+        raise UpdateError(str(exc)) from exc
 
     versions = store / VERSIONS_DIRNAME
     destination = versions / version
@@ -151,6 +152,7 @@ def stage_application_update(
         (staging / "backend").parent.mkdir(parents=True, exist_ok=True)
         shutil.copytree(source / "backend", staging / "backend")
         shutil.copytree(source / "runtime", staging / "runtime")
+        validate_application_payload(staging)
         _verify_expected_manifest(staging, expected_manifest)
         manifest = _payload_manifest(staging)
         _write_json_atomic(staging / PAYLOAD_MANIFEST_FILENAME, manifest)
@@ -197,8 +199,108 @@ def _resolve_pointer(store: Path, pointer: Mapping[str, Any]) -> ActivePayload:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     if not isinstance(manifest, Mapping):
         raise UpdateError(f"Invalid application payload manifest: {manifest_path}")
+    try:
+        validate_application_payload(root)
+    except RuntimeError as exc:
+        raise UpdateError(str(exc)) from exc
     _verify_expected_manifest(root, manifest)
     return ActivePayload(version, root, root / "backend", root / "runtime")
+
+
+def _validate_runtime_usability(candidate: ActivePayload) -> None:
+    """Run the candidate's complete launcher preflight before changing a pointer."""
+    runtime_python = candidate.runtime_root / "python.exe"
+    if not runtime_python.is_file():
+        runtime_python = candidate.runtime_root / "Scripts" / "python.exe"
+    launcher = candidate.backend_root / "desktop_launcher.py"
+    with tempfile.TemporaryDirectory(prefix="ecd-runtime-check-") as temporary_directory:
+        temporary_root = Path(temporary_directory)
+        profile_root = temporary_root / "profile"
+        app_data_root = temporary_root / "app-data"
+        temp_root = temporary_root / "temp"
+        for directory in (profile_root, app_data_root, temp_root):
+            directory.mkdir()
+        environment = {
+            name: value
+            for name, value in os.environ.items()
+            if not name.upper().startswith(("ECD_", "GIT_"))
+            and name.upper() not in {"PYTHONHOME", "PYTHONPATH", "PYTHONUSERBASE", "VIRTUAL_ENV"}
+        }
+        environment.update(
+            {
+                "APPDATA": str(app_data_root),
+                "LOCALAPPDATA": str(app_data_root),
+                "USERPROFILE": str(profile_root),
+                "HOME": str(profile_root),
+                "TEMP": str(temp_root),
+                "TMP": str(temp_root),
+                "PYTHONNOUSERSITE": "1",
+                "PYTHONDONTWRITEBYTECODE": "1",
+            }
+        )
+        python_probe = [
+            runtime_python,
+            "-I",
+            "-B",
+            "-c",
+            f"print({PYTHON_PROBE_TOKEN!r})",
+        ]
+        command = [
+            runtime_python,
+            "-I",
+            "-B",
+            launcher,
+            "--check-runtime",
+            "--runtime-root",
+            candidate.runtime_root,
+            "--app-data-root",
+            app_data_root,
+            "--workspace",
+            temporary_root / "workspace",
+            "--backend-root",
+            candidate.backend_root,
+            "--web-root",
+            candidate.backend_root / "web",
+            "--schema-catalog-root",
+            candidate.backend_root / "schema-catalog",
+            "--schema-catalog-manifest",
+            candidate.backend_root / "schema-catalog-manifest.json",
+        ]
+        try:
+            python_result = subprocess.run(
+                python_probe,
+                cwd=candidate.runtime_root,
+                env=environment,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=RUNTIME_USABILITY_TIMEOUT_SECONDS,
+                check=False,
+            )
+            if python_result.returncode != 0 or python_result.stdout.strip() != PYTHON_PROBE_TOKEN:
+                raise UpdateError("Candidate application Python identity check failed")
+            result = subprocess.run(
+                command,
+                cwd=candidate.backend_root,
+                env=environment,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=RUNTIME_USABILITY_TIMEOUT_SECONDS,
+                check=False,
+            )
+        except OSError as exc:
+            raise UpdateError(f"Candidate application runtime could not start: {exc}") from exc
+        except subprocess.TimeoutExpired as exc:
+            raise UpdateError(
+                f"Candidate application runtime check exceeded {RUNTIME_USABILITY_TIMEOUT_SECONDS} seconds"
+            ) from exc
+        if result.returncode != 0:
+            output = (result.stderr.strip() or result.stdout.strip())[-RUNTIME_USABILITY_ERROR_LIMIT:]
+            detail = f": {output}" if output else ""
+            raise UpdateError(f"Candidate application runtime check failed{detail}")
 
 
 def activate_staged_update(store_root: Path, version: str) -> ActivePayload:
@@ -207,12 +309,21 @@ def activate_staged_update(store_root: Path, version: str) -> ActivePayload:
     version = _validate_version(version)
     staged_pointer = _pointer_for(store, version)
     candidate = _resolve_pointer(store, staged_pointer)
+    _validate_runtime_usability(candidate)
     active_path = store / ACTIVE_POINTER_FILENAME
     previous_path = store / PREVIOUS_POINTER_FILENAME
     previous = _read_pointer(active_path) if active_path.is_file() else None
+    rollback_history = _read_pointer(previous_path) if previous_path.is_file() else None
     if previous is not None:
         _write_json_atomic(previous_path, previous)
-    _write_json_atomic(active_path, staged_pointer)
+    try:
+        _write_json_atomic(active_path, staged_pointer)
+    except Exception:
+        if rollback_history is None:
+            previous_path.unlink(missing_ok=True)
+        else:
+            _write_json_atomic(previous_path, rollback_history)
+        raise
     return candidate
 
 
@@ -227,11 +338,16 @@ def rollback_application_update(store_root: Path) -> ActivePayload:
     previous_path = store / PREVIOUS_POINTER_FILENAME
     previous = _read_pointer(previous_path)
     candidate = _resolve_pointer(store, previous)
+    _validate_runtime_usability(candidate)
     active_path = store / ACTIVE_POINTER_FILENAME
     current = _read_pointer(active_path) if active_path.is_file() else None
     if current is not None:
         _write_json_atomic(previous_path, current)
-    _write_json_atomic(active_path, previous)
+    try:
+        _write_json_atomic(active_path, previous)
+    except Exception:
+        _write_json_atomic(previous_path, previous)
+        raise
     return candidate
 
 

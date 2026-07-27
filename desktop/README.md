@@ -64,6 +64,8 @@ $env:ECD_TAURI_RUNTIME_ROOT = "$env:LOCALAPPDATA\ECD\runtime"
 $env:ECD_TAURI_PORT = "8099"
 $env:ECD_TAURI_HEALTH_TIMEOUT_MS = "300000"
 $env:ECD_TAURI_WEB_ROOT = "C:\path\to\esp-config-designer\frontend\dist"
+$env:ECD_TAURI_SCHEMA_CATALOG_ROOT = "C:\path\to\esp-config-designer\shared\schema-catalog"
+$env:ECD_TAURI_SCHEMA_CATALOG_MANIFEST = "C:\path\to\schema-catalog-manifest.json"
 npm run dev
 ```
 
@@ -75,6 +77,12 @@ stage does not implement that packaging.
 The web root can point directly at
 `esp-config-designer/frontend/dist`. Nothing is copied into `desktop/` or the
 backend by the Tauri shell.
+
+The schema catalog root is independent from the web root. Source development
+uses `esp-config-designer/shared/schema-catalog`; packaged resources use
+`ecd-app/backend/schema-catalog`.
+Packaged mode also supplies a generated hash manifest and validates every
+catalog file before starting Flask.
 
 ## Production-like resources
 
@@ -192,8 +200,9 @@ that network, while the direct OTA and native API ports were reachable.
 That gate exposed a Windows-only component-schema route defect: converting a
 validated catalog path to backslashes caused Werkzeug to reject every nested
 schema with HTTP 404. The backend now preserves the POSIX relative path,
-frontend selection failures are visible, resource verification checks every
-available catalog schema, and packaged smoke requests a real schema. The latest
+frontend selection failures are visible, resource verification checks the full
+canonical catalog and both generated projections, and packaged smoke requests
+the catalog through static and API routes. The latest
 workspace gate additionally verifies unattended default creation, restart reuse
 and preservation of an existing custom selection. The Stage 4 repository
 relocation gate rebuilt the unsigned debug installer from a fresh isolated

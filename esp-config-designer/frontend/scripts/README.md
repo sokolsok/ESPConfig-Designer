@@ -26,12 +26,12 @@ required.
 
 The action generator has three inputs and outputs with distinct ownership:
 
-- `public/action_list/base_actions.json` is the source of truth for catalog
+- `../shared/schema-catalog/action_list/base_actions.json` is the source of truth for catalog
   membership, action IDs, metadata, and each action's `schemaUrl`.
 - `scripts/action-definition-generator.js` is the source of truth for generated
   field schemas. It contains exact definitions, reusable family rules, and the
   target-only fallback.
-- `public/actions/**/*.json` is the checked-in generated tree consumed by the
+- `../shared/schema-catalog/actions/**/*.json` is the checked-in generated tree consumed by the
   frontend. Do not make durable edits there; move corrections into the generator.
 
 The generator rejects empty catalogs, duplicate action IDs, any `schemaUrl` that
@@ -47,7 +47,7 @@ node scripts/generate-action-definitions.js --check
 ```
 
 The command calculates the complete expected tree in memory and compares it to
-`public/actions/`. It reports sorted `missing`, `changed`, noncanonical `case`,
+`../shared/schema-catalog/actions/`. It reports sorted `missing`, `changed`, noncanonical `case`,
 and `stale` JSON paths, exits nonzero on drift, and never creates, changes, or
 removes files.
 
@@ -68,10 +68,14 @@ The equivalent direct command is:
 node scripts/generate-action-definitions.js
 ```
 
+The CLI resolves the canonical catalog relative to its own module. Tests and
+specialized tooling can set `ECD_SCHEMA_CATALOG_ROOT` to an explicit fixture;
+normal source generation must not override it.
+
 Plain generation is non-destructive with respect to stale files. After validating
 the catalog and all generated definitions, it:
 
-- creates or overwrites every catalog action under `public/actions/`;
+- creates or overwrites every catalog action under `../shared/schema-catalog/actions/`;
 - restores canonical directory and file-name casing without deleting the output
   on case-insensitive Windows filesystems;
 - retains stale JSON files that are not represented by the catalog;
@@ -89,7 +93,7 @@ node scripts/generate-action-definitions.js --prune
 stale JSON files. Empty catalogs are rejected even with `--prune`, but always
 review the reported stale paths before using it.
 
-Any manual change made only in `public/actions/` will be overwritten. For a
+Any manual change made only in `../shared/schema-catalog/actions/` will be overwritten. For a
 one-off or structurally complex action, update an exact definition in
 `action-definition-generator.js`. For a repeated pattern, update the shared
 family rule instead.
@@ -104,8 +108,9 @@ node scripts/generate-action-definitions.js --check
 npm run build
 ```
 
-The tests and check cover the source `public/actions/` tree. `npm run build`
-copies public assets into `dist/`. The Home Assistant and standalone Docker
+The tests and check cover the canonical `../shared/schema-catalog/actions/`
+tree. `npm run build` validates and projects the complete canonical catalog into
+`dist/`. The Home Assistant and standalone Docker
 builds run the same frontend build and copy its output into the image
-automatically. Do not copy `public/actions/` directly into an image because that
+automatically. Do not copy the source action tree directly into `/web` because that
 bypasses the normal frontend build output.

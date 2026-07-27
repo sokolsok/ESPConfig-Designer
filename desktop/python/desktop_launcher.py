@@ -40,16 +40,19 @@ def _active_payload_bootstrap(launcher_root: Path, argv=None):
     active = resolve_active_payload(known.application_store.resolve())
     active_launcher = active.backend_root / "desktop_launcher.py"
     active_web = active.backend_root / "web"
+    active_schema_catalog = active.backend_root / "schema-catalog"
     active_python = active.runtime_root / "python.exe"
     if not active_python.is_file():
         active_python = active.runtime_root / "Scripts" / "python.exe"
-    for required in (active_launcher, active_web / "index.html", active_python):
-        if not required.is_file():
-            raise RuntimeError(f"Active application payload is incomplete: {required}")
-
     arguments = _replace_option(arguments, "--backend-root", active.backend_root)
     arguments = _replace_option(arguments, "--runtime-root", active.runtime_root)
     arguments = _replace_option(arguments, "--web-root", active_web)
+    arguments = _replace_option(arguments, "--schema-catalog-root", active_schema_catalog)
+    arguments = _replace_option(
+        arguments,
+        "--schema-catalog-manifest",
+        active.backend_root / "schema-catalog-manifest.json",
+    )
     sys.argv[1:] = arguments
     if Path(__file__).resolve() != active_launcher.resolve() or Path(sys.executable).resolve() != active_python.resolve():
         os.execv(
@@ -78,7 +81,11 @@ sys.path.insert(0, str(launcher_root))
 from desktop_runtime import isolate_embedded_python
 
 isolate_embedded_python(
-    Path(sys.executable).resolve().parent,
+    (
+        Path(sys.executable).resolve().parent.parent
+        if Path(sys.executable).resolve().parent.name.lower() == "scripts"
+        else Path(sys.executable).resolve().parent
+    ),
     (launcher_root, launcher_backend_root),
 )
 
@@ -95,6 +102,7 @@ from desktop_runtime import (
     verify_bundled_git,
     verify_esphome_cli,
 )
+from application_payload import schema_catalog_requires_manifest, validate_launch_schema_catalog
 from runtime_manifest import (
     build_runtime_manifest,
     ensure_cache_compatible,
@@ -109,6 +117,8 @@ def parse_args(argv=None):
     parser.add_argument("--workspace", type=Path, default=Path.home() / "Documents" / "ecd_workspace")
     parser.add_argument("--backend-root", type=Path, default=launcher_backend_root)
     parser.add_argument("--web-root", type=Path, default=None)
+    parser.add_argument("--schema-catalog-root", type=Path, default=None)
+    parser.add_argument("--schema-catalog-manifest", type=Path, default=None)
     parser.add_argument("--application-store", type=Path, default=None)
     parser.add_argument("--port", type=int, default=int(os.environ.get("PORT", "8099")))
     parser.add_argument("--check-runtime", action="store_true")
@@ -125,6 +135,12 @@ def prepare_runtime(args):
     web_root = (args.web_root or (backend_root / "web")).resolve()
     if not (web_root / "index.html").is_file():
         raise RuntimeError(f"Backend web root is incomplete: {web_root}")
+    schema_catalog_root = (args.schema_catalog_root or (backend_root / "schema-catalog")).resolve()
+    validate_launch_schema_catalog(
+        schema_catalog_root,
+        args.schema_catalog_manifest.resolve() if args.schema_catalog_manifest is not None else None,
+        require_manifest=schema_catalog_requires_manifest(backend_root, schema_catalog_root),
+    )
 
     # Fail before starting Flask when the selected runtime is not self-contained.
     runtime_python = resolve_runtime_python(runtime_root)
@@ -139,6 +155,7 @@ def prepare_runtime(args):
         runtime_root=runtime_root,
         app_data_root=app_data_root,
         workspace=workspace,
+        schema_catalog_root=schema_catalog_root,
         web_root=web_root,
     )
     ensure_desktop_directories(paths)
@@ -171,6 +188,7 @@ def main(argv=None) -> int:
         print(f"[info] PlatformIO root: {paths.platformio_root}", flush=True)
         print(f"[info] Bundled Git executable: {bundled_git}", flush=True)
         if args.check_runtime:
+            runpy.run_path(str(paths.backend_root / "server.py"), run_name="__ecd_runtime_preflight__")
             return 0
         runpy.run_path(str(paths.backend_root / "server.py"), run_name="__main__")
         return 0

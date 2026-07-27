@@ -248,7 +248,7 @@ test("serializes schema-driven YAML", async () => {
     ]);
 
     const switchTemplateSchema = JSON.parse(
-      await readFile(new URL("../public/schemas/components/switch/template.json", import.meta.url), "utf8")
+      await readFile(new URL("../../shared/schema-catalog/schemas/components/switch/template.json", import.meta.url), "utf8")
     );
     const switchTemplateActionLines = buildSchemaYaml(
       {

@@ -4,14 +4,15 @@
   "version": "1.3.3",
   "type": "module",
   "scripts": {
+    "check:catalog": "node ../shared/schema-catalog-contract.mjs",
     "generate:actions": "node scripts/generate-action-definitions.js",
     "check:actions": "node scripts/generate-action-definitions.js --check",
-    "test": "npm run check:actions && node --test --test-concurrency=1 --import=./tests/register-extensionless-js-loader.mjs",
+    "test": "npm run check:catalog && npm run check:actions && node --test --test-concurrency=1 --import=./tests/register-extensionless-js-loader.mjs && node --test ../shared/tests/schemaCatalogContract.test.mjs",
     "test:capabilities": "node --test tests/runtimeCapabilities.test.mjs",
     "test:diagnostics": "node --test tests/runtimeDiagnostics.test.mjs",
     "dev": "node scripts/start-dev.js",
     "serve": "vite",
-    "build": "vite build",
+    "build": "npm run check:catalog && vite build && node ../shared/schema-catalog-contract.mjs --projection dist",
     "preview": "vite preview"
   },
   "dependencies": {

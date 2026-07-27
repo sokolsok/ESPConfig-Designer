@@ -21,6 +21,7 @@ RUNTIME_PACKAGES = {
     "wheel": "0.47.0",
 }
 GIT_VERSION = "2.55.0.windows.3"
+RUNTIME_TOOL_CHECK_TIMEOUT_SECONDS = 30
 
 
 def isolated_python_paths(
@@ -56,7 +57,7 @@ def isolated_python_paths(
 
 def isolate_embedded_python(runtime_root: Path, trusted_source_roots: Iterable[Path]) -> None:
     """Remove user/global Python inputs before inspecting packaged distributions."""
-    for name in ("PYTHONHOME", "PYTHONPATH", "PYTHONUSERBASE"):
+    for name in ("PYTHONHOME", "PYTHONPATH", "PYTHONUSERBASE", "VIRTUAL_ENV"):
         os.environ.pop(name, None)
     os.environ["PYTHONNOUSERSITE"] = "1"
     sys.path[:] = isolated_python_paths(runtime_root, trusted_source_roots)
@@ -70,6 +71,7 @@ class DesktopRuntimePaths:
     runtime_root: Path
     app_data_root: Path
     workspace: Path
+    schema_catalog_root: Path
     web_root: Optional[Path] = None
 
     @property
@@ -145,6 +147,7 @@ class DesktopRuntimePaths:
                 "JOB_DIR": str(self.jobs_root),
                 "DEVICES_PATH": str(self.app_data_root / "devices.json"),
                 "WEB_ROOT": str(self.web_root or (self.backend_root / "web")),
+                "SCHEMA_CATALOG_ROOT": str(self.schema_catalog_root),
                 "SEED_ROOT": str(self.backend_root / "seed_esphome"),
                 "HOST": "127.0.0.1",
                 "PORT": str(port),
@@ -276,10 +279,15 @@ def verify_bundled_git(git_root: Path, environment: Mapping[str, str], cwd: Path
             text=True,
             encoding="utf-8",
             errors="replace",
+            timeout=RUNTIME_TOOL_CHECK_TIMEOUT_SECONDS,
             check=False,
         )
     except OSError as exc:
         raise RuntimeError(f"Could not start bundled Git: {exc}") from exc
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError(
+            f"Bundled Git check timed out after {RUNTIME_TOOL_CHECK_TIMEOUT_SECONDS} seconds"
+        ) from exc
     output = "\n".join(part for part in (result.stdout, result.stderr) if part).strip()
     if result.returncode != 0:
         raise RuntimeError(f"Bundled Git check failed with exit code {result.returncode}: {output}")
@@ -332,10 +340,15 @@ def verify_esphome_cli(python_executable: Path, environment: Mapping[str, str], 
             text=True,
             encoding="utf-8",
             errors="replace",
+            timeout=RUNTIME_TOOL_CHECK_TIMEOUT_SECONDS,
             check=False,
         )
     except OSError as exc:
         raise RuntimeError(f"Could not start portable ESPHome CLI: {exc}") from exc
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError(
+            f"Portable ESPHome CLI check timed out after {RUNTIME_TOOL_CHECK_TIMEOUT_SECONDS} seconds"
+        ) from exc
     output = "\n".join(part for part in (result.stdout, result.stderr) if part).strip()
     if result.returncode != 0:
         raise RuntimeError(f"Portable ESPHome CLI check failed with exit code {result.returncode}: {output}")

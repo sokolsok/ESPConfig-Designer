@@ -1,10 +1,12 @@
 import path from "path";
+import { fileURLToPath } from "node:url";
 
 import { checkActionDefinitions, writeActionDefinitions } from "./action-definition-generator.js";
 
-const rootDir = process.cwd();
-const catalogPath = path.join(rootDir, "public", "action_list", "base_actions.json");
-const outputDir = path.join(rootDir, "public", "actions");
+const defaultCatalogRoot = fileURLToPath(new URL("../../shared/schema-catalog/", import.meta.url));
+const catalogRoot = path.resolve(process.env.ECD_SCHEMA_CATALOG_ROOT || defaultCatalogRoot);
+const catalogPath = path.join(catalogRoot, "action_list", "base_actions.json");
+const outputDir = path.join(catalogRoot, "actions");
 const args = process.argv.slice(2);
 const check = args.includes("--check");
 const prune = args.includes("--prune");

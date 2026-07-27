@@ -14,6 +14,11 @@ import {
 } from "../scripts/action-definition-generator.js";
 
 const frontendRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const schemaCatalogRoot = path.resolve(frontendRoot, "..", "shared", "schema-catalog");
+const actionGeneratorEnvironment = (catalogRoot) => ({
+  ...process.env,
+  ECD_SCHEMA_CATALOG_ROOT: catalogRoot
+});
 
 const snapshotJsonTree = (rootDir) => {
   if (!fs.existsSync(rootDir)) return [];
@@ -349,8 +354,8 @@ test("targets datetime.time.set at the datetime component domain", () => {
 
 test("reproduces the complete checked-in action definition tree", () => {
   const { definitions, drift } = checkActionDefinitions({
-    catalogPath: path.join(frontendRoot, "public", "action_list", "base_actions.json"),
-    outputDir: path.join(frontendRoot, "public", "actions")
+    catalogPath: path.join(schemaCatalogRoot, "action_list", "base_actions.json"),
+    outputDir: path.join(schemaCatalogRoot, "actions")
   });
 
   assert.equal(definitions.length, 447);
@@ -387,7 +392,11 @@ test("reports sorted drift without changing the generated tree", () => {
     const cliResult = spawnSync(
       process.execPath,
       [path.join(frontendRoot, "scripts", "generate-action-definitions.js"), "--check"],
-      { cwd: tempDir, encoding: "utf8" }
+      {
+        cwd: tempDir,
+        encoding: "utf8",
+        env: actionGeneratorEnvironment(path.join(tempDir, "public"))
+      }
     );
     assert.equal(cliResult.status, 1);
     assert.equal(cliResult.stdout, "");
@@ -470,19 +479,24 @@ test("plain generation retains stale JSON and CLI prune removes it explicitly", 
     }), "utf8");
     fs.writeFileSync(stalePath, "{\"id\":\"stale\"}\n", "utf8");
 
-    const generateResult = spawnSync(process.execPath, [cliPath], { cwd: tempDir, encoding: "utf8" });
+    const cliOptions = {
+      cwd: tempDir,
+      encoding: "utf8",
+      env: actionGeneratorEnvironment(path.join(tempDir, "public"))
+    };
+    const generateResult = spawnSync(process.execPath, [cliPath], cliOptions);
     assert.equal(generateResult.status, 1);
     assert.match(generateResult.stderr, /retained 1 stale file/);
     assert.match(generateResult.stderr, /--prune/);
     assert.equal(fs.existsSync(stalePath), true);
     assert.equal(fs.existsSync(path.join(outputDir, "delay.json")), true);
 
-    const pruneResult = spawnSync(process.execPath, [cliPath, "--prune"], { cwd: tempDir, encoding: "utf8" });
+    const pruneResult = spawnSync(process.execPath, [cliPath, "--prune"], cliOptions);
     assert.equal(pruneResult.status, 0);
     assert.match(pruneResult.stdout, /Pruned 1 stale action definition/);
     assert.equal(fs.existsSync(stalePath), false);
 
-    const checkResult = spawnSync(process.execPath, [cliPath, "--check"], { cwd: tempDir, encoding: "utf8" });
+    const checkResult = spawnSync(process.execPath, [cliPath, "--check"], cliOptions);
     assert.equal(checkResult.status, 0);
     assert.match(checkResult.stdout, /current \(1 files\)/);
   } finally {
@@ -517,7 +531,15 @@ test("check reports case drift and generation restores exact canonical path casi
       actualPath: "SWITCH/TURN_ON.JSON"
     }]);
 
-    const checkResult = spawnSync(process.execPath, [cliPath, "--check"], { cwd: tempDir, encoding: "utf8" });
+    const checkResult = spawnSync(
+      process.execPath,
+      [cliPath, "--check"],
+      {
+        cwd: tempDir,
+        encoding: "utf8",
+        env: actionGeneratorEnvironment(path.join(tempDir, "public"))
+      }
+    );
     assert.equal(checkResult.status, 1);
     assert.match(checkResult.stderr, /case: SWITCH\/TURN_ON\.JSON -> switch\/turn_on\.json/);
     assert.deepEqual(snapshotJsonTree(outputDir), before);

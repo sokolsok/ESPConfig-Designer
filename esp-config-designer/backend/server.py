@@ -79,6 +79,10 @@ PLATFORMIO_ROOT = os.environ.get("ECD_PLATFORMIO_DIR", "").strip()
 RUNTIME_MANIFEST_PATH = os.environ.get("ECD_RUNTIME_MANIFEST_PATH", "").strip()
 CACHE_MANIFEST_PATH = os.environ.get("ECD_CACHE_MANIFEST_PATH", "").strip()
 WEB_ROOT = os.environ.get("WEB_ROOT", "/web").strip()
+SCHEMA_CATALOG_ROOT = os.environ.get(
+    "SCHEMA_CATALOG_ROOT",
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "shared", "schema-catalog"),
+).strip()
 DEVICES_PATH = os.environ.get("DEVICES_PATH", "/data/devices.json").strip()
 PING_PORT = int(os.environ.get("PING_PORT", "3232"))
 PING_TIMEOUT = float(os.environ.get("PING_TIMEOUT", "0.8"))
@@ -97,8 +101,8 @@ SECRETS_RAW_MAX_BYTES = 256 * 1024
 
 COMPONENTS_RUNTIME_ROOTNAME = "esp_components"
 COMPONENTS_RUNTIME_FILENAME = "components_list.json"
-COMPONENTS_BASE_LIST_PATH = os.path.join(WEB_ROOT, "components_list", "components_list.json")
-COMPONENTS_BASE_SCHEMAS_ROOT = os.path.join(WEB_ROOT, "schemas", "components")
+COMPONENTS_BASE_LIST_PATH = os.path.join(SCHEMA_CATALOG_ROOT, "components_list", "components_list.json")
+COMPONENTS_BASE_SCHEMAS_ROOT = os.path.join(SCHEMA_CATALOG_ROOT, "schemas", "components")
 COMPONENTS_IMPORT_MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 COMPONENTS_IMPORT_MAX_FILES = 500
 COMPONENTS_IMPORT_MAX_UNPACKED_BYTES = 30 * 1024 * 1024
@@ -2433,7 +2437,7 @@ def api_component_schema(relpath):
         return json_error("Invalid schema path", "COMPONENTS_SCHEMA_PATH_INVALID", 400)
 
     runtime_base = os.path.join(components_runtime_root(), "schemas")
-    base_base = os.path.join(WEB_ROOT, "schemas")
+    base_base = os.path.join(SCHEMA_CATALOG_ROOT, "schemas")
 
     runtime_candidate = resolve_component_schema_path(runtime_base, schema_relpath)
     if runtime_candidate and os.path.isfile(runtime_candidate):

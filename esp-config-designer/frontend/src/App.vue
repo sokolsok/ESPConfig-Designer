@@ -17,7 +17,7 @@
     <header class="builder-hero app-topbar">
       <div class="app-topbar-left">
         <div class="builder-hero-brand">
-        <img src="/ECD_logo.png" alt="ECD" />
+        <img :src="ecdLogo" alt="ECD" />
         <span class="builder-hero-meta">v {{ appVersion }}</span>
         </div>
         <nav class="app-social-links" aria-label="External links">
@@ -141,6 +141,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { RouterView, useRoute, useRouter } from "vue-router";
+import ecdLogo from "./ECD_logo.png";
 import UnsavedChangesModal from "./components/UnsavedChangesModal.vue";
 import {
   isRuntimeCapabilityEnabled,

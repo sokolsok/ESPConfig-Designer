@@ -4,11 +4,14 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 if (-not $ResourcesRoot) {
     $ResourcesRoot = Join-Path $PSScriptRoot "..\resources\ecd-app"
 }
 $ResourcesRoot = [System.IO.Path]::GetFullPath($ResourcesRoot)
 $backendRoot = Join-Path $ResourcesRoot "backend"
+$schemaCatalogRoot = Join-Path $backendRoot "schema-catalog"
+$webRoot = Join-Path $backendRoot "web"
 $runtimeRoot = Join-Path $ResourcesRoot "runtime"
 
 foreach ($requiredPath in @(
@@ -16,11 +19,15 @@ foreach ($requiredPath in @(
     (Join-Path $backendRoot "server.py"),
     (Join-Path $backendRoot "desktop_launcher.py"),
     (Join-Path $backendRoot "desktop_runtime.py"),
+    (Join-Path $backendRoot "application_payload.py"),
     (Join-Path $backendRoot "runtime_contract.py"),
     (Join-Path $backendRoot "runtime_manifest.py"),
     (Join-Path $backendRoot "runtime_diagnostics.py"),
     (Join-Path $backendRoot "runtime_update.py"),
     (Join-Path $backendRoot "web\index.html"),
+    (Join-Path $schemaCatalogRoot "components_list\components_list.json"),
+    (Join-Path $schemaCatalogRoot "schemas\components\custom\empty.json"),
+    (Join-Path $backendRoot "schema-catalog-manifest.json"),
     (Join-Path $runtimeRoot "python.exe"),
     (Join-Path $runtimeRoot "runtime-manifest.json"),
     (Join-Path $runtimeRoot "git\cmd\git.exe"),
@@ -41,6 +48,9 @@ if (Test-Path -LiteralPath (Join-Path $backendRoot "tests") -PathType Container)
 if (Test-Path -LiteralPath (Join-Path $backendRoot "runtime_config.py") -PathType Leaf) {
     throw "Packaged resources contain the obsolete mixed runtime_config.py"
 }
+if (Test-Path -LiteralPath (Join-Path $schemaCatalogRoot "schema-catalog") -PathType Container) {
+    throw "Packaged resources contain a nested schema-catalog root"
+}
 
 $layout = Get-Content -LiteralPath (Join-Path $ResourcesRoot "resource-layout.json") -Raw | ConvertFrom-Json
 if ($layout.mutableDataPolicy -ne "app-data-only") {
@@ -49,25 +59,26 @@ if ($layout.mutableDataPolicy -ne "app-data-only") {
 if ($layout.workspacePolicy -ne "user-selected-outside-app-data") {
     throw "Resource layout has an invalid workspace policy"
 }
+if ($layout.schemaCatalogRoot -ne "backend/schema-catalog") {
+    throw "Resource layout has an invalid schema catalog root"
+}
+if ($layout.schemaCatalogManifest -ne "backend/schema-catalog-manifest.json") {
+    throw "Resource layout has an invalid schema catalog manifest"
+}
 
-$catalogPath = Join-Path $backendRoot "web\components_list\components_list.json"
-if (-not (Test-Path -LiteralPath $catalogPath -PathType Leaf)) {
-    throw "Packaged component catalog is missing: $catalogPath"
+$catalogContract = Join-Path $repoRoot "esp-config-designer\shared\schema-catalog-contract.mjs"
+$canonicalCatalog = Join-Path $repoRoot "esp-config-designer\shared\schema-catalog"
+& node $catalogContract --root $canonicalCatalog --projection $schemaCatalogRoot
+if ($LASTEXITCODE -ne 0) {
+    throw "Packaged schema catalog differs from the canonical source"
 }
-$catalog = Get-Content -LiteralPath $catalogPath -Raw | ConvertFrom-Json
-$catalogItems = @()
-foreach ($category in @($catalog.categories)) {
-    $catalogItems += @($category.items)
-    foreach ($subcategory in @($category.subcategories)) {
-        $catalogItems += @($subcategory.items)
-    }
+& node $catalogContract --root $schemaCatalogRoot --manifest (Join-Path $backendRoot "schema-catalog-manifest.json")
+if ($LASTEXITCODE -ne 0) {
+    throw "Packaged schema catalog manifest is invalid"
 }
-foreach ($item in $catalogItems) {
-    if ($item.available -eq $false -or -not $item.schemaPath) { continue }
-    $schemaPath = Join-Path (Join-Path $backendRoot "web\schemas") ($item.schemaPath -replace '/', '\')
-    if (-not (Test-Path -LiteralPath $schemaPath -PathType Leaf)) {
-        throw "Packaged component schema is missing: $($item.schemaPath)"
-    }
+& node $catalogContract --root $schemaCatalogRoot --projection $webRoot
+if ($LASTEXITCODE -ne 0) {
+    throw "Frontend web catalog differs from the packaged backend catalog"
 }
 
 $generatedFiles = Get-ChildItem -LiteralPath $ResourcesRoot -Recurse -Force -File |

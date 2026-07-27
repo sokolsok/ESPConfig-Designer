@@ -15,9 +15,57 @@ sys.path.insert(0, str(BACKEND_ROOT))
 sys.path.insert(0, str(ADAPTER_ROOT))
 
 import desktop_runtime
+import application_payload
 
 
 class DesktopRuntimeTests(unittest.TestCase):
+    def test_flat_launch_requires_schema_catalog_manifest(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            catalog_root = self._create_source_catalog(pathlib.Path(temp_dir))
+            with self.assertRaisesRegex(RuntimeError, "Packaged schema catalog manifest is required"):
+                application_payload.validate_launch_schema_catalog(
+                    catalog_root,
+                    None,
+                    require_manifest=True,
+                )
+
+    def test_source_launch_requires_basic_schema_catalog_files(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            catalog_root = pathlib.Path(temp_dir) / "schema-catalog"
+            catalog_root.mkdir()
+            with self.assertRaisesRegex(RuntimeError, "Source schema catalog is incomplete"):
+                application_payload.validate_launch_schema_catalog(
+                    catalog_root,
+                    None,
+                    require_manifest=False,
+                )
+
+    def test_source_launch_does_not_require_hash_manifest(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            catalog_root = self._create_source_catalog(pathlib.Path(temp_dir))
+            application_payload.validate_launch_schema_catalog(
+                catalog_root,
+                None,
+                require_manifest=False,
+            )
+
+    def test_catalog_topology_requires_manifest_when_catalog_is_inside_backend(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = pathlib.Path(temp_dir)
+            backend_root = root / "backend"
+            self.assertTrue(
+                application_payload.schema_catalog_requires_manifest(
+                    backend_root,
+                    backend_root / "schema-catalog",
+                )
+            )
+            self.assertFalse(
+                application_payload.schema_catalog_requires_manifest(
+                    backend_root,
+                    root / "shared" / "schema-catalog",
+                )
+            )
+
     def test_embedded_python_paths_exclude_user_and_global_packages(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = pathlib.Path(temp_dir)
@@ -55,6 +103,7 @@ class DesktopRuntimeTests(unittest.TestCase):
                 "PYTHONHOME": str(root / "global"),
                 "PYTHONPATH": str(root / "global"),
                 "PYTHONUSERBASE": str(root / "user"),
+                "VIRTUAL_ENV": str(root / "venv"),
             }
             with mock.patch.dict(os.environ, environment, clear=True), mock.patch.object(
                 desktop_runtime.sys,
@@ -65,7 +114,7 @@ class DesktopRuntimeTests(unittest.TestCase):
                     runtime_root,
                     (adapter_root, backend_root),
                 )
-                for name in ("PYTHONHOME", "PYTHONPATH", "PYTHONUSERBASE"):
+                for name in ("PYTHONHOME", "PYTHONPATH", "PYTHONUSERBASE", "VIRTUAL_ENV"):
                     self.assertNotIn(name, os.environ)
                 self.assertEqual("1", os.environ["PYTHONNOUSERSITE"])
                 self.assertEqual(
@@ -81,6 +130,7 @@ class DesktopRuntimeTests(unittest.TestCase):
                 runtime_root=root / "runtime",
                 app_data_root=root / "app-data",
                 workspace=root / "workspace with żółć",
+                schema_catalog_root=root / "schema-catalog",
                 web_root=root / "frontend-dist",
             )
             environment = paths.environment(python_executable=root / "runtime" / "python.exe", port=8099)
@@ -92,6 +142,7 @@ class DesktopRuntimeTests(unittest.TestCase):
             self.assertEqual(str(paths.build_root), environment["ESPHOME_BUILD_PATH"])
             self.assertEqual(str(paths.platformio_root), environment["PLATFORMIO_CORE_DIR"])
             self.assertEqual(str(paths.web_root), environment["WEB_ROOT"])
+            self.assertEqual(str(paths.schema_catalog_root), environment["SCHEMA_CATALOG_ROOT"])
             self.assertEqual("127.0.0.1", environment["HOST"])
             self.assertNotEqual(environment["TARGET_DIR"], environment["ESPHOME_BUILD_PATH"])
 
@@ -103,6 +154,7 @@ class DesktopRuntimeTests(unittest.TestCase):
                 runtime_root=root / "runtime",
                 app_data_root=root / "app-data",
                 workspace=root / "workspace with spaces",
+                schema_catalog_root=root / "schema-catalog",
             )
             desktop_runtime.ensure_desktop_directories(paths)
 
@@ -152,6 +204,7 @@ class DesktopRuntimeTests(unittest.TestCase):
                 runtime_root=root / "runtime",
                 app_data_root=root / "app-data",
                 workspace=root / "workspace",
+                schema_catalog_root=root / "schema-catalog",
             )
             environment = paths.environment(
                 python_executable=paths.runtime_root / "python.exe",
@@ -196,6 +249,27 @@ class DesktopRuntimeTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, "Bundled Git version mismatch"):
                     desktop_runtime.verify_bundled_git(git_root, {"PATH": "bundled-only"}, pathlib.Path(temp_dir))
 
+    def test_runtime_tool_checks_have_bounded_timeouts(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = pathlib.Path(temp_dir)
+            git_root = root / "git"
+            self._create_git_layout(git_root)
+            with mock.patch.object(
+                desktop_runtime.subprocess,
+                "run",
+                side_effect=subprocess.TimeoutExpired(["git", "--version"], 1),
+            ):
+                with self.assertRaisesRegex(RuntimeError, "Bundled Git check timed out"):
+                    desktop_runtime.verify_bundled_git(git_root, {"PATH": "bundled-only"}, root)
+
+            with mock.patch.object(
+                desktop_runtime.subprocess,
+                "run",
+                side_effect=subprocess.TimeoutExpired(["python", "-m", "esphome"], 1),
+            ):
+                with self.assertRaisesRegex(RuntimeError, "ESPHome CLI check timed out"):
+                    desktop_runtime.verify_esphome_cli(root / "python.exe", {"PATH": "runtime-only"}, root)
+
     def test_launcher_imports_split_roots_with_hostile_python_environment(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             hostile = pathlib.Path(temp_dir)
@@ -231,6 +305,18 @@ class DesktopRuntimeTests(unittest.TestCase):
             )
             self.assertEqual(0, result.returncode, result.stderr)
             self.assertIn("--backend-root", result.stdout)
+
+    @staticmethod
+    def _create_source_catalog(root):
+        catalog_root = root / "schema-catalog"
+        for relative_path in (
+            "components_list/components_list.json",
+            "schemas/components/custom/empty.json",
+        ):
+            path = catalog_root / relative_path
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("{}", encoding="ascii")
+        return catalog_root
 
     @staticmethod
     def _create_git_layout(git_root):

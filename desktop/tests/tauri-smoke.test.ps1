@@ -56,8 +56,10 @@ if (-not (Test-Path -LiteralPath (Join-Path $resourceRoot "backend/server.py") -
 }
 $runtimeManifestPath = Join-Path $resourceRoot "runtime/runtime-manifest.json"
 $layoutManifestPath = Join-Path $resourceRoot "resource-layout.json"
+$catalogPath = Join-Path $resourceRoot "backend/schema-catalog/components_list/components_list.json"
 $runtimeManifestHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $runtimeManifestPath).Hash
 $layoutManifestHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $layoutManifestPath).Hash
+$catalogHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $catalogPath).Hash
 New-Item -ItemType Directory -Path $workspace -Force | Out-Null
 New-Item -ItemType Directory -Path $hostilePythonRoot, $hostileUserSite -Force | Out-Null
 foreach ($moduleName in @("desktop_runtime", "runtime_contract", "runtime_manifest", "runtime_update")) {
@@ -99,10 +101,22 @@ try {
     $schemaResponse = Invoke-WebRequest -UseBasicParsing -Uri ("http://127.0.0.1:{0}/api/component-schemas/components/custom/empty.json" -f $port)
     Assert-True ($schemaResponse.StatusCode -eq 200) "Packaged component schema route did not return HTTP 200"
     Assert-True ($schemaResponse.Headers["Content-Type"] -like "application/json*") "Packaged component schema response is not JSON"
+    $catalogResponse = Invoke-RestMethod -Uri ("http://127.0.0.1:{0}/api/component-catalog" -f $port)
+    Assert-True ($catalogResponse.status -eq "ok") "Packaged component catalog API response is invalid"
+    Assert-True (@($catalogResponse.catalog.categories).Count -gt 0) "Packaged component catalog API is empty"
+    foreach ($relativePath in @(
+        "components_list/components_list.json",
+        "schemas/components/custom/empty.json"
+    )) {
+        $staticResponse = Invoke-WebRequest -UseBasicParsing -Uri ("http://127.0.0.1:{0}/{1}" -f $port, $relativePath)
+        Assert-True ($staticResponse.StatusCode -eq 200) "Packaged static catalog path did not return HTTP 200: $relativePath"
+        Assert-True ($staticResponse.Headers["Content-Type"] -like "application/json*") "Packaged static catalog path is not JSON: $relativePath"
+    }
     Assert-True (Test-Path -LiteralPath (Join-Path $appDataRoot "workspace.json") -PathType Leaf) "Workspace config was not persisted in app-data"
     Assert-True (-not (Test-Path -LiteralPath (Join-Path $resourceRoot "workspace.json"))) "Resource root was used for workspace config"
     Assert-True ($runtimeManifestHash -eq (Get-FileHash -Algorithm SHA256 -LiteralPath $runtimeManifestPath).Hash) "Runtime manifest changed in resource root"
     Assert-True ($layoutManifestHash -eq (Get-FileHash -Algorithm SHA256 -LiteralPath $layoutManifestPath).Hash) "Resource layout manifest changed in resource root"
+    Assert-True ($catalogHash -eq (Get-FileHash -Algorithm SHA256 -LiteralPath $catalogPath).Hash) "Schema catalog changed in resource root"
 
     Assert-True (Close-TauriGracefully $process) "Tauri did not close within the cleanup timeout"
     Write-Host "tauri packaged smoke: PASS"

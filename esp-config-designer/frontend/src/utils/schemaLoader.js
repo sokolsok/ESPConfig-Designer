@@ -61,7 +61,7 @@ const mergeArrayKeepFirstByKey = (primaryItems = [], secondaryItems = []) => {
   return result;
 };
 
-// Fetch a schema JSON file from public/schemas.
+// Fetch a schema JSON file from the catalog projected at /schemas.
 const fetchSchemaJson = async (path) => {
   if (!isDev && rawSchemaCache.has(path)) {
     return rawSchemaCache.get(path);
@@ -247,7 +247,7 @@ export const loadComponentSchema = async (componentId, schemaPath = "") => {
   return resolvedSchema;
 };
 
-// Load a schema by relative path (already under public/schemas).
+// Load a schema by relative path under the projected /schemas tree.
 export const loadSchemaByPath = async (path) => {
   const rawSchema = await fetchSchemaJson(path);
   return resolveSchema(rawSchema);

@@ -1,11 +1,12 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 use std::env;
 use std::fs;
 use std::io::{Read, Write};
 use std::net::{SocketAddr, TcpStream};
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
@@ -28,6 +29,8 @@ struct BackendConfig {
     script: PathBuf,
     backend_root: PathBuf,
     web_root: PathBuf,
+    schema_catalog_root: PathBuf,
+    schema_catalog_manifest: Option<PathBuf>,
     runtime_root: PathBuf,
     app_data_root: PathBuf,
     workspace: PathBuf,
@@ -43,9 +46,15 @@ impl BackendConfig {
         app_data_root: PathBuf,
         workspace: PathBuf,
     ) -> Result<Self, String> {
-        let (packaged_backend, packaged_runtime, packaged_web, packaged_script) =
-            packaged_resource_paths(app)?;
-        let (development_backend, development_web, development_script) =
+        let (
+            packaged_backend,
+            packaged_runtime,
+            packaged_web,
+            packaged_schema_catalog,
+            packaged_schema_manifest,
+            packaged_script,
+        ) = packaged_resource_paths(app)?;
+        let (development_backend, development_web, development_schema_catalog, development_script) =
             development_resource_paths();
         let backend_override = env::var_os("ECD_TAURI_BACKEND_ROOT").map(PathBuf::from);
         let backend_root = backend_override
@@ -59,6 +68,13 @@ impl BackendConfig {
             "ECD_TAURI_WEB_ROOT",
             packaged_web.unwrap_or(development_web),
         );
+        let schema_catalog_root = env_path(
+            "ECD_TAURI_SCHEMA_CATALOG_ROOT",
+            packaged_schema_catalog.unwrap_or(development_schema_catalog),
+        );
+        let schema_catalog_manifest = env::var_os("ECD_TAURI_SCHEMA_CATALOG_MANIFEST")
+            .map(PathBuf::from)
+            .or(packaged_schema_manifest);
         let executable = env::var_os("ECD_TAURI_BACKEND_EXECUTABLE")
             .map(PathBuf::from)
             .unwrap_or_else(|| {
@@ -94,6 +110,8 @@ impl BackendConfig {
             script,
             backend_root,
             web_root,
+            schema_catalog_root,
+            schema_catalog_manifest,
             runtime_root,
             app_data_root,
             workspace,
@@ -126,8 +144,15 @@ impl BackendConfig {
             .arg(&self.backend_root)
             .arg("--web-root")
             .arg(&self.web_root)
+            .arg("--schema-catalog-root")
+            .arg(&self.schema_catalog_root)
             .arg("--port")
             .arg(self.port.to_string());
+        if let Some(schema_catalog_manifest) = &self.schema_catalog_manifest {
+            command
+                .arg("--schema-catalog-manifest")
+                .arg(schema_catalog_manifest);
+        }
         if let Some(application_store) = &self.application_store {
             command.arg("--application-store").arg(application_store);
         }
@@ -480,10 +505,116 @@ fn path_for_child_process(path: PathBuf) -> PathBuf {
     path
 }
 
+fn collect_catalog_files(
+    catalog_root: &Path,
+    current: &Path,
+    files: &mut HashSet<String>,
+) -> Result<(), String> {
+    let entries = fs::read_dir(current).map_err(|error| {
+        format!(
+            "Could not read schema catalog directory '{}': {error}",
+            current.display()
+        )
+    })?;
+    for entry in entries {
+        let entry = entry.map_err(|error| format!("Could not inspect schema catalog: {error}"))?;
+        let file_type = entry
+            .file_type()
+            .map_err(|error| format!("Could not inspect schema catalog entry: {error}"))?;
+        let path = entry.path();
+        if file_type.is_symlink() {
+            return Err(format!(
+                "Schema catalog must not contain symlinks: {}",
+                path.display()
+            ));
+        }
+        if file_type.is_dir() {
+            collect_catalog_files(catalog_root, &path, files)?;
+        } else if file_type.is_file() {
+            let relative = path
+                .strip_prefix(catalog_root)
+                .map_err(|_| "Schema catalog path escaped its root".to_string())?
+                .to_string_lossy()
+                .replace('\\', "/");
+            files.insert(relative);
+        } else {
+            return Err(format!(
+                "Unsupported schema catalog entry: {}",
+                path.display()
+            ));
+        }
+    }
+    Ok(())
+}
+
+fn validate_schema_catalog_manifest(
+    catalog_root: &Path,
+    manifest_path: &Path,
+) -> Result<(), String> {
+    let contents = fs::read_to_string(manifest_path).map_err(|error| {
+        format!(
+            "Could not read schema catalog manifest '{}': {error}",
+            manifest_path.display()
+        )
+    })?;
+    let manifest: serde_json::Value = serde_json::from_str(&contents)
+        .map_err(|error| format!("Invalid schema catalog manifest: {error}"))?;
+    let files = manifest
+        .get("files")
+        .and_then(serde_json::Value::as_array)
+        .ok_or_else(|| "Invalid schema catalog manifest files".to_string())?;
+    if manifest
+        .get("schemaVersion")
+        .and_then(serde_json::Value::as_u64)
+        != Some(1)
+        || manifest.get("kind").and_then(serde_json::Value::as_str) != Some("ecd-schema-catalog")
+        || manifest
+            .get("fileCount")
+            .and_then(serde_json::Value::as_u64)
+            != Some(files.len() as u64)
+    {
+        return Err("Invalid schema catalog manifest contract".to_string());
+    }
+
+    let mut expected = HashSet::new();
+    for entry in files {
+        let relative = entry
+            .get("path")
+            .and_then(serde_json::Value::as_str)
+            .ok_or_else(|| "Invalid schema catalog manifest path".to_string())?;
+        let digest = entry
+            .get("sha256")
+            .and_then(serde_json::Value::as_str)
+            .ok_or_else(|| "Invalid schema catalog manifest hash".to_string())?;
+        let relative_path = Path::new(relative);
+        if relative.is_empty()
+            || relative.contains('\\')
+            || relative_path.is_absolute()
+            || !relative_path
+                .components()
+                .all(|component| matches!(component, Component::Normal(_)))
+            || digest.len() != 64
+            || !digest.bytes().all(|byte| byte.is_ascii_hexdigit())
+            || !expected.insert(relative.to_string())
+        {
+            return Err(format!("Invalid schema catalog manifest entry: {relative}"));
+        }
+    }
+
+    let mut actual = HashSet::new();
+    collect_catalog_files(catalog_root, catalog_root, &mut actual)?;
+    if actual != expected {
+        return Err("Schema catalog files do not match the manifest".to_string());
+    }
+    Ok(())
+}
+
 fn packaged_resource_paths(
     app: &AppHandle,
 ) -> Result<
     (
+        Option<PathBuf>,
+        Option<PathBuf>,
         Option<PathBuf>,
         Option<PathBuf>,
         Option<PathBuf>,
@@ -513,6 +644,8 @@ fn packaged_resource_paths_from_root(
         Option<PathBuf>,
         Option<PathBuf>,
         Option<PathBuf>,
+        Option<PathBuf>,
+        Option<PathBuf>,
     ),
     String,
 > {
@@ -523,21 +656,42 @@ fn packaged_resource_paths_from_root(
                 resource_root.display()
             ));
         }
-        return Ok((None, None, None, None));
+        return Ok((None, None, None, None, None, None));
     }
     let backend = resource_root.join("backend");
     let runtime = resource_root.join("runtime");
     let web = backend.join("web");
+    let schema_catalog = backend.join("schema-catalog");
+    let schema_catalog_manifest = backend.join("schema-catalog-manifest.json");
     let script = backend.join("desktop_launcher.py");
     if backend.join("server.py").is_file()
         && script.is_file()
         && runtime.join("python.exe").is_file()
         && web.join("index.html").is_file()
+        && schema_catalog
+            .join("components_list")
+            .join("components_list.json")
+            .is_file()
+        && schema_catalog
+            .join("schemas")
+            .join("components")
+            .join("custom")
+            .join("empty.json")
+            .is_file()
+        && schema_catalog_manifest.is_file()
     {
-        return Ok((Some(backend), Some(runtime), Some(web), Some(script)));
+        validate_schema_catalog_manifest(&schema_catalog, &schema_catalog_manifest)?;
+        return Ok((
+            Some(backend),
+            Some(runtime),
+            Some(web),
+            Some(schema_catalog),
+            Some(schema_catalog_manifest),
+            Some(script),
+        ));
     }
     if !required && is_development_resource_placeholder(resource_root) {
-        return Ok((None, None, None, None));
+        return Ok((None, None, None, None, None, None));
     }
     Err(format!(
         "Tauri resource root is incomplete: {}",
@@ -563,10 +717,13 @@ fn is_development_resource_placeholder(resource_root: &Path) -> bool {
         .unwrap_or(false)
 }
 
-fn development_resource_paths_from_repo(repo_root: &Path) -> Option<(PathBuf, PathBuf, PathBuf)> {
+fn development_resource_paths_from_repo(
+    repo_root: &Path,
+) -> Option<(PathBuf, PathBuf, PathBuf, PathBuf)> {
     let application = repo_root.join("esp-config-designer");
     let backend = application.join("backend");
     let frontend = application.join("frontend").join("dist");
+    let schema_catalog = application.join("shared").join("schema-catalog");
     let script = repo_root
         .join("desktop")
         .join("python")
@@ -574,13 +731,23 @@ fn development_resource_paths_from_repo(repo_root: &Path) -> Option<(PathBuf, Pa
     if backend.join("server.py").is_file()
         && script.is_file()
         && frontend.join("index.html").is_file()
+        && schema_catalog
+            .join("components_list")
+            .join("components_list.json")
+            .is_file()
+        && schema_catalog
+            .join("schemas")
+            .join("components")
+            .join("custom")
+            .join("empty.json")
+            .is_file()
     {
-        return Some((backend, frontend, script));
+        return Some((backend, frontend, schema_catalog, script));
     }
     None
 }
 
-fn development_resource_paths() -> (PathBuf, PathBuf, PathBuf) {
+fn development_resource_paths() -> (PathBuf, PathBuf, PathBuf, PathBuf) {
     let manifest_repo = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("..")
         .join("..");
@@ -600,6 +767,10 @@ fn development_resource_paths() -> (PathBuf, PathBuf, PathBuf) {
             .join("esp-config-designer")
             .join("frontend")
             .join("dist"),
+        manifest_repo
+            .join("esp-config-designer")
+            .join("shared")
+            .join("schema-catalog"),
         manifest_repo
             .join("desktop")
             .join("python")
@@ -908,6 +1079,8 @@ mod tests {
             script: root.join("desktop_launcher.py"),
             backend_root: root.join("backend"),
             web_root: root.join("web"),
+            schema_catalog_root: root.join("schema-catalog"),
+            schema_catalog_manifest: None,
             runtime_root: root.join("runtime"),
             app_data_root: root.join("app-data"),
             workspace: root.join("Workspace żółć 東京"),
@@ -946,6 +1119,14 @@ mod tests {
         assert_eq!(arguments.first().copied(), Some(OsStr::new("-I")));
         assert_eq!(arguments.get(1).copied(), Some(OsStr::new("-B")));
         assert_eq!(arguments.get(2).copied(), Some(config.script.as_os_str()));
+        let schema_option = arguments
+            .iter()
+            .position(|argument| *argument == OsStr::new("--schema-catalog-root"))
+            .expect("schema catalog argument");
+        assert_eq!(
+            arguments.get(schema_option + 1).copied(),
+            Some(config.schema_catalog_root.as_os_str())
+        );
     }
 
     #[test]
@@ -957,18 +1138,36 @@ mod tests {
             .join("frontend")
             .join("dist");
         let adapter = root.join("desktop").join("python");
+        let schema_catalog = root
+            .join("esp-config-designer")
+            .join("shared")
+            .join("schema-catalog");
         fs::create_dir_all(&backend).expect("create backend");
         fs::create_dir_all(&frontend).expect("create frontend");
         fs::create_dir_all(&adapter).expect("create adapter");
+        fs::create_dir_all(schema_catalog.join("components_list")).expect("create component list");
+        fs::create_dir_all(schema_catalog.join("schemas/components/custom"))
+            .expect("create component schema");
         fs::write(backend.join("server.py"), b"").expect("write server");
         fs::write(adapter.join("desktop_launcher.py"), b"").expect("write launcher");
         fs::write(frontend.join("index.html"), b"").expect("write frontend");
+        fs::write(
+            schema_catalog.join("components_list/components_list.json"),
+            b"{}",
+        )
+        .expect("write component list");
+        fs::write(
+            schema_catalog.join("schemas/components/custom/empty.json"),
+            b"{}",
+        )
+        .expect("write component schema");
 
-        let (resolved_backend, resolved_frontend, resolved_script) =
+        let (resolved_backend, resolved_frontend, resolved_schema_catalog, resolved_script) =
             development_resource_paths_from_repo(&root).expect("discover source resources");
 
         assert_eq!(resolved_backend, backend);
         assert_eq!(resolved_frontend, frontend);
+        assert_eq!(resolved_schema_catalog, schema_catalog);
         assert_eq!(resolved_script, adapter.join("desktop_launcher.py"));
         let _ = fs::remove_dir_all(root);
     }
@@ -986,6 +1185,58 @@ mod tests {
         let _ = fs::remove_dir_all(root);
     }
 
+    #[test]
+    fn packaged_resources_require_schema_catalog() {
+        let root = test_root("missing-schema-catalog");
+        let backend = root.join("backend");
+        fs::create_dir_all(backend.join("web")).expect("create web root");
+        fs::create_dir_all(root.join("runtime")).expect("create runtime root");
+        fs::write(backend.join("server.py"), b"").expect("write server");
+        fs::write(backend.join("desktop_launcher.py"), b"").expect("write launcher");
+        fs::write(backend.join("web/index.html"), b"").expect("write frontend");
+        fs::write(root.join("runtime/python.exe"), b"").expect("write python");
+
+        let error = packaged_resource_paths_from_root(&root, false)
+            .expect_err("packaged resources without schema catalog must fail");
+
+        assert!(error.contains("resource root is incomplete"));
+        let _ = fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn schema_catalog_manifest_rejects_partial_tree() {
+        let root = test_root("partial-schema-catalog");
+        let catalog = root.join("schema-catalog");
+        fs::create_dir_all(catalog.join("components_list")).expect("create component list");
+        fs::create_dir_all(catalog.join("schemas/components/custom"))
+            .expect("create component schema");
+        fs::write(catalog.join("components_list/components_list.json"), b"{}")
+            .expect("write component list");
+        fs::write(catalog.join("schemas/components/custom/empty.json"), b"{}")
+            .expect("write component schema");
+        let manifest_path = root.join("schema-catalog-manifest.json");
+        fs::write(
+            &manifest_path,
+            r#"{
+                "schemaVersion": 1,
+                "kind": "ecd-schema-catalog",
+                "fileCount": 3,
+                "files": [
+                    {"path": "components_list/components_list.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+                    {"path": "schemas/components/custom/empty.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+                    {"path": "schemas/general/missing.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"}
+                ]
+            }"#,
+        )
+        .expect("write catalog manifest");
+
+        let error = validate_schema_catalog_manifest(&catalog, &manifest_path)
+            .expect_err("partial schema catalog must fail");
+
+        assert!(error.contains("files do not match"));
+        let _ = fs::remove_dir_all(root);
+    }
+
     #[cfg(debug_assertions)]
     #[test]
     fn development_placeholder_uses_source_resources() {
@@ -1000,7 +1251,7 @@ mod tests {
         let resources = packaged_resource_paths_from_root(&root, false)
             .expect("development placeholder must permit source discovery");
 
-        assert_eq!(resources, (None, None, None, None));
+        assert_eq!(resources, (None, None, None, None, None, None));
         let _ = fs::remove_dir_all(root);
     }
 

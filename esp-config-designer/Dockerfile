@@ -6,6 +6,7 @@ COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 
 COPY frontend/ ./
+COPY shared/ /shared/
 RUN npm run build
 
 FROM ghcr.io/esphome/esphome-hassio:2026.6.4
@@ -24,6 +25,7 @@ COPY backend/server.py /server.py
 COPY backend/runtime_contract.py /runtime_contract.py
 COPY backend/runtime_manifest.py /runtime_manifest.py
 COPY backend/runtime_diagnostics.py /runtime_diagnostics.py
+COPY shared/schema-catalog /schema-catalog
 COPY run.sh /run.sh
 COPY backend/seed_esphome /seed_esphome
 COPY logo.png /logo.png

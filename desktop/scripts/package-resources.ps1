@@ -7,6 +7,7 @@ param(
 $ErrorActionPreference = "Stop"
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $backendSource = Join-Path $repoRoot "esp-config-designer\backend"
+$schemaCatalogSource = Join-Path $repoRoot "esp-config-designer\shared\schema-catalog"
 $desktopPythonSource = Join-Path $repoRoot "desktop\python"
 $frontendDist = Join-Path $repoRoot "esp-config-designer\frontend\dist"
 $windowsPlatformSource = Join-Path $repoRoot "desktop\platforms\windows"
@@ -23,6 +24,7 @@ if (-not $RuntimeRoot) {
 $OutputRoot = [System.IO.Path]::GetFullPath($OutputRoot)
 $RuntimeRoot = [System.IO.Path]::GetFullPath($RuntimeRoot)
 $backendOutput = Join-Path $OutputRoot "backend"
+$schemaCatalogOutput = Join-Path $backendOutput "schema-catalog"
 $runtimeOutput = Join-Path $OutputRoot "runtime"
 
 foreach ($requiredPath in @(
@@ -32,8 +34,11 @@ foreach ($requiredPath in @(
     (Join-Path $backendSource "runtime_diagnostics.py"),
     (Join-Path $desktopPythonSource "desktop_launcher.py"),
     (Join-Path $desktopPythonSource "desktop_runtime.py"),
+    (Join-Path $desktopPythonSource "application_payload.py"),
     (Join-Path $desktopPythonSource "runtime_update.py"),
     (Join-Path $backendSource "seed_esphome"),
+    (Join-Path $schemaCatalogSource "components_list\components_list.json"),
+    (Join-Path $schemaCatalogSource "schemas\components\custom\empty.json"),
     (Join-Path $frontendDist "index.html"),
     (Join-Path $windowsPlatformSource "git-manifest.json"),
     (Join-Path $RuntimeRoot "python.exe"),
@@ -78,15 +83,22 @@ if (Test-Path -LiteralPath $OutputRoot) {
         Remove-Item -Recurse -Force
 }
 New-Item -ItemType Directory -Path $backendOutput -Force | Out-Null
+New-Item -ItemType Directory -Path $schemaCatalogOutput -Force | Out-Null
 New-Item -ItemType Directory -Path $runtimeOutput -Force | Out-Null
 
 foreach ($fileName in @("server.py", "runtime_contract.py", "runtime_manifest.py", "runtime_diagnostics.py")) {
     Copy-Item -LiteralPath (Join-Path $backendSource $fileName) -Destination (Join-Path $backendOutput $fileName)
 }
-foreach ($fileName in @("desktop_launcher.py", "desktop_runtime.py", "runtime_update.py")) {
+foreach ($fileName in @("desktop_launcher.py", "desktop_runtime.py", "application_payload.py", "runtime_update.py")) {
     Copy-Item -LiteralPath (Join-Path $desktopPythonSource $fileName) -Destination (Join-Path $backendOutput $fileName)
 }
 Copy-Item -LiteralPath (Join-Path $backendSource "seed_esphome") -Destination $backendOutput -Recurse
+Copy-Item -Path (Join-Path $schemaCatalogSource "*") -Destination $schemaCatalogOutput -Recurse -Force
+$catalogContract = Join-Path $repoRoot "esp-config-designer\shared\schema-catalog-contract.mjs"
+& node $catalogContract --root $schemaCatalogSource --write-manifest (Join-Path $backendOutput "schema-catalog-manifest.json")
+if ($LASTEXITCODE -ne 0) {
+    throw "Could not create the packaged schema catalog manifest"
+}
 New-Item -ItemType Directory -Path (Join-Path $backendOutput "web") -Force | Out-Null
 Copy-Item -Path (Join-Path $frontendDist "*") -Destination (Join-Path $backendOutput "web") -Recurse -Force
 
@@ -107,6 +119,8 @@ $layoutManifest = [ordered]@{
     kind = "ecd-tauri-resource-layout"
     backend = "backend"
     webRoot = "backend/web"
+    schemaCatalogRoot = "backend/schema-catalog"
+    schemaCatalogManifest = "backend/schema-catalog-manifest.json"
     runtime = "runtime"
     mutableDataPolicy = "app-data-only"
     workspacePolicy = "user-selected-outside-app-data"

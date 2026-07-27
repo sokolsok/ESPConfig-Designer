@@ -36,7 +36,7 @@ Think of a schema as a runtime contract between:
 
 When a user edits a project, the frontend does this:
 
-1. load the component catalog from `public/components_list/components_list.json`
+1. load the component catalog projected from `shared/schema-catalog/components_list/components_list.json`
 2. resolve the schema path for the chosen component from the catalog
 3. load the schema JSON
 4. resolve top-level and field-level `extends`
@@ -58,16 +58,16 @@ Important implications for schema authors:
 
 ### Main schema locations
 
-- general schemas: `public/schemas/general/`
-- component schemas: `public/schemas/components/<domain>/<platform>.json`
-- component catalog: `public/components_list/components_list.json`
+- general schemas: `esp-config-designer/shared/schema-catalog/schemas/general/`
+- component schemas: `esp-config-designer/shared/schema-catalog/schemas/components/<domain>/<platform>.json`
+- component catalog: `esp-config-designer/shared/schema-catalog/components_list/components_list.json`
 
 ### Generated/runtime picker metadata
 
-- action picker index: `public/action_list/base_actions.json`
-- action field definitions: `public/actions/**/*.json`
-- condition picker index: `public/condition_list/base_conditions.json`
-- condition field definitions: `public/conditions/**/*.json`
+- action picker index: `esp-config-designer/shared/schema-catalog/action_list/base_actions.json`
+- action field definitions: `esp-config-designer/shared/schema-catalog/actions/**/*.json`
+- condition picker index: `esp-config-designer/shared/schema-catalog/condition_list/base_conditions.json`
+- condition field definitions: `esp-config-designer/shared/schema-catalog/conditions/**/*.json`
 
 ### Generators and docs
 
@@ -81,16 +81,16 @@ complete generated tree.
 
 ### Typical examples
 
-- `binary_sensor/gpio` -> `public/schemas/components/binary_sensor/gpio.json`
-- `sensor/bme280` -> `public/schemas/components/sensor/bme280.json`
-- `display/st7701s` -> `public/schemas/components/display/st7701s.json`
-- `general/system/logger` -> `public/schemas/general/system/logger.json`
+- `binary_sensor/gpio` -> `esp-config-designer/shared/schema-catalog/schemas/components/binary_sensor/gpio.json`
+- `sensor/bme280` -> `esp-config-designer/shared/schema-catalog/schemas/components/sensor/bme280.json`
+- `display/st7701s` -> `esp-config-designer/shared/schema-catalog/schemas/components/display/st7701s.json`
+- `general/system/logger` -> `esp-config-designer/shared/schema-catalog/schemas/general/system/logger.json`
 
 ---
 
 ## 4. Non-negotiable catalog rule
 
-`public/components_list/components_list.json` is the single source of truth for component schema paths.
+`esp-config-designer/shared/schema-catalog/components_list/components_list.json` is the single source of truth for component schema paths.
 
 That means:
 
@@ -1421,7 +1421,7 @@ If a component needs validation that cannot be expressed through the schema cont
    - root singleton
    - shared helper/hub
 3. create the schema file in the correct location
-4. add the component entry to `public/components_list/components_list.json`
+4. add the component entry to `esp-config-designer/shared/schema-catalog/components_list/components_list.json`
 5. define `requirements` if the component depends on buses/protocols/system/network/component helpers
 6. use `extends` where possible instead of copying base fields
 7. model transport variants with `platformByBus` + conditional `requirements`

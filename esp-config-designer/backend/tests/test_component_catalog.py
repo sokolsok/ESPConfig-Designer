@@ -46,10 +46,64 @@ def catalog_with_items(items):
 
 
 class ComponentCatalogTests(unittest.TestCase):
+    def test_component_apis_use_catalog_root_independent_from_web(self):
+        original_mode = server.ECD_MODE
+        original_auth_mode = server.ECD_AUTH_MODE
+        original_web_root = server.WEB_ROOT
+        original_catalog_root = server.SCHEMA_CATALOG_ROOT
+        original_target_dir = server.TARGET_DIR
+        original_list_path = server.COMPONENTS_BASE_LIST_PATH
+        original_schemas_root = server.COMPONENTS_BASE_SCHEMAS_ROOT
+        try:
+            with tempfile.TemporaryDirectory() as temp_dir:
+                root = pathlib.Path(temp_dir)
+                web_root = root / "web"
+                catalog_root = root / "schema-catalog"
+                web_root.mkdir()
+                (web_root / "index.html").write_text("<div id='app'></div>", encoding="utf-8")
+                list_path = catalog_root / "components_list" / "components_list.json"
+                list_path.parent.mkdir(parents=True)
+                expected_catalog = catalog_with_items([component_entry("Empty", "custom/empty")])
+                list_path.write_text(json.dumps(expected_catalog), encoding="utf-8")
+                schema_path = catalog_root / "schemas" / "components" / "custom" / "empty.json"
+                schema_path.parent.mkdir(parents=True)
+                schema_path.write_text('{"id":"custom.empty","fields":[]}', encoding="utf-8")
+
+                server.ECD_MODE = "desktop"
+                server.ECD_AUTH_MODE = "none"
+                server.WEB_ROOT = str(web_root)
+                server.TARGET_DIR = str(root / "target")
+                server.SCHEMA_CATALOG_ROOT = str(catalog_root)
+                server.COMPONENTS_BASE_LIST_PATH = str(list_path)
+                server.COMPONENTS_BASE_SCHEMAS_ROOT = str(catalog_root / "schemas" / "components")
+                client = server.app.test_client()
+
+                catalog_response = client.get("/api/component-catalog")
+                schema_response = client.get("/api/component-schemas/components/custom/empty.json")
+                try:
+                    self.assertEqual(200, catalog_response.status_code, catalog_response.get_data(as_text=True))
+                    self.assertEqual("ok", catalog_response.json["status"])
+                    self.assertEqual(expected_catalog["categories"], catalog_response.json["catalog"]["categories"])
+                    self.assertTrue(catalog_response.json["catalog"]["generatedAt"])
+                    self.assertEqual(200, schema_response.status_code, schema_response.get_data(as_text=True))
+                    self.assertEqual({"id": "custom.empty", "fields": []}, schema_response.json)
+                finally:
+                    catalog_response.close()
+                    schema_response.close()
+        finally:
+            server.ECD_MODE = original_mode
+            server.ECD_AUTH_MODE = original_auth_mode
+            server.WEB_ROOT = original_web_root
+            server.TARGET_DIR = original_target_dir
+            server.SCHEMA_CATALOG_ROOT = original_catalog_root
+            server.COMPONENTS_BASE_LIST_PATH = original_list_path
+            server.COMPONENTS_BASE_SCHEMAS_ROOT = original_schemas_root
+
     def test_component_schema_route_serves_nested_schema_paths_on_windows(self):
         original_mode = server.ECD_MODE
         original_auth_mode = server.ECD_AUTH_MODE
         original_web_root = server.WEB_ROOT
+        original_catalog_root = server.SCHEMA_CATALOG_ROOT
         try:
             with tempfile.TemporaryDirectory() as temp_dir:
                 web_root = pathlib.Path(temp_dir) / "web"
@@ -59,6 +113,7 @@ class ComponentCatalogTests(unittest.TestCase):
                 server.ECD_MODE = "desktop"
                 server.ECD_AUTH_MODE = "none"
                 server.WEB_ROOT = str(web_root)
+                server.SCHEMA_CATALOG_ROOT = str(web_root)
 
                 response = server.app.test_client().get(
                     "/api/component-schemas/components/display/mipi_rgb.json"
@@ -73,6 +128,7 @@ class ComponentCatalogTests(unittest.TestCase):
             server.ECD_MODE = original_mode
             server.ECD_AUTH_MODE = original_auth_mode
             server.WEB_ROOT = original_web_root
+            server.SCHEMA_CATALOG_ROOT = original_catalog_root
 
     def test_zip_member_validation_allows_only_root_license_markdown(self):
         self.assertEqual("LICENSE.md", server.safe_zip_component_package_member_path("LICENSE.md"))
