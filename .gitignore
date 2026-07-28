@@ -13,9 +13,7 @@ htmlcov/
 # Node.js and frontend output
 **/node_modules/
 /esp-config-designer-frontend/dist/
-/esp-config-designer-frontend/runtime/
 /esp-config-designer/frontend/dist/
-/esp-config-designer/frontend/runtime/
 
 # Desktop build and packaged resources
 /desktop/src-tauri/target/

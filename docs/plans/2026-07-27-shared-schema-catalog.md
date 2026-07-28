@@ -1,5 +1,11 @@
 # Shared Schema Catalog Implementation Plan
 
+**Status:** Implemented
+
+**Implemented by:** `776743c`
+
+**Last reviewed:** 2026-07-28
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Make `esp-config-designer/shared/schema-catalog/` the only tracked source of schemas and catalogs used by the frontend, backend, Docker images, and Desktop application.

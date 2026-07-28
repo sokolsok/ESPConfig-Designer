@@ -11,6 +11,7 @@ on:
       - "scripts/docker-runtime-gate.sh"
       - "scripts/version-contract.mjs"
       - "VERSION"
+      - "CHANGELOG.md"
       - ".github/workflows/docker-standalone.yml"
   workflow_dispatch:
 

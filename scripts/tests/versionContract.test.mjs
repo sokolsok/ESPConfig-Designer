@@ -30,7 +30,7 @@ async function createVersionTree(version = "1.3.3") {
   await writeFile(join(tauriRoot, "Cargo.toml"), `[package]\nname = "esp-config-designer-desktop"\nversion = "${version}"\n`);
   await writeFile(join(tauriRoot, "Cargo.lock"), `version = 4\n\n[[package]]\nname = "esp-config-designer-desktop"\nversion = "${version}"\n`);
   await writeJson(root, "desktop/src-tauri/tauri.conf.json", { version });
-  await writeFile(join(root, "esp-config-designer/CHANGELOG.md"), `## ${version}\n\nCurrent release.\n`);
+  await writeFile(join(root, "CHANGELOG.md"), `## ${version}\n\nCurrent release.\n`);
   return root;
 }
 
@@ -86,6 +86,6 @@ test("requires release tags to be v-prefixed canonical versions", async () => {
 
 test("rejects changelog drift", async () => {
   const root = await createVersionTree();
-  await writeFile(join(root, "esp-config-designer/CHANGELOG.md"), "## 1.3.2\n\nOld release.\n");
+  await writeFile(join(root, "CHANGELOG.md"), "## 1.3.2\n\nOld release.\n");
   await assert.rejects(validateVersionTree(root), /CHANGELOG\.md latest heading/);
 });

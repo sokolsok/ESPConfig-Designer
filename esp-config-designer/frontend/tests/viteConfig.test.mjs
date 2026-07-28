@@ -1,11 +1,14 @@
 import assert from "node:assert/strict";
+import { mkdir, mkdtemp, rm, symlink } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
 import {
   createBackendProxy,
   resolveDevProxyTarget,
-  resolveRuntimeRoot
+  resolveRuntimeRoot,
+  validateRuntimeRootFilesystem
 } from "../vite.config.helpers.js";
 import {
   createDevBackendEnvironment,
@@ -15,36 +18,191 @@ import {
   waitForDevBackend
 } from "../scripts/dev-server-config.js";
 
-test("uses the legacy runtime when existing local data is present", () => {
-  const frontendRoot = path.resolve("repo", "esp-config-designer", "frontend");
-  const legacyRoot = path.resolve("repo", "esp-config-designer-frontend", "runtime");
-
-  assert.equal(
-    resolveRuntimeRoot({ frontendRoot, env: {}, pathExists: (candidate) => candidate === legacyRoot }),
-    legacyRoot
-  );
-});
-
-test("uses the nested runtime for a checkout without legacy data", () => {
-  const frontendRoot = path.resolve("repo", "esp-config-designer", "frontend");
-
-  assert.equal(
-    resolveRuntimeRoot({ frontendRoot, env: {}, pathExists: () => false }),
-    path.join(frontendRoot, "runtime")
-  );
-});
-
-test("explicit runtime configuration takes precedence over the legacy fallback", () => {
-  const frontendRoot = path.resolve("repo", "esp-config-designer", "frontend");
+test("uses an absolute external runtime override before platform defaults", () => {
+  const frontendRoot = "C:\\source\\repo\\esp-config-designer\\frontend";
+  const configuredRoot = "D:\\ECD data\\development";
 
   assert.equal(
     resolveRuntimeRoot({
       frontendRoot,
-      env: { ECD_DEV_RUNTIME_ROOT: "../runtime-fixture" },
+      env: {
+        ECD_DEV_RUNTIME_ROOT: ` ${configuredRoot} `,
+        LOCALAPPDATA: "C:\\Users\\dev\\AppData\\Local"
+      },
+      platform: "win32"
+    }),
+    configuredRoot
+  );
+});
+
+test("rejects a relative runtime override without falling back", () => {
+  assert.throws(
+    () => resolveRuntimeRoot({
+      frontendRoot: "/source/repo/esp-config-designer/frontend",
+      env: { ECD_DEV_RUNTIME_ROOT: "../runtime" },
+      platform: "linux"
+    }),
+    /ECD_DEV_RUNTIME_ROOT must be an absolute path/
+  );
+});
+
+test("rejects runtime overrides in the repository or overlapping legacy data", () => {
+  const frontendRoot = "C:\\source\\repo\\esp-config-designer\\frontend";
+  const common = { frontendRoot, platform: "win32" };
+
+  assert.throws(
+    () => resolveRuntimeRoot({
+      ...common,
+      env: { ECD_DEV_RUNTIME_ROOT: "C:\\source\\repo\\external-looking" }
+    }),
+    /outside the repository/
+  );
+  assert.throws(
+    () => resolveRuntimeRoot({
+      ...common,
+      env: { ECD_DEV_RUNTIME_ROOT: "C:\\source\\repo\\esp-config-designer-frontend" }
+    }),
+    /must not overlap the legacy runtime/
+  );
+  assert.throws(
+    () => resolveRuntimeRoot({
+      ...common,
+      env: {
+        ECD_DEV_RUNTIME_ROOT: "C:\\source\\repo\\esp-config-designer-frontend\\runtime\\child"
+      }
+    }),
+    /must not overlap the legacy runtime/
+  );
+});
+
+test("uses the external Windows development workspace", () => {
+  assert.equal(
+    resolveRuntimeRoot({
+      frontendRoot: "C:\\source\\repo\\esp-config-designer\\frontend",
+      env: { LOCALAPPDATA: "C:\\Users\\dev\\AppData\\Local" },
+      platform: "win32"
+    }),
+    "C:\\Users\\dev\\AppData\\Local\\ECD\\development"
+  );
+});
+
+test("fails when Windows LOCALAPPDATA is missing or relative", () => {
+  const frontendRoot = "C:\\source\\repo\\esp-config-designer\\frontend";
+  assert.throws(
+    () => resolveRuntimeRoot({ frontendRoot, env: {}, platform: "win32" }),
+    /LOCALAPPDATA is required/
+  );
+  assert.throws(
+    () => resolveRuntimeRoot({
+      frontendRoot,
+      env: { LOCALAPPDATA: "relative\\local" },
+      platform: "win32"
+    }),
+    /LOCALAPPDATA must be an absolute path/
+  );
+});
+
+test("uses absolute XDG_DATA_HOME on POSIX", () => {
+  assert.equal(
+    resolveRuntimeRoot({
+      frontendRoot: "/source/repo/esp-config-designer/frontend",
+      env: { XDG_DATA_HOME: "/var/user data" },
+      platform: "linux"
+    }),
+    "/var/user data/ecd/development"
+  );
+});
+
+test("rejects relative XDG_DATA_HOME instead of silently falling back", () => {
+  assert.throws(
+    () => resolveRuntimeRoot({
+      frontendRoot: "/source/repo/esp-config-designer/frontend",
+      env: { XDG_DATA_HOME: "relative/data", HOME: "/home/dev" },
+      platform: "linux"
+    }),
+    /XDG_DATA_HOME must be an absolute path/
+  );
+});
+
+test("uses HOME on POSIX when XDG_DATA_HOME is unset", () => {
+  assert.equal(
+    resolveRuntimeRoot({
+      frontendRoot: "/source/repo/esp-config-designer/frontend",
+      env: { HOME: "/home/dev" },
+      platform: "darwin"
+    }),
+    "/home/dev/.local/share/ecd/development"
+  );
+});
+
+test("fails when POSIX HOME is unavailable or relative", () => {
+  const frontendRoot = "/source/repo/esp-config-designer/frontend";
+  assert.throws(
+    () => resolveRuntimeRoot({ frontendRoot, env: {}, platform: "linux" }),
+    /HOME is required/
+  );
+  assert.throws(
+    () => resolveRuntimeRoot({
+      frontendRoot,
+      env: { HOME: "relative/home" },
+      platform: "linux"
+    }),
+    /HOME must be an absolute path/
+  );
+});
+
+test("legacy existence never changes the external default", () => {
+  assert.equal(
+    resolveRuntimeRoot({
+      frontendRoot: "/source/repo/esp-config-designer/frontend",
+      env: { HOME: "/home/dev" },
+      platform: "linux",
       pathExists: () => true
     }),
-    path.resolve(frontendRoot, "../runtime-fixture")
+    "/home/dev/.local/share/ecd/development"
   );
+});
+
+test("normalizes Windows separators and casing for repository rejection", () => {
+  assert.throws(
+    () => resolveRuntimeRoot({
+      frontendRoot: "C:\\Source\\Repo\\esp-config-designer\\frontend",
+      env: { ECD_DEV_RUNTIME_ROOT: "c:/source/repo/child/../runtime" },
+      platform: "win32"
+    }),
+    /outside the repository/
+  );
+});
+
+test("filesystem validation rejects an external alias into the repository", async (t) => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "ecd resolver "));
+  try {
+    const repositoryRoot = path.join(root, "repository");
+    const frontendRoot = path.join(repositoryRoot, "esp-config-designer", "frontend");
+    const legacyRoot = path.join(repositoryRoot, "esp-config-designer-frontend", "runtime");
+    const alias = path.join(root, "external alias");
+    await mkdir(frontendRoot, { recursive: true });
+    await mkdir(legacyRoot, { recursive: true });
+    try {
+      await symlink(repositoryRoot, alias, process.platform === "win32" ? "junction" : "dir");
+    } catch (error) {
+      if (["EPERM", "EACCES", "ENOSYS"].includes(error.code)) {
+        t.skip(`Symlinks are unavailable: ${error.code}`);
+        return;
+      }
+      throw error;
+    }
+
+    await assert.rejects(
+      validateRuntimeRootFilesystem({
+        runtimeRoot: path.join(alias, "runtime"),
+        repositoryRoot
+      }),
+      /outside the repository/
+    );
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
 });
 
 test("creates a narrow backend proxy without intercepting Vite static routes", () => {

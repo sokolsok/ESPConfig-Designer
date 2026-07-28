@@ -6,14 +6,24 @@ them.
 ## Local development launcher
 
 `npm run dev` starts both Vite and the shared Python backend. Both processes use
-one project store. If `esp-config-designer-frontend/runtime/` exists, the
-launcher preserves that legacy runtime; otherwise it uses `runtime/` under the
-new frontend root.
+one external development workspace. The default root is:
+
+```text
+Windows: %LOCALAPPDATA%\ECD\development
+POSIX:   $XDG_DATA_HOME/ecd/development
+POSIX:   $HOME/.local/share/ecd/development when XDG_DATA_HOME is unset
+```
+
+`LOCALAPPDATA`, a configured `XDG_DATA_HOME`, and fallback `HOME` must be
+absolute. Missing or invalid environment configuration fails before either
+server starts. The launcher never falls back to the legacy runtime or any other
+path in the checkout.
 
 The launcher uses the prepared `%LOCALAPPDATA%/ECD/runtime/python.exe` on
 Windows when available. These environment variables override its defaults:
 
-- `ECD_DEV_RUNTIME_ROOT` selects a different runtime root;
+- `ECD_DEV_RUNTIME_ROOT` selects a different absolute runtime root outside the
+  repository and must not equal, contain, or be contained by the legacy runtime;
 - `ECD_DEV_BACKEND_PYTHON` selects the Python executable;
 - `ECD_DEV_ESPHOME_BIN` selects the ESPHome command;
 - `ECD_DEV_PROXY_TARGET` selects a local HTTP backend address and port.
@@ -21,6 +31,20 @@ Windows when available. These environment variables override its defaults:
 Remote or HTTPS proxy targets are rejected because this command owns and starts
 the development backend. Use `npm run serve` when only the Vite server is
 required.
+
+## Legacy development runtime migration
+
+The repository migration is complete. The two migration package commands are
+retained only for an upgrade worktree that still has the old ignored source and
+does not yet have a final external target. They are not routine development
+commands and fail closed in an already migrated checkout.
+
+Migration is never run by `npm run dev`. It requires owner-approved dry-run,
+apply, activation, manual data verification, backup acceptance, and separately
+approved cleanup. See the
+[completed migration plan](../../../docs/plans/2026-07-28-external-development-workspace-migration.md)
+for the command contract, byte/hash verification, platform limitations, and
+recorded outcome.
 
 ## Action definition generator
 

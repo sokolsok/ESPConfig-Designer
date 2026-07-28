@@ -11,13 +11,21 @@ import {
   resolveDevPythonExecutable,
   waitForDevBackend
 } from "./dev-server-config.js";
-import { resolveDevProxyTarget, resolveRuntimeRoot } from "../vite.config.helpers.js";
+import {
+  resolveDevProxyTarget,
+  resolveRuntimeRoot,
+  validateRuntimeRootFilesystem
+} from "../vite.config.helpers.js";
 
 const frontendRoot = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 const backendRoot = resolveDevBackendRoot(frontendRoot);
 const loadedEnv = loadEnv("development", frontendRoot, "");
 const devEnv = { ...loadedEnv, ...process.env };
-const runtimeRoot = resolveRuntimeRoot({ frontendRoot, env: devEnv });
+const configuredRuntimeRoot = resolveRuntimeRoot({ frontendRoot, env: devEnv });
+const { physicalRuntime: runtimeRoot } = await validateRuntimeRootFilesystem({
+  runtimeRoot: configuredRuntimeRoot,
+  repositoryRoot: path.resolve(frontendRoot, "..", "..")
+});
 const backendTarget = parseDevBackendTarget(resolveDevProxyTarget(devEnv));
 const pythonExecutable = resolveDevPythonExecutable({ env: devEnv });
 const backendEnvironment = createDevBackendEnvironment({

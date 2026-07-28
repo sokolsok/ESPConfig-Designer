@@ -11,6 +11,8 @@
     "test:capabilities": "node --test tests/runtimeCapabilities.test.mjs",
     "test:diagnostics": "node --test tests/runtimeDiagnostics.test.mjs",
     "dev": "node scripts/start-dev.js",
+    "migrate:dev-runtime": "node scripts/migrate-dev-runtime.js --dry-run",
+    "migrate:dev-runtime:apply": "node scripts/migrate-dev-runtime.js --apply",
     "serve": "vite",
     "build": "npm run check:catalog && vite build && node ../shared/schema-catalog-contract.mjs --projection dist",
     "preview": "vite preview"

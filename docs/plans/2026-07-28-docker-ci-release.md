@@ -1,5 +1,11 @@
 # Docker, CI, and Release Infrastructure Implementation Plan
 
+**Status:** Implemented
+
+**Implemented by:** `10789f2`, `0ad1236`, `e3b5780`, `5bba3a3`, and `645ad7c`
+
+**Last reviewed:** 2026-07-28
+
 > **For Claude:** REQUIRED SUB-SKILL: Use `coding-guide` and execute each task with its focused verification before moving to the next task.
 
 **Goal:** Complete Stage 9 with optional serial Compose support, one product-version source, CI for all product variants, and a clean-checkout Desktop Windows build gate.

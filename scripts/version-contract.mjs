@@ -63,8 +63,8 @@ export async function validateVersionTree(root, options = {}) {
   );
   add("desktop/src-tauri/tauri.conf.json version", tauri.version);
 
-  const changelog = await readText(repositoryRoot, "esp-config-designer/CHANGELOG.md");
-  add("esp-config-designer/CHANGELOG.md latest heading", /^##\s+([^\s]+)\s*$/m.exec(changelog)?.[1]);
+  const changelog = await readText(repositoryRoot, "CHANGELOG.md");
+  add("CHANGELOG.md latest heading", /^##\s+([^\s]+)\s*$/m.exec(changelog)?.[1]);
 
   if (options.releaseTag) add("release tag", options.releaseTag === `v${version}` ? version : options.releaseTag);
 

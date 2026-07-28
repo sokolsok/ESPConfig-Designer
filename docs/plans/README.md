@@ -13,5 +13,9 @@ project's technical and installation documentation.
 | [Tauri packaging and workspace](2026-07-17-tauri-packaging-workspace.md) | Implemented | Immutable resources and Tauri-owned workspace lifecycle; first-start UX partly superseded |
 | [Runtime diagnostics](2026-07-18-runtime-diagnostics.md) | Implemented | Bounded backend diagnostics and capability-aware frontend presentation |
 | [Default desktop workspace](2026-07-19-default-desktop-workspace.md) | Implemented | Automatic `%USERPROFILE%\Documents\ecd_workspace` creation and persistence |
+| [Shared schema catalog](2026-07-27-shared-schema-catalog.md) | Implemented | One canonical catalog projected into frontend, backend, Docker, and Desktop layouts |
+| [Docker, CI, and release infrastructure](2026-07-28-docker-ci-release.md) | Implemented | Compose variants, product version contract, hosted gates, and controlled Docker publication |
+| [Repository documentation and cleanup](2026-07-28-repository-documentation-cleanup.md) | Implemented | Product-wide documentation followed by individually approved legacy cleanup |
+| [External development workspace migration](2026-07-28-external-development-workspace-migration.md) | Implemented | External per-OS `npm run dev` workspace, explicit byte-preserving migration, and gated legacy cleanup |
 
-Last reviewed: 2026-07-21.
+Last reviewed: 2026-07-28.

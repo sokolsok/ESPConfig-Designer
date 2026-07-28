@@ -10,6 +10,7 @@ on:
       - "esp-config-designer/shared/**"
       - "scripts/version-contract.mjs"
       - "VERSION"
+      - "CHANGELOG.md"
       - ".github/workflows/desktop-windows.yml"
   push:
     branches:
@@ -21,6 +22,7 @@ on:
       - "esp-config-designer/shared/**"
       - "scripts/version-contract.mjs"
       - "VERSION"
+      - "CHANGELOG.md"
       - ".github/workflows/desktop-windows.yml"
   workflow_dispatch:
 
