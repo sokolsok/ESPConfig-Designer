@@ -306,6 +306,28 @@ class DesktopRuntimeTests(unittest.TestCase):
             self.assertEqual(0, result.returncode, result.stderr)
             self.assertIn("--backend-root", result.stdout)
 
+    def test_launcher_forces_utf8_standard_streams(self):
+        environment = os.environ.copy()
+        environment["PYTHONIOENCODING"] = "ascii"
+        launcher = ADAPTER_ROOT / "desktop_launcher.py"
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-B",
+                "-c",
+                f"import runpy; runpy.run_path({str(launcher)!r}); print('żółć')",
+            ],
+            cwd=BACKEND_ROOT,
+            env=environment,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="strict",
+            check=False,
+        )
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertEqual("żółć", result.stdout.strip())
+
     @staticmethod
     def _create_source_catalog(root):
         catalog_root = root / "schema-catalog"
