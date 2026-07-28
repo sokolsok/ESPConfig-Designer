@@ -11,9 +11,12 @@ RUN npm run build
 
 FROM ghcr.io/esphome/esphome-hassio:2026.6.4
 
+ARG BUILD_VERSION=dev
+
 ENV LANG=C.UTF-8
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 ENV PYTHONDONTWRITEBYTECODE=1
+ENV ECD_VERSION=$BUILD_VERSION
 
 RUN python3 -m venv --system-site-packages /opt/designer-venv \
     && /opt/designer-venv/bin/python -m pip install --no-cache-dir -U pip \

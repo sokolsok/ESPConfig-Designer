@@ -8,20 +8,67 @@ on:
       - "v*.*.*"
     paths:
       - "esp-config-designer/**"
+      - "desktop/**"
+      - "scripts/**"
+      - "VERSION"
       - ".github/workflows/docker-standalone.yml"
+      - ".github/workflows/quality.yml"
+      - ".github/workflows/desktop-windows.yml"
   workflow_dispatch:
+
+concurrency:
+  group: docker-publication-${{ startsWith(github.ref, 'refs/tags/') && github.ref || 'edge' }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
   packages: write
 
 jobs:
+  validate-ref:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate publication ref
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" != "refs/heads/main" && ! "$GITHUB_REF" =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Publication is allowed only from main or a canonical version tag." >&2
+            exit 1
+          fi
+
+  quality:
+    needs: validate-ref
+    uses: ./.github/workflows/quality.yml
+
+  desktop:
+    needs: validate-ref
+    uses: ./.github/workflows/desktop-windows.yml
+
   docker:
+    needs:
+      - quality
+      - desktop
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.14.0"
+
+      - name: Verify release version
+        run: node scripts/version-contract.mjs
+
+      - name: Read canonical version
+        id: version
+        shell: bash
+        run: echo "value=$(tr -d '\r\n' < VERSION)" >> "$GITHUB_OUTPUT"
+
+      - name: Build and run both native images
+        run: bash scripts/docker-runtime-gate.sh
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -44,8 +91,6 @@ jobs:
           tags: |
             type=raw,value=edge,enable=${{ github.ref == 'refs/heads/main' }}
             type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') }}
 
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -57,5 +102,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            BUILD_VERSION=${{ github.ref_name }}
+            BUILD_VERSION=${{ steps.version.outputs.value }}
             VCS_REF=${{ github.sha }}

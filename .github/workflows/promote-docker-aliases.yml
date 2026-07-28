@@ -1,0 +1,69 @@
+name: Promote Docker release aliases
+run-name: Promote ${{ inputs.version }} to minor and latest aliases
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Immutable GHCR version to promote (X.Y.Z)
+        required: true
+        type: string
+
+concurrency:
+  group: docker-alias-promotion
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate immutable version
+        id: version
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          if [[ ! "$RELEASE_VERSION" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "Version must use X.Y.Z without a v prefix." >&2
+            exit 1
+          fi
+          echo "minor=${RELEASE_VERSION%.*}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify immutable image exists
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: docker buildx imagetools inspect "ghcr.io/sokolsok/esp-config-designer:$RELEASE_VERSION"
+
+      - name: Promote release aliases
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+          MINOR_VERSION: ${{ steps.version.outputs.minor }}
+        run: |
+          docker buildx imagetools create \
+            --tag "ghcr.io/sokolsok/esp-config-designer:$MINOR_VERSION" \
+            --tag "ghcr.io/sokolsok/esp-config-designer:latest" \
+            "ghcr.io/sokolsok/esp-config-designer:$RELEASE_VERSION"
+
+      - name: Verify promoted aliases
+        shell: bash
+        env:
+          MINOR_VERSION: ${{ steps.version.outputs.minor }}
+        run: |
+          docker buildx imagetools inspect "ghcr.io/sokolsok/esp-config-designer:$MINOR_VERSION"
+          docker buildx imagetools inspect "ghcr.io/sokolsok/esp-config-designer:latest"

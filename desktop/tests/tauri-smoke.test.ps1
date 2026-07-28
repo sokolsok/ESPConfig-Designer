@@ -1,6 +1,8 @@
 [CmdletBinding()]
 param(
-    [string]$Executable = ""
+    [string]$Executable = "",
+    [string]$ResourceRoot = "",
+    [switch]$UseExecutableResources
 )
 
 $ErrorActionPreference = "Stop"
@@ -38,7 +40,10 @@ if (-not $Executable) {
     $Executable = Join-Path $desktopRoot "src-tauri\target\debug\esp-config-designer-desktop.exe"
 }
 $Executable = [System.IO.Path]::GetFullPath($Executable)
-$resourceRoot = Join-Path $desktopRoot "resources\ecd-app"
+if (-not $ResourceRoot) {
+    $ResourceRoot = Join-Path $desktopRoot "resources\ecd-app"
+}
+$resourceRoot = [System.IO.Path]::GetFullPath($ResourceRoot)
 $suffix = [guid]::NewGuid().ToString("N")
 $appDataRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("ecd-tauri-smoke-appdata-" + $suffix)
 $unicodeName = "ECD Smoke Workspace " + [string][char]0x017C + [char]0x00F3 + [char]0x0142 + [char]0x0107 + "-" + $suffix
@@ -71,7 +76,11 @@ $startInfo = New-Object System.Diagnostics.ProcessStartInfo
 $startInfo.FileName = $Executable
 $startInfo.WorkingDirectory = $desktopRoot
 $startInfo.UseShellExecute = $false
-$startInfo.EnvironmentVariables["ECD_TAURI_RESOURCE_ROOT"] = $resourceRoot
+if (-not $UseExecutableResources) {
+    $startInfo.EnvironmentVariables["ECD_TAURI_RESOURCE_ROOT"] = $resourceRoot
+} else {
+    $startInfo.EnvironmentVariables.Remove("ECD_TAURI_RESOURCE_ROOT")
+}
 $startInfo.EnvironmentVariables["ECD_TAURI_APP_DATA_ROOT"] = $appDataRoot
 $startInfo.EnvironmentVariables["ECD_TAURI_WORKSPACE"] = $workspace
 $startInfo.EnvironmentVariables["ECD_TAURI_PORT"] = $port.ToString()

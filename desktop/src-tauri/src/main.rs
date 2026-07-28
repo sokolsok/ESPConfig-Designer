@@ -159,6 +159,7 @@ impl BackendConfig {
         command
             .current_dir(&self.backend_root)
             .env("ECD_MODE", "desktop")
+            .env("ECD_VERSION", env!("CARGO_PKG_VERSION"))
             .env("HOST", "127.0.0.1")
             .env("PORT", self.port.to_string())
             .env("PYTHONDONTWRITEBYTECODE", "1")
@@ -1100,9 +1101,14 @@ mod tests {
             .get_envs()
             .find(|(name, _)| *name == OsStr::new("PYTHONIOENCODING"))
             .and_then(|(_, value)| value);
+        let product_version = command
+            .get_envs()
+            .find(|(name, _)| *name == OsStr::new("ECD_VERSION"))
+            .and_then(|(_, value)| value);
 
         assert_eq!(python_utf8, Some(OsStr::new("1")));
         assert_eq!(python_io_encoding, Some(OsStr::new("utf-8")));
+        assert_eq!(product_version, Some(OsStr::new(env!("CARGO_PKG_VERSION"))));
         assert!(command
             .get_envs()
             .any(|(name, value)| name == OsStr::new("PYTHONPATH") && value.is_none()));

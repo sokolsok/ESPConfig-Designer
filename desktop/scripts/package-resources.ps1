@@ -18,7 +18,11 @@ if (-not $OutputRoot) {
     $OutputRoot = $defaultOutputRoot
 }
 if (-not $RuntimeRoot) {
-    $RuntimeRoot = Join-Path $env:LOCALAPPDATA "ECD\runtime"
+    if ($env:ECD_RUNTIME_ROOT) {
+        $RuntimeRoot = $env:ECD_RUNTIME_ROOT
+    } else {
+        $RuntimeRoot = Join-Path $env:LOCALAPPDATA "ECD\runtime"
+    }
 }
 
 $OutputRoot = [System.IO.Path]::GetFullPath($OutputRoot)
@@ -26,29 +30,6 @@ $RuntimeRoot = [System.IO.Path]::GetFullPath($RuntimeRoot)
 $backendOutput = Join-Path $OutputRoot "backend"
 $schemaCatalogOutput = Join-Path $backendOutput "schema-catalog"
 $runtimeOutput = Join-Path $OutputRoot "runtime"
-
-foreach ($requiredPath in @(
-    (Join-Path $backendSource "server.py"),
-    (Join-Path $backendSource "runtime_contract.py"),
-    (Join-Path $backendSource "runtime_manifest.py"),
-    (Join-Path $backendSource "runtime_diagnostics.py"),
-    (Join-Path $desktopPythonSource "desktop_launcher.py"),
-    (Join-Path $desktopPythonSource "desktop_runtime.py"),
-    (Join-Path $desktopPythonSource "application_payload.py"),
-    (Join-Path $desktopPythonSource "runtime_update.py"),
-    (Join-Path $backendSource "seed_esphome"),
-    (Join-Path $schemaCatalogSource "components_list\components_list.json"),
-    (Join-Path $schemaCatalogSource "schemas\components\custom\empty.json"),
-    (Join-Path $frontendDist "index.html"),
-    (Join-Path $windowsPlatformSource "git-manifest.json"),
-    (Join-Path $RuntimeRoot "python.exe"),
-    (Join-Path $RuntimeRoot "runtime-manifest.json"),
-    (Join-Path $RuntimeRoot "git\LICENSE.txt")
-)) {
-    if (-not (Test-Path -LiteralPath $requiredPath)) {
-        throw "Required packaging input is missing: $requiredPath"
-    }
-}
 
 if (Test-Path -LiteralPath $OutputRoot) {
     $existingItems = @(Get-ChildItem -LiteralPath $OutputRoot -Force)
@@ -78,6 +59,32 @@ if (Test-Path -LiteralPath $OutputRoot) {
     if ($existingItems.Count -gt 0 -and -not $isGeneratedOutput -and -not $isDefaultPlaceholder) {
         throw "Refusing to clean a non-generated packaging output: $OutputRoot"
     }
+}
+
+foreach ($requiredPath in @(
+    (Join-Path $backendSource "server.py"),
+    (Join-Path $backendSource "runtime_contract.py"),
+    (Join-Path $backendSource "runtime_manifest.py"),
+    (Join-Path $backendSource "runtime_diagnostics.py"),
+    (Join-Path $desktopPythonSource "desktop_launcher.py"),
+    (Join-Path $desktopPythonSource "desktop_runtime.py"),
+    (Join-Path $desktopPythonSource "application_payload.py"),
+    (Join-Path $desktopPythonSource "runtime_update.py"),
+    (Join-Path $backendSource "seed_esphome"),
+    (Join-Path $schemaCatalogSource "components_list\components_list.json"),
+    (Join-Path $schemaCatalogSource "schemas\components\custom\empty.json"),
+    (Join-Path $frontendDist "index.html"),
+    (Join-Path $windowsPlatformSource "git-manifest.json"),
+    (Join-Path $RuntimeRoot "python.exe"),
+    (Join-Path $RuntimeRoot "runtime-manifest.json"),
+    (Join-Path $RuntimeRoot "git\LICENSE.txt")
+)) {
+    if (-not (Test-Path -LiteralPath $requiredPath)) {
+        throw "Required packaging input is missing: $requiredPath"
+    }
+}
+
+if (Test-Path -LiteralPath $OutputRoot) {
     Get-ChildItem -LiteralPath $OutputRoot -Force |
         Where-Object { $_.Name -ne "README.txt" } |
         Remove-Item -Recurse -Force

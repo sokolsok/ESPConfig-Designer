@@ -1,0 +1,60 @@
+name: Docker and Home Assistant gates
+
+on:
+  pull_request:
+    paths:
+      - "esp-config-designer/**"
+      - "docker/**"
+      - "scripts/docker-runtime-gate.sh"
+      - "scripts/version-contract.mjs"
+      - "scripts/tests/versionContract.test.mjs"
+      - "VERSION"
+      - ".github/workflows/docker.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "esp-config-designer/**"
+      - "docker/**"
+      - "scripts/docker-runtime-gate.sh"
+      - "scripts/version-contract.mjs"
+      - "scripts/tests/versionContract.test.mjs"
+      - "VERSION"
+      - ".github/workflows/docker.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.14.0"
+
+      - name: Verify repository contracts
+        run: |
+          node scripts/version-contract.mjs
+          node --test scripts/tests/versionContract.test.mjs docker/tests/composeContract.test.mjs
+
+      - name: Validate Compose variants
+        env:
+          ECD_SERIAL_DEVICE: /dev/null
+        run: |
+          docker compose -f docker/compose.yaml config --quiet
+          docker compose -f docker/compose.yaml -f docker/compose.host.yaml config --quiet
+          docker compose -f docker/compose.yaml -f docker/compose.bridge.yaml config --quiet
+          docker compose -f docker/compose.yaml -f docker/compose.host.yaml -f docker/compose.serial.yaml config --quiet
+          docker compose -f docker/compose.yaml -f docker/compose.bridge.yaml -f docker/compose.serial.yaml config --quiet
+          docker compose -f docker/compose.yaml -f docker/compose.host.yaml -f docker/compose.watchtower.yaml config --quiet
+          docker compose -f docker/compose.yaml -f docker/compose.bridge.yaml -f docker/compose.watchtower.yaml config --quiet
+
+      - name: Build and run both images
+        run: bash scripts/docker-runtime-gate.sh

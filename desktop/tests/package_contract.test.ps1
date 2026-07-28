@@ -75,7 +75,7 @@ foreach ($includeReadme in @($false, $true)) {
             $ErrorActionPreference = "Continue"
             $packageOutput = & "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass `
                 -File (Join-Path $desktopRoot "scripts\package-resources.ps1") `
-                -OutputRoot $unsafeOutput -RuntimeRoot (Join-Path $env:LOCALAPPDATA "ECD\runtime") 2>&1
+                -OutputRoot $unsafeOutput -RuntimeRoot (Join-Path $unsafeOutput "missing-runtime") 2>&1
             $unsafeExitCode = $LASTEXITCODE
         } finally {
             $ErrorActionPreference = $previousPreference
@@ -109,6 +109,7 @@ if ($null -ne $windowsBundle) {
 
 if ($InstallRoot) {
     $resolvedInstallRoot = [System.IO.Path]::GetFullPath($InstallRoot)
+    Assert-True (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "esp-config-designer-desktop.exe") -PathType Leaf) "Installed Desktop executable is missing"
     Assert-True (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\backend\server.py") -PathType Leaf) "Installed shared backend is missing"
     foreach ($fileName in @("desktop_launcher.py", "desktop_runtime.py", "application_payload.py", "runtime_contract.py", "runtime_manifest.py", "runtime_diagnostics.py", "runtime_update.py")) {
         Assert-True (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\backend\$fileName") -PathType Leaf) "Installed flat backend module is missing: $fileName"

@@ -1,0 +1,4 @@
+services:
+  esp-config-designer:
+    devices:
+      - "${ECD_SERIAL_DEVICE:?Set ECD_SERIAL_DEVICE}:${ECD_SERIAL_CONTAINER_DEVICE:-/dev/ttyUSB0}"

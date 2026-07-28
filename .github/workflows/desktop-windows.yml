@@ -1,0 +1,202 @@
+name: Desktop Windows gates
+
+on:
+  workflow_call:
+  pull_request:
+    paths:
+      - "desktop/**"
+      - "esp-config-designer/backend/**"
+      - "esp-config-designer/frontend/**"
+      - "esp-config-designer/shared/**"
+      - "scripts/version-contract.mjs"
+      - "VERSION"
+      - ".github/workflows/desktop-windows.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "desktop/**"
+      - "esp-config-designer/backend/**"
+      - "esp-config-designer/frontend/**"
+      - "esp-config-designer/shared/**"
+      - "scripts/version-contract.mjs"
+      - "VERSION"
+      - ".github/workflows/desktop-windows.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  desktop:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify clean checkout inputs
+        shell: powershell
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File desktop/scripts/clean-checkout-gate.ps1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.14.0"
+          cache: npm
+          cache-dependency-path: |
+            esp-config-designer/frontend/package-lock.json
+            desktop/package-lock.json
+
+      - name: Pin Rust toolchain
+        shell: powershell
+        run: |
+          rustup toolchain install 1.97.1 --profile minimal
+          rustup default 1.97.1
+          rustc --version
+
+      - name: Install Node dependencies
+        shell: powershell
+        run: |
+          npm ci --prefix esp-config-designer/frontend
+          if ($LASTEXITCODE -ne 0) { throw "Frontend npm ci failed" }
+          npm ci --prefix desktop
+          if ($LASTEXITCODE -ne 0) { throw "Desktop npm ci failed" }
+
+      - name: Verify source contracts
+        shell: powershell
+        run: |
+          node scripts/version-contract.mjs
+          if ($LASTEXITCODE -ne 0) { throw "Version contract failed" }
+          node --test scripts/tests/versionContract.test.mjs docker/tests/composeContract.test.mjs
+          if ($LASTEXITCODE -ne 0) { throw "Repository contract tests failed" }
+
+      - name: Cache pinned portable runtime
+        id: runtime-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}\ecd-runtime
+          key: ecd-runtime-windows-x64-v1-${{ hashFiles('desktop/platforms/windows/prepare-runtime.ps1', 'desktop/platforms/windows/requirements-runtime.txt', 'desktop/platforms/windows/git-manifest.json', 'esp-config-designer/backend/runtime_manifest.py', 'desktop/python/desktop_runtime.py') }}
+
+      - name: Prepare pinned portable runtime
+        if: steps.runtime-cache.outputs.cache-hit != 'true'
+        shell: powershell
+        run: >-
+          powershell -NoProfile -ExecutionPolicy Bypass
+          -File desktop/platforms/windows/prepare-runtime.ps1
+          -OutputRoot "${{ runner.temp }}\ecd-runtime"
+
+      - name: Export runtime path
+        shell: powershell
+        run: Add-Content -LiteralPath $env:GITHUB_ENV -Value "ECD_RUNTIME_ROOT=${{ runner.temp }}\ecd-runtime"
+
+      - name: Run frontend and shared gates
+        shell: powershell
+        run: |
+          npm test --prefix esp-config-designer/frontend
+          if ($LASTEXITCODE -ne 0) { throw "Frontend tests failed" }
+          npm run build --prefix esp-config-designer/frontend
+          if ($LASTEXITCODE -ne 0) { throw "Frontend build failed" }
+
+      - name: Run backend and Desktop Python gates
+        shell: powershell
+        run: |
+          & "$env:ECD_RUNTIME_ROOT\python.exe" -I -B -m unittest discover -s esp-config-designer/backend/tests -v
+          if ($LASTEXITCODE -ne 0) { throw "Backend tests failed" }
+          & "$env:ECD_RUNTIME_ROOT\python.exe" -I -B -m py_compile esp-config-designer/backend/runtime_contract.py esp-config-designer/backend/runtime_manifest.py esp-config-designer/backend/runtime_diagnostics.py esp-config-designer/backend/server.py desktop/python/application_payload.py desktop/python/desktop_runtime.py desktop/python/desktop_launcher.py desktop/python/runtime_update.py
+          if ($LASTEXITCODE -ne 0) { throw "Python syntax check failed" }
+          & "$env:ECD_RUNTIME_ROOT\python.exe" -I -B -m unittest discover -s desktop/tests/python -v
+          if ($LASTEXITCODE -ne 0) { throw "Desktop Python tests failed" }
+
+      - name: Run Desktop source contracts
+        shell: powershell
+        run: |
+          npm --prefix desktop run test:workspace
+          if ($LASTEXITCODE -ne 0) { throw "Workspace contract failed" }
+          npm --prefix desktop run test:package
+          if ($LASTEXITCODE -ne 0) { throw "Package contract failed" }
+          $gateRoot = Join-Path $env:RUNNER_TEMP "ecd-source-runtime-gate"
+          $appData = Join-Path $gateRoot "appdata"
+          $workspace = Join-Path $gateRoot "workspace"
+          New-Item -ItemType Directory -Path $appData, $workspace -Force | Out-Null
+          powershell -NoProfile -ExecutionPolicy Bypass -File desktop/platforms/windows/launch.ps1 -RuntimeRoot $env:ECD_RUNTIME_ROOT -AppDataRoot $appData -Workspace $workspace -CheckRuntime
+          if ($LASTEXITCODE -ne 0) { throw "Source runtime check failed" }
+
+      - name: Package and verify Desktop resources
+        shell: powershell
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File desktop/scripts/package-resources.ps1 -RuntimeRoot $env:ECD_RUNTIME_ROOT
+          if ($LASTEXITCODE -ne 0) { throw "Resource packaging failed" }
+          npm --prefix desktop run verify:resources
+          if ($LASTEXITCODE -ne 0) { throw "Resource verification failed" }
+          $resourceRoot = (Resolve-Path "desktop/resources/ecd-app").Path
+          $flatRoot = Join-Path $env:RUNNER_TEMP "ecd-flat-runtime-gate"
+          New-Item -ItemType Directory -Path (Join-Path $flatRoot "appdata"), (Join-Path $flatRoot "workspace") -Force | Out-Null
+          powershell -NoProfile -ExecutionPolicy Bypass -File desktop/platforms/windows/launch.ps1 -RuntimeRoot (Join-Path $resourceRoot "runtime") -BackendRoot (Join-Path $resourceRoot "backend") -AppDataRoot (Join-Path $flatRoot "appdata") -Workspace (Join-Path $flatRoot "workspace") -CheckRuntime
+          if ($LASTEXITCODE -ne 0) { throw "Flat packaged runtime check failed" }
+          npm --prefix desktop run verify:resources
+          if ($LASTEXITCODE -ne 0) { throw "Resources changed during runtime check" }
+
+      - name: Run Rust debug and release tests
+        shell: powershell
+        run: |
+          cargo test --locked --manifest-path desktop/src-tauri/Cargo.toml
+          if ($LASTEXITCODE -ne 0) { throw "Rust debug tests failed" }
+          cargo test --release --locked --manifest-path desktop/src-tauri/Cargo.toml
+          if ($LASTEXITCODE -ne 0) { throw "Rust release tests failed" }
+
+      - name: Build fresh Tauri debug executable
+        shell: powershell
+        run: npm --prefix desktop run build:dev
+
+      - name: Build unsigned development NSIS
+        shell: powershell
+        run: npm --prefix desktop run build:package:dev
+
+      - name: Run first-start and hostile packaged smoke
+        shell: powershell
+        run: |
+          npm --prefix desktop run test:tauri-first-start-default
+          if ($LASTEXITCODE -ne 0) { throw "First-start gate failed" }
+          npm --prefix desktop run test:tauri-smoke
+          if ($LASTEXITCODE -ne 0) { throw "Packaged smoke failed" }
+          npm --prefix desktop run verify:resources
+          if ($LASTEXITCODE -ne 0) { throw "Resources changed during GUI gates" }
+
+      - name: Verify unsigned development installer
+        id: installer
+        shell: powershell
+        run: |
+          $installers = @(Get-ChildItem -LiteralPath "desktop/src-tauri/target/debug/bundle/nsis" -Filter "*-setup.exe" -File)
+          if ($installers.Count -ne 1) { throw "Expected one NSIS installer, found $($installers.Count)" }
+          $signature = Get-AuthenticodeSignature -LiteralPath $installers[0].FullName
+          if ($signature.Status -ne "NotSigned") { throw "Unexpected Authenticode status: $($signature.Status)" }
+          $hash = Get-FileHash -Algorithm SHA256 -LiteralPath $installers[0].FullName
+          "$($hash.Hash)  $($installers[0].Name)" | Set-Content -LiteralPath "$($installers[0].FullName).sha256" -Encoding ASCII
+          Add-Content -LiteralPath $env:GITHUB_OUTPUT -Value "path=$($installers[0].FullName)"
+          Add-Content -LiteralPath $env:GITHUB_OUTPUT -Value "hash_path=$($installers[0].FullName).sha256"
+
+      - name: Install and verify development package
+        shell: powershell
+        run: |
+          $installRoot = Join-Path $env:RUNNER_TEMP "ecd-installed"
+          $process = Start-Process -FilePath "${{ steps.installer.outputs.path }}" -ArgumentList @("/S", "/D=$installRoot") -Wait -PassThru
+          if ($process.ExitCode -ne 0) { throw "NSIS installation failed with exit code $($process.ExitCode)" }
+          powershell -NoProfile -ExecutionPolicy Bypass -File desktop/tests/package_contract.test.ps1 -InstallRoot $installRoot
+          if ($LASTEXITCODE -ne 0) { throw "Installed package contract failed" }
+          $installedExecutable = Join-Path $installRoot "esp-config-designer-desktop.exe"
+          $installedResources = Join-Path $installRoot "ecd-app"
+          powershell -NoProfile -ExecutionPolicy Bypass -File desktop/tests/tauri-smoke.test.ps1 -Executable $installedExecutable -ResourceRoot $installedResources -UseExecutableResources
+          if ($LASTEXITCODE -ne 0) { throw "Installed package smoke failed" }
+          powershell -NoProfile -ExecutionPolicy Bypass -File desktop/scripts/verify-resources.ps1 -ResourcesRoot $installedResources
+          if ($LASTEXITCODE -ne 0) { throw "Installed resources verification failed" }
+
+      - name: Upload unsigned development installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: esp-config-designer-windows-unsigned-development
+          path: |
+            ${{ steps.installer.outputs.path }}
+            ${{ steps.installer.outputs.hash_path }}
+          retention-days: 7
+          if-no-files-found: error

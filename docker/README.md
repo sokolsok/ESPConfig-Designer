@@ -6,14 +6,28 @@ This folder contains Docker Compose examples for running ESPConfig Designer as a
 
 ```bash
 cp .env.example .env
-docker compose up -d
+docker compose -f compose.yaml -f compose.host.yaml up -d
 ```
 
-The default `compose.yaml` uses `network_mode: host` for reliable ESPHome mDNS, logs, OTA, and online/offline status behavior.
+`compose.yaml` contains common service settings. The explicit `compose.host.yaml`
+override uses host networking for reliable ESPHome mDNS, logs, OTA, and
+online/offline status behavior.
 
-The Compose examples also pass `/dev/ttyUSB0` and `/dev/ttyACM0` into the container
-for the `Install -> Serial port (HA Server)` flow. Add any additional host serial
-device mappings required by your hardware before starting the container.
+Serial devices are not required for normal startup. To enable the
+`Install -> Serial port (HA Server)` flow, set `ECD_SERIAL_DEVICE` in `.env` and
+add the serial override:
+
+```bash
+docker compose \
+  -f compose.yaml \
+  -f compose.host.yaml \
+  -f compose.serial.yaml \
+  up -d
+```
+
+Prefer a stable host path under `/dev/serial/by-id/`. It is mapped to
+`ECD_SERIAL_CONTAINER_DEVICE`, which defaults to `/dev/ttyUSB0`. Add another
+device entry to a local override if more than one adapter must be available.
 
 Open the UI at:
 
@@ -26,7 +40,7 @@ http://<docker-host-ip>:8099
 If host networking is not available:
 
 ```bash
-docker compose -f compose.bridge.yaml up -d
+docker compose -f compose.yaml -f compose.bridge.yaml up -d
 ```
 
 Bridge networking may require manual IP addresses for devices because `.local` mDNS resolution is less reliable.
@@ -61,7 +75,16 @@ Manual update:
 
 ```bash
 docker compose pull
-docker compose up -d
+docker compose -f compose.yaml -f compose.host.yaml up -d
 ```
 
-`compose.watchtower.yaml` is an optional example for automatic updates. It is not included in the default setup because it requires Docker socket access.
+`compose.watchtower.yaml` is an optional override for automatic updates. It is
+not included in the normal setup because it requires Docker socket access:
+
+```bash
+docker compose \
+  -f compose.yaml \
+  -f compose.host.yaml \
+  -f compose.watchtower.yaml \
+  up -d
+```
