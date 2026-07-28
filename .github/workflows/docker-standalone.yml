@@ -8,12 +8,10 @@ on:
       - "v*.*.*"
     paths:
       - "esp-config-designer/**"
-      - "desktop/**"
-      - "scripts/**"
+      - "scripts/docker-runtime-gate.sh"
+      - "scripts/version-contract.mjs"
       - "VERSION"
       - ".github/workflows/docker-standalone.yml"
-      - ".github/workflows/quality.yml"
-      - ".github/workflows/desktop-windows.yml"
   workflow_dispatch:
 
 concurrency:
@@ -67,11 +65,18 @@ jobs:
         shell: bash
         run: echo "value=$(tr -d '\r\n' < VERSION)" >> "$GITHUB_OUTPUT"
 
-      - name: Build and run both native images
-        run: bash scripts/docker-runtime-gate.sh
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
+
+      - name: Build and run both images on linux/amd64
+        env:
+          DOCKER_PLATFORM: linux/amd64
+        run: bash scripts/docker-runtime-gate.sh
+
+      - name: Build and run both images on linux/arm64
+        env:
+          DOCKER_PLATFORM: linux/arm64
+        run: bash scripts/docker-runtime-gate.sh
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -82,6 +87,23 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Protect immutable release tag
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        env:
+          IMAGE: ghcr.io/sokolsok/esp-config-designer
+          VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          if output="$(docker buildx imagetools inspect "$IMAGE:$VERSION" 2>&1)"; then
+            echo "::error::Release image $IMAGE:$VERSION already exists and is immutable."
+            exit 1
+          fi
+          if ! grep -Eiq 'manifest unknown|not found' <<< "$output"; then
+            echo "$output" >&2
+            echo "::error::Could not verify immutable release tag availability."
+            exit 1
+          fi
 
       - name: Docker metadata
         id: meta

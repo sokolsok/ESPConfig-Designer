@@ -5,7 +5,16 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 version="$(tr -d '\r\n' < "$repo_root/VERSION")"
 revision="$(git -C "$repo_root" rev-parse HEAD 2>/dev/null || printf unknown)"
-suffix="${GITHUB_RUN_ID:-local}-$$"
+platform="${DOCKER_PLATFORM:-}"
+platform_args=()
+if [[ -n "$platform" ]]; then
+  case "$platform" in
+    linux/amd64|linux/arm64) platform_args=(--platform "$platform") ;;
+    *) echo "Unsupported DOCKER_PLATFORM: $platform" >&2; exit 1 ;;
+  esac
+fi
+platform_suffix="${platform//\//-}"
+suffix="${GITHUB_RUN_ID:-local}-${platform_suffix:-native}-$$"
 standalone_image="ecd-stage9-standalone:$suffix"
 addon_image="ecd-stage9-addon:$suffix"
 standalone_container="ecd-stage9-standalone-$suffix"
@@ -15,6 +24,7 @@ temp_root="$(mktemp -d)"
 cleanup() {
   docker rm -f "$standalone_container" "$addon_container" >/dev/null 2>&1 || true
   docker run --rm \
+    "${platform_args[@]}" \
     --entrypoint /bin/sh \
     --volume "$temp_root:/cleanup" \
     "$standalone_image" \
@@ -30,6 +40,7 @@ done
 printf '{}\n' > "$temp_root/addon-data/options.json"
 
 docker build \
+  "${platform_args[@]}" \
   --build-arg "BUILD_VERSION=$version" \
   --build-arg "VCS_REF=$revision" \
   --file "$repo_root/esp-config-designer/Dockerfile.standalone" \
@@ -37,13 +48,14 @@ docker build \
   "$repo_root/esp-config-designer"
 
 docker build \
+  "${platform_args[@]}" \
   --build-arg "BUILD_VERSION=$version" \
   --file "$repo_root/esp-config-designer/Dockerfile" \
   --tag "$addon_image" \
   "$repo_root/esp-config-designer"
 
 for image in "$standalone_image" "$addon_image"; do
-  docker run --rm --entrypoint /bin/sh "$image" -c '
+  docker run --rm "${platform_args[@]}" --entrypoint /bin/sh "$image" -c '
     test -f /web/index.html
     test -f /web/components_list/components_list.json
     test -f /web/schemas/components/custom/empty.json
@@ -57,6 +69,7 @@ docker image inspect --format '{{index .Config.Labels "org.opencontainers.image.
   | grep -Fx "$version" >/dev/null
 
 docker run -d \
+  "${platform_args[@]}" \
   --name "$standalone_container" \
   --env ECD_AUTH_MODE=none \
   --publish 18099:8099 \
@@ -66,6 +79,7 @@ docker run -d \
   "$standalone_image" >/dev/null
 
 docker run -d \
+  "${platform_args[@]}" \
   --name "$addon_container" \
   --publish 18100:8099 \
   --volume "$temp_root/addon-config:/config" \
