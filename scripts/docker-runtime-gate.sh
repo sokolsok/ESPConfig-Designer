@@ -14,8 +14,13 @@ temp_root="$(mktemp -d)"
 
 cleanup() {
   docker rm -f "$standalone_container" "$addon_container" >/dev/null 2>&1 || true
+  docker run --rm \
+    --entrypoint /bin/sh \
+    --volume "$temp_root:/cleanup" \
+    "$standalone_image" \
+    -c 'rm -rf /cleanup/* /cleanup/.[!.]* /cleanup/..?*' >/dev/null 2>&1 || true
   docker image rm -f "$standalone_image" "$addon_image" >/dev/null 2>&1 || true
-  rm -rf "$temp_root"
+  rm -rf "$temp_root" || true
 }
 trap cleanup EXIT
 

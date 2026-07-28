@@ -1956,9 +1956,7 @@ const renameWithCanonicalCase = (existingPath, canonicalPath) => {
   }
 };
 
-const canonicalizeWindowsPath = (outputDir, schemaPath) => {
-  if (process.platform !== "win32") return;
-
+const canonicalizePath = (outputDir, schemaPath) => {
   fs.mkdirSync(outputDir, { recursive: true });
   const segments = schemaPath.split("/");
   let currentDir = outputDir;
@@ -2032,7 +2030,7 @@ export const writeActionDefinitions = ({ catalogPath, outputDir, prune = false }
   const expectedFiles = getExpectedFiles(definitions);
 
   definitions.forEach(({ schemaPath, definition }) => {
-    canonicalizeWindowsPath(outputDir, schemaPath);
+    canonicalizePath(outputDir, schemaPath);
     const outputPath = path.join(outputDir, schemaPath);
     fs.mkdirSync(path.dirname(outputPath), { recursive: true });
     fs.writeFileSync(outputPath, serializeDefinition(definition), "utf8");

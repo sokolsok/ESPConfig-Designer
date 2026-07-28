@@ -6,8 +6,6 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName Microsoft.VisualBasic
 
 function Assert-True([bool]$condition, [string]$message) {
     if (-not $condition) {
@@ -16,12 +14,8 @@ function Assert-True([bool]$condition, [string]$message) {
 }
 
 function Request-TauriClose([System.Diagnostics.Process]$process) {
-    try {
-        [void][Microsoft.VisualBasic.Interaction]::AppActivate("ESPConfig Designer")
-        [System.Windows.Forms.SendKeys]::SendWait("%{F4}")
-    } catch {
-        [void]$process.CloseMainWindow()
-    }
+    $process.Refresh()
+    [void]$process.CloseMainWindow()
 }
 
 function Close-TauriGracefully([System.Diagnostics.Process]$process) {

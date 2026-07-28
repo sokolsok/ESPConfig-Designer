@@ -78,6 +78,17 @@ jobs:
 
       - name: Run backend tests
         working-directory: esp-config-designer/backend
+        env:
+          TARGET_DIR: ${{ runner.temp }}/ecd-backend/target
+          PROJECT_DIR: ${{ runner.temp }}/ecd-backend/target/esp_projects
+          ASSET_ROOT: ${{ runner.temp }}/ecd-backend/target/esp_assets
+          JOB_DIR: ${{ runner.temp }}/ecd-backend/jobs
+          ESPHOME_DATA_DIR: ${{ runner.temp }}/ecd-backend/esphome-data
+          ESPHOME_CONFIG_DIR: ${{ runner.temp }}/ecd-backend/esphome-config
+          DEVICES_PATH: ${{ runner.temp }}/ecd-backend/devices.json
+          WEB_ROOT: ${{ runner.temp }}/ecd-backend/web
+          SCHEMA_CATALOG_ROOT: ${{ github.workspace }}/esp-config-designer/shared/schema-catalog
+          SEED_ROOT: ${{ github.workspace }}/esp-config-designer/backend/seed_esphome
         run: python -I -B -m unittest discover -s tests -v
 
       - name: Check backend syntax
