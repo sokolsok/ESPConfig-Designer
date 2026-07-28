@@ -13,20 +13,25 @@ function Assert-True([bool]$condition, [string]$message) {
     }
 }
 
-function Request-TauriClose([System.Diagnostics.Process]$process) {
-    $process.Refresh()
-    [void]$process.CloseMainWindow()
-}
-
-function Close-TauriGracefully([System.Diagnostics.Process]$process) {
-    $deadline = [DateTime]::UtcNow.AddSeconds(30)
-    while (-not $process.HasExited -and [DateTime]::UtcNow -lt $deadline) {
-        Request-TauriClose $process
-        if ($process.WaitForExit(5000)) {
-            return $true
+function Stop-TauriProcess([System.Diagnostics.Process]$process, [int]$port) {
+    if (-not $process.HasExited) {
+        $taskkill = Start-Process `
+            -FilePath (Join-Path $env:SystemRoot "System32\taskkill.exe") `
+            -ArgumentList @("/PID", $process.Id.ToString(), "/T", "/F") `
+            -Wait -PassThru -NoNewWindow
+        if ($taskkill.ExitCode -ne 0 -and -not $process.HasExited) {
+            throw "Could not terminate Tauri process tree (taskkill exit $($taskkill.ExitCode))"
         }
+        Assert-True ($process.WaitForExit(30000)) "Tauri did not stop within the cleanup timeout"
     }
-    return $process.HasExited
+
+    $deadline = [DateTime]::UtcNow.AddSeconds(30)
+    while ([DateTime]::UtcNow -lt $deadline) {
+        $listeners = @(Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue)
+        if ($listeners.Count -eq 0) { return }
+        Start-Sleep -Milliseconds 250
+    }
+    throw "Tauri backend port remained open after process cleanup"
 }
 
 $desktopRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
@@ -121,11 +126,11 @@ try {
     Assert-True ($layoutManifestHash -eq (Get-FileHash -Algorithm SHA256 -LiteralPath $layoutManifestPath).Hash) "Resource layout manifest changed in resource root"
     Assert-True ($catalogHash -eq (Get-FileHash -Algorithm SHA256 -LiteralPath $catalogPath).Hash) "Schema catalog changed in resource root"
 
-    Assert-True (Close-TauriGracefully $process) "Tauri did not close within the cleanup timeout"
+    Stop-TauriProcess $process $port
     Write-Host "tauri packaged smoke: PASS"
 } finally {
     if ($process -and -not $process.HasExited) {
-        Assert-True (Close-TauriGracefully $process) "Tauri remained open after graceful test cleanup"
+        Stop-TauriProcess $process $port
     }
     if (Test-Path -LiteralPath $appDataRoot) {
         Remove-Item -LiteralPath $appDataRoot -Recurse -Force

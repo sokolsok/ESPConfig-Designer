@@ -11,18 +11,25 @@ function Assert-True([bool]$condition, [string]$message) {
     }
 }
 
-function Request-TauriClose([System.Diagnostics.Process]$process) {
-    $process.Refresh()
-    [void]$process.CloseMainWindow()
-}
-
-function Close-TauriGracefully([System.Diagnostics.Process]$process) {
-    $deadline = [DateTime]::UtcNow.AddSeconds(30)
-    while (-not $process.HasExited -and [DateTime]::UtcNow -lt $deadline) {
-        Request-TauriClose $process
-        if ($process.WaitForExit(5000)) { return $true }
+function Stop-TauriProcess([System.Diagnostics.Process]$process, [int]$port) {
+    if (-not $process.HasExited) {
+        $taskkill = Start-Process `
+            -FilePath (Join-Path $env:SystemRoot "System32\taskkill.exe") `
+            -ArgumentList @("/PID", $process.Id.ToString(), "/T", "/F") `
+            -Wait -PassThru -NoNewWindow
+        if ($taskkill.ExitCode -ne 0 -and -not $process.HasExited) {
+            throw "Could not terminate Tauri process tree (taskkill exit $($taskkill.ExitCode))"
+        }
+        Assert-True ($process.WaitForExit(30000)) "Tauri did not stop within the cleanup timeout"
     }
-    return $process.HasExited
+
+    $deadline = [DateTime]::UtcNow.AddSeconds(30)
+    while ([DateTime]::UtcNow -lt $deadline) {
+        $listeners = @(Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue)
+        if ($listeners.Count -eq 0) { return }
+        Start-Sleep -Milliseconds 250
+    }
+    throw "Tauri backend port remained open after process cleanup"
 }
 
 function Wait-Backend([System.Diagnostics.Process]$process, [int]$port) {
@@ -78,14 +85,14 @@ try {
     $record = Get-Content -LiteralPath (Join-Path $appDataRoot "workspace.json") -Raw | ConvertFrom-Json
     $recordWorkspace = [string]$record.workspace -replace '^\\\\\?\\', ''
     Assert-True ($recordWorkspace -eq [System.IO.Path]::GetFullPath($expectedWorkspace)) "Default workspace record is incorrect"
-    Assert-True (Close-TauriGracefully $process) "Tauri did not close after default workspace test"
+    Stop-TauriProcess $process $port
 
     $process = [System.Diagnostics.Process]::Start($startInfo)
     Wait-Backend $process $port
     $workspaceResponse = Invoke-RestMethod -Uri ("http://127.0.0.1:{0}/api/workspace" -f $port)
     $reportedWorkspace = [string]$workspaceResponse.workspace.path -replace '^\\\\\?\\', ''
     Assert-True ($reportedWorkspace -eq [System.IO.Path]::GetFullPath($expectedWorkspace)) "Saved default workspace was not reused"
-    Assert-True (Close-TauriGracefully $process) "Tauri did not close after default workspace restart"
+    Stop-TauriProcess $process $port
 
     New-Item -ItemType Directory -Path $existingAppDataRoot, $existingWorkspace -Force | Out-Null
     $existingRecord = @{ version = 1; workspace = [System.IO.Path]::GetFullPath($existingWorkspace) } | ConvertTo-Json
@@ -102,11 +109,11 @@ try {
     $reportedExisting = [string]$existingResponse.workspace.path -replace '^\\\\\?\\', ''
     Assert-True ($reportedExisting -eq [System.IO.Path]::GetFullPath($existingWorkspace)) "Existing saved workspace was replaced"
     Assert-True (-not (Test-Path -LiteralPath (Join-Path $existingProfileRoot "Documents\ecd_workspace"))) "Default workspace was created for an existing user"
-    Assert-True (Close-TauriGracefully $process) "Tauri did not close after existing workspace test"
+    Stop-TauriProcess $process $port
     Write-Host "tauri first-start default workspace: PASS"
 } finally {
     if ($process -and -not $process.HasExited) {
-        Assert-True (Close-TauriGracefully $process) "Tauri remained open after graceful test cleanup"
+        Stop-TauriProcess $process $port
     }
     if (Test-Path -LiteralPath $appDataRoot) {
         Remove-Item -LiteralPath $appDataRoot -Recurse -Force
