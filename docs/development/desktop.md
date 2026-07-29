@@ -79,6 +79,19 @@ ECD_TAURI_HEALTH_TIMEOUT_MS
 They are not normal end-user settings. The normal backend binds only to
 `127.0.0.1` and starts in `desktop` mode.
 
+## External links
+
+The shared frontend keeps external links as standard `target="_blank"` anchors.
+Standalone Docker and Home Assistant therefore continue to open them through
+the host browser. In Desktop mode, the application shell routes HTTP and HTTPS
+links through Tauri Opener so they open in the user's default system browser
+instead of creating another webview.
+
+The opener capability is separate from the main capability. It grants the
+loopback-hosted UI at `http://127.0.0.1:*` only the scoped URL-open command and
+accepts only HTTP and HTTPS targets. Do not replace it with a general shell or
+unscoped opener permission.
+
 ## Storage boundaries
 
 Default mutable paths:

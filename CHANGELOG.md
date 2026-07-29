@@ -1,3 +1,13 @@
+## 1.4.0
+
+* Added a self-contained Windows Desktop development package backed by the shared application sources and isolated workspace/app-data storage.
+* Added standalone Docker deployment with explicit Compose variants, Basic Auth, and multi-architecture runtime gates.
+* Consolidated Home Assistant, Docker, and Desktop onto one maintained backend, frontend, and schema catalog.
+* Added runtime diagnostics, Desktop process-tree ownership, portable-runtime validation, and cache compatibility handling.
+* Moved integrated frontend development data outside the repository and added a guarded migration utility for legacy development workspaces.
+* Opened external HTTP and HTTPS links from Windows Desktop in the system browser while preserving normal browser behavior for Home Assistant and Docker.
+
+
 ## 1.3.3
 
 * Added support for flashing devices connected directly to the Home Assistant server, including HTTP-based wired flashing.

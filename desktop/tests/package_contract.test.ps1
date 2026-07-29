@@ -15,6 +15,18 @@ $desktopRoot = Split-Path -Parent $PSScriptRoot
 $repoRoot = Split-Path -Parent $desktopRoot
 $configPath = Join-Path $desktopRoot "src-tauri\tauri.conf.json"
 $config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
+$externalLinksCapabilityPath = Join-Path $desktopRoot "src-tauri\capabilities\external-links.json"
+Assert-True (Test-Path -LiteralPath $externalLinksCapabilityPath -PathType Leaf) "External-link capability is missing"
+$externalLinksCapability = Get-Content -LiteralPath $externalLinksCapabilityPath -Raw | ConvertFrom-Json
+$externalLinkOrigins = @($externalLinksCapability.remote.urls)
+Assert-True ($externalLinkOrigins.Count -eq 1 -and $externalLinkOrigins[0] -eq "http://127.0.0.1:*") "External-link capability must be limited to the Desktop loopback origin"
+$externalLinkPermissions = @($externalLinksCapability.permissions)
+Assert-True ($externalLinkPermissions.Count -eq 1) "External-link capability must contain one scoped permission"
+$externalLinkPermission = $externalLinkPermissions[0]
+Assert-True ($externalLinkPermission.identifier -eq "opener:allow-open-url") "External-link capability must only allow opening URLs"
+$externalLinkScopes = @($externalLinkPermission.allow | ForEach-Object { $_.url } | Sort-Object)
+Assert-True ($externalLinkScopes.Count -eq 2) "External-link capability must contain two URL scopes"
+Assert-True ($externalLinkScopes[0] -eq "http://*" -and $externalLinkScopes[1] -eq "https://*") "External-link capability must be limited to HTTP and HTTPS"
 
 $applicationRoot = Join-Path $repoRoot "esp-config-designer"
 $backendSource = Join-Path $applicationRoot "backend"

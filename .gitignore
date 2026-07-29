@@ -12,7 +12,6 @@ htmlcov/
 
 # Node.js and frontend output
 **/node_modules/
-/esp-config-designer-frontend/dist/
 /esp-config-designer/frontend/dist/
 
 # Desktop build and packaged resources
@@ -33,7 +32,6 @@ htmlcov/
 .env.*
 !.env.example
 !**/.env.example
-!/esp-config-designer-frontend/.env.local
 !/esp-config-designer/frontend/.env.local
 
 # Private working notes

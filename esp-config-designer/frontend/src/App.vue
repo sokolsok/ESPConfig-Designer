@@ -1,5 +1,5 @@
 <template>
-  <div class="app-shell">
+  <div class="app-shell" @click.capture="handleExternalLinkClick">
     <UnsavedChangesModal
       :open="leaveModalOpen"
       :busy="leaveModalBusy"
@@ -37,20 +37,6 @@
       </div>
 
       <div class="app-topbar-actions">
-        <button
-          v-if="isDiagnosticsRoute"
-          class="btn-standard secondary"
-          @click="requestRouteChange('dashboard')"
-        >
-          Dashboard
-        </button>
-        <button
-          v-else
-          class="btn-standard secondary"
-          @click="requestRouteChange('diagnostics')"
-        >
-          Diagnostics
-        </button>
         <div v-if="isDashboardRoute && canLocalYamlImport" ref="importMenuRef" class="topbar-action-menu">
           <button
             class="btn-standard action-import"
@@ -139,10 +125,12 @@
 </template>
 
 <script setup>
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { RouterView, useRoute, useRouter } from "vue-router";
 import ecdLogo from "./ECD_logo.png";
 import UnsavedChangesModal from "./components/UnsavedChangesModal.vue";
+import { resolveDesktopExternalUrl } from "./utils/externalLinks";
 import {
   isRuntimeCapabilityEnabled,
   loadRuntimeCapabilities,
@@ -177,7 +165,6 @@ const route = useRoute();
 const router = useRouter();
 const isBuilderRoute = computed(() => route.name === "builder");
 const isDashboardRoute = computed(() => route.name === "dashboard");
-const isDiagnosticsRoute = computed(() => route.name === "diagnostics");
 const showActionButtons = computed(() => isBuilderRoute.value || isDashboardRoute.value);
 const canYamlImport = computed(() => runtimeCapabilities.yamlImport === true);
 const canLocalYamlImport = computed(() => runtimeCapabilities.localYamlImport === true);
@@ -311,6 +298,23 @@ const triggerDashboardEdit = () => {
 
 const triggerValidate = () => {
   window.dispatchEvent(new CustomEvent("app:validate"));
+};
+
+const handleExternalLinkClick = (event) => {
+  const target = event.target;
+  if (!(target instanceof Element)) return;
+  const anchor = target.closest('a[target="_blank"]');
+  if (!anchor) return;
+  const url = resolveDesktopExternalUrl({
+    mode: runtimeCapabilities.mode,
+    href: anchor.getAttribute("href"),
+    currentHref: window.location.href
+  });
+  if (!url) return;
+  event.preventDefault();
+  void openUrl(url).catch((error) => {
+    console.error("Could not open external link in the system browser.", error);
+  });
 };
 
 const handleGlobalClick = (event) => {

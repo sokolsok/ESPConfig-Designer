@@ -958,6 +958,7 @@ fn home_dir() -> PathBuf {
 fn main() {
     let builder = tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![change_workspace])
         .setup(|app| {
             let app_data_root = app_data_root_from_environment();

@@ -41,10 +41,8 @@ commands and fail closed in an already migrated checkout.
 
 Migration is never run by `npm run dev`. It requires owner-approved dry-run,
 apply, activation, manual data verification, backup acceptance, and separately
-approved cleanup. See the
-[completed migration plan](../../../docs/plans/2026-07-28-external-development-workspace-migration.md)
-for the command contract, byte/hash verification, platform limitations, and
-recorded outcome.
+approved cleanup. The migration commands validate source and target isolation,
+byte/hash parity, and platform-specific path constraints before activation.
 
 ## Action definition generator
 

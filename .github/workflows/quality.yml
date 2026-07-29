@@ -26,7 +26,7 @@ jobs:
       - name: Verify product version
         run: |
           node scripts/version-contract.mjs
-          node --test scripts/tests/versionContract.test.mjs
+          node --test scripts/tests/versionContract.test.mjs scripts/tests/backendWorkflowIsolation.test.mjs
 
       - name: Verify Compose source split
         run: node --test docker/tests/composeContract.test.mjs

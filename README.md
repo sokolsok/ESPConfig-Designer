@@ -110,7 +110,7 @@ desktop/
   python/                 Desktop runtime adapter
   src-tauri/              Tauri shell and Windows package
 docker/                   standalone Compose files
-docs/                     installation, development, authoring, and plans
+docs/                     installation, development, and authoring
 scripts/                  repository contracts and shared gates
 VERSION                   canonical product version
 ```
@@ -126,7 +126,6 @@ dependency directories, and local Docker state are not source trees.
 - [Desktop development](docs/development/desktop.md)
 - [Schema authoring quick guide](docs/HOW_TO_CREATE_SCHEMA.md)
 - [Extended schema authoring reference](docs/HOW_TO_CREATE_SCHEMA_EXTENDED.md)
-- [Implementation plans](docs/plans/README.md)
 - [Changelog](CHANGELOG.md)
 
 ## Security
