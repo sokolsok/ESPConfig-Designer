@@ -76,6 +76,13 @@ export function isExcludedRuntimePayloadEntry(name, isDirectory, topLevel) {
   );
 }
 
+export function releaseBuildRootName(productVersion, sourceCommit) {
+  if (!SOURCE_SHA_PATTERN.test(sourceCommit)) {
+    throw new Error("Release build root requires a full source commit SHA");
+  }
+  return `ecd-r-${productVersion}-${sourceCommit.slice(0, 16)}`;
+}
+
 export function createProvenance({
   productVersion,
   sourceCommit,
@@ -481,7 +488,7 @@ async function main() {
     `${productVersion}-${sourceCommit}`,
   );
   assertCandidateOutputAvailable(candidateRoot);
-  const buildRoot = join(tmpdir(), `ecd-release-build-${productVersion}-${sourceCommit}`);
+  const buildRoot = join(tmpdir(), releaseBuildRootName(productVersion, sourceCommit));
   const repoRoot = createSourceSnapshot(launcherRepoRoot, sourceCommit, buildRoot);
   const desktopRoot = join(repoRoot, "desktop");
   const snapshotVersion = readFileSync(join(repoRoot, "VERSION"), "utf8").trim();

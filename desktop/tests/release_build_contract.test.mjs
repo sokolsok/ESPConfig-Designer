@@ -8,6 +8,7 @@ import {
   assertVersionedInstaller,
   createProvenance,
   isExcludedRuntimePayloadEntry,
+  releaseBuildRootName,
   resolveRuntimeRoot,
   selectSingleArtifact,
   validateProvenance,
@@ -45,6 +46,12 @@ test("runtime payload identity matches the bytecode-free package projection", ()
   assert.equal(isExcludedRuntimePayloadEntry("python-manifest.json", false, true), true);
   assert.equal(isExcludedRuntimePayloadEntry("python.exe", false, true), false);
   assert.equal(isExcludedRuntimePayloadEntry("module.py", false, false), false);
+});
+
+test("isolated Windows build root remains short while retaining commit identity", () => {
+  const name = releaseBuildRootName("1.4.0", SHA);
+  assert.equal(name, "ecd-r-1.4.0-0123456789abcdef");
+  assert.ok(name.length <= 32);
 });
 
 test("release output rejects stale and multiple artifacts", () => {
