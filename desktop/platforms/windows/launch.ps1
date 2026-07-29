@@ -55,7 +55,7 @@ if (-not $AppDataRoot) {
     $AppDataRoot = Join-Path $env:LOCALAPPDATA "ECD"
 }
 if (-not $Workspace) {
-    $Workspace = Join-Path $env:USERPROFILE "ESPConfig Designer\workspace"
+    $Workspace = Join-Path $env:USERPROFILE "Documents\ecd_workspace"
 }
 
 $pythonCandidates = @(

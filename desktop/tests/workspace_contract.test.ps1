@@ -45,6 +45,15 @@ $appData = Join-Path $root "app-data"
 $emptyWorkspace = Join-Path $root "ECD Workspace żółć"
 $existingWorkspace = Join-Path $root "existing workspace"
 $installRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
+$directLauncher = Join-Path $installRoot "platforms\windows\launch.ps1"
+$directLauncherSource = Get-Content -LiteralPath $directLauncher -Raw
+$expectedDefaultAssignment = '$Workspace = Join-Path $env:USERPROFILE "Documents\ecd_workspace"'
+$legacyDefaultAssignment = '$Workspace = Join-Path $env:USERPROFILE "ESPConfig Designer\workspace"'
+
+Assert-True ($directLauncherSource.Contains($expectedDefaultAssignment)) "Direct launcher default must match the product workspace"
+Assert-True (-not $directLauncherSource.Contains($legacyDefaultAssignment)) "Direct launcher still contains the legacy workspace default"
+Assert-True ($directLauncherSource.Contains('if (-not $Workspace)')) "Direct launcher must preserve an explicit workspace"
+Assert-True ($directLauncherSource.Contains('"--workspace", $Workspace')) "Direct launcher must pass the selected workspace to Python"
 
 try {
     New-Item -ItemType Directory -Path $appData, $emptyWorkspace, $existingWorkspace -Force | Out-Null

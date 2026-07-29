@@ -101,6 +101,10 @@ app data: %LOCALAPPDATA%\ECD
 workspace: %USERPROFILE%\Documents\ecd_workspace
 ```
 
+The direct `desktop/platforms/windows/launch.ps1` launcher uses the same
+workspace when `-Workspace` is omitted. An explicit `-Workspace` remains a
+development/test override.
+
 App data owns runtime/cache/build/job state and the workspace pointer. The
 workspace owns project JSON, YAML, assets, and custom components. Generated
 application resources and the installation root are immutable.

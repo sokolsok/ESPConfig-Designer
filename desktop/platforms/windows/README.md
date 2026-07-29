@@ -94,6 +94,9 @@ app data:     %LOCALAPPDATA%\ECD
 workspace:    %USERPROFILE%\Documents\ecd_workspace
 ```
 
+The direct `launch.ps1` launcher uses this workspace when `-Workspace` is not
+provided and preserves an explicit workspace argument.
+
 App-data layout:
 
 ```text
