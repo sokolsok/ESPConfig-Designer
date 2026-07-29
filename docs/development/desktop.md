@@ -48,8 +48,17 @@ powershell -NoProfile -ExecutionPolicy Bypass `
 ```
 
 The default build-machine runtime root is `%LOCALAPPDATA%\ECD\runtime`. The
-script prepares pinned Python, ESPHome, PlatformIO, Python packages, and MinGit,
-then writes a runtime manifest. It does not write into a project workspace.
+script verifies the canonical Python archive against the repository SHA-256 and
+NuGet-published SHA-512, verifies MinGit against its upstream SHA-256, and
+installs the complete Windows Python graph with pip hash mode. It then writes a
+separate installed-runtime fingerprint. The script does not write into a project
+workspace.
+
+`requirements-runtime.txt` remains the short direct-version policy. The complete
+CPython 3.13 x64 Windows resolution is tracked in
+`requirements-runtime.lock`; `crcmod`, `esptool`, and `paho-mqtt` are pinned
+source distributions built with the separately hash-locked build support. This
+controls build inputs but is not a claim of byte-for-byte reproducibility.
 
 Use `-OutputRoot <path>` for an isolated runtime. The output path must satisfy
 the script's ownership and emptiness checks.
@@ -188,10 +197,12 @@ desktop/resources/ecd-app/
 ```
 
 The resource packager combines canonical tracked sources with the prepared
-runtime into one generated layout. The verifier checks manifests, catalog
-projections, source ownership, and absence of Python bytecode and known write
-probes. Workspace, app-data, and cache separation is enforced by the package,
-workspace, and smoke contracts rather than a general mutable-file classifier.
+runtime into one generated layout. It includes the tracked release-input
+inventory and third-party notices under `supply-chain/`. The verifier checks
+their exact tracked projections, manifests, catalog projections, source
+ownership, and absence of Python bytecode and known write probes. Workspace,
+app-data, and cache separation is enforced by the package, workspace, and smoke
+contracts rather than a general mutable-file classifier.
 
 ## Repository contracts and tests
 
@@ -218,6 +229,7 @@ Desktop and Rust contracts:
 ```powershell
 npm --prefix desktop run test:workspace
 npm --prefix desktop run test:package
+npm --prefix desktop run test:supply-chain
 cargo test --locked --manifest-path desktop/src-tauri/Cargo.toml
 cargo test --release --locked --manifest-path desktop/src-tauri/Cargo.toml
 ```
@@ -256,6 +268,13 @@ The package/config contract verifies this bundler setting. A dedicated clean
 machine or VM without WebView2 is still required to prove both successful online
 bootstrap and controlled offline failure for the actual installer; neither result
 is implied by a local package build.
+
+The tracked supply-chain inventory records Tauri CLI `2.5.0` as the owner of
+the NSIS `3.08` and `nsis-tauri-utils 0.4.2` acquisition checks. That bundler
+uses its own pinned SHA-1 values; the repository documents this boundary rather
+than implementing a second downloader. The mutable Microsoft Evergreen WebView2
+URL has no stable artifact hash, and the Tauri template checks download and
+process success rather than an ECD-controlled digest or signer rule.
 
 The package is for development and testing only. See the
 [Windows installation status](../installation/windows.md).

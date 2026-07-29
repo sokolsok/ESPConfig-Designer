@@ -52,6 +52,14 @@ The Rust graph is locked by `desktop/src-tauri/Cargo.lock`. Runtime dependency
 changes require new manifests, compile/cache/offline verification, and a rebuilt
 package; they must not be mixed into unrelated work.
 
+`python-manifest.json` pins the canonical Python NuGet artifact with a
+repository SHA-256 and NuGet-published SHA-512. `git-manifest.json` retains the
+official MinGit SHA-256. `requirements-runtime.lock` pins all 98 packages in the
+CPython 3.13 x64 Windows graph with SHA-256; `requirements-bootstrap.lock`
+prepares the pinned build support required by the `crcmod`, `esptool`, and
+`paho-mqtt` source distributions. The generated `runtime-manifest.json` remains
+a separate fingerprint of what was installed.
+
 ## WebView2 installation
 
 The NSIS package explicitly sets Tauri's Windows-only
@@ -98,7 +106,13 @@ desktop/resources/ecd-app/
     python.exe
     runtime-manifest.json
     git-manifest.json
+    python-manifest.json
+    requirements-bootstrap.lock
+    requirements-runtime.lock
     git/
+  supply-chain/
+    inventory.json
+    THIRD-PARTY-NOTICES.md
   resource-layout.json
 ```
 
@@ -107,6 +121,13 @@ files, immutable resource policy, catalog manifests and projection parity, and
 rejects bytecode, write probes, and nested source copies. Focused package,
 workspace, and smoke contracts enforce that known mutable data remains outside
 the resource and installation roots.
+
+The tracked inventory covers the Python, npm, Cargo, native tool, and GitHub
+Actions graphs. External Actions are pinned to full commit SHAs. Tauri CLI
+`2.5.0` remains responsible for downloading NSIS `3.08` and
+`nsis-tauri-utils 0.4.2` and checking its embedded SHA-1 values; ECD does not
+duplicate that downloader. Microsoft's Evergreen WebView2 URL is intentionally
+mutable and cannot have one stable digest in `downloadBootstrapper` mode.
 
 ## Storage model
 

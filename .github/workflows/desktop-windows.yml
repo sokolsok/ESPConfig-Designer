@@ -35,14 +35,14 @@ jobs:
     timeout-minutes: 120
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Verify clean checkout inputs
         shell: powershell
         run: powershell -NoProfile -ExecutionPolicy Bypass -File desktop/scripts/clean-checkout-gate.ps1
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: "22.14.0"
           cache: npm
@@ -75,10 +75,10 @@ jobs:
 
       - name: Cache pinned portable runtime
         id: runtime-cache
-        uses: actions/cache@v4
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
           path: ${{ runner.temp }}\ecd-runtime
-          key: ecd-runtime-windows-x64-v1-${{ hashFiles('desktop/platforms/windows/prepare-runtime.ps1', 'desktop/platforms/windows/requirements-runtime.txt', 'desktop/platforms/windows/git-manifest.json', 'esp-config-designer/backend/runtime_manifest.py', 'desktop/python/desktop_runtime.py') }}
+          key: ecd-runtime-windows-x64-v1-${{ hashFiles('desktop/platforms/windows/prepare-runtime.ps1', 'desktop/platforms/windows/artifact-integrity.ps1', 'desktop/platforms/windows/python-manifest.json', 'desktop/platforms/windows/requirements-runtime.txt', 'desktop/platforms/windows/requirements-bootstrap.lock', 'desktop/platforms/windows/requirements-runtime.lock', 'desktop/platforms/windows/git-manifest.json', 'esp-config-designer/backend/runtime_manifest.py', 'desktop/python/desktop_runtime.py') }}
 
       - name: Prepare pinned portable runtime
         if: steps.runtime-cache.outputs.cache-hit != 'true'
@@ -128,6 +128,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "Workspace contract failed" }
           npm --prefix desktop run test:package
           if ($LASTEXITCODE -ne 0) { throw "Package contract failed" }
+          npm --prefix desktop run test:supply-chain
+          if ($LASTEXITCODE -ne 0) { throw "Supply-chain contract failed" }
           $gateRoot = Join-Path $env:RUNNER_TEMP "ecd-source-runtime-gate"
           $appData = Join-Path $gateRoot "appdata"
           $workspace = Join-Path $gateRoot "workspace"
@@ -205,7 +207,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "Installed resources verification failed" }
 
       - name: Upload unsigned development installer
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: esp-config-designer-windows-unsigned-development
           path: |

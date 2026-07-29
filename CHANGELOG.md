@@ -9,6 +9,7 @@
 * Reconciled interrupted jobs safely after backend restarts and prevented multiple backend processes from sharing one job directory.
 * Added a restrictive Desktop Content Security Policy for the loopback-hosted UI and a WebView2 enforcement gate without changing Home Assistant or standalone responses.
 * Configured the Windows installer to obtain the official Microsoft WebView2 bootstrapper when the runtime is missing.
+* Added hash-verified Windows runtime inputs, a complete locked Python graph, immutable GitHub Actions references, and packaged supply-chain inventory and third-party notices.
 
 
 ## 1.3.3

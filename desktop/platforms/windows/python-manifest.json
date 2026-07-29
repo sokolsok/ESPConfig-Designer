@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "kind": "ecd-python-artifact",
+  "product": "CPython NuGet x64",
+  "version": "3.13.9",
+  "architecture": "x64",
+  "archive": "python-3.13.9-nuget.zip",
+  "source": "https://api.nuget.org/v3-flatcontainer/python/3.13.9/python.3.13.9.nupkg",
+  "sha256": "ea7541c98f77b6f344460b88db6e677573069979bcbf0ba18747cc2c125aba25",
+  "upstreamSha512": "11190d691ff12cc7f0918818aa6f9323dcacc34445f80d9c84898bc4b55d6cde9970ea2dc899f2047efde70e452e964d20a928551a713b7eceef55164c1e6008",
+  "publisher": "Python Software Foundation",
+  "provenance": "NuGet catalog metadata publishes the SHA-512; SHA-256 is pinned by this repository for the same canonical artifact.",
+  "license": "Python-2.0"
+}

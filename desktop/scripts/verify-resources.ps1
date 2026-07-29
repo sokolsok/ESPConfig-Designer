@@ -13,6 +13,7 @@ $backendRoot = Join-Path $ResourcesRoot "backend"
 $schemaCatalogRoot = Join-Path $backendRoot "schema-catalog"
 $webRoot = Join-Path $backendRoot "web"
 $runtimeRoot = Join-Path $ResourcesRoot "runtime"
+$supplyChainRoot = Join-Path $ResourcesRoot "supply-chain"
 
 foreach ($requiredPath in @(
     (Join-Path $ResourcesRoot "resource-layout.json"),
@@ -32,10 +33,24 @@ foreach ($requiredPath in @(
     (Join-Path $runtimeRoot "runtime-manifest.json"),
     (Join-Path $runtimeRoot "git\cmd\git.exe"),
     (Join-Path $runtimeRoot "git\LICENSE.txt"),
-    (Join-Path $runtimeRoot "git-manifest.json")
+    (Join-Path $runtimeRoot "git-manifest.json"),
+    (Join-Path $runtimeRoot "python-manifest.json"),
+    (Join-Path $runtimeRoot "requirements-bootstrap.lock"),
+    (Join-Path $runtimeRoot "requirements-runtime.lock"),
+    (Join-Path $supplyChainRoot "inventory.json"),
+    (Join-Path $supplyChainRoot "THIRD-PARTY-NOTICES.md")
 )) {
     if (-not (Test-Path -LiteralPath $requiredPath)) {
         throw "Packaged resource is missing: $requiredPath"
+    }
+}
+
+$canonicalSupplyChainRoot = Join-Path $repoRoot "desktop\supply-chain"
+foreach ($fileName in @("inventory.json", "THIRD-PARTY-NOTICES.md")) {
+    $expectedHash = (Get-FileHash -LiteralPath (Join-Path $canonicalSupplyChainRoot $fileName) -Algorithm SHA256).Hash
+    $actualHash = (Get-FileHash -LiteralPath (Join-Path $supplyChainRoot $fileName) -Algorithm SHA256).Hash
+    if ($actualHash -ne $expectedHash) {
+        throw "Packaged supply-chain metadata differs from the tracked source: $fileName"
     }
 }
 

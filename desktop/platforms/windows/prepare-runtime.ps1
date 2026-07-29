@@ -4,13 +4,13 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$PythonVersion = "3.13.9"
 $RuntimePackages = @("esphome", "platformio", "Flask", "pyserial", "setuptools", "wheel")
 foreach ($name in @("PYTHONHOME", "PYTHONPATH", "PYTHONUSERBASE", "VIRTUAL_ENV")) {
     Remove-Item -LiteralPath "Env:$name" -ErrorAction SilentlyContinue
 }
 $env:PYTHONNOUSERSITE = "1"
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
+. (Join-Path $PSScriptRoot "artifact-integrity.ps1")
 $runtimeManifestScript = Join-Path $repoRoot "esp-config-designer\backend\runtime_manifest.py"
 if (-not (Test-Path -LiteralPath $runtimeManifestScript -PathType Leaf)) {
     throw "Runtime manifest generator is missing: $runtimeManifestScript"
@@ -20,6 +20,20 @@ if (-not (Test-Path -LiteralPath $gitManifestPath -PathType Leaf)) {
     throw "Bundled Git manifest is missing: $gitManifestPath"
 }
 $gitManifest = Get-Content -LiteralPath $gitManifestPath -Raw | ConvertFrom-Json
+$pythonManifestPath = Join-Path $PSScriptRoot "python-manifest.json"
+if (-not (Test-Path -LiteralPath $pythonManifestPath -PathType Leaf)) {
+    throw "Python artifact manifest is missing: $pythonManifestPath"
+}
+$pythonManifest = Get-Content -LiteralPath $pythonManifestPath -Raw | ConvertFrom-Json
+if ($pythonManifest.schemaVersion -ne 1 -or $pythonManifest.kind -ne "ecd-python-artifact" -or
+    $pythonManifest.product -ne "CPython NuGet x64" -or $pythonManifest.architecture -ne "x64") {
+    throw "Python artifact manifest contract is invalid"
+}
+$PythonVersion = [string]$pythonManifest.version
+$PythonArchive = [string]$pythonManifest.archive
+$PythonUrl = [string]$pythonManifest.source
+$PythonSha256 = [string]$pythonManifest.sha256
+$PythonUpstreamSha512 = [string]$pythonManifest.upstreamSha512
 $GitVersion = [string]$gitManifest.version
 $GitArchive = [string]$gitManifest.archive
 $GitUrl = [string]$gitManifest.source
@@ -28,10 +42,8 @@ if (-not $OutputRoot) {
     $OutputRoot = Join-Path $env:LOCALAPPDATA "ECD\runtime"
 }
 $OutputRoot = [System.IO.Path]::GetFullPath($OutputRoot)
-$pythonZip = "python-$PythonVersion-nuget.zip"
-$pythonUrl = "https://www.nuget.org/api/v2/package/python/$PythonVersion"
 $tempRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("ecd-runtime-" + [guid]::NewGuid().ToString("N"))
-$zipPath = Join-Path $tempRoot $pythonZip
+$zipPath = Join-Path $tempRoot $PythonArchive
 $gitZipPath = Join-Path $tempRoot $GitArchive
 
 if ((Test-Path -LiteralPath $OutputRoot) -and ((Get-ChildItem -LiteralPath $OutputRoot -Force | Measure-Object).Count -gt 0)) {
@@ -41,13 +53,12 @@ New-Item -ItemType Directory -Path $tempRoot -Force | Out-Null
 New-Item -ItemType Directory -Path $OutputRoot -Force | Out-Null
 try {
     Write-Host "[info] Downloading Python $PythonVersion portable distribution"
-    Invoke-WebRequest -Uri $pythonUrl -OutFile $zipPath -UseBasicParsing
+    Invoke-WebRequest -Uri $PythonUrl -OutFile $zipPath -UseBasicParsing
+    Assert-ArtifactHash -Path $zipPath -Algorithm "SHA512" -ExpectedHash $PythonUpstreamSha512 -Name "Python $PythonVersion"
+    Assert-ArtifactHash -Path $zipPath -Algorithm "SHA256" -ExpectedHash $PythonSha256 -Name "Python $PythonVersion"
     Write-Host "[info] Downloading bundled Git for Windows $GitVersion"
     Invoke-WebRequest -Uri $GitUrl -OutFile $gitZipPath -UseBasicParsing
-    $actualGitHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $gitZipPath).Hash.ToLowerInvariant()
-    if ($actualGitHash -ne $GitSha256) {
-        throw "Bundled Git SHA-256 mismatch: expected $GitSha256, found $actualGitHash"
-    }
+    Assert-ArtifactHash -Path $gitZipPath -Algorithm "SHA256" -ExpectedHash $GitSha256 -Name "Bundled Git"
 
     $packageRoot = Join-Path $tempRoot "python-package"
     Expand-Archive -LiteralPath $zipPath -DestinationPath $packageRoot -Force
@@ -63,11 +74,11 @@ try {
     if ($LASTEXITCODE -ne 0) {
         throw "ensurepip failed with exit code $LASTEXITCODE"
     }
-    & $pythonPath -m pip install --disable-pip-version-check --no-cache-dir setuptools==82.0.0 wheel==0.47.0
+    & $pythonPath -m pip install --disable-pip-version-check --no-cache-dir --require-hashes -r (Join-Path $PSScriptRoot "requirements-bootstrap.lock")
     if ($LASTEXITCODE -ne 0) {
         throw "Installing Python package build support failed with exit code $LASTEXITCODE"
     }
-    & $pythonPath -m pip install --disable-pip-version-check --no-cache-dir --no-build-isolation -r (Join-Path $PSScriptRoot "requirements-runtime.txt")
+    & $pythonPath -m pip install --disable-pip-version-check --no-cache-dir --no-build-isolation --require-hashes -r (Join-Path $PSScriptRoot "requirements-runtime.lock")
     if ($LASTEXITCODE -ne 0) {
         throw "Installing pinned runtime dependencies failed with exit code $LASTEXITCODE"
     }

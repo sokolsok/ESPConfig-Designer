@@ -78,6 +78,10 @@ foreach ($fileName in @(
     "launch.ps1",
     "clean-machine-gate.ps1",
     "requirements-runtime.txt",
+    "requirements-runtime.lock",
+    "requirements-bootstrap.lock",
+    "python-manifest.json",
+    "artifact-integrity.ps1",
     "git-manifest.json",
     "README.md"
 )) {
@@ -153,6 +157,9 @@ if ($InstallRoot) {
     Assert-True (-not (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\backend\schema-catalog\schema-catalog") -PathType Container)) "Installed resources contain nested schema-catalog"
     Assert-True (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\runtime\python.exe") -PathType Leaf) "Installed embedded Python is missing"
     Assert-True (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\runtime\git\cmd\git.exe") -PathType Leaf) "Installed MinGit is missing"
+    Assert-True (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\runtime\python-manifest.json") -PathType Leaf) "Installed Python artifact provenance is missing"
+    Assert-True (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\supply-chain\inventory.json") -PathType Leaf) "Installed supply-chain inventory is missing"
+    Assert-True (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\supply-chain\THIRD-PARTY-NOTICES.md") -PathType Leaf) "Installed third-party notices are missing"
     Assert-True (-not (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\workspace.json"))) "Workspace config was written to installed resources"
     $bytecodeFiles = @(Get-ChildItem -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app") -Recurse -File -Filter "*.pyc")
     Assert-True ($bytecodeFiles.Count -eq 0) "Python bytecode was written to installed resources"

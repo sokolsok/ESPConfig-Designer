@@ -107,6 +107,10 @@ The Windows workflow starts from a fresh checkout, prepares and verifies the
 pinned portable runtime, builds the shared frontend and Desktop resources, runs
 Python and Rust contracts, builds an unsigned debug NSIS package, installs it
 silently, and exercises both the packaged and installed application layouts.
+The package also contains a machine-readable release-input inventory and
+third-party notices. Python and MinGit archives and the complete Python package
+graph are hash-checked during preparation; the installed-runtime fingerprint is
+an additional check rather than a substitute for download verification.
 
 This is development-package validation, not a signed release gate. The separate
 `desktop/platforms/windows/clean-machine-gate.ps1` performs real firmware

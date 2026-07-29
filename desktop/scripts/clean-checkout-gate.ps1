@@ -33,6 +33,10 @@ foreach ($relativePath in @(
     "esp-config-designer\frontend\package-lock.json",
     "esp-config-designer\shared\schema-catalog\components_list\components_list.json",
     "desktop\platforms\windows\prepare-runtime.ps1",
+    "desktop\platforms\windows\python-manifest.json",
+    "desktop\platforms\windows\requirements-runtime.lock",
+    "desktop\supply-chain\inventory.json",
+    "desktop\supply-chain\THIRD-PARTY-NOTICES.md",
     "desktop\package-lock.json"
 )) {
     if (-not (Test-Path -LiteralPath (Join-Path $repoRoot $relativePath) -PathType Leaf)) {
