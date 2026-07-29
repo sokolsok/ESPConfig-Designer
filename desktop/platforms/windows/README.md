@@ -52,6 +52,29 @@ The Rust graph is locked by `desktop/src-tauri/Cargo.lock`. Runtime dependency
 changes require new manifests, compile/cache/offline verification, and a rebuilt
 package; they must not be mixed into unrelated work.
 
+## WebView2 installation
+
+The NSIS package explicitly sets Tauri's Windows-only
+`bundle.windows.webviewInstallMode` to `downloadBootstrapper` with silent
+bootstrapper execution. If Microsoft Edge WebView2 Runtime is already installed,
+NSIS leaves it in place. If it is missing, the installer downloads Microsoft's
+Evergreen bootstrapper and runs it before copying the application files. The
+bootstrapper requires network access; it is not embedded in the package.
+
+With no WebView2 runtime and no working network connection, the pinned Tauri CLI
+`2.5.0` NSIS template aborts installation when the bootstrapper download or
+execution fails. The installer reports the WebView2 failure instead of completing
+with an unusable application. The recoverable action is to restore network access
+and rerun the installer. The configuration is covered by the package contract,
+but installation on a clean machine without WebView2 and its offline failure path
+have not yet been executed on a dedicated machine or VM.
+
+This installation-time download is separate from PlatformIO. Even after WebView2
+is available and ESPConfig Designer is installed, the first firmware compile may
+download board platforms, frameworks, and toolchains into `%LOCALAPPDATA%\ECD\p`.
+Offline firmware compilation is expected only after the required PlatformIO
+content has been populated and verified by an earlier online compile.
+
 ## Generated package layout
 
 `desktop/scripts/package-resources.ps1` assembles:
@@ -255,8 +278,10 @@ a replacement for Tauri/NSIS release signing or discovery.
 - no trusted timestamp or SmartScreen publisher verification;
 - no public updater or complete update UX;
 - incomplete clean supported-Windows release matrix;
-- possible WebView2 bootstrap download;
-- possible first-compile PlatformIO downloads;
+- no clean-machine online/offline verification of the configured WebView2
+  bootstrapper;
+- first-compile PlatformIO downloads still require network and clean-machine
+  verification;
 - no Linux or macOS Desktop runtime/package gates.
 
 Do not present the current Windows package as a release.

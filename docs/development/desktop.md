@@ -25,7 +25,9 @@ Do not create a second backend, frontend, or schema catalog under `desktop/`.
   runtime.
 
 The end-user runtime is embedded. Global Python, ESPHome, PlatformIO, and Git
-are not application dependencies.
+are not application dependencies. The WebView2 requirement in this development
+section applies to running the application directly; the NSIS end-user package
+has a separate online bootstrap path described below.
 
 ## Install development dependencies
 
@@ -239,6 +241,21 @@ npm --prefix desktop run build:package:dev
 The installer is generated below `desktop/src-tauri/target/debug/bundle/nsis/`.
 Its hash changes between builds. Verify the exact artifact rather than copying a
 historical hash from documentation.
+
+The package explicitly uses Tauri's Windows `downloadBootstrapper` WebView2
+installation mode. On a machine without WebView2, NSIS downloads and silently
+runs Microsoft's Evergreen bootstrapper before copying the application files.
+If that download or bootstrapper execution fails, the pinned Tauri CLI `2.5.0`
+installer aborts with a WebView2 installation error; it must be rerun after
+network access is restored. This is distinct from PlatformIO downloads that may
+occur later during the first firmware compile. A populated PlatformIO cache can
+support subsequent verified offline compiles, but the WebView2 bootstrap itself
+is online-only.
+
+The package/config contract verifies this bundler setting. A dedicated clean
+machine or VM without WebView2 is still required to prove both successful online
+bootstrap and controlled offline failure for the actual installer; neither result
+is implied by a local package build.
 
 The package is for development and testing only. See the
 [Windows installation status](../installation/windows.md).

@@ -9,7 +9,7 @@ Desktop Windows gate or a local development build.
 - The installer and installed executable are not Authenticode-signed.
 - No trusted timestamp or SmartScreen publisher result exists.
 - No public Desktop updater or update notification is configured.
-- WebView2 may need to be downloaded if it is absent.
+- The installer requires network access to bootstrap WebView2 if it is absent.
 - The first firmware compile can require network access for PlatformIO content.
 - Windows 10 clean-machine release coverage and signed release verification are
   incomplete.
@@ -67,6 +67,30 @@ The current development package still has a narrow upstream Tauri plugin race
 when two copies are cold-started almost simultaneously. This does not affect the
 normal second-launch flow, but it must be closed and retested before the package
 is considered ready for release signing.
+
+## Network requirements
+
+The NSIS installer explicitly uses Tauri's official online
+`downloadBootstrapper` mode. It first checks for Microsoft Edge WebView2 Runtime.
+When the runtime is absent, NSIS downloads Microsoft's Evergreen bootstrapper and
+runs it silently before installing ESPConfig Designer. The WebView2 bootstrapper
+is not bundled, so this clean-machine case requires a working network connection.
+
+If WebView2 is absent and the bootstrapper cannot be downloaded or returns an
+error, the pinned Tauri CLI `2.5.0` NSIS flow aborts and reports a WebView2
+installation failure rather than completing with an application that cannot
+start. Restore network access and rerun the installer. The configuration is
+covered by the package contract, and the abort path was confirmed in the pinned
+Tauri NSIS template source. A real clean machine or VM without WebView2 has not
+yet verified either the online-success or offline-failure scenario for the
+current artifact.
+
+PlatformIO uses a separate network flow after installation. The first firmware
+compile may download board platforms, frameworks, and toolchains into the
+application's mutable cache. Installing WebView2 does not populate that cache.
+Subsequent offline compilation is supported only after an earlier online compile
+has obtained all required PlatformIO content and that exact cache/runtime
+combination has passed the offline replay gate.
 
 The Desktop UI is served by a backend bound to `127.0.0.1` and protected in the
 WebView by a Desktop-only Content Security Policy. The policy blocks inline

@@ -126,11 +126,16 @@ Assert-True ($null -ne $resourceProperty) "Packaged resources must use an explic
 Assert-True ($resourceProperty.Value -eq $resourceTarget) "Packaged resources must resolve to resource_dir/ecd-app"
 
 $windowsBundle = $config.bundle.windows
-if ($null -ne $windowsBundle) {
-    Assert-True ([string]::IsNullOrWhiteSpace([string]$windowsBundle.certificateThumbprint)) "Development package must not configure a certificate"
-    Assert-True ([string]::IsNullOrWhiteSpace([string]$windowsBundle.signCommand)) "Development package must not configure a signing command"
-    Assert-True ([string]::IsNullOrWhiteSpace([string]$windowsBundle.timestampUrl)) "Development package must not configure a timestamp service"
-}
+Assert-True ($null -ne $windowsBundle) "Windows bundle configuration is missing"
+$webviewInstallMode = $windowsBundle.webviewInstallMode
+Assert-True ($null -ne $webviewInstallMode) "Windows bundle must explicitly configure WebView2 installation"
+Assert-True ($webviewInstallMode.type -eq "downloadBootstrapper") "Windows bundle must use Tauri's online WebView2 bootstrapper"
+Assert-True ($webviewInstallMode.silent -eq $true) "WebView2 bootstrapper must run silently under the NSIS installer"
+Assert-True ($null -eq $config.plugins.updater) "Desktop package must not configure an auto-updater"
+Assert-True ($config.bundle.createUpdaterArtifacts -ne $true) "Desktop package must not create updater artifacts"
+Assert-True ([string]::IsNullOrWhiteSpace([string]$windowsBundle.certificateThumbprint)) "Development package must not configure a certificate"
+Assert-True ([string]::IsNullOrWhiteSpace([string]$windowsBundle.signCommand)) "Development package must not configure a signing command"
+Assert-True ([string]::IsNullOrWhiteSpace([string]$windowsBundle.timestampUrl)) "Development package must not configure a timestamp service"
 
 if ($InstallRoot) {
     $resolvedInstallRoot = [System.IO.Path]::GetFullPath($InstallRoot)
