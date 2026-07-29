@@ -16,6 +16,39 @@ Desktop Windows gate or a local development build.
 
 Do not present or redistribute the current package as a released installer.
 
+## Planned support policy for 1.4.0
+
+The planned release matrix is deliberately limited to:
+
+| System | Editions | Architecture | Planned clean-machine baseline |
+|---|---|---|---:|
+| Windows 10 22H2 | Home and Pro | x64 | `19045.7548` |
+| Windows 11 25H2 | Home and Pro | x64 | `26200.8894` |
+
+In prose, these targets are Windows 10 22H2 Home and Pro x64 and
+Windows 11 25H2 Home and Pro x64. Windows ARM64, Enterprise, Education, LTSC,
+IoT, and other Windows releases are outside this declaration. A newer monthly
+build may replace a listed baseline at release freeze, but the exact tested
+builds must be recorded before support is declared.
+
+This is a target matrix, not a claim that the current artifact supports it. The
+clean-machine Windows 10 and Windows 11 gates for the final signed artifact are
+`NOT RUN`. Until they pass, Windows Desktop remains development-only.
+
+Microsoft ended standard support for Windows 10 22H2 on October 14, 2025. ECD
+plans transitional Windows 10 support through October 12, 2027 at the latest,
+conditional on the machine receiving applicable Microsoft security updates,
+the Evergreen WebView2 Runtime remaining supported, and ECD continuing to pass
+its release gates. ECD may end Windows 10 support earlier if those security or
+runtime conditions can no longer be met. This policy does not provide Windows
+ESU enrollment or extend Microsoft's support for Windows itself.
+
+Microsoft publishes the authoritative
+[Windows 10 release information](https://learn.microsoft.com/windows/release-health/release-information),
+[Windows 10 lifecycle](https://learn.microsoft.com/lifecycle/products/windows-10-home-and-pro),
+[Windows 10 ESU terms](https://learn.microsoft.com/windows/whats-new/extended-security-updates),
+and [Windows 11 release information](https://learn.microsoft.com/windows/release-health/windows11-release-information).
+
 ## Development package installation
 
 The hosted Desktop workflow creates an unsigned installer as a short-lived
@@ -34,6 +67,9 @@ The NSIS package installs per user, normally below:
 ```text
 %LOCALAPPDATA%\ESPConfig Designer
 ```
+
+The bundle explicitly selects NSIS `currentUser` mode and is intended to install
+without administrator elevation.
 
 Mutable application data remains under:
 
@@ -57,6 +93,39 @@ On a clean first start, the application creates the default workspace:
 An existing valid custom workspace selection is reused. Installation and
 application resource directories must never contain workspace, build, cache, or
 job data.
+
+## Reinstall, manual update, and uninstall
+
+The approved data-lifecycle policy is:
+
+- reinstalling the same version preserves the workspace and all
+  `%LOCALAPPDATA%\ECD` data;
+- a manual update installs a newer NSIS package over the existing per-user
+  installation and preserves the same data;
+- uninstall removes immutable application files but preserves the workspace and
+  `%LOCALAPPDATA%\ECD` for a later reinstall;
+- removing retained projects, assets, secrets, device registrations, caches,
+  builds, firmware, jobs, or logs is a separate manual data operation.
+
+The workspace contains YAML, project JSON, secrets, assets, and custom
+components. `%LOCALAPPDATA%\ECD` contains the workspace pointer, device
+registry, PlatformIO cache (`p/`), builds and firmware (`b/`), ESPHome state
+(`d/` and `g/`), isolated home (`h/`), jobs and logs (`j/`), and
+`cache-recovery/`. The 30-day recovery cleanup applies only to verified old
+quarantines; it is not an uninstall policy and never deletes active cache or
+builds.
+
+The reinstall, update, uninstall, and retained-data gates for the current
+artifact are `NOT RUN`. Do not rely on a historical installer as evidence for
+this policy.
+
+There is no auto-updater, update notification, or automatic version discovery.
+For a future public `1.4.0` update, obtain the newer signed installer from the
+release channel published at that time, verify its Authenticode identity and
+published SHA-256, close the application, and run the installer normally. No
+public download URL exists yet. `runtime_update.py` is an internal immutable
+payload transaction used for integrity, activation, and rollback testing; it is
+not the public updater and does not download releases.
 
 Only one application instance runs in a user session. A second launch activates
 the existing window instead of starting another backend. If another application
@@ -120,10 +189,24 @@ It is not part of hosted CI and must not be reported as a current hosted PASS.
 
 ## Release requirements
 
-A public Windows release still requires an owner-approved support policy,
-non-debug package, clean supported-Windows tests, a trusted code-signing
-certificate and timestamp, verification of installed PE files and installer,
-final hashes, and a deliberate update strategy.
+A public Windows release still requires a non-debug package, clean tests of the
+matrix above, and a trusted Authenticode signature and timestamp. The planned
+application is to SignPath Foundation; if accepted, the displayed Publisher is
+expected to be `SignPath Foundation`, not the project name. No certificate,
+signing workflow, publisher result, or approval exists yet.
+
+The planned provider's current eligibility and operating requirements are
+defined by the [SignPath Foundation terms](https://signpath.org/terms). Provider
+acceptance remains discretionary.
+
+The final installer and project-owned PE files must be signed with SHA-256 and a
+trusted RFC 3161 timestamp, checked after installation with
+`Get-AuthenticodeSignature` and `signtool verify /pa /all /tw`, and hashed only
+after signing and timestamping. The release page must publish the exact SHA-256
+and source provenance for those final files. SmartScreen reputation is a
+separate observed result and is not guaranteed by a valid signature. The public
+release URL, final Publisher, certificate thumbprint, and artifact hashes remain
+unset until the signed files exist.
 
 Technical runtime details remain in the
 [Windows platform reference](../../desktop/platforms/windows/README.md).

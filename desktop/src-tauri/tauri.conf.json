@@ -24,6 +24,9 @@
       "../resources/ecd-app/": "ecd-app/"
     },
     "windows": {
+      "nsis": {
+        "installMode": "currentUser"
+      },
       "webviewInstallMode": {
         "type": "downloadBootstrapper",
         "silent": true

@@ -724,3 +724,33 @@ These build-only installer inputs are downloaded by the pinned Tauri CLI and ver
 | Microsoft Edge WebView2 Evergreen Bootstrapper | Unknown | Unknown | install-time |
 
 WebView2 is an install-time Microsoft prerequisite, not bundled content. The configured `downloadBootstrapper` mode uses Microsoft's mutable Evergreen URL and silently runs the bootstrapper only when the runtime is absent. Microsoft controls the resolved version and artifact; no stable hash can be pinned, network access is required, and ECD's inventory cannot establish the exact future payload selected by that URL.
+
+## Build and CI toolchains
+
+| Component | Version | License | Inclusion |
+| --- | --- | --- | --- |
+| Node.js | 22.14.0 | Unknown | build-only |
+| actions/cache | 0400d5f644dc74513175e3cd8d07132dd4860809 | Unknown | build-only |
+| actions/checkout | 11bd71901bbe5b1630ceea73d27597364c9af683 | Unknown | build-only |
+| actions/checkout | 11bd71901bbe5b1630ceea73d27597364c9af683 | Unknown | build-only |
+| actions/checkout | 11bd71901bbe5b1630ceea73d27597364c9af683 | Unknown | build-only |
+| actions/checkout | 11bd71901bbe5b1630ceea73d27597364c9af683 | Unknown | build-only |
+| actions/checkout | 11bd71901bbe5b1630ceea73d27597364c9af683 | Unknown | build-only |
+| actions/checkout | 11bd71901bbe5b1630ceea73d27597364c9af683 | Unknown | build-only |
+| actions/setup-node | 49933ea5288caeca8642d1e84afbd3f7d6820020 | Unknown | build-only |
+| actions/setup-node | 49933ea5288caeca8642d1e84afbd3f7d6820020 | Unknown | build-only |
+| actions/setup-node | 49933ea5288caeca8642d1e84afbd3f7d6820020 | Unknown | build-only |
+| actions/setup-node | 49933ea5288caeca8642d1e84afbd3f7d6820020 | Unknown | build-only |
+| actions/setup-node | 49933ea5288caeca8642d1e84afbd3f7d6820020 | Unknown | build-only |
+| actions/setup-python | a26af69be951a213d495a4c3e4e4022e16d87065 | Unknown | build-only |
+| actions/upload-artifact | ea165f8d65b6e75b540449e92b4886f43607fa02 | Unknown | build-only |
+| docker/build-push-action | 10e90e3645eae34f1e60eeb005ba3a3d33f178e8 | Unknown | build-only |
+| docker/login-action | c94ce9fb468520275223c153574b00df6fe4bcc9 | Unknown | build-only |
+| docker/login-action | c94ce9fb468520275223c153574b00df6fe4bcc9 | Unknown | build-only |
+| docker/metadata-action | c299e40c65443455700f0fdfc63efafe5b349051 | Unknown | build-only |
+| docker/setup-buildx-action | 8d2750c68a42422c14e847fe6c8ac0403b4cbd6f | Unknown | build-only |
+| docker/setup-buildx-action | 8d2750c68a42422c14e847fe6c8ac0403b4cbd6f | Unknown | build-only |
+| docker/setup-qemu-action | c7c53464625b32c7a7e944ae62b3e17d2b600130 | Unknown | build-only |
+| docker/setup-qemu-action | c7c53464625b32c7a7e944ae62b3e17d2b600130 | Unknown | build-only |
+
+Node.js and GitHub Actions are build-only inputs and are not redistributed in the installed application. Action rows represent workflow occurrences, including repeated use of the same pinned commit. Their inclusion makes the notices cover every release-input scope recorded by the machine-readable inventory.

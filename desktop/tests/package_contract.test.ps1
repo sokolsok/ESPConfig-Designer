@@ -131,6 +131,9 @@ Assert-True ($resourceProperty.Value -eq $resourceTarget) "Packaged resources mu
 
 $windowsBundle = $config.bundle.windows
 Assert-True ($null -ne $windowsBundle) "Windows bundle configuration is missing"
+$nsisConfiguration = $windowsBundle.nsis
+Assert-True ($null -ne $nsisConfiguration) "Windows bundle must explicitly configure NSIS"
+Assert-True ($nsisConfiguration.installMode -eq "currentUser") "NSIS must remain a per-user installation"
 $webviewInstallMode = $windowsBundle.webviewInstallMode
 Assert-True ($null -ne $webviewInstallMode) "Windows bundle must explicitly configure WebView2 installation"
 Assert-True ($webviewInstallMode.type -eq "downloadBootstrapper") "Windows bundle must use Tauri's online WebView2 bootstrapper"
@@ -140,6 +143,36 @@ Assert-True ($config.bundle.createUpdaterArtifacts -ne $true) "Desktop package m
 Assert-True ([string]::IsNullOrWhiteSpace([string]$windowsBundle.certificateThumbprint)) "Development package must not configure a certificate"
 Assert-True ([string]::IsNullOrWhiteSpace([string]$windowsBundle.signCommand)) "Development package must not configure a signing command"
 Assert-True ([string]::IsNullOrWhiteSpace([string]$windowsBundle.timestampUrl)) "Development package must not configure a timestamp service"
+
+$publicDocuments = @(
+    (Join-Path $repoRoot "README.md"),
+    (Join-Path $repoRoot "CHANGELOG.md"),
+    (Join-Path $repoRoot "docs\installation\windows.md"),
+    (Join-Path $repoRoot "docs\development\desktop.md"),
+    (Join-Path $desktopRoot "README.md"),
+    (Join-Path $windowsPlatformRoot "README.md")
+)
+foreach ($documentPath in $publicDocuments) {
+    $documentSource = Get-Content -LiteralPath $documentPath -Raw
+    Assert-True (-not $documentSource.Contains("R&D/")) "Public documentation references private R&D material: $documentPath"
+    Assert-True (-not $documentSource.Contains("C:\Users\")) "Public documentation contains a machine-local user path: $documentPath"
+}
+
+$windowsInstallationGuide = Get-Content -LiteralPath (Join-Path $repoRoot "docs\installation\windows.md") -Raw
+foreach ($requiredPolicy in @(
+    "Windows 10 22H2 Home and Pro x64",
+    "19045.7548",
+    "October 12, 2027",
+    "Windows 11 25H2 Home and Pro x64",
+    "26200.8894",
+    "Windows ARM64",
+    "manual update",
+    "runtime_update.py",
+    "SignPath Foundation",
+    "NOT RUN"
+)) {
+    Assert-True ($windowsInstallationGuide.Contains($requiredPolicy)) "Windows installation policy is missing: $requiredPolicy"
+}
 
 if ($InstallRoot) {
     $resolvedInstallRoot = [System.IO.Path]::GetFullPath($InstallRoot)

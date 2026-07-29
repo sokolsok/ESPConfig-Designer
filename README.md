@@ -11,7 +11,7 @@ frontend, Flask backend, and schema catalog power three deployment variants:
 - a Home Assistant add-on with ingress;
 - a standalone Docker service;
 - a Windows Desktop application, currently available only as an unsigned
-  development build.
+  Windows x64 development build.
 
 [Watch the tutorial](https://youtu.be/CrP15p8e_z8).
 
@@ -67,6 +67,11 @@ There is no public Windows release yet. The current NSIS package is an unsigned
 development/test artifact and must not be presented or redistributed as a
 release. See the [Windows installation status](docs/installation/windows.md) or
 the [Desktop development guide](docs/development/desktop.md).
+
+The planned `1.4.0` target is Windows 10 22H2 Home and Pro x64 and Windows 11
+25H2 Home and Pro x64, subject to final clean-machine verification. Windows
+ARM64 is outside the release scope. No Windows version is publicly supported by
+the current unsigned debug package.
 
 ## Features
 
@@ -136,7 +141,9 @@ behind another trusted authentication layer.
 
 The Windows development installer is not signed. No trusted Authenticode
 certificate, timestamp, SmartScreen release result, or public updater is
-configured.
+configured. The planned release uses manual updates; final download location,
+publisher verification, and installer hashes will be published only after a
+signed artifact exists.
 
 ## Relationship with ESPHome and Home Assistant
 

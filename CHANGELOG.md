@@ -1,12 +1,15 @@
 ## 1.4.0
 
-* Added a self-contained Windows Desktop development package backed by the shared application sources and isolated workspace/app-data storage.
+* Added a Windows x64 Desktop development package with embedded Python, ESPHome, PlatformIO, and MinGit, backed by the shared application sources and isolated workspace/app-data storage.
 * Added standalone Docker deployment with explicit Compose variants, Basic Auth, and multi-architecture runtime gates.
 * Consolidated Home Assistant, Docker, and Desktop onto one maintained backend, frontend, and schema catalog.
 * Added runtime diagnostics, Desktop process-tree ownership, portable-runtime validation, and cache compatibility handling.
 * Moved integrated frontend development data outside the repository and added a guarded migration utility for legacy development workspaces.
 * Opened external HTTP and HTTPS links from Windows Desktop in the system browser while preserving normal browser behavior for Home Assistant and Docker.
 * Reconciled interrupted jobs safely after backend restarts and prevented multiple backend processes from sharing one job directory.
+* Added fail-closed 30-day cleanup for verified incompatible-cache recovery records while preserving active cache, builds, and workspace data.
+* Aligned the direct Windows launcher with the normal `%USERPROFILE%\Documents\ecd_workspace` default.
+* Added normal warm second-launch handling that activates the existing Desktop window without starting a second backend; simultaneous cold start remains an upstream release blocker.
 * Added a restrictive Desktop Content Security Policy for the loopback-hosted UI and a WebView2 enforcement gate without changing Home Assistant or standalone responses.
 * Configured the Windows installer to obtain the official Microsoft WebView2 bootstrapper when the runtime is missing.
 * Added hash-verified Windows runtime inputs, a complete locked Python graph, immutable GitHub Actions references, and packaged supply-chain inventory and third-party notices.

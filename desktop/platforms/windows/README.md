@@ -14,6 +14,9 @@ package remains development-only: no trusted signing certificate, timestamp,
 SmartScreen release result, public updater, or supported public Windows release
 has been completed.
 
+The implemented runtime and package are Windows x64 only. Windows ARM64 has no
+runtime, package, or test matrix and is outside the `1.4.0` scope.
+
 The manual `clean-machine-gate.ps1` firmware replay is not part of hosted CI and
 is not self-contained. It requires a prepared `C:\ECDTest` fixture, runtime,
 application payload, workspace, and `test.yaml`.
@@ -138,6 +141,12 @@ installation: %LOCALAPPDATA%\ESPConfig Designer
 app data:     %LOCALAPPDATA%\ECD
 workspace:    %USERPROFILE%\Documents\ecd_workspace
 ```
+
+Tauri explicitly configures NSIS `currentUser` install mode. Reinstall, manual
+update, and uninstall are required to preserve the workspace and all app data,
+including active cache, builds, ESPHome data, device registry, job history, and
+cache-recovery records. The uninstaller removes immutable installation files;
+the installed lifecycle gate for this policy is still `NOT RUN`.
 
 The direct `launch.ps1` launcher uses this workspace when `-Workspace` is not
 provided and preserves an explicit workspace argument.
@@ -293,6 +302,10 @@ integrity validation, active/previous pointers, activation, and rollback. It is
 an internal tested transaction mechanism, not a complete public updater and not
 a replacement for Tauri/NSIS release signing or discovery.
 
+The public update model for `1.4.0` is a manual install of a newer signed NSIS
+package over the existing per-user installation. There is no automatic version
+discovery, download, notification, or updater UI.
+
 ## Release blockers
 
 - unsigned debug installer and installed executable;
@@ -304,5 +317,9 @@ a replacement for Tauri/NSIS release signing or discovery.
 - first-compile PlatformIO downloads still require network and clean-machine
   verification;
 - no Linux or macOS Desktop runtime/package gates.
+
+The planned public matrix is Windows 10 22H2 Home and Pro x64 and Windows 11
+25H2 Home and Pro x64. It does not become a support claim until the exact final
+artifact passes the corresponding clean-machine gates.
 
 Do not present the current Windows package as a release.

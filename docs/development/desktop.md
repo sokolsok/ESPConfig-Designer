@@ -279,6 +279,15 @@ process success rather than an ECD-controlled digest or signer rule.
 The package is for development and testing only. See the
 [Windows installation status](../installation/windows.md).
 
+There is no release package command in this stage. `build:package:dev` always
+passes `--debug`; a non-debug build, signing workflow, certificate, timestamp,
+and publication remain separate release work.
+
+The NSIS configuration explicitly uses `currentUser` install mode. The approved
+data-lifecycle policy keeps the workspace and `%LOCALAPPDATA%\ECD` across
+reinstall, manual update, and uninstall, but those installed-package scenarios
+remain clean-machine gates for the future release artifact.
+
 ## Automated Desktop gates
 
 After building current resources and a debug executable:
@@ -293,6 +302,11 @@ The hosted `.github/workflows/desktop-windows.yml` gate additionally starts from
 a fresh checkout, verifies source absence of generated inputs, installs the
 unsigned package silently, checks the installed layout, runs installed smoke,
 and uploads the installer for seven days.
+
+The workflow definition describes configured coverage; it is not evidence that
+the current commit passed hosted CI. Hosted quality/Desktop, supported-Windows
+clean-machine, installed-package lifecycle, signing, and physical-device results
+must remain `NOT RUN` unless a run for the exact artifact is recorded.
 
 ## Manual residual gate
 

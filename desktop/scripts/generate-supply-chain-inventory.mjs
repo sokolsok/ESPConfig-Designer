@@ -236,6 +236,9 @@ function cargoComponents(manifestPath, lockPath) {
   return metadata.packages.map((pkg) => {
     const checksum = checksums.get(`${pkg.name}\0${pkg.version}\0${pkg.source ?? ""}`) ?? null;
     const registryPackage = pkg.source?.startsWith("registry+");
+    const packageProvenance = pkg.source
+      ? `cargo metadata package ${pkg.id}`
+      : `cargo workspace package ${repoPath(pkg.manifest_path)}#${pkg.name}@${pkg.version}`;
     return component({
       ecosystem: "cargo",
       scope: "cargo",
@@ -246,7 +249,7 @@ function cargoComponents(manifestPath, lockPath) {
       integrity: checksum ? { algorithm: "SHA-256", value: checksum } : null,
       license: pkg.license,
       publisher: pkg.authors?.length ? pkg.authors.join(", ") : null,
-      provenance: [`cargo metadata package ${pkg.id}`, repoPath(lockPath)],
+      provenance: [packageProvenance, repoPath(lockPath)],
       usage: usage.get(pkg.id) ?? "build-only",
       extra: { repository: pkg.repository ?? null },
     }, {
@@ -336,6 +339,7 @@ function notices(components) {
   const python = inScope("python");
   const npm = inScope("npm");
   const cargo = inScope("cargo");
+  const actions = inScope("github-actions");
   return `# Third-Party Notices
 
 This inventory records release inputs and their declared upstream licenses. Package artifacts are checked against the hashes in the Python, npm, and Cargo lock data where those ecosystems provide hashes. Consult each linked upstream source and distributed license file for the complete controlling license text.
@@ -381,6 +385,12 @@ These build-only installer inputs are downloaded by the pinned Tauri CLI and ver
 ${componentTable(named("Microsoft Edge WebView2 Evergreen Bootstrapper"))}
 
 WebView2 is an install-time Microsoft prerequisite, not bundled content. The configured \`downloadBootstrapper\` mode uses Microsoft's mutable Evergreen URL and silently runs the bootstrapper only when the runtime is absent. Microsoft controls the resolved version and artifact; no stable hash can be pinned, network access is required, and ECD's inventory cannot establish the exact future payload selected by that URL.
+
+## Build and CI toolchains
+
+${componentTable([...named("Node.js"), ...actions])}
+
+Node.js and GitHub Actions are build-only inputs and are not redistributed in the installed application. Action rows represent workflow occurrences, including repeated use of the same pinned commit. Their inclusion makes the notices cover every release-input scope recorded by the machine-readable inventory.
 `;
 }
 

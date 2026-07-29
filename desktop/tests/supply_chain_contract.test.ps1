@@ -126,19 +126,52 @@ $inventorySource = Get-Content -LiteralPath $inventoryPath -Raw
 foreach ($forbiddenValue in @("R&D/", "frontend/dist", "desktop/resources/ecd-app", "workspace.json", "devices.json", "secrets.yaml", "C:\\Users\\")) {
     Assert-True (-not $inventorySource.Contains($forbiddenValue)) "Supply-chain inventory contains private, mutable, generated, or machine-local data: $forbiddenValue"
 }
+foreach ($inventoryComponent in @($inventory.components)) {
+    foreach ($provenance in @($inventoryComponent.provenance)) {
+        Assert-True (
+            $provenance -notmatch "(?i)path\+file://" -and
+            $provenance -notmatch "(?i)file:///" -and
+            $provenance -notmatch "(?i)(?:^|\s)[A-Z]:[\\/]" -and
+            $provenance -notmatch "(?i)(?:^|[\\/])Users[\\/]"
+        ) "Supply-chain inventory contains machine-local provenance for $($inventoryComponent.scope)/$($inventoryComponent.name): $provenance"
+    }
+}
 $notices = Get-Content -LiteralPath $noticesPath -Raw
-foreach ($heading in @("Python runtime", "Python packages", "Frontend and npm", "Rust and Tauri", "MinGit", "NSIS", "WebView2")) {
+foreach ($heading in @("Python runtime", "Python packages", "Frontend and npm", "Rust and Tauri", "MinGit", "NSIS", "WebView2", "Build and CI toolchains")) {
     Assert-True ($notices.Contains($heading)) "Third-party notices section is missing: $heading"
 }
+Assert-True ($notices.Contains("| Node.js | 22.14.0 |")) "Third-party notices omit the pinned Node.js build toolchain"
 Assert-True (-not $notices.Contains("R&D/")) "Public notices must not reference private R&D documents"
 
 $externalActionPattern = '^\s*-?\s*uses:\s*(?!\./)([^@\s]+)@([^\s#]+)'
+$expectedActions = @()
 foreach ($workflow in Get-ChildItem -LiteralPath (Join-Path $repoRoot ".github\workflows") -Filter "*.yml" -File) {
-    foreach ($line in Get-Content -LiteralPath $workflow.FullName) {
+    $workflowLines = @(Get-Content -LiteralPath $workflow.FullName)
+    for ($lineIndex = 0; $lineIndex -lt $workflowLines.Count; $lineIndex += 1) {
+        $line = $workflowLines[$lineIndex]
         if ($line -match $externalActionPattern) {
-            Assert-True ($Matches[2] -match "^[0-9a-f]{40}$") "External action is not pinned to a full commit SHA in $($workflow.Name): $line"
+            $actionName = $Matches[1]
+            $actionVersion = $Matches[2]
+            Assert-True ($actionVersion -match "^[0-9a-f]{40}$") "External action is not pinned to a full commit SHA in $($workflow.Name): $line"
+            $expectedActions += [pscustomobject]@{
+                Name = $actionName
+                Version = $actionVersion.ToLowerInvariant()
+                Provenance = ".github/workflows/$($workflow.Name):$($lineIndex + 1)"
+            }
         }
     }
+}
+Assert-True ($expectedActions.Count -eq $scopeCounts.'github-actions') "GitHub Actions inventory count does not match workflow occurrences"
+foreach ($expectedAction in $expectedActions) {
+    $actionMatches = @($inventory.components | Where-Object {
+        $_.scope -eq "github-actions" -and
+        $_.name -eq $expectedAction.Name -and
+        $_.version -eq $expectedAction.Version -and
+        @($_.provenance).Count -eq 1 -and
+        $_.provenance[0] -eq $expectedAction.Provenance
+    })
+    Assert-True ($actionMatches.Count -eq 1) "GitHub Actions inventory is stale or incomplete: $($expectedAction.Name) at $($expectedAction.Provenance)"
+    Assert-True ($notices.Contains("| $($expectedAction.Name) | $($expectedAction.Version) |")) "Third-party notices omit GitHub Action $($expectedAction.Name)@$($expectedAction.Version)"
 }
 
 $prepareSource = Get-Content -LiteralPath (Join-Path $windowsRoot "prepare-runtime.ps1") -Raw

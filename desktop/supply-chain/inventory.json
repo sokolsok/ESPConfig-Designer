@@ -1921,7 +1921,7 @@
       "license": null,
       "publisher": "ESPConfig Designer",
       "provenance": [
-        "cargo metadata package path+file:///C:/Users/Sebastian/Desktop/ECD/Addon%20HA/desktop/src-tauri#esp-config-designer-desktop@1.4.0",
+        "cargo workspace package desktop/src-tauri/Cargo.toml#esp-config-designer-desktop@1.4.0",
         "desktop/src-tauri/Cargo.lock"
       ],
       "usage": "shipped",
@@ -10193,7 +10193,7 @@
       "license": null,
       "publisher": "actions",
       "provenance": [
-        ".github/workflows/desktop-windows.yml:208"
+        ".github/workflows/desktop-windows.yml:210"
       ],
       "usage": "build-only",
       "unavailable": {

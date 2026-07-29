@@ -18,7 +18,9 @@ Mutable app data stays under `%LOCALAPPDATA%\ECD`; project data stays in the
 selected workspace.
 
 The current Windows package is an unsigned development/test build, not a public
-release.
+release. It is x64-only; Windows ARM64 is outside the `1.4.0` scope. The planned
+Windows 10/11 support matrix remains conditional on clean-machine tests of the
+future signed release artifact.
 
 ## Start here
 
