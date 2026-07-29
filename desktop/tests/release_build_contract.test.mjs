@@ -1,4 +1,7 @@
 import assert from "node:assert/strict";
+import { chmodSync, mkdtempSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { test } from "node:test";
 
 import {
@@ -8,6 +11,7 @@ import {
   assertVersionedInstaller,
   createProvenance,
   isExcludedRuntimePayloadEntry,
+  makeFilesReadOnly,
   releaseBuildRootName,
   resolveRuntimeRoot,
   selectSingleArtifact,
@@ -52,6 +56,19 @@ test("isolated Windows build root remains short while retaining commit identity"
   const name = releaseBuildRootName("1.4.0", SHA);
   assert.equal(name, "ecd-r-1.4.0-0123456789abcdef");
   assert.ok(name.length <= 32);
+});
+
+test("verified package resources are made read-only before bundling", () => {
+  const root = mkdtempSync(join(tmpdir(), "ecd-release-readonly-"));
+  const file = join(root, "resource.txt");
+  try {
+    writeFileSync(file, "immutable");
+    makeFilesReadOnly(root);
+    assert.equal(statSync(file).mode & 0o222, 0);
+  } finally {
+    chmodSync(file, 0o666);
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test("release output rejects stale and multiple artifacts", () => {

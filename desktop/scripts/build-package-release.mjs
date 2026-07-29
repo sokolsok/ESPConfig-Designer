@@ -83,6 +83,22 @@ export function releaseBuildRootName(productVersion, sourceCommit) {
   return `ecd-r-${productVersion}-${sourceCommit.slice(0, 16)}`;
 }
 
+export function makeFilesReadOnly(root) {
+  for (const entry of readdirSync(root, { withFileTypes: true })) {
+    const path = join(root, entry.name);
+    if (entry.isSymbolicLink()) {
+      throw new Error(`Package resources contain a symbolic link: ${path}`);
+    }
+    if (entry.isDirectory()) {
+      makeFilesReadOnly(path);
+    } else if (entry.isFile()) {
+      chmodSync(path, 0o444);
+    } else {
+      throw new Error(`Package resources contain a special filesystem entry: ${path}`);
+    }
+  }
+}
+
 export function createProvenance({
   productVersion,
   sourceCommit,
@@ -546,11 +562,16 @@ async function main() {
   ) {
     throw new Error("Packaged runtime identity differs from the explicitly selected runtime");
   }
+  const resourcePayloadSha256 = hashDirectory(resourcesRoot);
+  makeFilesReadOnly(resourcesRoot);
 
   const tauriScript = join(desktopRoot, "node_modules", "@tauri-apps", "cli", "tauri.js");
   requireFile(tauriScript, "Pinned local Tauri CLI");
   const tools = toolVersions(desktopRoot, tauriScript, npmScript);
   runVisible(process.execPath, [tauriScript, ...RELEASE_TAURI_ARGUMENTS], desktopRoot);
+  if (hashDirectory(resourcesRoot) !== resourcePayloadSha256) {
+    throw new Error("Verified package resources changed during Tauri bundling");
+  }
 
   const installerPath = selectSingleArtifact(listSetupExecutables(nsisRoot), "release installer");
   const builtApplication = selectSingleArtifact(existsSync(applicationPath) ? [applicationPath] : [], "release application executable");

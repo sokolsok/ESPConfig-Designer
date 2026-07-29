@@ -34,6 +34,10 @@ fn backend_creation_flags() -> u32 {
     }
 }
 
+fn backend_inherits_stdio() -> bool {
+    cfg!(debug_assertions) || !cfg!(windows)
+}
+
 #[derive(Debug, Clone)]
 struct BackendConfig {
     executable: PathBuf,
@@ -189,9 +193,12 @@ impl BackendConfig {
             .env_remove("PYTHONHOME")
             .env_remove("PYTHONPATH")
             .env_remove("PYTHONUSERBASE")
-            .stdin(Stdio::null())
-            .stdout(Stdio::inherit())
-            .stderr(Stdio::inherit());
+            .stdin(Stdio::null());
+        if backend_inherits_stdio() {
+            command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
+        } else {
+            command.stdout(Stdio::null()).stderr(Stdio::null());
+        }
         command
     }
 }
@@ -1270,6 +1277,7 @@ mod tests {
         };
 
         assert_eq!(backend_creation_flags(), expected);
+        assert_eq!(backend_inherits_stdio(), cfg!(debug_assertions));
     }
 
     #[test]
