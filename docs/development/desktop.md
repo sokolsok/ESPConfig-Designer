@@ -276,12 +276,26 @@ than implementing a second downloader. The mutable Microsoft Evergreen WebView2
 URL has no stable artifact hash, and the Tauri template checks download and
 process success rather than an ECD-controlled digest or signer rule.
 
-The package is for development and testing only. See the
+The public package is still unavailable and current artifacts remain for
+development and testing only. See the
 [Windows installation status](../installation/windows.md).
 
-There is no release package command in this stage. `build:package:dev` always
-passes `--debug`; a non-debug build, signing workflow, certificate, timestamp,
-and publication remain separate release work.
+An explicit unsigned release build is available for technical pipeline testing:
+
+```powershell
+$env:ECD_RELEASE_RUNTIME_ROOT = "C:\absolute\path\to\prepared-runtime"
+npm --prefix desktop run build:package:release
+```
+
+The command requires a clean committed source SHA, builds from an isolated Git
+snapshot, recreates dependencies/frontend/resources from locked canonical
+inputs, verifies package and supply-chain contracts, and runs
+`tauri build --bundles nsis` without `--debug`. Its immutable output is marked
+`unsigned technical candidate - not for users` and includes provenance plus
+SHA-256 values for the release application and installer. It does not sign,
+timestamp, tag, publish, create an updater, produce a final RC, or claim
+byte-for-byte reproducibility. `build:package:dev` remains the separate debug
+NSIS command.
 
 The NSIS configuration explicitly uses `currentUser` install mode. The approved
 data-lifecycle policy keeps the workspace and `%LOCALAPPDATA%\ECD` across

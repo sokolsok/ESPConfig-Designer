@@ -187,6 +187,11 @@ foreach ($requiredPolicy in @(
     Assert-True ($windowsInstallationGuide.Contains($requiredPolicy)) "Windows installation policy is missing: $requiredPolicy"
 }
 
+$desktopDevelopmentGuide = Get-Content -LiteralPath (Join-Path $repoRoot "docs\development\desktop.md") -Raw
+Assert-True ($desktopDevelopmentGuide.Contains("npm --prefix desktop run build:package:release")) "Desktop development guide is missing the unsigned release build command"
+Assert-True ($desktopDevelopmentGuide.Contains("unsigned technical candidate - not for users")) "Desktop development guide is missing the unsigned candidate warning"
+Assert-True (-not $desktopDevelopmentGuide.Contains("There is no release package command")) "Desktop development guide still denies the release command"
+
 if ($InstallRoot) {
     $resolvedInstallRoot = [System.IO.Path]::GetFullPath($InstallRoot)
     Assert-True (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "esp-config-designer-desktop.exe") -PathType Leaf) "Installed Desktop executable is missing"
