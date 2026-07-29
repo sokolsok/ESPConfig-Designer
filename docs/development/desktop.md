@@ -104,6 +104,36 @@ loopback-hosted UI at `http://127.0.0.1:*` only the scoped URL-open command and
 accepts only HTTP and HTTPS targets. Do not replace it with a general shell or
 unscoped opener permission.
 
+## Content Security Policy
+
+The main window uses `WebviewUrl::External` to load the shared frontend from the
+loopback Flask server. Tauri's configured CSP applies to responses served by its
+own asset protocol, not to this external HTTP document. The Tauri asset path is
+therefore configured fail-closed, while the shared backend adds the effective
+`Content-Security-Policy` HTTP header only in `desktop` mode. Home Assistant and
+Standalone Docker responses are unchanged.
+
+The Desktop policy permits same-origin scripts, API requests, SSE, long-polling,
+firmware responses, and packaged/user assets. It permits only the current Google
+Fonts hosts and jsDelivr MDI host as remote resource origins. Inline scripts,
+`unsafe-eval`, workers, frames, objects, and wildcard sources remain blocked.
+Dynamic Vue and display-editor style attributes require the single scoped
+`style-src-attr 'unsafe-inline'` exception. Blob URLs are used for user-initiated
+downloads, not as script, worker, image, font, or media sources.
+
+The packaged Tauri smoke starts WebView2 with an isolated DevTools endpoint. Its
+CDP gate observes the main-document response and CSP violation events, exercises
+hash routing, API fetch, EventSource, long-poll, firmware and local-asset
+requests, checks Tauri IPC availability, and proves that an injected inline
+script is blocked. The HTTP header assertion alone is not treated as proof of
+WebView enforcement. Browser-local WebSerial still requires the physical
+clean-machine gate.
+
+The `1.4.0` Desktop backend has no per-launch API token. It binds to
+`127.0.0.1`, but another process in the same user environment that can reach the
+listener can call its API. A Desktop-only token handshake remains post-release
+hardening; CSP does not replace authentication.
+
 ## Storage boundaries
 
 Default mutable paths:

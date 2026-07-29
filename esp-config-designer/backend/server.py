@@ -59,6 +59,24 @@ except Exception:
     Zeroconf = None
 
 TRUTHY_VALUES = {"1", "true", "yes", "on"}
+DESKTOP_CONTENT_SECURITY_POLICY = (
+    "default-src 'none'; "
+    "base-uri 'none'; "
+    "form-action 'none'; "
+    "frame-ancestors 'none'; "
+    "script-src 'self'; "
+    "script-src-attr 'none'; "
+    "style-src-elem 'self' https://fonts.googleapis.com; "
+    "style-src-attr 'unsafe-inline'; "
+    "img-src 'self' data: https://cdn.jsdelivr.net; "
+    "font-src 'self' https://fonts.gstatic.com; "
+    "connect-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; "
+    "media-src 'none'; "
+    "worker-src 'none'; "
+    "frame-src 'none'; "
+    "object-src 'none'; "
+    "manifest-src 'none'"
+)
 
 
 def is_truthy(value: str) -> bool:
@@ -2449,6 +2467,13 @@ app = Flask(__name__)
 @app.before_request
 def enforce_standalone_auth():
     return standalone_basic_auth_response()
+
+
+@app.after_request
+def apply_desktop_security_headers(response):
+    if ECD_MODE == "desktop":
+        response.headers["Content-Security-Policy"] = DESKTOP_CONTENT_SECURITY_POLICY
+    return response
 
 
 @app.route("/api/health", methods=["GET"])

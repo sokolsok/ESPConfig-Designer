@@ -54,7 +54,12 @@ $workspace = Join-Path ([System.IO.Path]::GetTempPath()) $unicodeName
 $hostilePythonRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("ecd-hostile-python-" + $suffix)
 $hostileUserBase = Join-Path ([System.IO.Path]::GetTempPath()) ("ecd-hostile-userbase-" + $suffix)
 $hostileUserSite = Join-Path $hostileUserBase "Python313\site-packages"
+$webviewDataRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("ecd-webview-data-" + $suffix)
 $port = 18000 + (Get-Random -Minimum 1 -Maximum 400)
+$debugListener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, 0)
+$debugListener.Start()
+$debugPort = ([System.Net.IPEndPoint]$debugListener.LocalEndpoint).Port
+$debugListener.Stop()
 
 if (-not (Test-Path -LiteralPath $Executable -PathType Leaf)) {
     throw "Tauri executable is missing: $Executable"
@@ -70,6 +75,26 @@ $layoutManifestHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $layoutManife
 $catalogHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $catalogPath).Hash
 New-Item -ItemType Directory -Path $workspace -Force | Out-Null
 New-Item -ItemType Directory -Path $hostilePythonRoot, $hostileUserSite -Force | Out-Null
+$firmwareRoot = Join-Path $appDataRoot "b\csp-probe"
+$jobRoot = Join-Path $appDataRoot "j"
+New-Item -ItemType Directory -Path $firmwareRoot, $jobRoot -Force | Out-Null
+[System.IO.File]::WriteAllBytes((Join-Path $firmwareRoot "firmware.bin"), [byte[]](0, 1, 2, 3))
+$jobRecord = @{
+    id = "csp-probe"
+    state = "success"
+    created_at = "2026-07-29T00:00:00Z"
+    started_at = "2026-07-29T00:00:01Z"
+    ended_at = "2026-07-29T00:00:02Z"
+    exit_code = 0
+    error_summary = ""
+    yaml = "csp-probe.yaml"
+    action = "compile"
+    device = "csp-probe"
+    serial_port = ""
+} | ConvertTo-Json
+$utf8WithoutBom = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllText((Join-Path $jobRoot "csp-probe.json"), $jobRecord, $utf8WithoutBom)
+[System.IO.File]::WriteAllText((Join-Path $jobRoot "csp-probe.log"), "synthetic CSP smoke job`n", $utf8WithoutBom)
 foreach ($moduleName in @("desktop_runtime", "runtime_contract", "runtime_manifest", "runtime_update")) {
     "raise RuntimeError('hostile Python import used')" | Set-Content -LiteralPath (Join-Path $hostilePythonRoot "$moduleName.py") -Encoding ASCII
     "raise RuntimeError('hostile user-site import used')" | Set-Content -LiteralPath (Join-Path $hostileUserSite "$moduleName.py") -Encoding ASCII
@@ -90,6 +115,8 @@ $startInfo.EnvironmentVariables["ECD_TAURI_PORT"] = $port.ToString()
 $startInfo.EnvironmentVariables["ECD_TAURI_HEALTH_TIMEOUT_MS"] = "120000"
 $startInfo.EnvironmentVariables["PYTHONPATH"] = $hostilePythonRoot
 $startInfo.EnvironmentVariables["PYTHONUSERBASE"] = $hostileUserBase
+$startInfo.EnvironmentVariables["WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS"] = "--remote-debugging-port=$debugPort"
+$startInfo.EnvironmentVariables["WEBVIEW2_USER_DATA_FOLDER"] = $webviewDataRoot
 
 $process = $null
 $secondProcess = $null
@@ -109,6 +136,13 @@ try {
         }
     }
     Assert-True ($health.mode -eq "desktop") "Packaged Tauri backend did not reach desktop health"
+    $uiResponse = Invoke-WebRequest -UseBasicParsing -Uri ("http://127.0.0.1:{0}/" -f $port)
+    Assert-True (-not [string]::IsNullOrWhiteSpace([string]$uiResponse.Headers["Content-Security-Policy"])) "Desktop UI response has no CSP header"
+
+    & node (Join-Path $PSScriptRoot "webview-csp-gate.mjs") --debug-port $debugPort --backend-port $port
+    if ($LASTEXITCODE -ne 0) {
+        throw "WebView CSP gate failed with exit code $LASTEXITCODE"
+    }
 
     $secondProcess = [System.Diagnostics.Process]::Start($startInfo)
     Assert-True ($secondProcess.WaitForExit(30000)) "Second application instance did not exit"
@@ -156,7 +190,7 @@ try {
     if (Test-Path -LiteralPath $workspace) {
         Remove-Item -LiteralPath $workspace -Recurse -Force
     }
-    foreach ($path in @($hostilePythonRoot, $hostileUserBase)) {
+    foreach ($path in @($hostilePythonRoot, $hostileUserBase, $webviewDataRoot)) {
         if (Test-Path -LiteralPath $path) {
             Remove-Item -LiteralPath $path -Recurse -Force
         }

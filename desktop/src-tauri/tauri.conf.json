@@ -9,7 +9,7 @@
   "app": {
     "withGlobalTauri": false,
     "security": {
-      "csp": null
+      "csp": "default-src 'none'"
     }
   },
   "bundle": {

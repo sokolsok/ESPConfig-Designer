@@ -174,6 +174,28 @@ continues to rely on Job Objects rather than UI focus.
 Desktop serial flashing uses browser-local WebSerial and `esptool-js`; it is
 not the server-connected serial flow used by the add-on and standalone modes.
 
+## Loopback HTTP security
+
+The main WebView loads `http://127.0.0.1:<port>/` as an external URL. Tauri 2
+does not apply `app.security.csp` to that Flask response; its bundled-asset CSP
+is set to `default-src 'none'` as a fail-closed fallback. In Desktop mode Flask
+adds the actual CSP to every UI, static, API, streaming, download, and error
+response. The same shared backend deliberately omits this Desktop policy in
+Home Assistant and Standalone Docker modes so their ingress, authentication,
+and embedding behavior is not changed.
+
+The effective policy allows same-origin application traffic, the Google Fonts
+stylesheet/font hosts, and the jsDelivr MDI host. It has no wildcard source or
+`unsafe-eval`; inline scripts are blocked. The only inline exception is dynamic
+style attributes required by the current Vue UI and display editor. WebSerial
+permissions and physical-device support are separate from CSP and remain a
+clean-machine gate.
+
+The loopback listener is the current Desktop API boundary and has no per-launch
+token in `1.4.0`. CSP limits content loaded by the WebView but does not prevent a
+different local process from calling the backend. Per-launch authentication is
+planned as later hardening.
+
 ## Schema catalog
 
 The canonical source is `esp-config-designer/shared/schema-catalog/`. The

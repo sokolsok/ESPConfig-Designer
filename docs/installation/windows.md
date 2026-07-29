@@ -68,6 +68,15 @@ when two copies are cold-started almost simultaneously. This does not affect the
 normal second-launch flow, but it must be closed and retested before the package
 is considered ready for release signing.
 
+The Desktop UI is served by a backend bound to `127.0.0.1` and protected in the
+WebView by a Desktop-only Content Security Policy. The policy blocks inline
+scripts, evaluation, wildcard sources, frames, workers, and objects while
+retaining the application's API, job streaming, downloads, local assets,
+external-link opener, Google Fonts, and MDI icon flows. The loopback API does not
+have a per-launch token in `1.4.0`; other local processes able to reach its port
+remain inside the current trust boundary. CSP does not provide API
+authentication.
+
 ## What hosted CI verifies
 
 The Windows workflow starts from a fresh checkout, prepares and verifies the
