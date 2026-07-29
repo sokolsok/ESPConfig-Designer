@@ -6,12 +6,16 @@ import sys
 import unittest
 from unittest import mock
 
+from server_test_support import load_server
+
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND_ROOT))
 
 import runtime_diagnostics
 from runtime_diagnostics import build_runtime_diagnostics
 from runtime_manifest import build_cache_manifest, inspect_cache_compatibility
+
+server = load_server()
 
 
 class RuntimeDiagnosticsTests(unittest.TestCase):
@@ -157,8 +161,6 @@ class RuntimeDiagnosticsTests(unittest.TestCase):
 
 class DiagnosticsEndpointTests(unittest.TestCase):
     def test_endpoint_uses_only_a_saved_device_selector(self):
-        import server
-
         original_mode = server.ECD_MODE
         original_auth_mode = server.ECD_AUTH_MODE
         original_devices_path = server.DEVICES_PATH

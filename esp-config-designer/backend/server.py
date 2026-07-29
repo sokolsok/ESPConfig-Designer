@@ -1,5 +1,6 @@
 import base64
 import ctypes
+import errno
 import hmac
 import json
 import mimetypes
@@ -7,6 +8,7 @@ import os
 import queue
 import re
 import io
+import logging
 import select
 import subprocess
 import shutil
@@ -23,6 +25,16 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Optional, Tuple
 from urllib.parse import quote
+
+try:
+    import fcntl
+except ImportError:
+    fcntl = None
+
+try:
+    import msvcrt
+except ImportError:
+    msvcrt = None
 
 from flask import Flask, Response, jsonify, make_response, request, send_file, send_from_directory
 from runtime_contract import (
@@ -154,8 +166,14 @@ VALID_NAME = re.compile(r"^[A-Za-z0-9_.-]+$")
 VALID_YAML = re.compile(r"^[A-Za-z0-9_.-]+\.yaml$")
 VALID_DEVICE = re.compile(r"^[A-Za-z0-9._-]+$")
 VALID_COMPONENT_TOKEN = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
+VALID_JOB_ID = re.compile(r"^[A-Za-z0-9_-]+$")
 ANSI_ESCAPE = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 SERIAL_PORT_PREFIXES = ("/dev/ttyUSB", "/dev/ttyACM", "/dev/serial/by-id/")
+JOB_STATES = {"queued", "running", "success", "failed", "canceled"}
+INTERRUPTED_JOB_ERROR_SUMMARY = "Interrupted by backend restart"
+INTERRUPTED_JOB_EXIT_CODE = 1
+
+JOB_LOGGER = logging.getLogger("ecd.jobs")
 
 
 def utc_now() -> str:
@@ -1660,6 +1678,93 @@ def check_access():
     return jsonify({"status": "error", "message": "Ingress required"}), 403
 
 
+def atomic_write_json(path: str, data: dict) -> None:
+    directory = os.path.dirname(path)
+    os.makedirs(directory, exist_ok=True)
+    temp_path = os.path.join(directory, f".{os.path.basename(path)}.{uuid.uuid4().hex}.tmp")
+    handle = None
+    try:
+        descriptor = os.open(temp_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        handle = os.fdopen(descriptor, "w", encoding="utf-8", newline="\n")
+        json.dump(data, handle, ensure_ascii=False, indent=2)
+        handle.write("\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+        handle.close()
+        handle = None
+        os.replace(temp_path, path)
+        if os.name == "posix":
+            directory_descriptor = os.open(directory, os.O_RDONLY)
+            try:
+                os.fsync(directory_descriptor)
+            finally:
+                os.close(directory_descriptor)
+    except Exception:
+        if handle is not None:
+            handle.close()
+        try:
+            os.unlink(temp_path)
+        except FileNotFoundError:
+            pass
+        raise
+
+
+class _JobDirectoryLock:
+    FILE_NAME = ".ecd-job-directory.lock"
+
+    def __init__(self, job_dir: str) -> None:
+        self.job_dir = os.path.abspath(job_dir)
+        self.path = os.path.join(self.job_dir, self.FILE_NAME)
+        self.handle = None
+
+    def acquire(self) -> None:
+        if self.handle is not None:
+            return
+        os.makedirs(self.job_dir, exist_ok=True)
+        handle = open(self.path, "a+b")
+        try:
+            handle.seek(0, os.SEEK_END)
+            if handle.tell() == 0:
+                handle.write(b"\0")
+                handle.flush()
+                os.fsync(handle.fileno())
+            handle.seek(0)
+            if os.name == "nt":
+                if msvcrt is None:
+                    raise RuntimeError("Windows file locking is unavailable")
+                msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+            elif os.name == "posix":
+                if fcntl is None:
+                    raise RuntimeError("POSIX file locking is unavailable")
+                fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            else:
+                raise RuntimeError(f"Unsupported job directory locking platform: {os.name}")
+        except OSError as exc:
+            handle.close()
+            lock_errors = {errno.EACCES, errno.EAGAIN, errno.EDEADLK}
+            if exc.errno in lock_errors:
+                raise RuntimeError(f"Job directory is already in use: {self.job_dir}") from exc
+            raise RuntimeError(f"Could not lock job directory {self.job_dir}: {exc}") from exc
+        except Exception:
+            handle.close()
+            raise
+        self.handle = handle
+
+    def release(self) -> None:
+        handle = self.handle
+        self.handle = None
+        if handle is None:
+            return
+        try:
+            handle.seek(0)
+            if os.name == "nt" and msvcrt is not None:
+                msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+            elif os.name == "posix" and fcntl is not None:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+        finally:
+            handle.close()
+
+
 class Job:
     def __init__(
         self,
@@ -1674,6 +1779,7 @@ class Job:
         ended_at: Optional[str] = None,
         exit_code: Optional[int] = None,
         error_summary: str = "",
+        job_dir: Optional[str] = None,
     ) -> None:
         self.id = job_id
         self.yaml_name = yaml_name
@@ -1687,8 +1793,9 @@ class Job:
         self.exit_code = exit_code
         self.error_summary = error_summary
 
-        self.log_path = os.path.join(JOB_DIR, f"{self.id}.log")
-        self.json_path = os.path.join(JOB_DIR, f"{self.id}.json")
+        self.job_dir = os.path.abspath(job_dir or JOB_DIR)
+        self.log_path = os.path.join(self.job_dir, f"{self.id}.log")
+        self.json_path = os.path.join(self.job_dir, f"{self.id}.json")
 
         self.lock = threading.Lock()
         self.listeners = set()
@@ -1701,7 +1808,9 @@ class Job:
         self.last_log_line = ""
 
     @classmethod
-    def from_dict(cls, data: dict) -> "Job":
+    def from_dict(cls, data: dict, job_dir: Optional[str] = None) -> "Job":
+        if not isinstance(data, dict):
+            raise ValueError("Job record must be an object")
         return cls(
             job_id=data.get("id", ""),
             yaml_name=data.get("yaml", ""),
@@ -1714,6 +1823,7 @@ class Job:
             ended_at=data.get("ended_at"),
             exit_code=data.get("exit_code"),
             error_summary=data.get("error_summary", ""),
+            job_dir=job_dir,
         )
 
     def to_dict(self) -> dict:
@@ -1732,10 +1842,7 @@ class Job:
         }
 
     def save_status(self) -> None:
-        os.makedirs(JOB_DIR, exist_ok=True)
-        with open(self.json_path, "w", encoding="utf-8") as handle:
-            json.dump(self.to_dict(), handle, ensure_ascii=False, indent=2)
-            handle.write("\n")
+        atomic_write_json(self.json_path, self.to_dict())
 
     def add_listener(self) -> queue.Queue:
         listener = queue.Queue()
@@ -1909,37 +2016,71 @@ class _ProcessTreeController:
 
 
 class JobManager:
-    def __init__(self) -> None:
+    def __init__(self, start_worker: bool = True) -> None:
+        self.job_dir = os.path.abspath(JOB_DIR)
         self.jobs = {}
         self.lock = threading.Lock()
         self.serial_locks = {}
         self.serial_locks_lock = threading.Lock()
         self.queue = queue.Queue()
-        os.makedirs(JOB_DIR, exist_ok=True)
-        self._load_jobs()
-        self.worker = threading.Thread(target=self._worker, daemon=True)
-        self.worker.start()
+        self.worker = None
+        self.directory_lock = _JobDirectoryLock(self.job_dir)
+        self.directory_lock.acquire()
+        try:
+            self._load_jobs()
+        except Exception:
+            self.directory_lock.release()
+            raise
+        if start_worker:
+            self.worker = threading.Thread(target=self._worker, daemon=True)
+            self.worker.start()
 
     def _load_jobs(self) -> None:
-        for name in os.listdir(JOB_DIR):
+        for name in sorted(os.listdir(self.job_dir)):
             if not name.endswith(".json"):
                 continue
-            path = os.path.join(JOB_DIR, name)
+            path = os.path.join(self.job_dir, name)
             try:
                 with open(path, "r", encoding="utf-8") as handle:
                     data = json.load(handle)
-                job = Job.from_dict(data)
-                if job.id:
-                    self.jobs[job.id] = job
-            except Exception:
+            except (json.JSONDecodeError, UnicodeError) as exc:
+                JOB_LOGGER.warning("Skipping invalid persisted job %s: %s", name, exc)
                 continue
+            except OSError as exc:
+                raise RuntimeError(f"Could not read persisted job {name}") from exc
+
+            try:
+                job = Job.from_dict(data, job_dir=self.job_dir)
+                if not VALID_JOB_ID.fullmatch(job.id) or name != f"{job.id}.json":
+                    raise ValueError("Job id does not match its filename")
+                if job.state not in JOB_STATES:
+                    raise ValueError(f"Invalid job state: {job.state}")
+            except (TypeError, ValueError) as exc:
+                JOB_LOGGER.warning("Skipping invalid persisted job %s: %s", name, exc)
+                continue
+
+            if job.state in {"queued", "running"}:
+                job.state = "failed"
+                job.ended_at = utc_now()
+                job.exit_code = INTERRUPTED_JOB_EXIT_CODE
+                job.error_summary = INTERRUPTED_JOB_ERROR_SUMMARY
+                try:
+                    job.save_status()
+                except Exception as exc:
+                    raise RuntimeError(f"Could not persist reconciled job {job.id}") from exc
+            self.jobs[job.id] = job
+
+    def close(self) -> None:
+        if self.worker is not None:
+            raise RuntimeError("Cannot release job directory ownership while the worker is running")
+        self.directory_lock.release()
 
     def submit(self, yaml_name: str, action: str, device: str, serial_port: str = "") -> Job:
         job_id = uuid.uuid4().hex
-        job = Job(job_id, yaml_name, action, device, serial_port=serial_port)
+        job = Job(job_id, yaml_name, action, device, serial_port=serial_port, job_dir=self.job_dir)
         with self.lock:
             self.jobs[job.id] = job
-        os.makedirs(JOB_DIR, exist_ok=True)
+        os.makedirs(self.job_dir, exist_ok=True)
         with open(job.log_path, "w", encoding="utf-8"):
             pass
         job.save_status()
@@ -1966,6 +2107,7 @@ class JobManager:
             return None
         process = None
         process_controller = None
+        notify_done = False
         with job.lock:
             if job.state in ("success", "failed", "canceled"):
                 return job
@@ -1976,11 +2118,13 @@ class JobManager:
                 job.exit_code = -1
                 job.error_summary = "Canceled"
                 job.save_status()
-                job.notify_done()
-                return job
+                notify_done = True
             if job.state == "running" and job.process:
                 process = job.process
                 process_controller = job.process_controller
+        if notify_done:
+            job.notify_done()
+            return job
         if process_controller:
             process_controller.terminate()
         elif process and process.poll() is None:
@@ -1990,6 +2134,8 @@ class JobManager:
     def _worker(self) -> None:
         while True:
             job = self.queue.get()
+            if job is None:
+                return
             if job.state == "canceled":
                 continue
             serial_lock = None
@@ -1998,15 +2144,31 @@ class JobManager:
                     serial_lock = self.serial_locks.setdefault(job.serial_port, threading.Lock())
                 serial_lock.acquire()
             try:
-                self._run_job(job)
+                try:
+                    self._run_job(job)
+                except Exception:
+                    JOB_LOGGER.exception("Internal job worker failure for %s", job.id)
+                    with job.lock:
+                        job.state = "failed"
+                        job.ended_at = utc_now()
+                        job.exit_code = 1
+                        job.error_summary = "Internal job worker failure"
+                    try:
+                        job.save_status()
+                    except Exception:
+                        JOB_LOGGER.exception("Could not persist worker failure for %s", job.id)
+                    job.notify_done()
             finally:
                 if serial_lock is not None:
                     serial_lock.release()
 
     def _run_job(self, job: Job) -> None:
-        job.state = "running"
-        job.started_at = utc_now()
-        job.save_status()
+        with job.lock:
+            if job.state == "canceled":
+                return
+            job.state = "running"
+            job.started_at = utc_now()
+            job.save_status()
 
         yaml_path = os.path.join(TARGET_DIR, job.yaml_name)
         if job.action == "logs":

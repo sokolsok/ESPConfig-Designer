@@ -108,6 +108,22 @@ application resources and the installation root are immutable.
 An existing valid workspace is never migrated or replaced automatically. The
 hidden workspace-change command also refuses a switch while a job is active.
 
+## Job restart and ownership
+
+The shared backend takes an operating-system file lock for its job directory
+before reading or changing persisted jobs. A second backend process configured
+with the same `JOB_DIR` refuses to start. The lock is released by the operating
+system if the owning process exits.
+
+Job status JSON is written through a same-directory temporary file, flushed to
+disk, and atomically replaced. On startup, persisted `queued` or `running` jobs
+cannot be resumed and are changed to `failed` with exit code `1` and the stable
+summary `Interrupted by backend restart`. Their existing logs and history are
+preserved, terminal jobs are not rewritten, and malformed records are retained
+for inspection with a warning instead of being deleted silently. This behavior
+is owned by the shared backend and therefore also applies to Home Assistant and
+Standalone Docker deployments.
+
 ## Build and verify generated resources
 
 ```powershell

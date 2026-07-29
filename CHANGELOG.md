@@ -6,6 +6,7 @@
 * Added runtime diagnostics, Desktop process-tree ownership, portable-runtime validation, and cache compatibility handling.
 * Moved integrated frontend development data outside the repository and added a guarded migration utility for legacy development workspaces.
 * Opened external HTTP and HTTPS links from Windows Desktop in the system browser while preserving normal browser behavior for Home Assistant and Docker.
+* Reconciled interrupted jobs safely after backend restarts and prevented multiple backend processes from sharing one job directory.
 
 
 ## 1.3.3
