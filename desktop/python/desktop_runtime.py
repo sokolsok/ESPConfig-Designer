@@ -7,9 +7,10 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
-from typing import Dict, Iterable, Mapping, Optional
+from typing import Callable, Dict, Iterable, Mapping, Optional
 
 from runtime_contract import RUNTIME_TOOL_VERSIONS, ensure_workspace, workspace_status
+from runtime_manifest import CacheRetentionResult, prune_cache_recovery
 
 
 RUNTIME_PYTHON_VERSION = (3, 13, 9)
@@ -196,6 +197,32 @@ def ensure_desktop_directories(paths: DesktopRuntimePaths) -> None:
         directory.mkdir(parents=True, exist_ok=True)
         _check_writable(directory)
     ensure_workspace(paths.workspace)
+
+
+def run_cache_recovery_retention(
+    app_data_root: Path,
+    *,
+    reporter: Callable[[str], None] = print,
+) -> Optional[CacheRetentionResult]:
+    """Run best-effort retention without making Desktop startup depend on cleanup."""
+    def report(message: str) -> None:
+        try:
+            reporter(message)
+        except Exception:
+            pass
+
+    try:
+        result = prune_cache_recovery(app_data_root)
+    except Exception as exc:
+        report(f"[warning] Cache recovery retention failed and was skipped: {exc}")
+        return None
+    if result.deleted or result.preserved or result.warnings:
+        level = "warning" if result.warnings else "info"
+        report(
+            f"[{level}] Cache recovery retention: "
+            f"deleted={result.deleted}, preserved={result.preserved}, warnings={len(result.warnings)}"
+        )
+    return result
 
 
 def _check_writable(directory: Path) -> None:

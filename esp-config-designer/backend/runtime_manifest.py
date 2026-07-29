@@ -8,8 +8,9 @@ import hashlib
 import importlib.metadata
 import json
 import os
+import stat
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import shutil
 import tempfile
@@ -18,9 +19,13 @@ import uuid
 
 
 MANIFEST_SCHEMA_VERSION = 1
+RECOVERY_RECORD_SCHEMA_VERSION = 1
 RUNTIME_MANIFEST_FILENAME = "runtime-manifest.json"
 CACHE_MANIFEST_FILENAME = "cache-manifest.json"
 CACHE_RECOVERY_DIRNAME = "cache-recovery"
+RECOVERY_RECORD_FILENAME = "recovery.json"
+RECOVERY_CACHE_DIRNAME = "p"
+RECOVERY_RETENTION_DAYS = 30
 
 
 class ManifestError(RuntimeError):
@@ -208,6 +213,179 @@ class CacheRecoveryResult:
     manifest_path: Path = Path()
 
 
+@dataclass(frozen=True)
+class CacheRetentionResult:
+    deleted: int = 0
+    preserved: int = 0
+    warnings: tuple[str, ...] = ()
+
+
+def _utc_now(now=None) -> datetime:
+    value = now() if now is not None else datetime.now(timezone.utc)
+    if value.tzinfo is None or value.utcoffset() is None:
+        raise ValueError("Clock must return a timezone-aware datetime")
+    return value.astimezone(timezone.utc)
+
+
+def _utc_timestamp(value: datetime) -> str:
+    return value.isoformat().replace("+00:00", "Z")
+
+
+def _is_link_or_mount(path: Path) -> bool:
+    path = Path(path)
+    metadata = path.lstat()
+    is_junction = getattr(path, "is_junction", None)
+    reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0)
+    return (
+        stat.S_ISLNK(metadata.st_mode)
+        or bool(is_junction and is_junction())
+        or bool(getattr(metadata, "st_file_attributes", 0) & reparse_flag)
+        or os.path.ismount(path)
+    )
+
+
+def _validate_recovery_topology(recovery_path: Path) -> None:
+    recovery = Path(recovery_path)
+    if _is_link_or_mount(recovery):
+        raise ManifestError("Recovery directory is a link, reparse point, or mount")
+    if not stat.S_ISDIR(recovery.lstat().st_mode):
+        raise ManifestError("Recovery child is not a directory")
+    try:
+        with os.scandir(recovery) as entries:
+            children = {entry.name: Path(entry.path) for entry in entries}
+    except OSError as exc:
+        raise ManifestError("Recovery directory cannot be read safely") from exc
+    if set(children) != {RECOVERY_RECORD_FILENAME, RECOVERY_CACHE_DIRNAME}:
+        raise ManifestError("Recovery directory has an unexpected child")
+    record_path = children[RECOVERY_RECORD_FILENAME]
+    cache_path = children[RECOVERY_CACHE_DIRNAME]
+    if _is_link_or_mount(record_path) or _is_link_or_mount(cache_path):
+        raise ManifestError("Recovery directory contains a special direct child")
+    if not stat.S_ISREG(record_path.lstat().st_mode) or not stat.S_ISDIR(cache_path.lstat().st_mode):
+        raise ManifestError("Recovery directory has an invalid topology")
+
+
+def _validated_recovery_identity(recovery_path: Path) -> str:
+    """Validate the complete recovery tree without following special paths."""
+    recovery = Path(recovery_path)
+    digest = hashlib.sha256()
+    pending = [(recovery, Path("."))]
+    root_entries: Optional[set[str]] = None
+    while pending:
+        current, relative = pending.pop()
+        if _is_link_or_mount(current):
+            raise ManifestError("Recovery tree contains a link, reparse point, or mount")
+        metadata = current.lstat()
+        kind = "d" if stat.S_ISDIR(metadata.st_mode) else "f" if stat.S_ISREG(metadata.st_mode) else "o"
+        if kind == "o":
+            raise ManifestError("Recovery tree contains an unsupported filesystem object")
+        identity = (
+            relative.as_posix(),
+            kind,
+            metadata.st_dev,
+            metadata.st_ino,
+            metadata.st_mode,
+            metadata.st_size,
+            metadata.st_mtime_ns,
+        )
+        digest.update(repr(identity).encode("utf-8"))
+        if kind != "d":
+            continue
+        try:
+            with os.scandir(current) as entries:
+                children = sorted((Path(entry.path), relative / entry.name) for entry in entries)
+        except OSError as exc:
+            raise ManifestError("Recovery directory cannot be read safely") from exc
+        if current == recovery:
+            root_entries = {child.name for child, _relative in children}
+        pending.extend(reversed(children))
+
+    if root_entries != {RECOVERY_RECORD_FILENAME, RECOVERY_CACHE_DIRNAME}:
+        raise ManifestError("Recovery directory has an unexpected child")
+    record_path = recovery / RECOVERY_RECORD_FILENAME
+    cache_path = recovery / RECOVERY_CACHE_DIRNAME
+    if not record_path.is_file() or not cache_path.is_dir():
+        raise ManifestError("Recovery directory has an invalid topology")
+    return digest.hexdigest()
+
+
+def _parse_recovery_created_at(value: Any) -> datetime:
+    if not isinstance(value, str) or not value.endswith("Z"):
+        raise ManifestError("Recovery creation timestamp must be UTC")
+    try:
+        created_at = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ManifestError("Recovery creation timestamp is invalid") from exc
+    if created_at.utcoffset() != timezone.utc.utcoffset(created_at):
+        raise ManifestError("Recovery creation timestamp must be UTC")
+    return created_at.astimezone(timezone.utc)
+
+
+def _validate_recovery_record(recovery_path: Path) -> Optional[datetime]:
+    record_path = recovery_path / RECOVERY_RECORD_FILENAME
+    record = _read_manifest(record_path)
+    if "createdAt" not in record:
+        return None
+    if record.get("recoverySchemaVersion") != RECOVERY_RECORD_SCHEMA_VERSION:
+        raise ManifestError("Recovery record schema is unsupported")
+    if record.get("kind") != "platformio-cache-recovery":
+        raise ManifestError("Recovery record kind is invalid")
+    quarantined_cache = record.get("quarantinedCache")
+    if not isinstance(quarantined_cache, str) or not Path(quarantined_cache).is_absolute():
+        raise ManifestError("Recovery cache path is invalid")
+    expected_cache = recovery_path / RECOVERY_CACHE_DIRNAME
+    if quarantined_cache != str(expected_cache):
+        raise ManifestError("Recovery cache path does not match its directory")
+    return _parse_recovery_created_at(record["createdAt"])
+
+
+def prune_cache_recovery(app_data_root: Path, *, now=None) -> CacheRetentionResult:
+    """Delete only trusted Desktop cache recoveries older than thirty full days."""
+    recovery_root = Path(app_data_root) / CACHE_RECOVERY_DIRNAME
+    try:
+        recovery_root.lstat()
+    except FileNotFoundError:
+        return CacheRetentionResult()
+    except OSError:
+        return CacheRetentionResult(preserved=1, warnings=("recovery-root-unreadable",))
+
+    warnings: list[str] = []
+    deleted = 0
+    preserved = 0
+    try:
+        if _is_link_or_mount(recovery_root) or not recovery_root.is_dir():
+            return CacheRetentionResult(preserved=1, warnings=("recovery-root-unsafe",))
+        with os.scandir(recovery_root) as entries:
+            candidates = sorted(Path(entry.path) for entry in entries)
+    except OSError:
+        return CacheRetentionResult(preserved=1, warnings=("recovery-root-unreadable",))
+
+    cutoff = _utc_now(now)
+    for recovery_path in candidates:
+        try:
+            _validate_recovery_topology(recovery_path)
+            created_at = _validate_recovery_record(recovery_path)
+            if created_at is None:
+                preserved += 1
+                continue
+            if created_at > cutoff:
+                preserved += 1
+                warnings.append("recovery-created-in-future")
+                continue
+            if cutoff - created_at <= timedelta(days=RECOVERY_RETENTION_DAYS):
+                preserved += 1
+                continue
+            initial_identity = _validated_recovery_identity(recovery_path)
+            if _validated_recovery_identity(recovery_path) != initial_identity:
+                raise ManifestError("Recovery identity changed before deletion")
+            shutil.rmtree(recovery_path)
+            deleted += 1
+        except (ManifestError, OSError, UnicodeError, ValueError):
+            preserved += 1
+            warnings.append("recovery-preserved-unsafe-or-unreadable")
+    return CacheRetentionResult(deleted=deleted, preserved=preserved, warnings=tuple(warnings))
+
+
 def inspect_cache_compatibility(
     platformio_root: Path,
     runtime_manifest_path: Path,
@@ -245,6 +423,8 @@ def ensure_cache_compatible(
     platformio_root: Path,
     runtime_manifest: Mapping[str, Any],
     app_data_root: Path,
+    *,
+    now=None,
 ) -> CacheRecoveryResult:
     """Reuse only a cache whose observed inventory matches the runtime contract."""
     cache_root = Path(platformio_root)
@@ -264,15 +444,18 @@ def ensure_cache_compatible(
 
     quarantined_path: Optional[Path] = None
     if _has_cache_payload(cache_root):
+        created_at = _utc_now(now)
         recovery_root = Path(app_data_root) / CACHE_RECOVERY_DIRNAME / (
-            datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:8]
+            created_at.strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:8]
         )
         recovery_root.parent.mkdir(parents=True, exist_ok=True)
         quarantined_path = recovery_root / cache_root.name
         shutil.move(str(cache_root), str(quarantined_path))
         cache_root.mkdir(parents=True, exist_ok=True)
         recovery_record = {
-            "schemaVersion": MANIFEST_SCHEMA_VERSION,
+            "recoverySchemaVersion": RECOVERY_RECORD_SCHEMA_VERSION,
+            "kind": "platformio-cache-recovery",
+            "createdAt": _utc_timestamp(created_at),
             "reason": reason,
             "quarantinedCache": str(quarantined_path),
             "previousManifest": existing,

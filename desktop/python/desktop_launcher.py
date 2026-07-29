@@ -99,6 +99,7 @@ from desktop_runtime import (
     RUNTIME_PYTHON_VERSION,
     default_local_app_data,
     ensure_desktop_directories,
+    run_cache_recovery_retention,
     resolve_runtime_python,
     resolve_bundled_git,
     validate_runtime_dependencies,
@@ -162,6 +163,7 @@ def prepare_runtime(args):
         web_root=web_root,
     )
     ensure_desktop_directories(paths)
+    run_cache_recovery_retention(app_data_root)
     bundled_git = resolve_bundled_git(paths.git_root)
     environment = paths.environment(python_executable=runtime_python, port=args.port)
     git_output = verify_bundled_git(paths.git_root, environment, paths.backend_root)

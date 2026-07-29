@@ -41,6 +41,13 @@ Mutable application data remains under:
 %LOCALAPPDATA%\ECD
 ```
 
+Incompatible PlatformIO caches are quarantined under `cache-recovery/`. The
+application automatically removes only recovery directories that have valid
+application metadata and are older than 30 full days. Legacy or uncertain
+recoveries are retained for manual inspection. This cleanup does not remove the
+active cache, builds, workspace, or the recovery parent, and cleanup failures do
+not prevent the application from starting.
+
 On a clean first start, the application creates the default workspace:
 
 ```text

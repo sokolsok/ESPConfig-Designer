@@ -163,6 +163,44 @@ class DesktopRuntimeTests(unittest.TestCase):
             self.assertTrue(paths.build_root.is_dir())
             self.assertTrue(paths.jobs_root.is_dir())
 
+    def test_cache_recovery_retention_failure_is_reported_without_blocking_startup(self):
+        messages = []
+        with mock.patch.object(
+            desktop_runtime,
+            "prune_cache_recovery",
+            side_effect=RuntimeError("retention failed"),
+        ):
+            result = desktop_runtime.run_cache_recovery_retention(
+                pathlib.Path("app-data"), reporter=messages.append
+            )
+
+        self.assertIsNone(result)
+        self.assertEqual(1, len(messages))
+        self.assertIn("retention failed", messages[0])
+
+    def test_cache_recovery_retention_reports_summary(self):
+        retention = mock.Mock(deleted=2, preserved=3, warnings=("unsafe",))
+        messages = []
+        with mock.patch.object(desktop_runtime, "prune_cache_recovery", return_value=retention):
+            result = desktop_runtime.run_cache_recovery_retention(
+                pathlib.Path("app-data"), reporter=messages.append
+            )
+
+        self.assertIs(retention, result)
+        self.assertEqual(1, len(messages))
+        self.assertIn("deleted=2", messages[0])
+        self.assertIn("preserved=3", messages[0])
+
+    def test_cache_recovery_retention_reporter_failure_does_not_block_startup(self):
+        retention = mock.Mock(deleted=1, preserved=0, warnings=())
+        with mock.patch.object(desktop_runtime, "prune_cache_recovery", return_value=retention):
+            result = desktop_runtime.run_cache_recovery_retention(
+                pathlib.Path("app-data"),
+                reporter=mock.Mock(side_effect=OSError("closed stream")),
+            )
+
+        self.assertIs(retention, result)
+
     def test_missing_runtime_python_has_actionable_error(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             with self.assertRaisesRegex(RuntimeError, "Embedded Python is missing"):

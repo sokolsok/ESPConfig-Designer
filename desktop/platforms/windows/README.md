@@ -180,10 +180,18 @@ incompatible cache payload is moved under
 are preserved. Cache metadata is refreshed only after a successful relevant
 job.
 
-Recovery directories currently have no retention policy and can become large.
-Do not automatically delete the active `p/` cache: it is required for fast and
-offline replay. Builds under `b/` are reproducible but support incremental
-compilation, firmware download, and offline workflows.
+Each new recovery record includes a versioned recovery schema and an explicit
+UTC creation timestamp. On startup, the application deletes only verified
+direct recovery children older than 30 full days. Legacy records without a
+creation timestamp and any recovery with malformed metadata, unexpected files,
+unsafe paths, links, junctions, reparse points, mount points, or filesystem
+errors are retained. Retention problems are reported in the startup log and do
+not block startup.
+
+Retention never deletes the active `p/` cache, builds under `b/`, the workspace,
+or the `cache-recovery/` parent. The active cache is required for fast and
+offline replay; builds support incremental compilation, firmware download, and
+offline workflows.
 
 ## Diagnostics
 
@@ -210,7 +218,6 @@ a replacement for Tauri/NSIS release signing or discovery.
 - incomplete clean supported-Windows release matrix;
 - possible WebView2 bootstrap download;
 - possible first-compile PlatformIO downloads;
-- no cache-recovery retention policy;
 - no Linux or macOS Desktop runtime/package gates.
 
 Do not present the current Windows package as a release.
