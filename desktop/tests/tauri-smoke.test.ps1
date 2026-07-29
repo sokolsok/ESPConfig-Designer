@@ -13,7 +13,7 @@ function Assert-True([bool]$condition, [string]$message) {
     }
 }
 
-function Stop-TauriProcess([System.Diagnostics.Process]$process, [int]$port) {
+function Stop-ProcessTree([System.Diagnostics.Process]$process) {
     if (-not $process.HasExited) {
         $taskkill = Start-Process `
             -FilePath (Join-Path $env:SystemRoot "System32\taskkill.exe") `
@@ -24,6 +24,10 @@ function Stop-TauriProcess([System.Diagnostics.Process]$process, [int]$port) {
         }
         Assert-True ($process.WaitForExit(30000)) "Tauri did not stop within the cleanup timeout"
     }
+}
+
+function Stop-TauriProcess([System.Diagnostics.Process]$process, [int]$port) {
+    Stop-ProcessTree $process
 
     $deadline = [DateTime]::UtcNow.AddSeconds(30)
     while ([DateTime]::UtcNow -lt $deadline) {
@@ -88,6 +92,7 @@ $startInfo.EnvironmentVariables["PYTHONPATH"] = $hostilePythonRoot
 $startInfo.EnvironmentVariables["PYTHONUSERBASE"] = $hostileUserBase
 
 $process = $null
+$secondProcess = $null
 try {
     $process = [System.Diagnostics.Process]::Start($startInfo)
     $deadline = [DateTime]::UtcNow.AddSeconds(120)
@@ -104,6 +109,16 @@ try {
         }
     }
     Assert-True ($health.mode -eq "desktop") "Packaged Tauri backend did not reach desktop health"
+
+    $secondProcess = [System.Diagnostics.Process]::Start($startInfo)
+    Assert-True ($secondProcess.WaitForExit(30000)) "Second application instance did not exit"
+    Assert-True ($secondProcess.ExitCode -eq 0) "Second application instance failed with code $($secondProcess.ExitCode)"
+    Assert-True (-not $process.HasExited) "Second application instance terminated the primary instance"
+    $listeners = @(Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue)
+    Assert-True ($listeners.Count -eq 1) "Single-instance launch left $($listeners.Count) backend listeners"
+    $healthAfterSecondLaunch = Invoke-RestMethod -Uri ("http://127.0.0.1:{0}/api/health" -f $port) -TimeoutSec 2
+    Assert-True ($healthAfterSecondLaunch.mode -eq "desktop") "Primary backend failed after the second launch"
+
     $workspaceResponse = Invoke-RestMethod -Uri ("http://127.0.0.1:{0}/api/workspace" -f $port)
     Assert-True ($workspaceResponse.workspace.ready -eq $true) "Packaged workspace was not ready"
     $schemaResponse = Invoke-WebRequest -UseBasicParsing -Uri ("http://127.0.0.1:{0}/api/component-schemas/components/custom/empty.json" -f $port)
@@ -129,6 +144,9 @@ try {
     Stop-TauriProcess $process $port
     Write-Host "tauri packaged smoke: PASS"
 } finally {
+    if ($secondProcess -and -not $secondProcess.HasExited) {
+        Stop-ProcessTree $secondProcess
+    }
     if ($process -and -not $process.HasExited) {
         Stop-TauriProcess $process $port
     }

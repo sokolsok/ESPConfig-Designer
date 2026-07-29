@@ -15,6 +15,17 @@ $desktopRoot = Split-Path -Parent $PSScriptRoot
 $repoRoot = Split-Path -Parent $desktopRoot
 $configPath = Join-Path $desktopRoot "src-tauri\tauri.conf.json"
 $config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
+$cargoManifestSource = Get-Content -LiteralPath (Join-Path $desktopRoot "src-tauri\Cargo.toml") -Raw
+$tauriMainSource = Get-Content -LiteralPath (Join-Path $desktopRoot "src-tauri\src\main.rs") -Raw
+Assert-True ($cargoManifestSource.Contains('tauri-plugin-single-instance = "=2.4.3"')) "Single-instance plugin must be exactly pinned"
+$singleInstancePluginIndex = $tauriMainSource.IndexOf('.plugin(tauri_plugin_single_instance::init(')
+$dialogPluginIndex = $tauriMainSource.IndexOf('.plugin(tauri_plugin_dialog::init())')
+$openerPluginIndex = $tauriMainSource.IndexOf('.plugin(tauri_plugin_opener::init())')
+$setupIndex = $tauriMainSource.IndexOf('.setup(')
+Assert-True ($singleInstancePluginIndex -ge 0) "Single-instance plugin is not registered"
+Assert-True ($singleInstancePluginIndex -lt $dialogPluginIndex) "Single-instance plugin must precede the dialog plugin"
+Assert-True ($singleInstancePluginIndex -lt $openerPluginIndex) "Single-instance plugin must precede the opener plugin"
+Assert-True ($singleInstancePluginIndex -lt $setupIndex) "Single-instance plugin must be registered before setup"
 $externalLinksCapabilityPath = Join-Path $desktopRoot "src-tauri\capabilities\external-links.json"
 Assert-True (Test-Path -LiteralPath $externalLinksCapabilityPath -PathType Leaf) "External-link capability is missing"
 $externalLinksCapability = Get-Content -LiteralPath $externalLinksCapabilityPath -Raw | ConvertFrom-Json

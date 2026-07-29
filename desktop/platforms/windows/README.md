@@ -46,6 +46,7 @@ devices, jobs, ESPHome execution, diagnostics, and firmware artifacts.
 | wheel | `0.47.0` |
 | MinGit | `2.55.0.windows.3` |
 | Tauri CLI | `2.5.0` |
+| Tauri single-instance plugin | `2.4.3` |
 
 The Rust graph is locked by `desktop/src-tauri/Cargo.lock`. Runtime dependency
 changes require new manifests, compile/cache/offline verification, and a rebuilt
@@ -133,6 +134,19 @@ Tauri resolves app data, workspace, packaged backend, runtime, web root, and
 schema catalog before starting Python. It launches the embedded interpreter in
 isolated/no-bytecode mode, removes inherited Python and virtual-environment
 state, and waits for a desktop-mode `GET /api/health` response on `127.0.0.1`.
+
+The official Tauri single-instance plugin is registered before every other
+plugin and before setup can start the backend. A second launch exits without
+starting another backend and asks the primary instance to show, restore, and
+focus its main window. A port already occupied by an unrelated process remains
+a startup error and is not treated as an existing application instance.
+
+Known upstream limitation: `tauri-plugin-single-instance` `2.4.3` can allow a
+second process to continue when two cold starts occur in the narrow interval
+between creation of the plugin mutex and its Windows IPC window. Normal
+second-launch behavior is covered locally, but simultaneous cold start is not a
+release-ready guarantee. Upgrade to a fixed upstream plugin and rerun the
+simultaneous packaged/installed gate before release signing.
 
 The backend and ESPHome descendants are assigned to Windows Job Objects. The
 hosted GUI smoke harness may forcibly terminate only the isolated test process

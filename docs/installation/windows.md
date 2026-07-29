@@ -58,6 +58,16 @@ An existing valid custom workspace selection is reused. Installation and
 application resource directories must never contain workspace, build, cache, or
 job data.
 
+Only one application instance runs in a user session. A second launch activates
+the existing window instead of starting another backend. If another application
+uses the configured loopback port, ESPConfig Designer reports a startup conflict
+instead of connecting to that process.
+
+The current development package still has a narrow upstream Tauri plugin race
+when two copies are cold-started almost simultaneously. This does not affect the
+normal second-launch flow, but it must be closed and retested before the package
+is considered ready for release signing.
+
 ## What hosted CI verifies
 
 The Windows workflow starts from a fresh checkout, prepares and verifies the

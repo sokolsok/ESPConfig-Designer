@@ -79,6 +79,18 @@ ECD_TAURI_HEALTH_TIMEOUT_MS
 They are not normal end-user settings. The normal backend binds only to
 `127.0.0.1` and starts in `desktop` mode.
 
+The Desktop shell allows one application instance per user session. Starting
+the same executable again activates the existing main window and exits before
+workspace preparation or backend startup. An unrelated listener on the selected
+loopback port is rejected as a port conflict rather than adopted as an existing
+instance.
+
+The pinned upstream `tauri-plugin-single-instance` `2.4.3` has a Windows race
+during nearly simultaneous cold starts: the mutex can exist before the plugin's
+IPC window is available. The ordinary second-launch smoke passes, but it does
+not prove this race closed. Treat a fixed upstream plugin plus a simultaneous
+cold-start packaged and installed smoke as release-signing prerequisites.
+
 ## External links
 
 The shared frontend keeps external links as standard `target="_blank"` anchors.

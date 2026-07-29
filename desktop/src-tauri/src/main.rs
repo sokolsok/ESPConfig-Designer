@@ -5,7 +5,7 @@ use std::collections::HashSet;
 use std::env;
 use std::fs;
 use std::io::{Read, Write};
-use std::net::{SocketAddr, TcpStream};
+use std::net::{SocketAddr, TcpListener, TcpStream};
 use std::path::{Component, Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -904,6 +904,15 @@ fn health_check(port: u16) -> bool {
         && body.contains("\"mode\":\"desktop\"")
 }
 
+fn ensure_backend_port_available(port: u16) -> Result<(), String> {
+    let address = SocketAddr::from(([127, 0, 0, 1], port));
+    TcpListener::bind(address)
+        .map(|listener| drop(listener))
+        .map_err(|error| {
+            format!("Desktop backend port 127.0.0.1:{port} is already in use: {error}")
+        })
+}
+
 fn open_window(app: &AppHandle, port: u16) -> Result<(), String> {
     let url = format!("http://127.0.0.1:{port}/");
     let target_url = tauri::Url::parse(&url).map_err(|_| "Invalid backend URL".to_string())?;
@@ -914,6 +923,45 @@ fn open_window(app: &AppHandle, port: u16) -> Result<(), String> {
         .build()
         .map(|_| ())
         .map_err(|error| format!("Could not open desktop UI: {error}"))
+}
+
+trait MainWindowActivation {
+    fn show(&self);
+    fn unminimize(&self);
+    fn focus(&self);
+}
+
+impl<R: tauri::Runtime> MainWindowActivation for tauri::WebviewWindow<R> {
+    fn show(&self) {
+        if let Err(error) = tauri::WebviewWindow::show(self) {
+            eprintln!("Could not show the existing desktop window: {error}");
+        }
+    }
+
+    fn unminimize(&self) {
+        if let Err(error) = tauri::WebviewWindow::unminimize(self) {
+            eprintln!("Could not restore the existing desktop window: {error}");
+        }
+    }
+
+    fn focus(&self) {
+        if let Err(error) = tauri::WebviewWindow::set_focus(self) {
+            eprintln!("Could not focus the existing desktop window: {error}");
+        }
+    }
+}
+
+fn activate_main_window<W: MainWindowActivation>(window: Option<&W>) {
+    if let Some(window) = window {
+        window.show();
+        window.unminimize();
+        window.focus();
+    }
+}
+
+fn handle_second_instance(app: &AppHandle) {
+    let window = app.get_webview_window("main");
+    activate_main_window(window.as_ref());
 }
 
 fn env_path(name: &str, default: PathBuf) -> PathBuf {
@@ -957,6 +1005,9 @@ fn home_dir() -> PathBuf {
 
 fn main() {
     let builder = tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            handle_second_instance(app);
+        }))
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![change_workspace])
@@ -971,6 +1022,14 @@ fn main() {
                 .map_err(|error| Box::<dyn std::error::Error>::from(error))?;
             let config = BackendConfig::from_environment(app.handle(), app_data_root, workspace)
                 .map_err(|error| Box::<dyn std::error::Error>::from(error))?;
+            if let Err(error) = ensure_backend_port_available(config.port) {
+                app.dialog()
+                    .message(&error)
+                    .title("ESPConfig Designer could not start")
+                    .kind(MessageDialogKind::Error)
+                    .blocking_show();
+                return Err(Box::<dyn std::error::Error>::from(error));
+            }
             let backend = BackendProcess::start(&config)
                 .map_err(|error| Box::<dyn std::error::Error>::from(error))?;
             backend
@@ -1042,6 +1101,51 @@ mod tests {
             default_workspace(&profile),
             profile.join("Documents").join("ecd_workspace")
         );
+    }
+
+    #[derive(Default)]
+    struct WindowActivationProbe {
+        actions: Mutex<Vec<&'static str>>,
+    }
+
+    impl MainWindowActivation for WindowActivationProbe {
+        fn show(&self) {
+            self.actions.lock().expect("actions lock").push("show");
+        }
+
+        fn unminimize(&self) {
+            self.actions
+                .lock()
+                .expect("actions lock")
+                .push("unminimize");
+        }
+
+        fn focus(&self) {
+            self.actions.lock().expect("actions lock").push("focus");
+        }
+    }
+
+    #[test]
+    fn second_instance_restores_and_focuses_the_main_window() {
+        let window = WindowActivationProbe::default();
+
+        activate_main_window(Some(&window));
+        activate_main_window::<WindowActivationProbe>(None);
+
+        assert_eq!(
+            *window.actions.lock().expect("actions lock"),
+            vec!["show", "unminimize", "focus"]
+        );
+    }
+
+    #[test]
+    fn occupied_backend_port_is_rejected_before_launch() {
+        let listener = std::net::TcpListener::bind(("127.0.0.1", 0)).expect("bind test port");
+        let port = listener.local_addr().expect("test address").port();
+
+        let error = ensure_backend_port_available(port).expect_err("occupied port must fail");
+
+        assert!(error.contains("already in use"));
     }
 
     #[test]
