@@ -13,6 +13,19 @@ function Assert-True {
 
 $desktopRoot = Split-Path -Parent $PSScriptRoot
 $repoRoot = Split-Path -Parent $desktopRoot
+$releaseContractTest = Join-Path $PSScriptRoot "release_build_contract.test.mjs"
+& node --test $releaseContractTest
+Assert-True ($LASTEXITCODE -eq 0) "Unsigned release build contract failed"
+
+$desktopPackage = Get-Content -LiteralPath (Join-Path $desktopRoot "package.json") -Raw | ConvertFrom-Json
+$releaseScriptPath = Join-Path $desktopRoot "scripts\build-package-release.mjs"
+Assert-True (Test-Path -LiteralPath $releaseScriptPath -PathType Leaf) "Unsigned release build script is missing"
+Assert-True ($desktopPackage.scripts.'build:package:release' -eq "node scripts/build-package-release.mjs") "Unsigned release build command must have one repository-owned entry point"
+$releaseScriptSource = Get-Content -LiteralPath $releaseScriptPath -Raw
+Assert-True ($releaseScriptSource.Contains('build", "--bundles", "nsis"')) "Release build must explicitly use tauri build --bundles nsis"
+Assert-True (-not $releaseScriptSource.Contains('build", "--debug"')) "Release build must not pass --debug"
+Assert-True (-not $releaseScriptSource.Contains('npm.cmd')) "Release build must not execute the Windows npm command shim through spawnSync"
+Assert-True (-not $releaseScriptSource.Contains('tauri.cmd')) "Release build must not execute the Windows Tauri command shim through spawnSync"
 $configPath = Join-Path $desktopRoot "src-tauri\tauri.conf.json"
 $config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
 $configuredCsp = [string]$config.app.security.csp
