@@ -90,6 +90,7 @@ $jobRecord = @{
     action = "compile"
     device = "csp-probe"
     serial_port = ""
+    firmware_node = "csp-probe"
 } | ConvertTo-Json
 $utf8WithoutBom = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText((Join-Path $jobRoot "csp-probe.json"), $jobRecord, $utf8WithoutBom)

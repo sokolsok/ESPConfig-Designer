@@ -1598,6 +1598,43 @@ def find_firmware_path(node_name: str, variant: str = "ota") -> str:
     return candidates[0][1]
 
 
+def firmware_build_inventory() -> dict[str, tuple[tuple[str, int, int], ...]]:
+    inventory: dict[str, tuple[tuple[str, int, int], ...]] = {}
+    build_roots = []
+    for root in (
+        ESPHOME_BUILD_PATH,
+        "/data/build",
+        os.path.join(ESPHOME_DATA_DIR, "build"),
+    ):
+        if root and root not in build_roots and os.path.isdir(root):
+            build_roots.append(root)
+
+    node_names = set()
+    for build_root in build_roots:
+        try:
+            entries = os.listdir(build_root)
+        except OSError:
+            continue
+        for entry in entries:
+            if VALID_DEVICE.fullmatch(entry) and os.path.isdir(os.path.join(build_root, entry)):
+                node_names.add(entry)
+
+    for node_name in sorted(node_names):
+        artifacts = []
+        for variant in ("ota", "factory"):
+            path = find_firmware_path(node_name, variant)
+            if not path:
+                continue
+            try:
+                metadata = os.stat(path)
+            except OSError:
+                continue
+            artifacts.append((os.path.normcase(os.path.abspath(path)), metadata.st_size, metadata.st_mtime_ns))
+        if artifacts:
+            inventory[node_name] = tuple(sorted(artifacts))
+    return inventory
+
+
 def resolve_web_root() -> str:
     if WEB_ROOT and os.path.isdir(WEB_ROOT):
         return WEB_ROOT
@@ -1797,6 +1834,7 @@ class Job:
         ended_at: Optional[str] = None,
         exit_code: Optional[int] = None,
         error_summary: str = "",
+        firmware_node: Optional[str] = None,
         job_dir: Optional[str] = None,
     ) -> None:
         self.id = job_id
@@ -1810,6 +1848,12 @@ class Job:
         self.ended_at = ended_at
         self.exit_code = exit_code
         self.error_summary = error_summary
+        normalized_firmware_node = None if firmware_node is None else str(firmware_node)
+        self.firmware_node = (
+            normalized_firmware_node
+            if normalized_firmware_node is None or VALID_DEVICE.fullmatch(normalized_firmware_node)
+            else ""
+        )
 
         self.job_dir = os.path.abspath(job_dir or JOB_DIR)
         self.log_path = os.path.join(self.job_dir, f"{self.id}.log")
@@ -1841,6 +1885,7 @@ class Job:
             ended_at=data.get("ended_at"),
             exit_code=data.get("exit_code"),
             error_summary=data.get("error_summary", ""),
+            firmware_node=data.get("firmware_node"),
             job_dir=job_dir,
         )
 
@@ -1857,6 +1902,7 @@ class Job:
             "action": self.action,
             "device": self.device,
             "serial_port": self.serial_port,
+            "firmware_node": self.firmware_node,
         }
 
     def save_status(self) -> None:
@@ -2188,6 +2234,9 @@ class JobManager:
             job.started_at = utc_now()
             job.save_status()
 
+        firmware_inventory_before = (
+            firmware_build_inventory() if job.action in {"compile", "ota", "serial"} else {}
+        )
         yaml_path = os.path.join(TARGET_DIR, job.yaml_name)
         if job.action == "logs":
             exit_code = self._run_esphome(job, ["logs", yaml_path, "--device", job.device])
@@ -2247,6 +2296,16 @@ class JobManager:
             job.exit_code = -1
             job.error_summary = "Canceled"
         elif exit_code == 0:
+            if job.action in {"compile", "ota", "serial"}:
+                job.firmware_node = ""
+                firmware_inventory_after = firmware_build_inventory()
+                changed_nodes = sorted(
+                    node_name
+                    for node_name, artifacts in firmware_inventory_after.items()
+                    if firmware_inventory_before.get(node_name) != artifacts
+                )
+                if len(changed_nodes) == 1:
+                    job.firmware_node = changed_nodes[0]
             job.state = "success"
             job.exit_code = 0
             job.error_summary = ""
@@ -4298,16 +4357,43 @@ def api_firmware():
     if variant not in ("ota", "factory"):
         return jsonify({"status": "error", "message": "Invalid variant"}), 400
 
-    node_name = yaml_name[:-5]
-    firmware_path = find_firmware_path(node_name, variant)
+    with job_manager.lock:
+        jobs = list(job_manager.jobs.values())
+    matching_jobs = []
+    for job in jobs:
+        with job.lock:
+            if (
+                job.state == "success"
+                and job.action in {"compile", "ota", "serial"}
+                and job.yaml_name.lower() == yaml_name.lower()
+            ):
+                matching_jobs.append((job.ended_at or "", job.firmware_node))
+    matching_jobs.sort(key=lambda item: item[0], reverse=True)
+
+    yaml_stem = yaml_name[:-5]
+    if matching_jobs:
+        latest_firmware_node = matching_jobs[0][1]
+        if latest_firmware_node is None:
+            node_names = [yaml_stem]
+        elif latest_firmware_node:
+            node_names = [latest_firmware_node]
+        else:
+            node_names = []
+    else:
+        node_names = [yaml_stem]
+    firmware_path = ""
+    for node_name in node_names:
+        firmware_path = find_firmware_path(node_name, variant)
+        if firmware_path:
+            break
     if not firmware_path or not os.path.isfile(firmware_path):
         if variant == "factory":
             return jsonify({"status": "error", "message": "Factory firmware not found"}), 404
         return jsonify({"status": "error", "message": "Firmware not found"}), 404
 
-    download_name = f"{node_name}.bin"
+    download_name = f"{yaml_stem}.bin"
     if variant == "factory":
-        download_name = f"{node_name}.factory.bin"
+        download_name = f"{yaml_stem}.factory.bin"
 
     return send_file(
         firmware_path,

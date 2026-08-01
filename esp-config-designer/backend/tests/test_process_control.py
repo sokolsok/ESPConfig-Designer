@@ -6,6 +6,7 @@ import sys
 import tempfile
 import threading
 import time
+from types import SimpleNamespace
 import unittest
 from unittest import mock
 
@@ -78,6 +79,167 @@ class ProcessTreeControllerTests(unittest.TestCase):
                     manager.close()
         finally:
             server.JOB_DIR = original_job_dir
+
+    def test_successful_compile_records_the_changed_firmware_build_node(self):
+        original_build_path = server.ESPHOME_BUILD_PATH
+        original_job_dir = server.JOB_DIR
+        original_mode = server.ECD_MODE
+        try:
+            with tempfile.TemporaryDirectory() as temp_dir:
+                root = pathlib.Path(temp_dir)
+                server.ESPHOME_BUILD_PATH = str(root / "build")
+                server.JOB_DIR = str(root / "jobs")
+                server.ECD_MODE = "standalone"
+                manager = server.JobManager(start_worker=False)
+                try:
+                    job = manager.submit("test.yaml", "compile", "")
+
+                    def run_esphome(_job, args):
+                        if args[0] == "compile":
+                            output = root / "build" / "ecd-clean-gate" / ".pioenvs" / "ecd-clean-gate"
+                            output.mkdir(parents=True)
+                            (output / "firmware.bin").write_bytes(b"ota")
+                            (output / "firmware.factory.bin").write_bytes(b"factory")
+                        return 0
+
+                    with mock.patch.object(manager, "_run_esphome", side_effect=run_esphome):
+                        manager._run_job(job)
+
+                    self.assertEqual("success", job.state)
+                    self.assertEqual("ecd-clean-gate", job.firmware_node)
+                    persisted = json.loads(pathlib.Path(job.json_path).read_text(encoding="utf-8"))
+                    self.assertEqual("ecd-clean-gate", persisted["firmware_node"])
+                finally:
+                    manager.close()
+        finally:
+            server.ESPHOME_BUILD_PATH = original_build_path
+            server.JOB_DIR = original_job_dir
+            server.ECD_MODE = original_mode
+
+    def test_firmware_download_uses_build_node_recorded_by_matching_yaml_job(self):
+        original_build_path = server.ESPHOME_BUILD_PATH
+        original_esphome_data = server.ESPHOME_DATA_DIR
+        original_job_manager = server.job_manager
+        original_mode = server.ECD_MODE
+        original_auth_mode = server.ECD_AUTH_MODE
+        try:
+            with tempfile.TemporaryDirectory() as temp_dir:
+                root = pathlib.Path(temp_dir)
+                server.ESPHOME_BUILD_PATH = str(root / "build")
+                server.ESPHOME_DATA_DIR = str(root / "data")
+                server.ECD_MODE = "standalone"
+                server.ECD_AUTH_MODE = "none"
+                firmware = root / "build" / "ecd-clean-gate" / ".pioenvs" / "ecd-clean-gate" / "firmware.factory.bin"
+                firmware.parent.mkdir(parents=True)
+                firmware.write_bytes(b"factory firmware")
+                job = server.Job(
+                    "compile-job",
+                    "test.yaml",
+                    "compile",
+                    "",
+                    state="success",
+                    ended_at="2026-08-01T21:55:24Z",
+                    exit_code=0,
+                    firmware_node="ecd-clean-gate",
+                    job_dir=str(root / "jobs"),
+                )
+                server.job_manager = SimpleNamespace(lock=threading.Lock(), jobs={job.id: job})
+
+                response = server.app.test_client().get("/api/firmware?yaml=test.yaml&variant=factory")
+                try:
+                    self.assertEqual(200, response.status_code)
+                    self.assertEqual(b"factory firmware", response.data)
+                finally:
+                    response.close()
+        finally:
+            server.ESPHOME_BUILD_PATH = original_build_path
+            server.ESPHOME_DATA_DIR = original_esphome_data
+            server.job_manager = original_job_manager
+            server.ECD_MODE = original_mode
+            server.ECD_AUTH_MODE = original_auth_mode
+
+    def test_firmware_download_distinguishes_legacy_and_ambiguous_build_nodes(self):
+        original_build_path = server.ESPHOME_BUILD_PATH
+        original_esphome_data = server.ESPHOME_DATA_DIR
+        original_job_manager = server.job_manager
+        original_mode = server.ECD_MODE
+        original_auth_mode = server.ECD_AUTH_MODE
+        try:
+            with tempfile.TemporaryDirectory() as temp_dir:
+                root = pathlib.Path(temp_dir)
+                server.ESPHOME_BUILD_PATH = str(root / "build")
+                server.ESPHOME_DATA_DIR = str(root / "data")
+                server.ECD_MODE = "standalone"
+                server.ECD_AUTH_MODE = "none"
+                stale_firmware = root / "build" / "test" / ".pioenvs" / "test" / "firmware.bin"
+                stale_firmware.parent.mkdir(parents=True)
+                stale_firmware.write_bytes(b"stale firmware")
+                job = server.Job(
+                    "ambiguous-job",
+                    "test.yaml",
+                    "compile",
+                    "",
+                    state="success",
+                    ended_at="2026-08-01T21:55:24Z",
+                    exit_code=0,
+                    job_dir=str(root / "jobs"),
+                )
+                server.job_manager = SimpleNamespace(lock=threading.Lock(), jobs={job.id: job})
+
+                response = server.app.test_client().get("/api/firmware?yaml=test.yaml")
+                try:
+                    self.assertEqual(200, response.status_code)
+                    self.assertEqual(b"stale firmware", response.data)
+                finally:
+                    response.close()
+
+                job.firmware_node = ""
+                response = server.app.test_client().get("/api/firmware?yaml=test.yaml")
+                try:
+                    self.assertEqual(404, response.status_code)
+                    self.assertEqual("Firmware not found", response.get_json()["message"])
+                finally:
+                    response.close()
+        finally:
+            server.ESPHOME_BUILD_PATH = original_build_path
+            server.ESPHOME_DATA_DIR = original_esphome_data
+            server.job_manager = original_job_manager
+            server.ECD_MODE = original_mode
+            server.ECD_AUTH_MODE = original_auth_mode
+
+    def test_successful_compile_does_not_record_ambiguous_firmware_build_nodes(self):
+        original_build_path = server.ESPHOME_BUILD_PATH
+        original_job_dir = server.JOB_DIR
+        original_mode = server.ECD_MODE
+        try:
+            with tempfile.TemporaryDirectory() as temp_dir:
+                root = pathlib.Path(temp_dir)
+                server.ESPHOME_BUILD_PATH = str(root / "build")
+                server.JOB_DIR = str(root / "jobs")
+                server.ECD_MODE = "standalone"
+                manager = server.JobManager(start_worker=False)
+                try:
+                    job = manager.submit("test.yaml", "compile", "")
+
+                    def run_esphome(_job, args):
+                        if args[0] == "compile":
+                            for node_name in ("first-node", "second-node"):
+                                output = root / "build" / node_name / ".pioenvs" / node_name
+                                output.mkdir(parents=True)
+                                (output / "firmware.bin").write_bytes(node_name.encode("ascii"))
+                        return 0
+
+                    with mock.patch.object(manager, "_run_esphome", side_effect=run_esphome):
+                        manager._run_job(job)
+
+                    self.assertEqual("success", job.state)
+                    self.assertEqual("", job.firmware_node)
+                finally:
+                    manager.close()
+        finally:
+            server.ESPHOME_BUILD_PATH = original_build_path
+            server.JOB_DIR = original_job_dir
+            server.ECD_MODE = original_mode
 
     def test_load_jobs_preserves_and_reports_malformed_records(self):
         original_job_dir = server.JOB_DIR
