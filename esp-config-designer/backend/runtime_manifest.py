@@ -450,7 +450,17 @@ def ensure_cache_compatible(
         )
         recovery_root.parent.mkdir(parents=True, exist_ok=True)
         quarantined_path = recovery_root / cache_root.name
-        shutil.move(str(cache_root), str(quarantined_path))
+        recovery_root.mkdir()
+        try:
+            # Both paths are under app data, so rename the directory without
+            # traversing deep, partially installed PlatformIO package trees.
+            cache_root.rename(quarantined_path)
+        except Exception:
+            try:
+                recovery_root.rmdir()
+            except OSError:
+                pass
+            raise
         cache_root.mkdir(parents=True, exist_ok=True)
         recovery_record = {
             "recoverySchemaVersion": RECOVERY_RECORD_SCHEMA_VERSION,

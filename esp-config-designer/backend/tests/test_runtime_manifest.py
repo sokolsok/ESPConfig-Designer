@@ -109,6 +109,29 @@ class RuntimeManifestTests(unittest.TestCase):
             self.assertEqual(runtime_manifest.RECOVERY_RECORD_SCHEMA_VERSION, recovery_record["recoverySchemaVersion"])
             self.assertEqual("2026-07-29T12:00:00Z", recovery_record["createdAt"])
 
+    def test_cache_quarantine_does_not_fall_back_to_recursive_copy(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = pathlib.Path(temp_dir)
+            app_data = root / "app-data"
+            cache = app_data / "p"
+            nested_file = cache / "c" / "tmp" / "partially-installed" / "deep-file.bin"
+            nested_file.parent.mkdir(parents=True)
+            nested_file.write_bytes(b"partial package")
+
+            with mock.patch.object(
+                runtime_manifest.shutil,
+                "copytree",
+                side_effect=AssertionError("cache quarantine must use a same-volume directory rename"),
+            ):
+                result = runtime_manifest.ensure_cache_compatible(
+                    cache, runtime_fixture(), app_data, now=lambda: self.NOW
+                )
+
+            self.assertFalse(result.reused)
+            recovered_file = result.quarantined_path / "c" / "tmp" / "partially-installed" / "deep-file.bin"
+            self.assertTrue(recovered_file.is_file())
+            self.assertTrue((cache / runtime_manifest.CACHE_MANIFEST_FILENAME).is_file())
+
     def test_recovery_retention_deletes_only_records_older_than_thirty_full_days(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             app_data = pathlib.Path(temp_dir) / "app-data"
