@@ -35,11 +35,15 @@ Assert-True ($configuredCsp -eq "default-src 'none'") "Bundled Tauri assets must
 $cargoManifestSource = Get-Content -LiteralPath (Join-Path $desktopRoot "src-tauri\Cargo.toml") -Raw
 $tauriMainSource = Get-Content -LiteralPath (Join-Path $desktopRoot "src-tauri\src\main.rs") -Raw
 $tauriSmokeSource = Get-Content -LiteralPath (Join-Path $desktopRoot "tests\tauri-smoke.test.ps1") -Raw
+$webviewCspGateSource = Get-Content -LiteralPath (Join-Path $desktopRoot "tests\webview-csp-gate.mjs") -Raw
 Assert-True ($tauriMainSource.Contains('.additional_browser_args(')) "WebView smoke debugging must use Tauri browser arguments on elevated Windows runners"
 Assert-True ($tauriMainSource.Contains('.data_directory(')) "WebView smoke must use an isolated programmatic data directory"
 Assert-True ($tauriSmokeSource.Contains('ECD_TAURI_WEBVIEW_DEBUG_PORT')) "WebView smoke must pass the scoped Tauri debug port"
 Assert-True (-not $tauriSmokeSource.Contains('WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS')) "WebView smoke must not rely on WebView2 environment overrides ignored by elevated hosts"
 Assert-True (-not $tauriSmokeSource.Contains('WEBVIEW2_USER_DATA_FOLDER')) "WebView smoke must not rely on the WebView2 environment data-directory override"
+$initialDocumentReadyIndex = $webviewCspGateSource.IndexOf('await waitForDocument(client)')
+$pageReloadIndex = $webviewCspGateSource.IndexOf('await client.send("Page.reload"')
+Assert-True ($initialDocumentReadyIndex -ge 0 -and $initialDocumentReadyIndex -lt $pageReloadIndex) "WebView CSP smoke must finish the initial navigation before requesting a controlled reload"
 Assert-True ($cargoManifestSource.Contains('tauri-plugin-single-instance = "=2.4.3"')) "Single-instance plugin must be exactly pinned"
 $singleInstancePluginIndex = $tauriMainSource.IndexOf('.plugin(tauri_plugin_single_instance::init(')
 $dialogPluginIndex = $tauriMainSource.IndexOf('.plugin(tauri_plugin_dialog::init())')

@@ -111,6 +111,20 @@ async function evaluate(client, expression) {
   return response.result.value;
 }
 
+async function waitForDocument(client) {
+  const deadline = Date.now() + 30_000;
+  while (Date.now() < deadline) {
+    try {
+      const readyState = await evaluate(client, "document.readyState");
+      if (readyState === "interactive" || readyState === "complete") return;
+    } catch {
+      // The execution context can be replaced while the initial navigation commits.
+    }
+    await delay(100);
+  }
+  throw new Error("Initial WebView document did not finish navigation");
+}
+
 async function waitForApplication(client) {
   const deadline = Date.now() + 30_000;
   while (Date.now() < deadline) {
@@ -141,6 +155,7 @@ try {
   await client.send("Network.enable");
   await client.send("Runtime.enable");
   await client.send("Page.enable");
+  await waitForDocument(client);
   await client.send("Page.addScriptToEvaluateOnNewDocument", {
     source: `
       window.__ecdCspViolations = [];
