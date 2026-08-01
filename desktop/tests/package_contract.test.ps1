@@ -42,8 +42,9 @@ Assert-True ($tauriSmokeSource.Contains('ECD_TAURI_WEBVIEW_DEBUG_PORT')) "WebVie
 Assert-True (-not $tauriSmokeSource.Contains('WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS')) "WebView smoke must not rely on WebView2 environment overrides ignored by elevated hosts"
 Assert-True (-not $tauriSmokeSource.Contains('WEBVIEW2_USER_DATA_FOLDER')) "WebView smoke must not rely on the WebView2 environment data-directory override"
 $initialDocumentReadyIndex = $webviewCspGateSource.IndexOf('await waitForDocument(client)')
-$pageReloadIndex = $webviewCspGateSource.IndexOf('await client.send("Page.reload"')
-Assert-True ($initialDocumentReadyIndex -ge 0 -and $initialDocumentReadyIndex -lt $pageReloadIndex) "WebView CSP smoke must finish the initial navigation before requesting a controlled reload"
+$pageNavigateIndex = $webviewCspGateSource.IndexOf('await client.send("Page.navigate"')
+Assert-True ($initialDocumentReadyIndex -ge 0 -and $initialDocumentReadyIndex -lt $pageNavigateIndex) "WebView CSP smoke must finish the initial navigation before requesting controlled navigation"
+Assert-True (-not $webviewCspGateSource.Contains('client.send("Page.reload"')) "WebView CSP smoke must not rely on Page.reload, which is ignored by the installed hosted WebView"
 Assert-True ($cargoManifestSource.Contains('tauri-plugin-single-instance = "=2.4.3"')) "Single-instance plugin must be exactly pinned"
 $singleInstancePluginIndex = $tauriMainSource.IndexOf('.plugin(tauri_plugin_single_instance::init(')
 $dialogPluginIndex = $tauriMainSource.IndexOf('.plugin(tauri_plugin_dialog::init())')

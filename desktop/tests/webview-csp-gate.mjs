@@ -168,7 +168,7 @@ try {
       });
     `,
   });
-  await client.send("Page.reload", { ignoreCache: true });
+  await client.send("Page.navigate", { url: pageUrl });
   await waitForApplication(client);
   await delay(2_000);
 
