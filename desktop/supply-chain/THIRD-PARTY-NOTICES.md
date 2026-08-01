@@ -744,6 +744,7 @@ WebView2 is an install-time Microsoft prerequisite, not bundled content. The con
 | actions/setup-node | 49933ea5288caeca8642d1e84afbd3f7d6820020 | Unknown | build-only |
 | actions/setup-python | a26af69be951a213d495a4c3e4e4022e16d87065 | Unknown | build-only |
 | actions/upload-artifact | ea165f8d65b6e75b540449e92b4886f43607fa02 | Unknown | build-only |
+| actions/upload-artifact | ea165f8d65b6e75b540449e92b4886f43607fa02 | Unknown | build-only |
 | docker/build-push-action | 10e90e3645eae34f1e60eeb005ba3a3d33f178e8 | Unknown | build-only |
 | docker/login-action | c94ce9fb468520275223c153574b00df6fe4bcc9 | Unknown | build-only |
 | docker/login-action | c94ce9fb468520275223c153574b00df6fe4bcc9 | Unknown | build-only |

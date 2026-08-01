@@ -9,10 +9,13 @@ release boundaries.
 ## Status
 
 The Tauri application, resource package, unsigned debug NSIS installer, silent
-install, and installed application smoke are covered by hosted Windows CI. The
-package remains development-only: no trusted signing certificate, timestamp,
-SmartScreen release result, public updater, or supported public Windows release
-has been completed.
+install, and installed application smoke are covered by hosted Windows CI. An
+explicit manual workflow input also defines a non-debug unsigned technical
+candidate build, provenance/NotSigned checks, install, executable-hash identity,
+installed smoke, and three-day candidate upload. Both paths remain
+development-only: no trusted signing certificate, timestamp, SmartScreen
+release result, public updater, or supported public Windows release has been
+completed.
 
 The implemented runtime and package are Windows x64 only. Windows ARM64 has no
 runtime, package, or test matrix and is outside the `1.4.0` scope.

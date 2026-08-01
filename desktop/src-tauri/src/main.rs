@@ -940,10 +940,34 @@ fn ensure_backend_port_available(port: u16) -> Result<(), String> {
         })
 }
 
-fn open_window(app: &AppHandle, port: u16) -> Result<(), String> {
+fn parse_webview_debug_port(value: Option<&str>) -> Result<Option<u16>, String> {
+    let raw = value.unwrap_or("").trim();
+    if raw.is_empty() {
+        return Ok(None);
+    }
+    let port = raw.parse::<u16>().map_err(|_| {
+        "ECD_TAURI_WEBVIEW_DEBUG_PORT must be an integer between 1 and 65535".to_string()
+    })?;
+    if port == 0 {
+        return Err("ECD_TAURI_WEBVIEW_DEBUG_PORT must be between 1 and 65535".to_string());
+    }
+    Ok(Some(port))
+}
+
+fn open_window(app: &AppHandle, port: u16, app_data_root: &Path) -> Result<(), String> {
     let url = format!("http://127.0.0.1:{port}/");
     let target_url = tauri::Url::parse(&url).map_err(|_| "Invalid backend URL".to_string())?;
-    WebviewWindowBuilder::new(app, "main", WebviewUrl::External(target_url))
+    let mut builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::External(target_url));
+    let webview_debug_port = env::var("ECD_TAURI_WEBVIEW_DEBUG_PORT").ok();
+    if let Some(debug_port) = parse_webview_debug_port(webview_debug_port.as_deref())? {
+        let browser_arguments = format!(
+            "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --remote-debugging-port={debug_port}"
+        );
+        builder = builder
+            .additional_browser_args(&browser_arguments)
+            .data_directory(app_data_root.join("webview"));
+    }
+    builder
         .title("ESPConfig Designer")
         .inner_size(1440.0, 920.0)
         .min_inner_size(960.0, 640.0)
@@ -1062,7 +1086,7 @@ fn main() {
             backend
                 .wait_until_ready(config.port, config.health_timeout)
                 .map_err(|error| Box::<dyn std::error::Error>::from(error))?;
-            open_window(app.handle(), config.port)
+            open_window(app.handle(), config.port, &config.app_data_root)
                 .map_err(|error| Box::<dyn std::error::Error>::from(error))?;
             app.manage(BackendController {
                 process: Mutex::new(Some(backend)),
@@ -1128,6 +1152,17 @@ mod tests {
             default_workspace(&profile),
             profile.join("Documents").join("ecd_workspace")
         );
+    }
+
+    #[test]
+    fn webview_debug_port_is_optional_and_strict() {
+        assert_eq!(parse_webview_debug_port(None).unwrap(), None);
+        assert_eq!(
+            parse_webview_debug_port(Some(" 32123 ")).unwrap(),
+            Some(32123)
+        );
+        assert!(parse_webview_debug_port(Some("0")).is_err());
+        assert!(parse_webview_debug_port(Some("invalid")).is_err());
     }
 
     #[derive(Default)]

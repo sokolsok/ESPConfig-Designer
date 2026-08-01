@@ -1,5 +1,6 @@
 param(
-    [string]$InstallRoot = ""
+    [string]$InstallRoot = "",
+    [string]$ExpectedExecutableSha256 = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -14,7 +15,8 @@ function Assert-True {
 $desktopRoot = Split-Path -Parent $PSScriptRoot
 $repoRoot = Split-Path -Parent $desktopRoot
 $releaseContractTest = Join-Path $PSScriptRoot "release_build_contract.test.mjs"
-& node --test $releaseContractTest
+$workflowContractTest = Join-Path $PSScriptRoot "windows_workflow_contract.test.mjs"
+& node --test $releaseContractTest $workflowContractTest
 Assert-True ($LASTEXITCODE -eq 0) "Unsigned release build contract failed"
 
 $desktopPackage = Get-Content -LiteralPath (Join-Path $desktopRoot "package.json") -Raw | ConvertFrom-Json
@@ -32,6 +34,12 @@ $configuredCsp = [string]$config.app.security.csp
 Assert-True ($configuredCsp -eq "default-src 'none'") "Bundled Tauri assets must remain fail-closed; the loopback UI receives CSP from Flask"
 $cargoManifestSource = Get-Content -LiteralPath (Join-Path $desktopRoot "src-tauri\Cargo.toml") -Raw
 $tauriMainSource = Get-Content -LiteralPath (Join-Path $desktopRoot "src-tauri\src\main.rs") -Raw
+$tauriSmokeSource = Get-Content -LiteralPath (Join-Path $desktopRoot "tests\tauri-smoke.test.ps1") -Raw
+Assert-True ($tauriMainSource.Contains('.additional_browser_args(')) "WebView smoke debugging must use Tauri browser arguments on elevated Windows runners"
+Assert-True ($tauriMainSource.Contains('.data_directory(')) "WebView smoke must use an isolated programmatic data directory"
+Assert-True ($tauriSmokeSource.Contains('ECD_TAURI_WEBVIEW_DEBUG_PORT')) "WebView smoke must pass the scoped Tauri debug port"
+Assert-True (-not $tauriSmokeSource.Contains('WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS')) "WebView smoke must not rely on WebView2 environment overrides ignored by elevated hosts"
+Assert-True (-not $tauriSmokeSource.Contains('WEBVIEW2_USER_DATA_FOLDER')) "WebView smoke must not rely on the WebView2 environment data-directory override"
 Assert-True ($cargoManifestSource.Contains('tauri-plugin-single-instance = "=2.4.3"')) "Single-instance plugin must be exactly pinned"
 $singleInstancePluginIndex = $tauriMainSource.IndexOf('.plugin(tauri_plugin_single_instance::init(')
 $dialogPluginIndex = $tauriMainSource.IndexOf('.plugin(tauri_plugin_dialog::init())')
@@ -194,7 +202,15 @@ Assert-True (-not $desktopDevelopmentGuide.Contains("There is no release package
 
 if ($InstallRoot) {
     $resolvedInstallRoot = [System.IO.Path]::GetFullPath($InstallRoot)
-    Assert-True (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "esp-config-designer-desktop.exe") -PathType Leaf) "Installed Desktop executable is missing"
+    $installedExecutable = Join-Path $resolvedInstallRoot "esp-config-designer-desktop.exe"
+    Assert-True (Test-Path -LiteralPath $installedExecutable -PathType Leaf) "Installed Desktop executable is missing"
+    $installedSignature = Get-AuthenticodeSignature -LiteralPath $installedExecutable
+    Assert-True ($installedSignature.Status -eq "NotSigned") "Installed Desktop executable must be NotSigned"
+    if ($ExpectedExecutableSha256) {
+        Assert-True ($ExpectedExecutableSha256 -match "^[0-9a-fA-F]{64}$") "Expected installed executable SHA-256 is invalid"
+        $installedHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $installedExecutable).Hash
+        Assert-True ($installedHash -eq $ExpectedExecutableSha256) "Installed Desktop executable SHA-256 does not match the packaged application executable"
+    }
     Assert-True (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\backend\server.py") -PathType Leaf) "Installed shared backend is missing"
     foreach ($fileName in @("desktop_launcher.py", "desktop_runtime.py", "application_payload.py", "runtime_contract.py", "runtime_manifest.py", "runtime_diagnostics.py", "runtime_update.py")) {
         Assert-True (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot "ecd-app\backend\$fileName") -PathType Leaf) "Installed flat backend module is missing: $fileName"

@@ -314,8 +314,14 @@ npm --prefix desktop run verify:resources
 
 The hosted `.github/workflows/desktop-windows.yml` gate additionally starts from
 a fresh checkout, verifies source absence of generated inputs, installs the
-unsigned package silently, checks the installed layout, runs installed smoke,
-and uploads the installer for seven days.
+unsigned debug package silently, checks the installed layout, runs installed
+smoke, and uploads the installer for seven days. A manual dispatch with the
+`unsigned_release` input enabled then calls only
+`npm --prefix desktop run build:package:release`, verifies the candidate
+provenance, source SHA, clean status, hashes and `NotSigned` state, installs it,
+matches the installed executable hash, repeats installed smoke/resource checks,
+and retains the complete `unsigned-technical-candidate-not-for-users` set for
+three days. The manual path does not sign or publish anything.
 
 The workflow definition describes configured coverage; it is not evidence that
 the current commit passed hosted CI. Hosted quality/Desktop, supported-Windows

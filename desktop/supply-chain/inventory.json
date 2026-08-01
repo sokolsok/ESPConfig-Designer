@@ -9907,7 +9907,7 @@
       "license": null,
       "publisher": "actions",
       "provenance": [
-        ".github/workflows/desktop-windows.yml:78"
+        ".github/workflows/desktop-windows.yml:84"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -9929,7 +9929,7 @@
       "license": null,
       "publisher": "actions",
       "provenance": [
-        ".github/workflows/desktop-windows.yml:38"
+        ".github/workflows/desktop-windows.yml:44"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -10061,7 +10061,7 @@
       "license": null,
       "publisher": "actions",
       "provenance": [
-        ".github/workflows/desktop-windows.yml:45"
+        ".github/workflows/desktop-windows.yml:51"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -10193,7 +10193,29 @@
       "license": null,
       "publisher": "actions",
       "provenance": [
-        ".github/workflows/desktop-windows.yml:210"
+        ".github/workflows/desktop-windows.yml:216"
+      ],
+      "usage": "build-only",
+      "unavailable": {
+        "artifact": "A workflow action reference identifies a Git repository revision, not a standalone artifact.",
+        "license": "Workflow YAML does not include action license metadata."
+      }
+    },
+    {
+      "ecosystem": "github-actions",
+      "scope": "github-actions",
+      "name": "actions/upload-artifact",
+      "version": "ea165f8d65b6e75b540449e92b4886f43607fa02",
+      "source": "https://github.com/actions/upload-artifact",
+      "artifact": null,
+      "integrity": {
+        "algorithm": "git-commit",
+        "value": "ea165f8d65b6e75b540449e92b4886f43607fa02"
+      },
+      "license": null,
+      "publisher": "actions",
+      "provenance": [
+        ".github/workflows/desktop-windows.yml:282"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -10405,7 +10427,7 @@
       "name": "CPython NuGet x64",
       "version": "3.13.9",
       "source": "https://api.nuget.org/v3-flatcontainer/python/3.13.9/python.3.13.9.nupkg",
-      "artifact": "python.3.13.9.nupkg",
+      "artifact": "python-3.13.9-nuget.zip",
       "integrity": {
         "algorithm": "SHA-256",
         "value": "ea7541c98f77b6f344460b88db6e677573069979bcbf0ba18747cc2c125aba25"

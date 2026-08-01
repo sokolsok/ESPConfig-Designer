@@ -25,6 +25,12 @@ on:
       - "CHANGELOG.md"
       - ".github/workflows/desktop-windows.yml"
   workflow_dispatch:
+    inputs:
+      unsigned_release:
+        description: Build and install an unsigned release technical candidate (not for users)
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -214,4 +220,68 @@ jobs:
             ${{ steps.installer.outputs.path }}
             ${{ steps.installer.outputs.hash_path }}
           retention-days: 7
+          if-no-files-found: error
+
+      - name: Build unsigned release technical candidate
+        if: github.event_name == 'workflow_dispatch' && inputs.unsigned_release
+        shell: powershell
+        env:
+          ECD_RELEASE_RUNTIME_ROOT: ${{ env.ECD_RUNTIME_ROOT }}
+        run: npm --prefix desktop run build:package:release
+
+      - name: Verify unsigned release provenance
+        if: github.event_name == 'workflow_dispatch' && inputs.unsigned_release
+        id: release-candidate
+        shell: powershell
+        run: |
+          $version = (Get-Content -LiteralPath "VERSION" -Raw).Trim()
+          $candidateRoot = Join-Path "desktop/src-tauri/target/unsigned-technical-candidates" "$version-$env:GITHUB_SHA"
+          if (-not (Test-Path -LiteralPath $candidateRoot -PathType Container)) { throw "Unsigned release candidate directory is missing: $candidateRoot" }
+          $provenancePath = Join-Path $candidateRoot "provenance.json"
+          $provenance = Get-Content -LiteralPath $provenancePath -Raw | ConvertFrom-Json
+          if ($provenance.kind -ne "ecd-windows-unsigned-technical-candidate") { throw "Unexpected release provenance kind" }
+          if ($provenance.status -ne "unsigned technical candidate - not for users") { throw "Unexpected unsigned candidate status" }
+          if ($provenance.source.commit -ne $env:GITHUB_SHA -or $provenance.source.status -ne "clean") { throw "Release provenance does not identify the clean workflow source SHA" }
+          if ($provenance.build.mode -ne "release" -or ($provenance.build.command -join " ") -ne "tauri build --bundles nsis") { throw "Release provenance does not identify a non-debug NSIS build" }
+          if ($provenance.signing -ne "none" -or $provenance.publication -ne "none") { throw "Unsigned candidate provenance unexpectedly claims signing or publication" }
+          $application = @($provenance.artifacts | Where-Object { $_.role -eq "application-exe" })
+          $installer = @($provenance.artifacts | Where-Object { $_.role -eq "nsis-installer" })
+          if ($application.Count -ne 1 -or $installer.Count -ne 1) { throw "Expected exactly one release application EXE and one NSIS installer" }
+          foreach ($artifact in @($application[0], $installer[0])) {
+            $artifactPath = Join-Path $candidateRoot $artifact.file
+            if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) { throw "Candidate artifact is missing: $($artifact.file)" }
+            if ((Get-FileHash -Algorithm SHA256 -LiteralPath $artifactPath).Hash -ne $artifact.sha256) { throw "Candidate artifact hash does not match provenance: $($artifact.file)" }
+            $signature = Get-AuthenticodeSignature -LiteralPath $artifactPath
+            if ($artifact.signatureStatus -ne "NotSigned" -or $signature.Status -ne "NotSigned") { throw "Candidate artifact must be NotSigned: $($artifact.file)" }
+          }
+          foreach ($sidecar in @("SHA256SUMS", "UNSIGNED-NOT-FOR-USERS.txt", "inventory.json", "THIRD-PARTY-NOTICES.md")) {
+            if (-not (Test-Path -LiteralPath (Join-Path $candidateRoot $sidecar) -PathType Leaf)) { throw "Candidate sidecar is missing: $sidecar" }
+          }
+          Add-Content -LiteralPath $env:GITHUB_OUTPUT -Value "root=$((Resolve-Path $candidateRoot).Path)"
+          Add-Content -LiteralPath $env:GITHUB_OUTPUT -Value "installer=$((Resolve-Path (Join-Path $candidateRoot $installer[0].file)).Path)"
+          Add-Content -LiteralPath $env:GITHUB_OUTPUT -Value "application_sha256=$($application[0].sha256)"
+
+      - name: Install and verify unsigned release package
+        if: github.event_name == 'workflow_dispatch' && inputs.unsigned_release
+        shell: powershell
+        run: |
+          $installRoot = Join-Path $env:RUNNER_TEMP "ecd-release-installed"
+          $process = Start-Process -FilePath "${{ steps.release-candidate.outputs.installer }}" -ArgumentList @("/S", "/D=$installRoot") -Wait -PassThru
+          if ($process.ExitCode -ne 0) { throw "Release NSIS installation failed with exit code $($process.ExitCode)" }
+          powershell -NoProfile -ExecutionPolicy Bypass -File desktop/tests/package_contract.test.ps1 -InstallRoot $installRoot -ExpectedExecutableSha256 "${{ steps.release-candidate.outputs.application_sha256 }}"
+          if ($LASTEXITCODE -ne 0) { throw "Installed release package contract failed" }
+          $installedExecutable = Join-Path $installRoot "esp-config-designer-desktop.exe"
+          $installedResources = Join-Path $installRoot "ecd-app"
+          powershell -NoProfile -ExecutionPolicy Bypass -File desktop/tests/tauri-smoke.test.ps1 -Executable $installedExecutable -ResourceRoot $installedResources -UseExecutableResources
+          if ($LASTEXITCODE -ne 0) { throw "Installed release package smoke failed" }
+          powershell -NoProfile -ExecutionPolicy Bypass -File desktop/scripts/verify-resources.ps1 -ResourcesRoot $installedResources
+          if ($LASTEXITCODE -ne 0) { throw "Installed release resources verification failed" }
+
+      - name: Upload unsigned technical candidate not for users
+        if: github.event_name == 'workflow_dispatch' && inputs.unsigned_release
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: esp-config-designer-windows-unsigned-technical-candidate-not-for-users-${{ github.sha }}
+          path: ${{ steps.release-candidate.outputs.root }}
+          retention-days: 3
           if-no-files-found: error

@@ -102,7 +102,7 @@ Assert-True ($scopeCounts.python -eq 98) "Supply-chain inventory Python graph is
 Assert-True ($scopeCounts.npm -eq 89) "Supply-chain inventory npm graph is incomplete"
 Assert-True ($scopeCounts.cargo -eq 481) "Supply-chain inventory Cargo graph is incomplete"
 Assert-True ($scopeCounts.native -eq 10) "Supply-chain inventory native inputs are incomplete"
-Assert-True ($scopeCounts.'github-actions' -eq 22) "Supply-chain inventory GitHub Actions inputs are incomplete"
+Assert-True ($scopeCounts.'github-actions' -eq 23) "Supply-chain inventory GitHub Actions inputs are incomplete"
 foreach ($lockedLine in $lockLines) {
     $parts = $lockedLine.Substring(0, $lockedLine.Length - 2).Split(@("=="), 2, [System.StringSplitOptions]::None)
     $normalizedName = $parts[0].ToLowerInvariant().Replace("_", "-").Replace(".", "-")

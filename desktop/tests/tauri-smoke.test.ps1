@@ -54,7 +54,6 @@ $workspace = Join-Path ([System.IO.Path]::GetTempPath()) $unicodeName
 $hostilePythonRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("ecd-hostile-python-" + $suffix)
 $hostileUserBase = Join-Path ([System.IO.Path]::GetTempPath()) ("ecd-hostile-userbase-" + $suffix)
 $hostileUserSite = Join-Path $hostileUserBase "Python313\site-packages"
-$webviewDataRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("ecd-webview-data-" + $suffix)
 $port = 18000 + (Get-Random -Minimum 1 -Maximum 400)
 $debugListener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, 0)
 $debugListener.Start()
@@ -115,8 +114,7 @@ $startInfo.EnvironmentVariables["ECD_TAURI_PORT"] = $port.ToString()
 $startInfo.EnvironmentVariables["ECD_TAURI_HEALTH_TIMEOUT_MS"] = "120000"
 $startInfo.EnvironmentVariables["PYTHONPATH"] = $hostilePythonRoot
 $startInfo.EnvironmentVariables["PYTHONUSERBASE"] = $hostileUserBase
-$startInfo.EnvironmentVariables["WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS"] = "--remote-debugging-port=$debugPort"
-$startInfo.EnvironmentVariables["WEBVIEW2_USER_DATA_FOLDER"] = $webviewDataRoot
+$startInfo.EnvironmentVariables["ECD_TAURI_WEBVIEW_DEBUG_PORT"] = $debugPort.ToString()
 
 $process = $null
 $secondProcess = $null
@@ -190,7 +188,7 @@ try {
     if (Test-Path -LiteralPath $workspace) {
         Remove-Item -LiteralPath $workspace -Recurse -Force
     }
-    foreach ($path in @($hostilePythonRoot, $hostileUserBase, $webviewDataRoot)) {
+    foreach ($path in @($hostilePythonRoot, $hostileUserBase)) {
         if (Test-Path -LiteralPath $path) {
             Remove-Item -LiteralPath $path -Recurse -Force
         }

@@ -51,9 +51,11 @@ and [Windows 11 release information](https://learn.microsoft.com/windows/release
 
 ## Development package installation
 
-The hosted Desktop workflow creates an unsigned installer as a short-lived
-development artifact. A local developer can create the same class of package by
-following the [Desktop development guide](../development/desktop.md).
+The hosted Desktop workflow creates an unsigned debug installer as a short-lived
+development artifact. A manual dispatch can additionally request a non-debug
+unsigned technical candidate; that artifact is retained for three days and is
+explicitly marked as not for users. A local developer can create either class of
+package by following the [Desktop development guide](../development/desktop.md).
 
 Before testing any development package:
 
@@ -181,6 +183,13 @@ third-party notices. Python and MinGit archives and the complete Python package
 graph are hash-checked during preparation; the installed-runtime fingerprint is
 an additional check rather than a substitute for download verification.
 
+An explicit manual `unsigned_release` dispatch additionally runs the single
+repository-owned non-debug release command, verifies its clean source
+provenance and `NotSigned` application/installer, installs the candidate, checks
+that the installed executable has the expected SHA-256, repeats installed smoke
+and resource verification, and uploads the complete candidate set for three
+days. It performs no signing or publication and is not a public release.
+
 This is development-package validation, not a signed release gate. The separate
 `desktop/platforms/windows/clean-machine-gate.ps1` performs real firmware
 compile/cache/offline/cancel scenarios only when a prepared `C:\ECDTest`
@@ -189,11 +198,11 @@ It is not part of hosted CI and must not be reported as a current hosted PASS.
 
 ## Release requirements
 
-A public Windows release still requires a non-debug package, clean tests of the
-matrix above, and a trusted Authenticode signature and timestamp. The planned
-application is to SignPath Foundation; if accepted, the displayed Publisher is
-expected to be `SignPath Foundation`, not the project name. No certificate,
-signing workflow, publisher result, or approval exists yet.
+A public Windows release still requires clean tests of the matrix above and a
+trusted Authenticode signature and timestamp for a frozen non-debug candidate.
+The planned application is to SignPath Foundation; if accepted, the displayed
+Publisher is expected to be `SignPath Foundation`, not the project name. No
+certificate, signing workflow, publisher result, or approval exists yet.
 
 The planned provider's current eligibility and operating requirements are
 defined by the [SignPath Foundation terms](https://signpath.org/terms). Provider
