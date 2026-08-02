@@ -186,6 +186,7 @@ VALID_DEVICE = re.compile(r"^[A-Za-z0-9._-]+$")
 VALID_COMPONENT_TOKEN = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 VALID_JOB_ID = re.compile(r"^[A-Za-z0-9_-]+$")
 ANSI_ESCAPE = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+PLATFORMIO_PROCESSING = re.compile(r"(?:^|\s)Processing\s+([A-Za-z0-9._-]+)\s+\(")
 SERIAL_PORT_PREFIXES = ("/dev/ttyUSB", "/dev/ttyACM", "/dev/serial/by-id/")
 JOB_STATES = {"queued", "running", "success", "failed", "canceled"}
 INTERRUPTED_JOB_ERROR_SUMMARY = "Interrupted by backend restart"
@@ -1868,6 +1869,7 @@ class Job:
         self.process_controller: Optional["_ProcessTreeController"] = None
         self.cancel_requested = False
         self.last_log_line = ""
+        self.firmware_log_nodes = set()
 
     @classmethod
     def from_dict(cls, data: dict, job_dir: Optional[str] = None) -> "Job":
@@ -1919,7 +1921,10 @@ class Job:
             self.listeners.discard(listener)
 
     def push_log(self, line: str) -> None:
+        processing_match = PLATFORMIO_PROCESSING.search(line)
         with self.lock:
+            if processing_match:
+                self.firmware_log_nodes.add(processing_match.group(1))
             self.ring_buffer.append(line)
             self.line_seq += 1
             self.seq_buffer.append((self.line_seq, line))
@@ -2232,6 +2237,7 @@ class JobManager:
                 return
             job.state = "running"
             job.started_at = utc_now()
+            job.firmware_log_nodes.clear()
             job.save_status()
 
         firmware_inventory_before = (
@@ -2304,8 +2310,10 @@ class JobManager:
                     for node_name, artifacts in firmware_inventory_after.items()
                     if firmware_inventory_before.get(node_name) != artifacts
                 )
-                if len(changed_nodes) == 1:
-                    job.firmware_node = changed_nodes[0]
+                logged_nodes = sorted(job.firmware_log_nodes.intersection(firmware_inventory_after))
+                observed_nodes = logged_nodes if logged_nodes else changed_nodes
+                if len(observed_nodes) == 1:
+                    job.firmware_node = observed_nodes[0]
             job.state = "success"
             job.exit_code = 0
             job.error_summary = ""

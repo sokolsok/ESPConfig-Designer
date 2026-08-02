@@ -116,6 +116,40 @@ class ProcessTreeControllerTests(unittest.TestCase):
             server.JOB_DIR = original_job_dir
             server.ECD_MODE = original_mode
 
+    def test_cached_compile_records_the_firmware_build_node_from_platformio_output(self):
+        original_build_path = server.ESPHOME_BUILD_PATH
+        original_job_dir = server.JOB_DIR
+        original_mode = server.ECD_MODE
+        try:
+            with tempfile.TemporaryDirectory() as temp_dir:
+                root = pathlib.Path(temp_dir)
+                server.ESPHOME_BUILD_PATH = str(root / "build")
+                server.JOB_DIR = str(root / "jobs")
+                server.ECD_MODE = "standalone"
+                output = root / "build" / "ecd-clean-gate" / ".pioenvs" / "ecd-clean-gate"
+                output.mkdir(parents=True)
+                (output / "firmware.bin").write_bytes(b"unchanged ota")
+                manager = server.JobManager(start_worker=False)
+                try:
+                    job = manager.submit("test.yaml", "compile", "")
+
+                    def run_esphome(current_job, args):
+                        if args[0] == "compile":
+                            current_job.push_log("Processing ecd-clean-gate (platform: test)")
+                        return 0
+
+                    with mock.patch.object(manager, "_run_esphome", side_effect=run_esphome):
+                        manager._run_job(job)
+
+                    self.assertEqual("success", job.state)
+                    self.assertEqual("ecd-clean-gate", job.firmware_node)
+                finally:
+                    manager.close()
+        finally:
+            server.ESPHOME_BUILD_PATH = original_build_path
+            server.JOB_DIR = original_job_dir
+            server.ECD_MODE = original_mode
+
     def test_firmware_download_uses_build_node_recorded_by_matching_yaml_job(self):
         original_build_path = server.ESPHOME_BUILD_PATH
         original_esphome_data = server.ESPHOME_DATA_DIR
@@ -224,6 +258,7 @@ class ProcessTreeControllerTests(unittest.TestCase):
                     def run_esphome(_job, args):
                         if args[0] == "compile":
                             for node_name in ("first-node", "second-node"):
+                                _job.push_log(f"Processing {node_name} (platform: test)")
                                 output = root / "build" / node_name / ".pioenvs" / node_name
                                 output.mkdir(parents=True)
                                 (output / "firmware.bin").write_bytes(node_name.encode("ascii"))
