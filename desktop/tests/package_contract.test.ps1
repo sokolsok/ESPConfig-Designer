@@ -34,6 +34,12 @@ $configuredCsp = [string]$config.app.security.csp
 Assert-True ($configuredCsp -eq "default-src 'none'") "Bundled Tauri assets must remain fail-closed; the loopback UI receives CSP from Flask"
 $cargoManifestSource = Get-Content -LiteralPath (Join-Path $desktopRoot "src-tauri\Cargo.toml") -Raw
 $tauriMainSource = Get-Content -LiteralPath (Join-Path $desktopRoot "src-tauri\src\main.rs") -Raw
+$startupGuardPath = Join-Path $desktopRoot "src-tauri\src\startup_guard.rs"
+Assert-True (Test-Path -LiteralPath $startupGuardPath -PathType Leaf) "Windows startup guard module is missing"
+$startupGuardSource = Get-Content -LiteralPath $startupGuardPath -Raw
+$simultaneousStartTestPath = Join-Path $desktopRoot "tests\tauri-simultaneous-start.test.ps1"
+Assert-True (Test-Path -LiteralPath $simultaneousStartTestPath -PathType Leaf) "Simultaneous startup process gate is missing"
+$simultaneousStartTestSource = Get-Content -LiteralPath $simultaneousStartTestPath -Raw
 $tauriSmokeSource = Get-Content -LiteralPath (Join-Path $desktopRoot "tests\tauri-smoke.test.ps1") -Raw
 $webviewCspGateSource = Get-Content -LiteralPath (Join-Path $desktopRoot "tests\webview-csp-gate.mjs") -Raw
 Assert-True ($tauriMainSource.Contains('.additional_browser_args(')) "WebView smoke debugging must use Tauri browser arguments on elevated Windows runners"
@@ -46,14 +52,63 @@ $pageNavigateIndex = $webviewCspGateSource.IndexOf('await client.send("Page.navi
 Assert-True ($initialDocumentReadyIndex -ge 0 -and $initialDocumentReadyIndex -lt $pageNavigateIndex) "WebView CSP smoke must finish the initial navigation before requesting controlled navigation"
 Assert-True (-not $webviewCspGateSource.Contains('client.send("Page.reload"')) "WebView CSP smoke must not rely on Page.reload, which is ignored by the installed hosted WebView"
 Assert-True ($cargoManifestSource.Contains('tauri-plugin-single-instance = "=2.4.3"')) "Single-instance plugin must be exactly pinned"
+$guardAcquireIndex = $tauriMainSource.IndexOf('StartupGuard::acquire(')
+$builderIndex = $tauriMainSource.IndexOf('tauri::Builder::default()')
 $singleInstancePluginIndex = $tauriMainSource.IndexOf('.plugin(tauri_plugin_single_instance::init(')
 $dialogPluginIndex = $tauriMainSource.IndexOf('.plugin(tauri_plugin_dialog::init())')
 $openerPluginIndex = $tauriMainSource.IndexOf('.plugin(tauri_plugin_opener::init())')
 $setupIndex = $tauriMainSource.IndexOf('.setup(')
+Assert-True ($tauriMainSource.Contains('#[cfg(windows)]`r`nmod startup_guard;') -or $tauriMainSource.Contains("#[cfg(windows)]`nmod startup_guard;")) "Startup guard must remain isolated to Windows"
+Assert-True ($guardAcquireIndex -ge 0 -and $guardAcquireIndex -lt $builderIndex) "Startup guard must be acquired before creating the Tauri builder"
 Assert-True ($singleInstancePluginIndex -ge 0) "Single-instance plugin is not registered"
 Assert-True ($singleInstancePluginIndex -lt $dialogPluginIndex) "Single-instance plugin must precede the dialog plugin"
 Assert-True ($singleInstancePluginIndex -lt $openerPluginIndex) "Single-instance plugin must precede the opener plugin"
 Assert-True ($singleInstancePluginIndex -lt $setupIndex) "Single-instance plugin must be registered before setup"
+$setupBody = $tauriMainSource.Substring($setupIndex, [Math]::Min(500, $tauriMainSource.Length - $setupIndex))
+Assert-True ($setupBody -match '\.setup\(move \|app\| \{\s*#\[cfg\(windows\)\]\s*if let Err\(error\) = startup_guard\.release\(\)') "Startup guard must be released as the first setup operation"
+Assert-True ($setupBody -match 'startup_guard\s*\.release\(\)[\s\S]{0,300}show_startup_error') "Startup guard release failures must show a native error before setup fails"
+Assert-True ($startupGuardSource.Contains('Local\com.espconfigdesigner.desktop.startup-guard')) "Startup guard must use a stable session-local name distinct from the plugin mutex"
+Assert-True (-not $startupGuardSource.Contains('com.espconfigdesigner.desktop-sim')) "Startup guard must not reuse the single-instance plugin mutex name"
+Assert-True ($startupGuardSource.Contains('WaitForSingleObject')) "Startup guard must use a bounded Windows wait"
+Assert-True ($startupGuardSource.Contains('WAIT_TIMEOUT')) "Startup guard must handle timeout explicitly"
+Assert-True ($startupGuardSource.Contains('WAIT_ABANDONED')) "Startup guard must recover an abandoned mutex"
+Assert-True ($startupGuardSource.Contains('WAIT_FAILED')) "Startup guard must report Windows wait failures"
+Assert-True ($startupGuardSource -match 'Duration::from_secs\(10\)') "Startup guard wait must have a stable ten-second bound"
+Assert-True ($startupGuardSource -match 'Timeout[\s\S]{0,500}Err\(') "Startup guard timeout must fail closed"
+Assert-True (-not $config.PSObject.Properties.Name.Contains('allowMultipleInstances')) "Desktop must not enable multiple instances"
+Assert-True ($tauriMainSource -match 'fn handle_second_instance[\s\S]*?activate_main_window') "Single-instance callback must continue to activate the main window"
+Assert-True ($desktopPackage.scripts.'test:tauri-simultaneous-start' -eq "powershell -ExecutionPolicy Bypass -File tests/tauri-simultaneous-start.test.ps1") "Simultaneous startup command is missing"
+Assert-True ($simultaneousStartTestSource.Contains('ECD_TAURI_TEST_STARTUP_GUARD_HOLD_MS')) "Simultaneous startup gate must widen the guarded window deterministically"
+Assert-True ($simultaneousStartTestSource.Contains('Wait-StartupGuardOwned $primary')) "Simultaneous startup gate must prove primary guard ownership before launching secondary"
+Assert-True ($simultaneousStartTestSource.Contains('Wait-StartupGuardOwned $crashedPrimary')) "Crash gate must prove primary guard ownership before launching takeover"
+Assert-True ($simultaneousStartTestSource.Contains('Process did not recover the abandoned startup guard')) "Simultaneous startup gate must cover primary crash recovery"
+Assert-True ($simultaneousStartTestSource.Contains('Startup guard timeout failed open')) "Simultaneous startup gate must cover fail-closed timeout"
+Assert-True (-not $simultaneousStartTestSource.Contains('MainWindowHandle')) "Startup error cleanup must not target the plugin IPC window through Process.MainWindowHandle"
+Assert-True ($simultaneousStartTestSource.Contains('ESPConfig Designer could not start')) "Startup error cleanup must require the exact startup dialog title"
+foreach ($windowApi in @('EnumWindows', 'GetWindowThreadProcessId', 'IsWindowVisible', 'GetWindowTextLengthW', 'GetWindowTextW')) {
+    Assert-True ($simultaneousStartTestSource.Contains($windowApi)) "Startup error cleanup is missing precise window API: $windowApi"
+}
+Assert-True ($simultaneousStartTestSource -match 'GetWindowThreadProcessId[\s\S]{0,500}processId\s*!=\s*expectedProcessId') "Startup error cleanup must reject windows belonging to another PID"
+Assert-True ($simultaneousStartTestSource -match 'String\.Equals\([\s\S]{0,300}expectedTitle[\s\S]{0,100}StringComparison\.Ordinal') "Startup error cleanup must compare the complete dialog title exactly"
+$closeDialogMatch = [regex]::Match($simultaneousStartTestSource, 'function Close-StartupErrorDialog[\s\S]*?\r?\n\}')
+Assert-True ($closeDialogMatch.Success) "Startup error dialog closer is missing"
+Assert-True ($closeDialogMatch.Value -match 'if \(\$Process\.HasExited\) \{ return \}') "Startup error dialog wait must stop if the process exits first"
+Assert-True ($closeDialogMatch.Value -match 'Assert-True \(\[StartupGuardNative\]::PostMessageW\(') "Startup error cleanup must check the PostMessageW result"
+$cleanupErrorsIndex = $simultaneousStartTestSource.IndexOf('$cleanupErrors = New-Object System.Collections.Generic.List[string]')
+$mainCatchIndex = $simultaneousStartTestSource.IndexOf('catch {', $simultaneousStartTestSource.IndexOf('try {', $cleanupErrorsIndex))
+$finalCleanupIndex = $simultaneousStartTestSource.LastIndexOf('} finally {')
+Assert-True ($cleanupErrorsIndex -ge 0) "Simultaneous-start cleanup must collect independent cleanup errors"
+Assert-True ($simultaneousStartTestSource.Contains('$testFailure = $null')) "Simultaneous-start gate must reserve the original test failure"
+Assert-True ($mainCatchIndex -ge 0 -and $mainCatchIndex -lt $finalCleanupIndex) "Simultaneous-start gate must catch and preserve its primary failure before cleanup"
+Assert-True ($simultaneousStartTestSource -match 'catch \{\s*\$testFailure = \$_\s*\}[\s\S]*finally') "Simultaneous-start gate must preserve the original ErrorRecord"
+$cleanupBody = $simultaneousStartTestSource.Substring($finalCleanupIndex)
+Assert-True ($cleanupBody -match 'try \{[\s\S]{0,300}\$foreignListener\.Stop\(\)[\s\S]{0,300}\} catch \{') "Foreign-listener cleanup must have its own try/catch"
+Assert-True ($cleanupBody -match 'try \{[\s\S]{0,300}ReleaseMutex\(\$externalMutex\)[\s\S]{0,300}\} catch \{') "External mutex release must have its own try/catch"
+Assert-True ($cleanupBody -match 'try \{[\s\S]{0,300}CloseHandle\(\$externalMutex\)[\s\S]{0,300}\} catch \{') "External mutex handle close must have its own try/catch"
+Assert-True ($cleanupBody -match 'foreach \(\$process in \$processes\) \{\s*try \{[\s\S]{0,500}Stop-ProcessTree[\s\S]{0,300}\} catch \{') "Each test process must be cleaned in an independent try/catch"
+Assert-True ($cleanupBody -match 'foreach \(\$port in \$ports\) \{\s*try \{[\s\S]{0,300}Wait-NoListener[\s\S]{0,300}\} catch \{') "Each test port must be checked in an independent try/catch"
+Assert-True ($cleanupBody -match 'foreach \(\$root in \$roots\) \{\s*try \{[\s\S]{0,500}Remove-Item -LiteralPath \$root[\s\S]{0,300}\} catch \{') "Each test root must be removed in an independent try/catch"
+Assert-True ($cleanupBody -match 'if \(\$testFailure\)[\s\S]{0,500}throw \$testFailure') "Cleanup reporting must rethrow the original test failure"
 $externalLinksCapabilityPath = Join-Path $desktopRoot "src-tauri\capabilities\external-links.json"
 Assert-True (Test-Path -LiteralPath $externalLinksCapabilityPath -PathType Leaf) "External-link capability is missing"
 $externalLinksCapability = Get-Content -LiteralPath $externalLinksCapabilityPath -Raw | ConvertFrom-Json

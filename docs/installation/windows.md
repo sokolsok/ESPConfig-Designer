@@ -134,10 +134,26 @@ the existing window instead of starting another backend. If another application
 uses the configured loopback port, ESPConfig Designer reports a startup conflict
 instead of connecting to that process.
 
-The current development package still has a narrow upstream Tauri plugin race
-when two copies are cold-started almost simultaneously. This does not affect the
-normal second-launch flow, but it must be closed and retested before the package
-is considered ready for release signing.
+The pinned upstream Tauri single-instance plugin `2.4.3` still contains a narrow
+Windows race when two copies are cold-started almost simultaneously. ECD adds a
+separate session-local Windows startup guard that serializes only initialization
+of that plugin. Once the plugin has created its IPC target, ECD releases the
+guard before workspace, port, or backend startup. The plugin still identifies
+the primary instance, forwards launch data, activates its window, and exits the
+secondary process. The guard is not a workspace/backend lock, does not use the
+backend port, and does not permit multiple instances.
+
+The guard has a ten-second fail-closed timeout and reports a native startup error
+instead of allowing an unguarded instance to continue. A crashed owner leaves no
+stale mutex. The repository configures simultaneous-start tests for the fresh
+debug executable and installed development and unsigned technical packages, but
+the configured workflow is not evidence of a hosted PASS for the current source.
+A new immutable packaged/installed artifact and clean-machine simultaneous-start
+gate remain required before release signing.
+
+A future official plugin fix can be adopted separately. ECD may retain this
+guard as defense in depth or remove it only after separate packaged and installed
+regression verification.
 
 ## Network requirements
 
@@ -177,7 +193,8 @@ authentication.
 The Windows workflow starts from a fresh checkout, prepares and verifies the
 pinned portable runtime, builds the shared frontend and Desktop resources, runs
 Python and Rust contracts, builds an unsigned debug NSIS package, installs it
-silently, and exercises both the packaged and installed application layouts.
+silently, and exercises both the packaged and installed application layouts,
+including simultaneous cold starts.
 The package also contains a machine-readable release-input inventory and
 third-party notices. Python and MinGit archives and the complete Python package
 graph are hash-checked during preparation; the installed-runtime fingerprint is

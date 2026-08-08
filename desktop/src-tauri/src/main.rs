@@ -1,5 +1,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+#[cfg(windows)]
+mod startup_guard;
+
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::env;
@@ -1055,6 +1058,14 @@ fn home_dir() -> PathBuf {
 }
 
 fn main() {
+    #[cfg(windows)]
+    let startup_guard = match startup_guard::StartupGuard::acquire() {
+        Ok(guard) => guard,
+        Err(error) => {
+            startup_guard::show_startup_error(&error);
+            std::process::exit(1);
+        }
+    };
     let builder = tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             handle_second_instance(app);
@@ -1062,7 +1073,12 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![change_workspace])
-        .setup(|app| {
+        .setup(move |app| {
+            #[cfg(windows)]
+            if let Err(error) = startup_guard.release() {
+                startup_guard::show_startup_error(&error);
+                return Err(Box::<dyn std::error::Error>::from(error));
+            }
             let app_data_root = app_data_root_from_environment();
             fs::create_dir_all(&app_data_root).map_err(|error| {
                 Box::<dyn std::error::Error>::from(format!(

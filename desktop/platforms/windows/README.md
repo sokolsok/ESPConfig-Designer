@@ -198,11 +198,33 @@ focus its main window. A port already occupied by an unrelated process remains
 a startup error and is not treated as an existing application instance.
 
 Known upstream limitation: `tauri-plugin-single-instance` `2.4.3` can allow a
-second process to continue when two cold starts occur in the narrow interval
-between creation of the plugin mutex and its Windows IPC window. Normal
-second-launch behavior is covered locally, but simultaneous cold start is not a
-release-ready guarantee. Upgrade to a fixed upstream plugin and rerun the
-simultaneous packaged/installed gate before release signing.
+second process to continue when two cold starts occur between creation of the
+plugin mutex and its Windows IPC window. ECD places a separate
+`Local\com.espconfigdesigner.desktop.startup-guard` mutex around only this
+initialization interval. A dedicated short-lived thread owns and releases the
+mutex, avoiding any assumption that Tauri application setup runs on the main
+thread. The ten-second wait accepts normal and abandoned ownership; timeout and
+wait failure are fail-closed native startup errors. Process termination lets
+Windows recover ownership without a stale lock.
+
+The locked Tauri `2.11.5` build initializes plugin setup hooks synchronously in
+`Builder::build`. Single-instance `2.4.3` calls `CreateWindowExW` before its
+plugin setup returns, while application setup runs later on runtime `Ready`.
+ECD therefore releases its guard as the first application setup operation,
+before app-data, workspace, port, and backend work. The single-instance plugin
+continues to own IPC, launch payload forwarding, secondary exit, and
+show/restore/focus. The guard does not use the plugin's mutex name, implement
+IPC, inspect the backend port, or lock workspace/backend data.
+
+The focused process gate deterministically widens the protected interval and
+checks simultaneous cold start, abandoned ownership after primary termination,
+timeout, recovery, warm second launch, and unrelated port conflict. The Windows
+workflow runs it for a fresh debug executable, an installed development NSIS,
+and the installed manual unsigned technical candidate. Those configured gates
+still require actual hosted and clean-machine results for a new immutable
+artifact before release signing. A later fixed plugin upgrade is separate; the
+ECD guard can remain as defense in depth or be removed after its own packaged and
+installed regression decision.
 
 The backend and ESPHome descendants are assigned to Windows Job Objects. The
 hosted GUI smoke harness may forcibly terminate only the isolated test process

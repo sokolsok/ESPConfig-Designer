@@ -177,6 +177,8 @@ jobs:
       - name: Run first-start and hostile packaged smoke
         shell: powershell
         run: |
+          npm --prefix desktop run test:tauri-simultaneous-start
+          if ($LASTEXITCODE -ne 0) { throw "Fresh debug simultaneous-start gate failed" }
           npm --prefix desktop run test:tauri-first-start-default
           if ($LASTEXITCODE -ne 0) { throw "First-start gate failed" }
           npm --prefix desktop run test:tauri-smoke
@@ -207,6 +209,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "Installed package contract failed" }
           $installedExecutable = Join-Path $installRoot "esp-config-designer-desktop.exe"
           $installedResources = Join-Path $installRoot "ecd-app"
+          powershell -NoProfile -ExecutionPolicy Bypass -File desktop/tests/tauri-simultaneous-start.test.ps1 -Executable $installedExecutable -ResourceRoot $installedResources -UseExecutableResources
+          if ($LASTEXITCODE -ne 0) { throw "Installed development simultaneous-start gate failed" }
           powershell -NoProfile -ExecutionPolicy Bypass -File desktop/tests/tauri-smoke.test.ps1 -Executable $installedExecutable -ResourceRoot $installedResources -UseExecutableResources
           if ($LASTEXITCODE -ne 0) { throw "Installed package smoke failed" }
           powershell -NoProfile -ExecutionPolicy Bypass -File desktop/scripts/verify-resources.ps1 -ResourcesRoot $installedResources
@@ -272,6 +276,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "Installed release package contract failed" }
           $installedExecutable = Join-Path $installRoot "esp-config-designer-desktop.exe"
           $installedResources = Join-Path $installRoot "ecd-app"
+          powershell -NoProfile -ExecutionPolicy Bypass -File desktop/tests/tauri-simultaneous-start.test.ps1 -Executable $installedExecutable -ResourceRoot $installedResources -UseExecutableResources
+          if ($LASTEXITCODE -ne 0) { throw "Installed release simultaneous-start gate failed" }
           powershell -NoProfile -ExecutionPolicy Bypass -File desktop/tests/tauri-smoke.test.ps1 -Executable $installedExecutable -ResourceRoot $installedResources -UseExecutableResources
           if ($LASTEXITCODE -ne 0) { throw "Installed release package smoke failed" }
           powershell -NoProfile -ExecutionPolicy Bypass -File desktop/scripts/verify-resources.ps1 -ResourcesRoot $installedResources

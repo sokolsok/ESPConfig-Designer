@@ -96,11 +96,34 @@ workspace preparation or backend startup. An unrelated listener on the selected
 loopback port is rejected as a port conflict rather than adopted as an existing
 instance.
 
-The pinned upstream `tauri-plugin-single-instance` `2.4.3` has a Windows race
-during nearly simultaneous cold starts: the mutex can exist before the plugin's
-IPC window is available. The ordinary second-launch smoke passes, but it does
-not prove this race closed. Treat a fixed upstream plugin plus a simultaneous
-cold-start packaged and installed smoke as release-signing prerequisites.
+The pinned upstream `tauri-plugin-single-instance` `2.4.3` still has a Windows
+race during nearly simultaneous cold starts: its mutex can exist before its IPC
+window is available. ECD closes that gap with a separate Windows startup guard.
+The guard serializes only plugin initialization, uses its own session-local named
+mutex, and is released before app-data, workspace, port, or backend setup. The
+plugin remains responsible for instance identity, argument/current-directory
+forwarding, secondary-process exit, and show/restore/focus behavior. The guard is
+not a workspace or backend lock and does not enable multiple instances.
+
+This release point is based on the locked Tauri `2.11.5` lifecycle, not only the
+order visible in `main.rs`. `Builder::build` synchronously initializes each
+plugin; single-instance `2.4.3` calls `CreateWindowExW` before its setup returns.
+The application setup closure runs later on Tauri's runtime `Ready` event.
+Releasing the startup guard as the first application setup operation is therefore
+after the plugin's synchronous IPC-target creation and before ECD backend work.
+
+The guard waits at most ten seconds. Timeout or Windows wait failure is
+fail-closed and displays a native startup error, including in a release build
+without a console. A dedicated owner thread releases the mutex on the same thread
+that acquired it; Windows abandons/releases ownership if the process crashes, so
+a later launch can recover without a stale lock. The test-only
+`ECD_TAURI_TEST_STARTUP_GUARD_HOLD_MS` override accepts 1 through 5000 ms and only
+widens this protected interval for deterministic process testing.
+
+An official fixed plugin can be adopted in a separate dependency upgrade. The
+guard may remain as defense in depth or be removed only after a separate
+simultaneous packaged/installed regression decision; it does not depend on the
+plugin mutex name, window, or payload protocol.
 
 ## External links
 
@@ -308,18 +331,27 @@ After building current resources and a debug executable:
 
 ```powershell
 npm --prefix desktop run test:tauri-first-start-default
+npm --prefix desktop run test:tauri-simultaneous-start
 npm --prefix desktop run test:tauri-smoke
 npm --prefix desktop run verify:resources
 ```
 
+The simultaneous-start gate uses unique temporary app-data, workspace, and port
+fixtures. It covers widened cold start, primary crash/abandoned-mutex recovery,
+bounded timeout, a following normal start, warm second launch, and an unrelated
+port listener. It verifies process behavior and one desktop-mode backend
+listener; it does not automate visual focus assessment.
+
 The hosted `.github/workflows/desktop-windows.yml` gate additionally starts from
 a fresh checkout, verifies source absence of generated inputs, installs the
 unsigned debug package silently, checks the installed layout, runs installed
-smoke, and uploads the installer for seven days. A manual dispatch with the
+smoke and simultaneous-start gate, and uploads the installer for seven days. A
+manual dispatch with the
 `unsigned_release` input enabled then calls only
 `npm --prefix desktop run build:package:release`, verifies the candidate
 provenance, source SHA, clean status, hashes and `NotSigned` state, installs it,
-matches the installed executable hash, repeats installed smoke/resource checks,
+matches the installed executable hash, repeats installed simultaneous-start,
+smoke, and resource checks,
 and retains the complete `unsigned-technical-candidate-not-for-users` set for
 three days. The manual path does not sign or publish anything.
 

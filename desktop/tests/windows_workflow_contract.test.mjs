@@ -42,3 +42,20 @@ test("unsigned release candidate is installed and matched to the packaged execut
   assert.match(workflow, /unsigned-technical-candidate-not-for-users/);
   assert.match(workflow, /retention-days: [1-7]\b/);
 });
+
+test("simultaneous startup is gated for debug and both installed packages", () => {
+  const simultaneousInvocations = workflow.match(/tauri-simultaneous-start\.test\.ps1|test:tauri-simultaneous-start/g) ?? [];
+  assert.equal(simultaneousInvocations.length, 3);
+  assert.match(
+    workflow,
+    /Build fresh Tauri debug executable[\s\S]*?test:tauri-simultaneous-start[\s\S]*?Install and verify development package/,
+  );
+  assert.match(
+    workflow,
+    /Install and verify development package[\s\S]*?tauri-simultaneous-start\.test\.ps1[^\r\n]*-UseExecutableResources/,
+  );
+  assert.match(
+    workflow,
+    /Install and verify unsigned release package[\s\S]*?tauri-simultaneous-start\.test\.ps1[^\r\n]*-UseExecutableResources/,
+  );
+});

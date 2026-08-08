@@ -11,6 +11,7 @@
     "test:supply-chain": "powershell -ExecutionPolicy Bypass -File tests/supply_chain_contract.test.ps1",
     "test:tauri-smoke": "powershell -ExecutionPolicy Bypass -File tests/tauri-smoke.test.ps1",
     "test:tauri-first-start-default": "powershell -ExecutionPolicy Bypass -File tests/tauri-first-start-default.test.ps1",
+    "test:tauri-simultaneous-start": "powershell -ExecutionPolicy Bypass -File tests/tauri-simultaneous-start.test.ps1",
     "dev": "npm run build:frontend && tauri dev",
     "tauri": "tauri",
     "build:dev": "npm run build:frontend && tauri build --debug --no-bundle",
