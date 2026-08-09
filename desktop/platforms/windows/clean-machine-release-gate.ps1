@@ -466,7 +466,7 @@ function Assert-MatrixPolicy([object]$Policy, [string]$ProductVersion, [object]$
     foreach ($entry in $entries) {
         $tuple = "$([string]$entry.editionId)`0$([string]$entry.build)`0$([string]$entry.architecture)"
         if ([string]::IsNullOrWhiteSpace([string]$entry.id) -or
-            [string]$entry.editionId -notin @("Core", "Professional") -or
+            [string]::IsNullOrWhiteSpace([string]$entry.editionId) -or
             [string]$entry.build -notmatch '^\d+\.\d+$' -or [string]$entry.architecture -ne "x64" -or
             -not $entryIds.Add([string]$entry.id) -or -not $entryTuples.Add($tuple)) {
             throw "Matrix policy contains an invalid or duplicate entry"
