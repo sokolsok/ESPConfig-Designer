@@ -371,5 +371,80 @@ prepared `C:\ECDTest` fixture with runtime, packaged application, workspace, and
 Do not run it as a routine documentation gate or report it as PASS without the
 complete fixture and actual result.
 
+## Build the clean-machine release kit
+
+The installed-artifact clean-machine harness is separate from the source manual
+gate. Build its portable PowerShell 5.1 kit into a new external output root:
+
+```powershell
+$sourceSha = git rev-parse HEAD
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File desktop/scripts/build-clean-machine-kit.ps1 `
+  -OutputRoot C:\absolute\new\ecd-clean-machine-kit `
+  -SourceSha $sourceSha
+```
+
+The output contains an expanded `kit/`, `kit-manifest.json`, a deterministic
+`ecd-clean-machine-kit.zip`, and its SHA-256 sidecar. A production evidence run
+must build it from the same clean committed SHA as the candidate and bind the
+archive hash in the external artifact register. A local build from a dirty tree
+must not be presented as that evidence.
+
+The host must obtain the expected ZIP SHA-256 from the authenticated artifact
+register/channel and verify the raw ZIP before extracting or executing any kit
+file. Do not trust the adjacent sidecar alone. Safe ZIP inventory and extraction
+follow that authenticated byte check; orchestrator self-checks are additional
+post-launch validation, not the pre-execution trust boundary.
+
+Run the maintained contract through the normal package gate:
+
+```powershell
+npm --prefix desktop run test:package
+```
+
+The contract executes the real Windows PowerShell 5.1 entry points and verifies
+positive preflight plus rejection of hash substitution, multiple installers,
+unsafe or unowned roots, overlap, malformed provenance, and a report that claims
+PASS while omitting a required check. It also proves deterministic kit archives
+for identical inputs. This is parser/orchestrator verification, not a clean-VM
+lifecycle, firmware, WebView2, network, Defender, or physical-device PASS.
+
+The installed `Lifecycle` scenario is deliberately split across `Begin` and
+`Resume`. Both invocations must use the same candidate/register/kit inputs,
+GateRoot, report path, install root, workspace root, and app-data root. `Begin`
+persists an owned reboot checkpoint but no final report. After an actual Windows
+restart, `Resume` verifies that the system boot identity changed and consumes the
+checkpoint once. Do not use process or application restart as a substitute, and
+do not invoke `Resume` with a copied checkpoint from another run.
+
+Production execution requires an interactive standard user that is not a member
+of the local Administrators group, plus new, disjoint roots. It also requires a
+host-authenticated `ecd-clean-vm-attestation` JSON file and its expected SHA-256.
+The attestation binds a host-managed unique
+run nonce, exact source/register/kit/matrix-policy hash and entry, clean snapshot,
+and non-elevated account. The host must bind each nonce to the concrete VM and
+snapshot identity, retain it, and reject consumed nonces; VM
+snapshot rollback and a malicious same-user process rewriting all local state
+are not prevented by adjacent local hashes.
+
+The final report carries that attestation hash and run nonce and is not published
+until checkpoint and owned state are both `completed`. Failures after owned-root
+or Resume-checkpoint claim are finalized as `failed_cleaned` or
+`failed_cleanup_incomplete`; pre-claim Resume failures preserve state for safe
+diagnosis and do not authorize cleanup. The script inventories complete
+file-and-directory workspace/app-data trees around
+each NSIS reinstall/uninstall operation and checks the immutable install tree
+after application starts. Installer success with initially absent WebView2 is
+recorded as network not directly observed, not as an online-network PASS.
+
+Normal-close evidence comes only from closing the exact visible application
+window with a zero exit code; emergency termination remains cleanup. The local
+contract simulates the boot boundary only under `-ContractTest`, labels the result
+`contract_test`, and must not be reported as a real reboot or clean-machine
+lifecycle PASS. Version `1.4.0` is the first supported Windows Desktop release,
+so it has no supported Desktop predecessor and no predecessor-update scenario.
+Future Desktop releases must add that scenario using the latest previously
+published controlled installer with verified provenance.
+
 See the [Windows platform reference](../../desktop/platforms/windows/README.md)
 for runtime, capabilities, diagnostics, and cache/update contracts.

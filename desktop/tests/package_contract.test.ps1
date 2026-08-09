@@ -18,6 +18,9 @@ $releaseContractTest = Join-Path $PSScriptRoot "release_build_contract.test.mjs"
 $workflowContractTest = Join-Path $PSScriptRoot "windows_workflow_contract.test.mjs"
 & node --test $releaseContractTest $workflowContractTest
 Assert-True ($LASTEXITCODE -eq 0) "Unsigned release build contract failed"
+$cleanMachineKitContract = Join-Path $PSScriptRoot "clean-machine-kit-contract.test.ps1"
+& "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File $cleanMachineKitContract
+Assert-True ($LASTEXITCODE -eq 0) "Clean-machine kit contract failed"
 
 $desktopPackage = Get-Content -LiteralPath (Join-Path $desktopRoot "package.json") -Raw | ConvertFrom-Json
 $releaseScriptPath = Join-Path $desktopRoot "scripts\build-package-release.mjs"
@@ -240,14 +243,28 @@ foreach ($documentPath in $publicDocuments) {
 }
 
 $windowsInstallationGuide = Get-Content -LiteralPath (Join-Path $repoRoot "docs\installation\windows.md") -Raw
+$desktopPredecessorPolicy = "Desktop predecessor update applicability for 1.4.0: not applicable."
+Assert-True ($windowsInstallationGuide.Contains($desktopPredecessorPolicy)) "Windows installation policy does not explicitly remove a predecessor update from 1.4.0 scope"
+$mandatoryFirstReleaseLifecycle = 'Same-version reinstall,\s+uninstall data preservation, and reinstall with retained data remain mandatory\s+for `1\.4\.0`\.'
+Assert-True ($windowsInstallationGuide -match $mandatoryFirstReleaseLifecycle) "Windows installation policy weakened mandatory first-release lifecycle coverage"
+foreach ($forbiddenPredecessorClaim in @(
+    "Manual update from `1.3.3` remains",
+    "1.3.3 -> 1.4.0",
+    "future public `1.4.0` update"
+)) {
+    Assert-True (-not $windowsInstallationGuide.Contains($forbiddenPredecessorClaim)) "Windows installation policy reintroduced an invalid predecessor claim: $forbiddenPredecessorClaim"
+}
 foreach ($requiredPolicy in @(
     "Windows 10 22H2 Home and Pro x64",
     "19045.7548",
     "October 12, 2027",
     "Windows 11 25H2 Home and Pro x64",
-    "26200.8894",
+    "26200.8973",
     "Windows ARM64",
     "manual update",
+    "first supported Windows Desktop release",
+    "no supported Desktop predecessor",
+    "Future Desktop releases",
     "runtime_update.py",
     "SignPath Foundation",
     "NOT RUN"

@@ -1,0 +1,10 @@
+esphome:
+  name: ecd-clean-machine
+  friendly_name: ECD Clean Machine
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+logger:

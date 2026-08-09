@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "kind": "ecd-windows-matrix-policy",
+  "productVersion": "1.4.0",
+  "entries": [
+    {
+      "id": "windows-10-22h2-home-x64",
+      "editionId": "Core",
+      "build": "19045.7548",
+      "architecture": "x64"
+    },
+    {
+      "id": "windows-10-22h2-pro-x64",
+      "editionId": "Professional",
+      "build": "19045.7548",
+      "architecture": "x64"
+    },
+    {
+      "id": "windows-11-25h2-home-x64",
+      "editionId": "Core",
+      "build": "26200.8973",
+      "architecture": "x64"
+    },
+    {
+      "id": "windows-11-25h2-pro-x64",
+      "editionId": "Professional",
+      "build": "26200.8973",
+      "architecture": "x64"
+    }
+  ]
+}

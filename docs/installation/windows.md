@@ -23,7 +23,7 @@ The planned release matrix is deliberately limited to:
 | System | Editions | Architecture | Planned clean-machine baseline |
 |---|---|---|---:|
 | Windows 10 22H2 | Home and Pro | x64 | `19045.7548` |
-| Windows 11 25H2 | Home and Pro | x64 | `26200.8894` |
+| Windows 11 25H2 | Home and Pro | x64 | `26200.8973` |
 
 In prose, these targets are Windows 10 22H2 Home and Pro x64 and
 Windows 11 25H2 Home and Pro x64. Windows ARM64, Enterprise, Education, LTSC,
@@ -109,6 +109,22 @@ The approved data-lifecycle policy is:
 - removing retained projects, assets, secrets, device registrations, caches,
   builds, firmware, jobs, or logs is a separate manual data operation.
 
+Version `1.4.0` is planned as the first supported Windows Desktop release. There
+is no supported Desktop predecessor from which users can update: historical
+Desktop builds carrying version `1.3.3` were development builds without a
+canonical release tag, release provenance, or a controlled installer artifact.
+They are not an upgrade baseline for `1.4.0`, and relabeling or reconstructing
+one would not create valid release evidence.
+
+Desktop predecessor update applicability for 1.4.0: not applicable.
+
+Consequently, predecessor-to-`1.4.0` update testing is not applicable to this
+first Desktop release. Future Desktop releases must test manual update from the
+latest previously published and supported Desktop installer, with exact source,
+provenance, signatures, and hashes for both versions. Same-version reinstall,
+uninstall data preservation, and reinstall with retained data remain mandatory
+for `1.4.0`.
+
 The workspace contains YAML, project JSON, secrets, assets, and custom
 components. `%LOCALAPPDATA%\ECD` contains the workspace pointer, device
 registry, PlatformIO cache (`p/`), builds and firmware (`b/`), ESPHome state
@@ -117,17 +133,17 @@ registry, PlatformIO cache (`p/`), builds and firmware (`b/`), ESPHome state
 quarantines; it is not an uninstall policy and never deletes active cache or
 builds.
 
-The reinstall, update, uninstall, and retained-data gates for the current
-artifact are `NOT RUN`. Do not rely on a historical installer as evidence for
-this policy.
+The reinstall, uninstall, and retained-data gates for the current artifact are
+`NOT RUN`. No predecessor update gate applies to `1.4.0`. Do not rely on a
+historical installer as evidence for this policy.
 
 There is no auto-updater, update notification, or automatic version discovery.
-For a future public `1.4.0` update, obtain the newer signed installer from the
-release channel published at that time, verify its Authenticode identity and
-published SHA-256, close the application, and run the installer normally. No
-public download URL exists yet. `runtime_update.py` is an internal immutable
-payload transaction used for integrity, activation, and rollback testing; it is
-not the public updater and does not download releases.
+For a future public Desktop update after `1.4.0`, obtain the newer signed
+installer from the release channel published at that time, verify its
+Authenticode identity and published SHA-256, close the application, and run the
+installer normally. No public download URL exists yet. `runtime_update.py` is an
+internal immutable payload transaction used for integrity, activation, and
+rollback testing; it is not the public updater and does not download releases.
 
 Only one application instance runs in a user session. A second launch activates
 the existing window instead of starting another backend. If another application

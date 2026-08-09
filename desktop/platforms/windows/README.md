@@ -24,6 +24,114 @@ The manual `clean-machine-gate.ps1` firmware replay is not part of hosted CI and
 is not self-contained. It requires a prepared `C:\ECDTest` fixture, runtime,
 application payload, workspace, and `test.yaml`.
 
+## Clean-machine release kit
+
+`clean-machine-gate.ps1` remains the source-development firmware gate described
+above. Its meaning has not changed. Installed package lifecycle and release
+evidence belong to the separate `clean-machine-release-gate.ps1` orchestrator;
+the two scripts must not be reported as interchangeable coverage.
+
+Current coverage inventory:
+
+| Requirement | Existing coverage | Gap after the current contract | Owner |
+|---|---|---|---|
+| Source firmware compile/cache/restart | `clean-machine-gate.ps1` | Requires a prepared checkout and fixture; not installed-artifact evidence | Source-development gate |
+| Hosted packaged startup/CSP | Tauri first-start, simultaneous-start, and smoke tests | Uses Node/CDP and hosted resources; not PowerShell-only clean-VM evidence | Hosted Desktop gate |
+| Candidate identity and provenance | Release build provenance and `SHA256SUMS` | Clean VM must receive an external candidate-bound artifact register | Release orchestrator preflight |
+| Installed lifecycle | Hosted silent install and installed smoke; portable `Lifecycle` orchestration contract | Execution on the clean Windows matrix, including a real reboot and interactive close, remains `NOT RUN` | `Lifecycle` scenario |
+| Startup/process matrix | Hosted simultaneous-start gate | Natural/visible clean-machine cases remain `NOT RUN` | `Startup` scenario |
+| Firmware online/offline | Source manual gate | Installed exact-artifact flow and physical NIC control remain `NOT RUN` | `FirmwareOnline`/`FirmwareOffline` plus host control |
+| WebView2, low disk, Defender, physical device | Documentation and partial hosted checks | Dedicated VM snapshots/disks and owner-approved hardware remain `NOT RUN` | Host/manual gates |
+
+The release orchestrator requires absolute paths for a verified candidate root,
+its exact NSIS installer, expected source and EXE hashes, a candidate-bound
+artifact register, a versioned matrix policy, a scenario, a gate-owned root, and
+a JSON report. `Preflight` verifies the complete artifact file set,
+`SHA256SUMS`, provenance, `NotSigned` state, exact OS policy entry, non-overlap,
+and a persistent ownership marker before later scenarios may install anything.
+An existing root without its exact marker is rejected and is never cleaned.
+
+Reports use schema version `1` and one status vocabulary:
+`pass`, `fail`, or `not_run`. A top-level `pass` requires every scenario-specific
+check. Every `not_run` check requires a stable reason code. Scenarios other than
+`Preflight` and `Lifecycle` that are not yet implemented emit `not_run` with
+`scenario_not_implemented`; their presence in the script is not a clean-machine
+PASS.
+
+`Lifecycle` is a two-phase operation. `Begin` re-verifies the complete candidate,
+requires the exact passing Preflight receipt, rejects existing or overlapping
+install/workspace/app-data roots, performs install/start/restart/reinstall checks,
+and writes an atomic `lifecycle-reboot-checkpoint.json`. It does not write a
+final PASS report before reboot. The operator must perform a real system reboot;
+the script never substitutes an application or process restart.
+
+`Resume` accepts only the same owned run and roots with unchanged source,
+artifact-register, installer/application, and test-kit identities. Production
+runs additionally require a host-authenticated clean-VM attestation hash with a
+unique run nonce, exact matrix-policy hash and entry, clean-snapshot assertion,
+and non-elevated account assertion. The host must bind that nonce to the concrete
+VM instance and snapshot identity. `Resume` requires a changed Windows boot
+identity and claims the local checkpoint once,
+then verifies post-reboot start, uninstall data preservation, reinstall reuse,
+separate spaces/Unicode roots, and final process/listener/install cleanup. A
+normal-close check posts close only to the visible top-level application window
+owned by the exact process. Forced process-tree cleanup is failure recovery and
+never satisfies the graceful-close check. Checkpoints older than seven days or
+missing, malformed, altered, locally replayed, or identity-mismatched checkpoints
+fail closed. The host must also reject reused run nonces. Local hashes do not
+protect against a malicious same-user process rewriting the complete state chain
+or against VM snapshot rollback; those remain host trust-boundary concerns.
+
+The final Lifecycle report records the attestation SHA-256 and host run nonce
+and is accepted only after both checkpoint and owned state are atomically marked
+`completed`. Failures after `Begin` has claimed roots, or after `Resume` has
+claimed its checkpoint, clean each marker-verified owned root independently and
+mark the run `failed_cleaned` or `failed_cleanup_incomplete`. A pre-claim Resume
+failure preserves state for safe diagnosis and does not authorize cleanup. NSIS
+operations are surrounded by complete file-and-directory workspace/app-data tree
+inventories, while application
+starts separately verify the immutable install tree. Unicode roots must also be
+absent and disjoint before they can become run-owned.
+
+If WebView2 was absent before installation, Lifecycle records
+`webview2_absent_install_succeeded_network_not_observed`. Installer success is
+not presented as a direct network observation; dedicated online/offline WebView2
+evidence remains a separate host-controlled scenario.
+
+Version `1.4.0` is the first supported Windows Desktop release. Historical
+development builds labeled `1.3.3` have no canonical release provenance or
+controlled installer and are not an update baseline. A predecessor update is
+therefore not applicable to `1.4.0`; future Desktop releases must test manual
+update from the latest previously published supported installer.
+
+The executable contract uses explicit synthetic boot identities only with
+`-ContractTest`; reports retain `evidenceClass=contract_test`. This proves parser,
+ownership, retained synthetic data trees, state-machine, independent cleanup,
+and report behavior. It is not evidence of an NSIS lifecycle or real reboot on a
+clean VM.
+
+`desktop/scripts/build-clean-machine-kit.ps1` creates a separate portable test
+artifact from a fixed allowlist read from the exact committed Git archive. The
+kit contains the orchestrator, shared hash
+validator, versioned Windows matrix policy, and synthetic compile-only fixture.
+Its sorted manifest records the source SHA, each file hash, fixture hash, and an
+aggregate payload hash. The ZIP uses sorted entries, fixed timestamps, and no
+compression so repeated builds from identical bytes are deterministic; a
+SHA-256 sidecar records the archive identity.
+
+Before extraction or execution, the VM host must obtain the expected kit ZIP
+SHA-256 through the authenticated artifact/register channel and verify the raw
+archive bytes with Windows PowerShell. The adjacent sidecar is not a trust
+anchor by itself. Only after that host-side check may the ZIP be safely
+inventoried, extracted, and its orchestrator started. The orchestrator's archive,
+manifest, extracted-file, and self-hash checks are post-launch defense in depth,
+not a substitute for authenticated pre-execution verification.
+
+The tracked synthetic fixture is approved only at SHA-256
+`95eb66a5ec9aec4e095b138528892f0aa1414cd8c6fe5b045d4cf9ae8411c81f`.
+Clean-machine tooling hashes its bytes but must not parse or log fixture YAML.
+Physical-device fixtures remain separate, untracked, and owner-approved.
+
 ## Ownership
 
 ```text
