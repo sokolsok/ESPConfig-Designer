@@ -40,8 +40,10 @@ if ($ContractTest) {
     $sourceStatus = "synthetic-contract-test"
     $inputDesktopRoot = $desktopRoot
 } else {
-    $actualSourceSha = (& git -C $repoRoot rev-parse --verify "HEAD^{commit}").Trim()
-    if ($LASTEXITCODE -ne 0 -or $actualSourceSha -ne $SourceSha) { throw "SourceSha does not match the current committed source" }
+    $actualSourceShaOutput = & git -C $repoRoot rev-parse --verify "HEAD^{commit}" 2>$null
+    $actualSourceShaExitCode = $LASTEXITCODE
+    $actualSourceSha = ([string]$actualSourceShaOutput).Trim()
+    if ($actualSourceShaExitCode -ne 0 -or $actualSourceSha -ne $SourceSha) { throw "SourceSha does not match the current committed source" }
     $sourceDrift = & git -C $repoRoot status --porcelain=v1 --untracked-files=all
     if ($LASTEXITCODE -ne 0 -or @($sourceDrift).Count -ne 0) { throw "Clean-machine kit production build requires a clean source tree" }
     $sourceStatus = "clean"
@@ -97,9 +99,11 @@ foreach ($entry in @($allowlist | Sort-Object { [string]$_['path'] })) {
     }
 }
 if (-not $ContractTest) {
-    $finalSourceSha = (& git -C $repoRoot rev-parse --verify "HEAD^{commit}").Trim()
+    $finalSourceShaOutput = & git -C $repoRoot rev-parse --verify "HEAD^{commit}" 2>$null
+    $finalSourceShaExitCode = $LASTEXITCODE
+    $finalSourceSha = ([string]$finalSourceShaOutput).Trim()
     $finalSourceDrift = & git -C $repoRoot status --porcelain=v1 --untracked-files=all
-    if ($LASTEXITCODE -ne 0 -or $finalSourceSha -ne $SourceSha -or @($finalSourceDrift).Count -ne 0) {
+    if ($finalSourceShaExitCode -ne 0 -or $LASTEXITCODE -ne 0 -or $finalSourceSha -ne $SourceSha -or @($finalSourceDrift).Count -ne 0) {
         throw "Clean-machine kit source changed while committed inputs were staged"
     }
     Remove-Item -LiteralPath $snapshotRoot -Recurse -Force
