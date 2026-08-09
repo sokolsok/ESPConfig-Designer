@@ -27,7 +27,9 @@ function Invoke-Gate([string[]]$Arguments, [bool]$ShouldPass, [string]$ExpectedE
     } else {
         Assert-True ($exitCode -ne 0) "Gate unexpectedly accepted an invalid fixture"
         if ($ExpectedError) {
-            Assert-True (($output -join "`n") -like "*$ExpectedError*") "Gate failed for the wrong reason; expected '$ExpectedError': $($output -join "`n")"
+            $normalizedOutput = (($output -join "`n") -replace '\s+', ' ').Trim()
+            $normalizedExpectedError = ($ExpectedError -replace '\s+', ' ').Trim()
+            Assert-True ($normalizedOutput -like "*$normalizedExpectedError*") "Gate failed for the wrong reason; expected '$ExpectedError': $($output -join "`n")"
         }
     }
 }
