@@ -200,7 +200,7 @@ try {
     $roots.Add($simultaneousRoot)
     $simultaneousPort = Get-FreePort
     $ports.Add($simultaneousPort)
-    $heldStart = New-TauriStartInfo $simultaneousRoot $simultaneousPort 3000
+    $heldStart = New-TauriStartInfo $simultaneousRoot $simultaneousPort 5000
     $primary = [System.Diagnostics.Process]::Start($heldStart)
     $processes.Add($primary)
     Wait-StartupGuardOwned $primary
@@ -211,9 +211,9 @@ try {
     Start-Sleep -Milliseconds 750
     Assert-True (-not $primary.HasExited) "Primary exited during the widened startup window"
     Assert-True (-not $secondary.HasExited) "Secondary did not wait on the startup guard"
-    Assert-True (@(Get-NetTCPConnection -LocalPort $simultaneousPort -State Listen -ErrorAction SilentlyContinue).Count -eq 0) "Backend started before the widened guard was released"
     Assert-True (-not (Test-Path -LiteralPath (Join-Path $simultaneousRoot "appdata"))) "Startup wrote app-data while the guard window was widened"
     Assert-True (@(Get-ChildItem -LiteralPath (Join-Path $simultaneousRoot "workspace") -Force).Count -eq 0) "Startup wrote workspace data while the guard window was widened"
+    Assert-True (@(Get-NetTCPConnection -LocalPort $simultaneousPort -State Listen -ErrorAction SilentlyContinue).Count -eq 0) "Backend started before the widened guard was released"
     $health = Wait-DesktopHealth $primary $simultaneousPort
     Assert-True ($health.mode -eq "desktop") "Simultaneous startup health mode is not desktop"
     Assert-True ($secondary.WaitForExit(30000)) "Secondary did not exit after primary IPC became ready"
