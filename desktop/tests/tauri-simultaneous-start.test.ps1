@@ -61,6 +61,20 @@ function Assert-OneListener([int]$Port) {
     Assert-True ($listeners.Count -eq 1) "Expected exactly one listener on port $Port, found $($listeners.Count)"
 }
 
+function Assert-NoImmediateListener([int]$Port, [string]$Message) {
+    $client = [System.Net.Sockets.TcpClient]::new()
+    try {
+        try {
+            $client.Connect([System.Net.IPAddress]::Loopback, $Port)
+        } catch [System.Net.Sockets.SocketException] {
+            return
+        }
+        Assert-True (-not $client.Connected) $Message
+    } finally {
+        $client.Dispose()
+    }
+}
+
 function Wait-NoListener([int]$Port) {
     $deadline = [DateTime]::UtcNow.AddSeconds(30)
     while ([DateTime]::UtcNow -lt $deadline) {
@@ -213,7 +227,7 @@ try {
     Assert-True (-not $secondary.HasExited) "Secondary did not wait on the startup guard"
     Assert-True (-not (Test-Path -LiteralPath (Join-Path $simultaneousRoot "appdata"))) "Startup wrote app-data while the guard window was widened"
     Assert-True (@(Get-ChildItem -LiteralPath (Join-Path $simultaneousRoot "workspace") -Force).Count -eq 0) "Startup wrote workspace data while the guard window was widened"
-    Assert-True (@(Get-NetTCPConnection -LocalPort $simultaneousPort -State Listen -ErrorAction SilentlyContinue).Count -eq 0) "Backend started before the widened guard was released"
+    Assert-NoImmediateListener $simultaneousPort "Backend started before the widened guard was released"
     $health = Wait-DesktopHealth $primary $simultaneousPort
     Assert-True ($health.mode -eq "desktop") "Simultaneous startup health mode is not desktop"
     Assert-True ($secondary.WaitForExit(30000)) "Secondary did not exit after primary IPC became ready"
@@ -241,7 +255,7 @@ try {
     $processes.Add($takeover)
     Start-Sleep -Milliseconds 750
     Assert-True (-not $takeover.HasExited) "Takeover process did not wait before primary crash"
-    Assert-True (@(Get-NetTCPConnection -LocalPort $crashPort -State Listen -ErrorAction SilentlyContinue).Count -eq 0) "Crash scenario backend started before guard release"
+    Assert-NoImmediateListener $crashPort "Crash scenario backend started before guard release"
     Stop-ProcessTree $crashedPrimary
     $crashHealth = Wait-DesktopHealth $takeover $crashPort
     Assert-True ($crashHealth.mode -eq "desktop") "Process did not recover the abandoned startup guard"
