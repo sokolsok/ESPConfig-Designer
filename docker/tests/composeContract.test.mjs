@@ -64,3 +64,10 @@ test("Watchtower file adds labels and updater without duplicating the applicatio
   assert.match(source, /\/var\/run\/docker\.sock:\/var\/run\/docker\.sock/);
   assert.doesNotMatch(source.split(/^  watchtower:/m, 1)[0], /^    (image|container_name|restart|network_mode|environment|volumes|devices):/m);
 });
+
+test("multi-architecture frontend stages build on the native builder platform", async () => {
+  for (const name of ["../esp-config-designer/Dockerfile", "../esp-config-designer/Dockerfile.standalone"]) {
+    const source = await composeFile(name);
+    assert.match(source, /^FROM --platform=\$BUILDPLATFORM node:22-alpine AS frontend-build$/m, name);
+  }
+});
