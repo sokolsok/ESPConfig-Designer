@@ -19,6 +19,18 @@ function Assert-NoReparseAncestors([string]$Path, [string]$Name) {
     }
 }
 
+function Invoke-GitRevParse([string]$RepositoryRoot) {
+    $previousPreference = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = "Continue"
+        $output = @(& git -C $RepositoryRoot rev-parse --verify "HEAD^{commit}" 2>$null)
+        $exitCode = $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $previousPreference
+    }
+    return [pscustomobject]@{ ExitCode = $exitCode; Output = ($output -join "`n").Trim() }
+}
+
 if ($SourceSha -notmatch "^[0-9a-fA-F]{40}$") { throw "SourceSha must be a full commit SHA" }
 if (-not [IO.Path]::IsPathRooted($OutputRoot)) { throw "OutputRoot must be an absolute path" }
 $OutputRoot = [IO.Path]::GetFullPath($OutputRoot)
@@ -40,10 +52,8 @@ if ($ContractTest) {
     $sourceStatus = "synthetic-contract-test"
     $inputDesktopRoot = $desktopRoot
 } else {
-    $actualSourceShaOutput = & git -C $repoRoot rev-parse --verify "HEAD^{commit}" 2>$null
-    $actualSourceShaExitCode = $LASTEXITCODE
-    $actualSourceSha = ([string]$actualSourceShaOutput).Trim()
-    if ($actualSourceShaExitCode -ne 0 -or $actualSourceSha -ne $SourceSha) { throw "SourceSha does not match the current committed source" }
+    $actualSource = Invoke-GitRevParse $repoRoot
+    if ($actualSource.ExitCode -ne 0 -or $actualSource.Output -ne $SourceSha) { throw "SourceSha does not match the current committed source" }
     $sourceDrift = & git -C $repoRoot status --porcelain=v1 --untracked-files=all
     if ($LASTEXITCODE -ne 0 -or @($sourceDrift).Count -ne 0) { throw "Clean-machine kit production build requires a clean source tree" }
     $sourceStatus = "clean"
@@ -99,11 +109,9 @@ foreach ($entry in @($allowlist | Sort-Object { [string]$_['path'] })) {
     }
 }
 if (-not $ContractTest) {
-    $finalSourceShaOutput = & git -C $repoRoot rev-parse --verify "HEAD^{commit}" 2>$null
-    $finalSourceShaExitCode = $LASTEXITCODE
-    $finalSourceSha = ([string]$finalSourceShaOutput).Trim()
+    $finalSource = Invoke-GitRevParse $repoRoot
     $finalSourceDrift = & git -C $repoRoot status --porcelain=v1 --untracked-files=all
-    if ($finalSourceShaExitCode -ne 0 -or $LASTEXITCODE -ne 0 -or $finalSourceSha -ne $SourceSha -or @($finalSourceDrift).Count -ne 0) {
+    if ($finalSource.ExitCode -ne 0 -or $LASTEXITCODE -ne 0 -or $finalSource.Output -ne $SourceSha -or @($finalSourceDrift).Count -ne 0) {
         throw "Clean-machine kit source changed while committed inputs were staged"
     }
     Remove-Item -LiteralPath $snapshotRoot -Recurse -Force
