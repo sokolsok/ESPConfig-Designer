@@ -68,6 +68,9 @@ jobs:
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
+        with:
+          image: tonistiigi/binfmt@sha256:1b804311fe87047a4c96d38b4b3ef6f62fca8cd125265917a9e3dc3c996c39e6 # qemu-v9.2.2
+          platforms: arm64
 
       - name: Build and run both images on linux/amd64
         env:

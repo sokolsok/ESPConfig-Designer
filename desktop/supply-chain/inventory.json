@@ -10237,7 +10237,7 @@
       "license": null,
       "publisher": "docker",
       "provenance": [
-        ".github/workflows/docker-standalone.yml:119"
+        ".github/workflows/docker-standalone.yml:122"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -10259,7 +10259,7 @@
       "license": null,
       "publisher": "docker",
       "provenance": [
-        ".github/workflows/docker-standalone.yml:86"
+        ".github/workflows/docker-standalone.yml:89"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -10303,7 +10303,7 @@
       "license": null,
       "publisher": "docker",
       "provenance": [
-        ".github/workflows/docker-standalone.yml:111"
+        ".github/workflows/docker-standalone.yml:114"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -10325,7 +10325,7 @@
       "license": null,
       "publisher": "docker",
       "provenance": [
-        ".github/workflows/docker-standalone.yml:83"
+        ".github/workflows/docker-standalone.yml:86"
       ],
       "usage": "build-only",
       "unavailable": {
