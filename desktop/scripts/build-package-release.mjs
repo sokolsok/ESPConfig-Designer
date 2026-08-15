@@ -163,6 +163,7 @@ export function validateProvenance(provenance) {
     ["runtime manifest", provenance.runtime?.manifestSha256],
     ["runtime payload", provenance.runtime?.payloadSha256],
     ["resource layout", provenance.resources?.layoutSha256],
+    ["resource payload", provenance.resources?.payloadSha256],
     ["supply-chain inventory", provenance.supplyChain?.inventorySha256],
     ["third-party notices", provenance.supplyChain?.noticesSha256],
   ]) {
@@ -231,7 +232,8 @@ function sha256(path) {
 function hashDirectory(root) {
   const entries = [];
   function visit(directory, prefix = "") {
-    for (const entry of readdirSync(directory, { withFileTypes: true }).sort((left, right) => left.name.localeCompare(right.name))) {
+    for (const entry of readdirSync(directory, { withFileTypes: true }).sort((left, right) =>
+      left.name < right.name ? -1 : left.name > right.name ? 1 : 0)) {
       const path = join(directory, entry.name);
       const relativePath = prefix ? `${prefix}/${entry.name}` : entry.name;
       if (isExcludedRuntimePayloadEntry(entry.name, entry.isDirectory(), !prefix)) {
@@ -596,6 +598,7 @@ async function main() {
     resources: {
       identity: `${resourceLayout.kind}:${resourceLayout.schemaVersion}`,
       layoutSha256: sha256(resourceLayoutPath),
+      payloadSha256: resourcePayloadSha256,
     },
   };
   mkdirSync(dirname(candidateRoot), { recursive: true });

@@ -60,7 +60,29 @@ foreach ($requiredContract in @(
 Assert-True ($builderSource.Contains('archive --format=tar')) "Production kit builder must read payload bytes from the exact committed source"
 Assert-True ($builderSource.Contains('status --porcelain=v1 --untracked-files=all')) "Production kit builder must recheck source drift after staging"
 Assert-True ($orchestratorSource.Contains('$attestation.matrixPolicySha256 -ne $ExpectedMatrixPolicySha256')) "Clean-VM attestation must bind the exact matrix policy"
+Assert-True ($orchestratorSource.Contains('$attestation.scenario -ne $AttestationScenario')) "Clean-VM attestations must bind the exact Lifecycle or Startup scenario"
 Assert-True ($orchestratorSource.Contains('with code $exitCode (0x$exitCodeHex)')) "Graceful-close failures must report the exact decimal and hexadecimal application exit code"
+$stopExactStartupBody = [regex]::Match($orchestratorSource, '(?s)function Stop-ExactStartupPrimary\b.*?(?=\r?\nfunction )').Value
+Assert-True ($stopExactStartupBody.Contains('GetJobProcessIds') -and $stopExactStartupBody.Contains('Get-NetTCPConnection')) "Forced Startup cleanup must observe owned Job PIDs and the exact listener"
+Assert-True (-not $stopExactStartupBody.Contains('TerminateJob')) "Forced Startup evidence must not terminate the outer harness Job"
+$startupScenarioBody = [regex]::Match($orchestratorSource, '(?s)function Invoke-StartupScenario\b.*?(?=\r?\nfunction Assert-Report)').Value
+Assert-True ($startupScenarioBody -match '(?s)\$coldOne = Prepare-OwnedStartupProcess.*?\$coldTwo = Prepare-OwnedStartupProcess.*?Resume-OwnedStartupProcess \$coldOne.*?Resume-OwnedStartupProcess \$coldTwo') "Natural cold burst must prepare two separately owned suspended processes before either resume"
+Assert-True ($orchestratorSource.Contains('public static extern bool ShowWindow') -and $orchestratorSource.Contains('public static extern bool IsIconic') -and $startupScenarioBody.Contains('Minimize-ExactStartupWindow $primary')) "Warm focus evidence must minimize the exact primary window"
+Assert-True ($startupScenarioBody.Contains('$startupListeners[0].OwningProcess') -and $startupScenarioBody.Contains('$pythonProcesses[0].ProcessId')) "Startup listener ownership must bind to the exact embedded Python backend PID"
+Assert-True ($startupScenarioBody.Contains('Both widened-guard Startup processes must remain alive while the guard is held')) "Widened Startup guard must require both processes to remain alive"
+Assert-True ($startupScenarioBody.Contains('$timeoutWorkspaceBefore') -and $startupScenarioBody.Contains('$timeoutAppDataBefore') -and $startupScenarioBody.Contains('external Startup guard timeout')) "Startup timeout must preserve workspace and app-data trees"
+Assert-True (-not $startupScenarioBody.Contains('/tail')) "Startup reconciliation must not call or parse the job-tail API"
+Assert-True ($startupScenarioBody.Contains('Get-StartupFileIdentity $jobLogPath') -and $startupScenarioBody.Contains('Assert-StartupFileIdentity $jobLogBeforeRestart $jobLogPath')) "Startup reconciliation must preserve exact job-log byte identity"
+Assert-True ($orchestratorSource.Contains('Owned Startup cleanup root is missing its ownership marker')) "Startup cleanup must fail closed when an ownership marker is missing"
+foreach ($forbiddenStartupOverride in @(
+    "ECD_TAURI_BACKEND_ROOT", "ECD_TAURI_RUNTIME_ROOT", "ECD_TAURI_WEB_ROOT", "ECD_TAURI_SCHEMA_CATALOG_ROOT",
+    "ECD_TAURI_SCHEMA_CATALOG_MANIFEST", "ECD_TAURI_BACKEND_EXECUTABLE", "ECD_TAURI_BACKEND_SCRIPT",
+    "ECD_TAURI_APPLICATION_STORE", "ECD_TAURI_BACKEND_BINARY", "ECD_TAURI_WEBVIEW_DEBUG_PORT"
+)) {
+    Assert-True ($startupScenarioBody.Contains($forbiddenStartupOverride) -or $orchestratorSource.Contains($forbiddenStartupOverride)) "Startup environment does not clear inherited override: $forbiddenStartupOverride"
+}
+Assert-True ($startupScenarioBody.Contains('Assert-StartupMutexAbsent') -and $orchestratorSource.Contains('LastError() -eq 183')) "Startup controlled mutex cases must reject a pre-existing production mutex"
+Assert-True ($orchestratorSource.Contains('resourcePayloadSha256')) "Startup artifact/report contract must bind the complete resource payload"
 
 $trackedPolicy = Get-Content -LiteralPath $matrixPolicy -Raw | ConvertFrom-Json
 $expectedMatrixEntries = @(
@@ -86,7 +108,7 @@ try {
     New-Item -ItemType Directory -Path $artifactRoot | Out-Null
     $application = Join-Path $artifactRoot "esp-config-designer-desktop.exe"
     $installer = Join-Path $artifactRoot "ESPConfig Designer_1.4.0_x64-setup.exe"
-    Add-Type -TypeDefinition "public static class SyntheticCleanMachineApplication { public static void Main() {} }" `
+    Add-Type -TypeDefinition 'public static class SyntheticCleanMachineApplication { public static void Main() { string marker = System.Environment.GetEnvironmentVariable("ECD_CONTRACT_LAUNCH_SENTINEL"); if (!string.IsNullOrEmpty(marker)) System.IO.File.AppendAllText(marker, "launched\n"); } }' `
         -OutputAssembly $application -OutputType ConsoleApplication
     Copy-Item -LiteralPath $application -Destination $installer
     $applicationHash = (Get-FileHash -LiteralPath $application -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -108,7 +130,7 @@ try {
             tools = [ordered]@{ node = "synthetic"; npm = "synthetic"; rustc = "synthetic"; cargo = "synthetic"; tauri = "synthetic" }
         }
         runtime = [ordered]@{ identity = "runtime:1:synthetic"; manifestSha256 = ("c" * 64); payloadSha256 = ("d" * 64) }
-        resources = [ordered]@{ identity = "ecd-tauri-resource-layout:1"; layoutSha256 = ("e" * 64) }
+        resources = [ordered]@{ identity = "ecd-tauri-resource-layout:1"; layoutSha256 = ("e" * 64); payloadSha256 = ("f" * 64) }
         supplyChain = [ordered]@{
             inventorySha256 = (Get-FileHash -LiteralPath (Join-Path $artifactRoot "inventory.json") -Algorithm SHA256).Hash.ToLowerInvariant()
             noticesSha256 = (Get-FileHash -LiteralPath (Join-Path $artifactRoot "THIRD-PARTY-NOTICES.md") -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -176,7 +198,7 @@ try {
         installer = [ordered]@{ file = [IO.Path]::GetFileName($installer); sha256 = $installerHash; authenticodeStatus = "NotSigned" }
         application = [ordered]@{ file = [IO.Path]::GetFileName($application); sha256 = $applicationHash; authenticodeStatus = "NotSigned" }
         runtimeIdentity = "runtime:1:synthetic"; resourceIdentity = "ecd-tauri-resource-layout:1"
-        runtimeManifestSha256 = ("c" * 64); runtimePayloadSha256 = ("d" * 64); resourceLayoutSha256 = ("e" * 64)
+        runtimeManifestSha256 = ("c" * 64); runtimePayloadSha256 = ("d" * 64); resourceLayoutSha256 = ("e" * 64); resourcePayloadSha256 = ("f" * 64)
         inventorySha256 = (Get-FileHash -LiteralPath (Join-Path $artifactRoot "inventory.json") -Algorithm SHA256).Hash.ToLowerInvariant()
         noticesSha256 = (Get-FileHash -LiteralPath (Join-Path $artifactRoot "THIRD-PARTY-NOTICES.md") -Algorithm SHA256).Hash.ToLowerInvariant()
         fixtureSha256 = $fixtureHash; testKitSourceSha = $sourceSha; testKitSha256 = $testKitHash
@@ -232,6 +254,30 @@ try {
         ))
     }
 
+    function Get-StartupArguments(
+        [string]$Gate,
+        [string]$Label,
+        [string]$InstallRoot = "",
+        [string]$WorkspaceRoot = "",
+        [string]$AppDataRoot = ""
+    ) {
+        $installRoot = if ($InstallRoot) { $InstallRoot } else { Join-Path $root ("startup-install-" + $Label) }
+        $workspaceRoot = if ($WorkspaceRoot) { $WorkspaceRoot } else { Join-Path $root ("startup-workspace-" + $Label) }
+        $appDataRoot = if ($AppDataRoot) { $AppDataRoot } else { Join-Path $root ("startup-appdata-" + $Label) }
+        foreach ($ownedRoot in @($installRoot, $workspaceRoot, $appDataRoot)) {
+            $parent = Split-Path -Parent $ownedRoot
+            if (-not (Test-Path -LiteralPath $parent -PathType Container)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
+        }
+        $arguments = @($common)
+        $arguments[[Array]::IndexOf($arguments, "-Scenario") + 1] = "Startup"
+        return @($arguments + @(
+            "-GateRoot", $Gate, "-ReportPath", (Join-Path $Gate "startup.json"),
+            "-StartupInstallRoot", $installRoot,
+            "-StartupWorkspaceRoot", $workspaceRoot,
+            "-StartupAppDataRoot", $appDataRoot
+        ))
+    }
+
     function Set-ConsistentCheckpointBytes([string]$Gate, [byte[]]$Bytes) {
         $checkpointPath = Join-Path $Gate "lifecycle-reboot-checkpoint.json"
         [IO.File]::WriteAllBytes($checkpointPath, $Bytes)
@@ -250,6 +296,66 @@ try {
     Invoke-Gate ($common + @("-GateRoot", $passGate, "-ReportPath", $passReport)) $true
     $report = Get-Content -LiteralPath $passReport -Raw | ConvertFrom-Json
     Assert-True ($report.schemaVersion -eq 1 -and $report.result -eq "pass" -and $report.evidenceClass -eq "contract_test" -and @($report.checks).Count -gt 0) "Preflight report contract is invalid"
+
+    $startupGate = New-PassingContractGate "startup-pass"
+    $startupArguments = Get-StartupArguments $startupGate "pass"
+    $contractLaunchSentinel = Join-Path $root "contract-process-launched.txt"
+    $previousLaunchSentinel = [Environment]::GetEnvironmentVariable("ECD_CONTRACT_LAUNCH_SENTINEL", [EnvironmentVariableTarget]::Process)
+    try {
+        [Environment]::SetEnvironmentVariable("ECD_CONTRACT_LAUNCH_SENTINEL", $contractLaunchSentinel, [EnvironmentVariableTarget]::Process)
+        Invoke-Gate $startupArguments $true
+    } finally {
+        [Environment]::SetEnvironmentVariable("ECD_CONTRACT_LAUNCH_SENTINEL", $previousLaunchSentinel, [EnvironmentVariableTarget]::Process)
+    }
+    Assert-True (-not (Test-Path -LiteralPath $contractLaunchSentinel)) "Contract-test Startup launched a synthetic executable or installer"
+    $startupReportPath = Join-Path $startupGate "startup.json"
+    $startupReport = Get-Content -LiteralPath $startupReportPath -Raw | ConvertFrom-Json
+    $requiredStartupChecks = @(
+        "artifact_identity", "preflight_receipt", "clean_vm_attestation", "root_ownership", "isolated_roots",
+        "installed_application_hash", "installed_resources", "natural_cold_burst", "widened_startup_guard",
+        "no_early_writes", "single_primary_backend_listener", "secondary_exit_zero", "warm_focus_restore_manual",
+        "foreign_listener_8099", "forced_primary_job_cleanup", "abandoned_guard_takeover",
+        "interrupted_job_reconciliation", "graceful_close", "startup_guard_timeout", "final_cleanup"
+    )
+    Assert-True ($startupReport.result -eq "pass" -and $startupReport.evidenceClass -eq "contract_test") "Synthetic Startup did not produce a contract-test PASS"
+    Assert-True ($startupReport.cleanVmAttestationSha256 -eq "contract_test" -and $startupReport.hostRunNonce -eq "contract_test") "Contract-test Startup attestation fields are invalid"
+    Assert-True (@($startupReport.checks).Count -eq $requiredStartupChecks.Count) "Synthetic Startup report check count is invalid"
+    foreach ($requiredCheck in $requiredStartupChecks) {
+        Assert-True (@($startupReport.checks | Where-Object { $_.name -eq $requiredCheck -and $_.status -eq "pass" }).Count -eq 1) "Synthetic Startup report is missing required check: $requiredCheck"
+    }
+    Assert-True (@($startupReport.checks | Where-Object { -not ([string]$_.summary).StartsWith("Contract simulation") }).Count -eq 0) "Contract-test Startup checks overclaim production execution"
+    $startupReportArguments = @($common)
+    $startupReportArguments[[Array]::IndexOf($startupReportArguments, "-Scenario") + 1] = "Report"
+    Invoke-Gate ($startupReportArguments + @("-GateRoot", $startupGate, "-ReportPath", $startupReportPath, "-ExpectedReportScenario", "Startup")) $true
+
+    $missingStartupCheck = Get-Content -LiteralPath $startupReportPath -Raw | ConvertFrom-Json
+    $missingStartupCheck.checks = @($missingStartupCheck.checks | Where-Object { $_.name -ne "abandoned_guard_takeover" })
+    $missingStartupCheckPath = Join-Path $startupGate "startup-missing-check.json"
+    Write-JsonFile $missingStartupCheckPath $missingStartupCheck
+    Invoke-Gate ($startupReportArguments + @("-GateRoot", $startupGate, "-ReportPath", $missingStartupCheckPath, "-ExpectedReportScenario", "Startup")) $false "required check"
+
+    $startupStatePath = Join-Path $startupGate "startup-owned-resources.json"
+    $startupOwnerPath = Join-Path $startupGate ".ecd-clean-machine-owner.json"
+    $startupStateBytes = [IO.File]::ReadAllBytes($startupStatePath)
+    $startupOwnerBytes = [IO.File]::ReadAllBytes($startupOwnerPath)
+    $tamperedStartupState = Get-Content -LiteralPath $startupStatePath -Raw | ConvertFrom-Json
+    $tamperedStartupState.state = "active"
+    Write-JsonFile $startupStatePath $tamperedStartupState
+    $tamperedStartupOwner = Get-Content -LiteralPath $startupOwnerPath -Raw | ConvertFrom-Json
+    $tamperedStartupOwner.startupStateSha256 = (Get-FileHash -LiteralPath $startupStatePath -Algorithm SHA256).Hash.ToLowerInvariant()
+    Write-JsonFile $startupOwnerPath $tamperedStartupOwner
+    Invoke-Gate ($startupReportArguments + @("-GateRoot", $startupGate, "-ReportPath", $startupReportPath, "-ExpectedReportScenario", "Startup")) $false "completed bound startup state"
+    [IO.File]::WriteAllBytes($startupStatePath, $startupStateBytes)
+    [IO.File]::WriteAllBytes($startupOwnerPath, $startupOwnerBytes)
+
+    $unownedStartupGate = New-PassingContractGate "startup-unowned"
+    $unownedStartupInstall = Join-Path $root "existing-unowned-startup-install"
+    New-Item -ItemType Directory -Path $unownedStartupInstall | Out-Null
+    $unownedStartupSentinel = Join-Path $unownedStartupInstall "sentinel.txt"
+    [IO.File]::WriteAllText($unownedStartupSentinel, "must survive")
+    $unownedStartupArguments = Get-StartupArguments $unownedStartupGate "unowned" $unownedStartupInstall
+    Invoke-Gate $unownedStartupArguments $false "new, absent owned roots"
+    Assert-True (Test-Path -LiteralPath $unownedStartupSentinel -PathType Leaf) "Startup modified an existing unowned install root"
 
     $badHashArguments = @($common)
     $badHashArguments[[Array]::IndexOf($badHashArguments, "-ExpectedInstallerSha256") + 1] = ("0" * 64)

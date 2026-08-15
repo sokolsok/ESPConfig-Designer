@@ -111,6 +111,7 @@ function validProvenance() {
     resources: {
       identity: "ecd-tauri-resource-layout:1",
       layoutSha256: HASH,
+      payloadSha256: HASH,
     },
     supplyChain: {
       inventorySha256: HASH,
@@ -148,6 +149,10 @@ test("provenance rejects missing required fields and final unsigned hashes", () 
   const missingRuntimePayloadHash = validProvenance();
   delete missingRuntimePayloadHash.runtime.payloadSha256;
   assert.throws(() => validateProvenance(missingRuntimePayloadHash), /runtime payload SHA-256/i);
+
+  const missingResourcePayloadHash = validProvenance();
+  delete missingResourcePayloadHash.resources.payloadSha256;
+  assert.throws(() => validateProvenance(missingResourcePayloadHash), /resource payload SHA-256/i);
 
   const missingInstaller = validProvenance();
   missingInstaller.artifacts = missingInstaller.artifacts.filter(({ role }) => role !== "nsis-installer");

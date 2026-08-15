@@ -22,6 +22,9 @@ param(
     [string]$LifecycleInstallRoot = "",
     [string]$LifecycleWorkspaceRoot = "",
     [string]$LifecycleAppDataRoot = "",
+    [string]$StartupInstallRoot = "",
+    [string]$StartupWorkspaceRoot = "",
+    [string]$StartupAppDataRoot = "",
     [ValidateSet("", "Begin", "Resume")][string]$LifecycleStage = "",
     [string]$ContractBootId = "",
     [string]$CleanVmAttestation = "",
@@ -53,6 +56,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 public static class CleanMachinePathNative {
     private delegate bool EnumWindowsProc(IntPtr window, IntPtr parameter);
+    private delegate bool EnumChildProc(IntPtr window, IntPtr parameter);
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern IntPtr CreateFileW(string name, uint access, uint share, IntPtr security, uint creation, uint flags, IntPtr template);
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
@@ -75,12 +79,24 @@ public static class CleanMachinePathNative {
     private static extern uint ResumeThread(IntPtr thread);
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern bool TerminateProcess(IntPtr process, uint exitCode);
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern IntPtr CreateMutexW(IntPtr attributes, bool initialOwner, string name);
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern bool ReleaseMutex(IntPtr handle);
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern uint WaitForSingleObject(IntPtr handle, uint milliseconds);
     [DllImport("user32.dll", SetLastError = true)]
     private static extern bool EnumWindows(EnumWindowsProc callback, IntPtr parameter);
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool EnumChildWindows(IntPtr parent, EnumChildProc callback, IntPtr parameter);
     [DllImport("user32.dll")]
     private static extern uint GetWindowThreadProcessId(IntPtr window, out uint processId);
     [DllImport("user32.dll")]
-    private static extern bool IsWindowVisible(IntPtr window);
+    public static extern bool IsWindowVisible(IntPtr window);
+    [DllImport("user32.dll")]
+    public static extern bool IsIconic(IntPtr window);
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern bool ShowWindow(IntPtr window, int command);
     [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern int GetWindowTextLengthW(IntPtr window);
     [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
@@ -140,6 +156,20 @@ public static class CleanMachinePathNative {
         }, IntPtr.Zero);
         return found;
     }
+    public static bool WindowHasChildTextContaining(IntPtr parent, string expectedText) {
+        bool found = false;
+        EnumChildWindows(parent, delegate(IntPtr window, IntPtr parameter) {
+            int length = GetWindowTextLengthW(window);
+            if (length == 0) return true;
+            StringBuilder text = new StringBuilder(length + 1);
+            if (GetWindowTextW(window, text, text.Capacity) == length && text.ToString().Contains(expectedText)) {
+                found = true;
+                return false;
+            }
+            return true;
+        }, IntPtr.Zero);
+        return found;
+    }
     public static IntPtr CreateKillOnCloseJob() {
         IntPtr job = CreateJobObjectW(IntPtr.Zero, null);
         if (job == IntPtr.Zero) throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
@@ -183,13 +213,16 @@ public static class CleanMachinePathNative {
     public static void TerminateJob(IntPtr job) {
         if (!TerminateJobObject(job, 1)) throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
     }
-    public static SuspendedProcess CreateSuspendedProcess(string application, string currentDirectory) {
+    public static SuspendedProcess CreateSuspendedProcess(string application, string commandLine, string currentDirectory) {
         StartupInfo startup = new StartupInfo(); startup.Cb = (uint)Marshal.SizeOf(typeof(StartupInfo));
         ProcessInformation information;
-        if (!CreateProcessW(application, null, IntPtr.Zero, IntPtr.Zero, false, 0x00000004, IntPtr.Zero, currentDirectory, ref startup, out information)) {
+        if (!CreateProcessW(application, commandLine, IntPtr.Zero, IntPtr.Zero, false, 0x00000004, IntPtr.Zero, currentDirectory, ref startup, out information)) {
             throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
         }
         return new SuspendedProcess { ProcessHandle = information.Process, ThreadHandle = information.Thread, ProcessId = (int)information.ProcessId };
+    }
+    public static SuspendedProcess CreateSuspendedProcess(string application, string currentDirectory) {
+        return CreateSuspendedProcess(application, null, currentDirectory);
     }
     public static void ResumeSuspendedProcess(SuspendedProcess process) {
         if (ResumeThread(process.ThreadHandle) == 0xffffffff) throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
@@ -200,6 +233,7 @@ public static class CleanMachinePathNative {
         if (process.ProcessHandle != IntPtr.Zero) { CloseHandle(process.ProcessHandle); process.ProcessHandle = IntPtr.Zero; }
     }
     public static bool CloseOwnedHandle(IntPtr handle) { return CloseHandle(handle); }
+    public static int LastError() { return Marshal.GetLastWin32Error(); }
 }
 "@
 }
@@ -501,7 +535,7 @@ function Assert-ArtifactRegister([object]$Register) {
         $Register.installer.sha256, $Register.application.sha256,
         $Register.inventorySha256, $Register.noticesSha256,
         $Register.fixtureSha256, $Register.testKitSha256,
-        $Register.runtimeManifestSha256, $Register.runtimePayloadSha256, $Register.resourceLayoutSha256
+        $Register.runtimeManifestSha256, $Register.runtimePayloadSha256, $Register.resourceLayoutSha256, $Register.resourcePayloadSha256
     )) {
         if ([string]$value -notmatch $sha256Pattern) { throw "Artifact register contains an invalid SHA-256" }
     }
@@ -541,6 +575,7 @@ function Assert-Provenance([object]$Provenance, [object]$Register) {
         $Provenance.runtime.payloadSha256 -ne $Register.runtimePayloadSha256 -or
         $Provenance.resources.identity -ne $Register.resourceIdentity -or
         $Provenance.resources.layoutSha256 -ne $Register.resourceLayoutSha256 -or
+        $Provenance.resources.payloadSha256 -ne $Register.resourcePayloadSha256 -or
         $Provenance.supplyChain.inventorySha256 -ne $Register.inventorySha256 -or
         $Provenance.supplyChain.noticesSha256 -ne $Register.noticesSha256 -or
         $Provenance.reproducibility -ne "controlled inputs; byte-for-byte reproducibility is not claimed") {
@@ -575,6 +610,9 @@ function Assert-OwnedGateRoot(
         }
         if ($marker.PSObject.Properties.Name -contains "lifecycleStateSha256") {
             Assert-Hash (Join-Path $Root "lifecycle-owned-resources.json") ([string]$marker.lifecycleStateSha256) "Lifecycle owned-resource state" | Out-Null
+        }
+        if ($marker.PSObject.Properties.Name -contains "startupStateSha256") {
+            Assert-Hash (Join-Path $Root "startup-owned-resources.json") ([string]$marker.startupStateSha256) "Startup owned-resource state" | Out-Null
         }
         return [string]$marker.runId
     }
@@ -833,18 +871,22 @@ function Assert-LifecycleArtifactSet([object]$Register) {
     }
 }
 
-function Assert-CleanVmAttestation([object]$Register, [string]$MatrixEntry) {
+function Assert-CleanVmAttestation([object]$Register, [string]$MatrixEntry, [string]$AttestationScenario = "Lifecycle") {
     if ($ContractTest) {
         if ($CleanVmAttestation -or $ExpectedCleanVmAttestationSha256) { throw "CleanVmAttestation is forbidden in contract-test mode" }
         return [ordered]@{ sha256 = "contract_test"; runNonce = "contract_test" }
     }
     if ([string]::IsNullOrWhiteSpace($CleanVmAttestation) -or $ExpectedCleanVmAttestationSha256 -notmatch $sha256Pattern) {
-        throw "Production Lifecycle requires an authenticated clean-VM attestation and expected SHA-256"
+        throw "Production $AttestationScenario requires an authenticated clean-VM attestation and expected SHA-256"
     }
     $path = Assert-AbsolutePath $CleanVmAttestation "CleanVmAttestation"
-    if ((Test-PathOverlap $path $GateRoot) -or (Test-PathOverlap $path $script:LifecycleInstallRoot) -or
-        (Test-PathOverlap $path $script:LifecycleWorkspaceRoot) -or (Test-PathOverlap $path $script:LifecycleAppDataRoot)) {
-        throw "CleanVmAttestation must be outside Lifecycle-owned roots"
+    $scenarioRoots = if ($AttestationScenario -eq "Startup") {
+        @($script:StartupInstallRoot, $script:StartupWorkspaceRoot, $script:StartupAppDataRoot)
+    } else {
+        @($script:LifecycleInstallRoot, $script:LifecycleWorkspaceRoot, $script:LifecycleAppDataRoot)
+    }
+    if ((Test-PathOverlap $path $GateRoot) -or @($scenarioRoots | Where-Object { Test-PathOverlap $path $_ }).Count -gt 0) {
+        throw "CleanVmAttestation must be outside $AttestationScenario-owned roots"
     }
     Assert-NoReparsePath $path "CleanVmAttestation"
     Assert-NoAlternateStreams $path "CleanVmAttestation"
@@ -856,6 +898,7 @@ function Assert-CleanVmAttestation([object]$Register, [string]$MatrixEntry) {
         $attestation.testKitSha256 -ne $Register.testKitSha256 -or
         $attestation.matrixPolicySha256 -ne $ExpectedMatrixPolicySha256 -or
         $attestation.matrixEntryId -ne $MatrixEntry -or $attestation.cleanSnapshot -ne $true -or
+        $attestation.scenario -ne $AttestationScenario -or
         $attestation.nonElevatedUser -ne $true -or [string]$attestation.runNonce -notmatch '^[0-9a-fA-F]{64}$') {
         throw "Clean-VM attestation identity is invalid"
     }
@@ -871,6 +914,19 @@ function Write-LifecycleOwnedState([string]$Path, [object]$State) {
         $marker.lifecycleStateSha256 = $stateHash
     } else {
         $marker | Add-Member -NotePropertyName lifecycleStateSha256 -NotePropertyValue $stateHash
+    }
+    Write-JsonAtomic $markerPath $marker
+}
+
+function Write-StartupOwnedState([string]$Path, [object]$State) {
+    Write-JsonAtomic $Path $State
+    $markerPath = Join-Path $GateRoot $ownerMarkerName
+    $marker = Read-JsonObject $markerPath "GateRoot ownership marker"
+    $stateHash = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($marker.PSObject.Properties.Name -contains "startupStateSha256") {
+        $marker.startupStateSha256 = $stateHash
+    } else {
+        $marker | Add-Member -NotePropertyName startupStateSha256 -NotePropertyValue $stateHash
     }
     Write-JsonAtomic $markerPath $marker
 }
@@ -903,6 +959,222 @@ function Assert-SyntheticMarker([string]$Path, [string]$RunId) {
 function Invoke-Nsis([string]$Executable, [string[]]$Arguments, [string]$Name) {
     $process = Start-Process -FilePath $Executable -ArgumentList $Arguments -Wait -PassThru
     if ($process.ExitCode -ne 0) { throw "$Name failed with exit code $($process.ExitCode)" }
+}
+
+function ConvertTo-WindowsCommandLine([string]$Executable, [string[]]$Arguments) {
+    $values = @($Executable) + @($Arguments)
+    return (@($values | ForEach-Object {
+        $value = [string]$_
+        if ($value -notmatch '[\s"]') { $value } else { '"' + (($value -replace '(\\*)"', '$1$1\"') -replace '(\\+)$', '$1$1') + '"' }
+    }) -join " ")
+}
+
+function Prepare-OwnedStartupProcess(
+    [string]$Executable,
+    [string]$WorkingDirectory,
+    [hashtable]$Environment,
+    [string[]]$Arguments = @()
+) {
+    $previousEnvironment = @{}
+    $jobHandle = [IntPtr]::Zero
+    $suspended = $null
+    try {
+        $jobHandle = [CleanMachinePathNative]::CreateKillOnCloseJob()
+        foreach ($name in $Environment.Keys) {
+            $previousEnvironment[$name] = [Environment]::GetEnvironmentVariable($name, [EnvironmentVariableTarget]::Process)
+            [Environment]::SetEnvironmentVariable($name, $Environment[$name], [EnvironmentVariableTarget]::Process)
+        }
+        $commandLine = ConvertTo-WindowsCommandLine $Executable $Arguments
+        $suspended = [CleanMachinePathNative]::CreateSuspendedProcess($Executable, $commandLine, $WorkingDirectory)
+        [CleanMachinePathNative]::AssignToJob($jobHandle, $suspended.ProcessHandle)
+        $process = [Diagnostics.Process]::GetProcessById($suspended.ProcessId)
+        return [pscustomobject]@{ process = $process; jobHandle = $jobHandle; port = 0; suspended = $suspended; resumed = $false }
+    } catch {
+        $message = $_.Exception.Message
+        if ($suspended) { [CleanMachinePathNative]::TerminateSuspendedProcess($suspended) | Out-Null }
+        if ($jobHandle -ne [IntPtr]::Zero) { [CleanMachinePathNative]::CloseOwnedHandle($jobHandle) | Out-Null }
+        if ($suspended) { [CleanMachinePathNative]::CloseSuspendedProcessHandles($suspended) }
+        throw "Could not launch owned Startup process: $message"
+    } finally {
+        foreach ($name in $previousEnvironment.Keys) {
+            [Environment]::SetEnvironmentVariable($name, $previousEnvironment[$name], [EnvironmentVariableTarget]::Process)
+        }
+    }
+}
+
+function Resume-OwnedStartupProcess([object]$OwnedProcess) {
+    if ($null -eq $OwnedProcess -or $null -eq $OwnedProcess.suspended -or $OwnedProcess.resumed) {
+        throw "Startup process is not prepared for exactly one resume"
+    }
+    try {
+        [CleanMachinePathNative]::ResumeSuspendedProcess($OwnedProcess.suspended)
+        $OwnedProcess.resumed = $true
+    } catch {
+        $resumeError = $_.Exception.Message
+        [CleanMachinePathNative]::TerminateSuspendedProcess($OwnedProcess.suspended) | Out-Null
+        if ($OwnedProcess.jobHandle -ne [IntPtr]::Zero) {
+            [CleanMachinePathNative]::CloseOwnedHandle($OwnedProcess.jobHandle) | Out-Null
+            $OwnedProcess.jobHandle = [IntPtr]::Zero
+        }
+        throw "Could not resume owned Startup process: $resumeError"
+    } finally {
+        [CleanMachinePathNative]::CloseSuspendedProcessHandles($OwnedProcess.suspended)
+        $OwnedProcess.suspended = $null
+    }
+    return $OwnedProcess
+}
+
+function Start-OwnedStartupProcess(
+    [string]$Executable,
+    [string]$WorkingDirectory,
+    [hashtable]$Environment,
+    [string[]]$Arguments = @()
+) {
+    $owned = Prepare-OwnedStartupProcess $Executable $WorkingDirectory $Environment $Arguments
+    return (Resume-OwnedStartupProcess $owned)
+}
+
+function Close-OwnedStartupJob([object]$OwnedProcess, [bool]$Terminate = $false) {
+    if ($null -eq $OwnedProcess -or $OwnedProcess.jobHandle -eq [IntPtr]::Zero) { return }
+    $handle = $OwnedProcess.jobHandle
+    try {
+        if ($Terminate) { [CleanMachinePathNative]::TerminateJob($handle) }
+        $deadline = [DateTime]::UtcNow.AddSeconds(30)
+        while ([DateTime]::UtcNow -lt $deadline) {
+            if (@([CleanMachinePathNative]::GetJobProcessIds($handle)).Count -eq 0) { return }
+            Start-Sleep -Milliseconds 100
+        }
+        throw "Owned Startup Job Object processes survived cleanup"
+    } finally {
+        if (-not [CleanMachinePathNative]::CloseOwnedHandle($handle)) { throw "Could not close the Startup Job Object" }
+        $OwnedProcess.jobHandle = [IntPtr]::Zero
+        if ($OwnedProcess.PSObject.Properties.Name -contains "suspended" -and $null -ne $OwnedProcess.suspended) {
+            [CleanMachinePathNative]::CloseSuspendedProcessHandles($OwnedProcess.suspended)
+            $OwnedProcess.suspended = $null
+        }
+    }
+}
+
+function Stop-ExactStartupPrimary([object]$OwnedProcess, [int]$Port) {
+    if ($OwnedProcess.jobHandle -eq [IntPtr]::Zero -or
+        @([CleanMachinePathNative]::GetJobProcessIds($OwnedProcess.jobHandle)) -notcontains $OwnedProcess.process.Id) {
+        throw "Exact Startup primary is not owned by an open outer harness Job Object"
+    }
+    if (-not $OwnedProcess.process.HasExited) {
+        $actual = Get-Process -Id $OwnedProcess.process.Id -ErrorAction SilentlyContinue
+        if ($null -eq $actual -or $actual.StartTime.ToUniversalTime() -ne $OwnedProcess.process.StartTime.ToUniversalTime()) {
+            throw "Refusing to terminate a Startup primary whose identity is no longer owned"
+        }
+        $OwnedProcess.process.Kill()
+        if (-not $OwnedProcess.process.WaitForExit(30000)) { throw "Exact Startup primary did not terminate" }
+    }
+    $deadline = [DateTime]::UtcNow.AddSeconds(30)
+    while ([DateTime]::UtcNow -lt $deadline) {
+        $jobPids = @([CleanMachinePathNative]::GetJobProcessIds($OwnedProcess.jobHandle))
+        $listeners = @(Get-NetTCPConnection -LocalAddress "127.0.0.1" -LocalPort $Port -State Listen -ErrorAction SilentlyContinue)
+        if ($jobPids.Count -eq 0 -and $listeners.Count -eq 0) { break }
+        Start-Sleep -Milliseconds 100
+    }
+    $remainingPids = @([CleanMachinePathNative]::GetJobProcessIds($OwnedProcess.jobHandle))
+    $remainingListeners = @(Get-NetTCPConnection -LocalAddress "127.0.0.1" -LocalPort $Port -State Listen -ErrorAction SilentlyContinue)
+    if ($remainingPids.Count -ne 0 -or $remainingListeners.Count -ne 0) {
+        throw "Product descendants or listener survived exact-primary termination while the outer Startup Job Object remained open"
+    }
+    Close-OwnedStartupJob $OwnedProcess
+}
+
+function Minimize-ExactStartupWindow([object]$OwnedProcess) {
+    $window = [CleanMachinePathNative]::FindVisibleWindow([uint32]$OwnedProcess.process.Id, "ESPConfig Designer")
+    if ($window -eq [IntPtr]::Zero) { throw "Exact primary window was unavailable before warm restore/focus" }
+    if (-not [CleanMachinePathNative]::ShowWindow($window, 6)) { throw "Exact primary window was not visible before minimization" }
+    $deadline = [DateTime]::UtcNow.AddSeconds(5)
+    while ([DateTime]::UtcNow -lt $deadline -and -not [CleanMachinePathNative]::IsIconic($window)) { Start-Sleep -Milliseconds 50 }
+    if (-not [CleanMachinePathNative]::IsIconic($window)) { throw "Exact primary window did not become minimized" }
+    return $window
+}
+
+function Get-StartupFileIdentity([string]$Path) {
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { return [ordered]@{ exists = $false; length = [int64]0; sha256 = "" } }
+    Assert-NoReparsePath $Path "Startup job log"
+    Assert-NoAlternateStreams $Path "Startup job log"
+    $file = Get-Item -LiteralPath $Path
+    return [ordered]@{ exists = $true; length = [int64]$file.Length; sha256 = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant() }
+}
+
+function Assert-StartupFileIdentity([object]$Expected, [string]$Path) {
+    $actual = Get-StartupFileIdentity $Path
+    if ($actual.exists -ne $Expected.exists -or $actual.length -ne $Expected.length -or $actual.sha256 -ne $Expected.sha256) {
+        throw "Startup job log identity changed across backend restart"
+    }
+}
+
+function Remove-OwnedStartupRoot([string]$Root, [string]$Category, [string]$RunId, [string]$Nonce) {
+    if (-not (Test-Path -LiteralPath $Root)) { return }
+    $markerPath = Join-Path $Root $lifecycleRootMarkerName
+    if (-not (Test-Path -LiteralPath $markerPath -PathType Leaf)) {
+        throw "Owned Startup cleanup root is missing its ownership marker: $Category"
+    }
+    Assert-OwnedLifecycleRoot $Root $Category $RunId $Nonce
+    Remove-Item -LiteralPath $Root -Recurse -Force
+}
+
+function Wait-StartupHealth([object[]]$Candidates, [int]$Port) {
+    $deadline = [DateTime]::UtcNow.AddSeconds(120)
+    while ([DateTime]::UtcNow -lt $deadline) {
+        try {
+            $health = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/health" -TimeoutSec 2
+            if ($health.mode -eq "desktop") {
+                $alive = @($Candidates | Where-Object { -not $_.process.HasExited })
+                if ($alive.Count -eq 1) { $alive[0].port = $Port; return $alive[0] }
+            }
+        } catch { Start-Sleep -Milliseconds 100 }
+    }
+    throw "Startup primary did not reach exact desktop health"
+}
+
+function Wait-StartupGuardOwned([object]$OwnedProcess) {
+    $deadline = [DateTime]::UtcNow.AddSeconds(10)
+    while ([DateTime]::UtcNow -lt $deadline) {
+        if ($OwnedProcess.process.HasExited) { throw "Startup guard owner exited early" }
+        $handle = [CleanMachinePathNative]::CreateMutexW([IntPtr]::Zero, $false, "Local\com.espconfigdesigner.desktop.startup-guard")
+        if ($handle -eq [IntPtr]::Zero) { throw "Could not inspect the Startup mutex" }
+        try {
+            $wait = [CleanMachinePathNative]::WaitForSingleObject($handle, 0)
+            if ($wait -eq 0x102) { return }
+            if ($wait -eq 0 -or $wait -eq 0x80) { [CleanMachinePathNative]::ReleaseMutex($handle) | Out-Null }
+        } finally { [CleanMachinePathNative]::CloseOwnedHandle($handle) | Out-Null }
+        Start-Sleep -Milliseconds 20
+    }
+    throw "Process did not acquire the Startup mutex"
+}
+
+function Assert-StartupMutexAbsent {
+    $handle = [CleanMachinePathNative]::CreateMutexW([IntPtr]::Zero, $false, "Local\com.espconfigdesigner.desktop.startup-guard")
+    if ($handle -eq [IntPtr]::Zero) { throw "Could not inspect the production Startup mutex" }
+    $alreadyExists = [CleanMachinePathNative]::LastError() -eq 183
+    [CleanMachinePathNative]::CloseOwnedHandle($handle) | Out-Null
+    if ($alreadyExists) { throw "Production Startup mutex already exists; another ECD GUI gate may be active" }
+}
+
+function Close-ExactStartupWindow([object]$OwnedProcess, [string]$Title, [bool]$RequireZeroExit, [string]$RequiredText = "", [int]$GuardedPort = 0) {
+    $deadline = [DateTime]::UtcNow.AddSeconds(30)
+    $window = [IntPtr]::Zero
+    while ([DateTime]::UtcNow -lt $deadline -and -not $OwnedProcess.process.HasExited) {
+        if ($GuardedPort -gt 0 -and @(Get-NetTCPConnection -LocalAddress "127.0.0.1" -LocalPort $GuardedPort -State Listen -ErrorAction SilentlyContinue).Count -ne 0) {
+            throw "Startup created a listener while the external guard remained held"
+        }
+        $window = [CleanMachinePathNative]::FindVisibleWindow([uint32]$OwnedProcess.process.Id, $Title)
+        if ($window -ne [IntPtr]::Zero) { break }
+        Start-Sleep -Milliseconds 100
+    }
+    if ($window -eq [IntPtr]::Zero) { throw "Exact Startup window '$Title' was unavailable" }
+    if ($RequiredText -and -not [CleanMachinePathNative]::WindowHasChildTextContaining($window, $RequiredText)) {
+        throw "Exact Startup window '$Title' did not contain the required controlled error"
+    }
+    if (-not [CleanMachinePathNative]::PostMessageW($window, 0x0010, [UIntPtr]::Zero, [IntPtr]::Zero)) { throw "Could not close exact Startup window '$Title'" }
+    if (-not $OwnedProcess.process.WaitForExit(30000)) { throw "Startup process did not exit after exact-window close" }
+    if ($RequireZeroExit -and $OwnedProcess.process.ExitCode -ne 0) { throw "Startup application exited nonzero: $($OwnedProcess.process.ExitCode)" }
+    Close-OwnedStartupJob $OwnedProcess
 }
 
 function Get-FreeLifecyclePort {
@@ -1055,7 +1327,7 @@ function New-LifecycleReport(
         sha256SumsSha256 = $Register.sha256SumsSha256; provenanceSha256 = $Register.provenanceSha256
         installerSha256 = $Register.installer.sha256; applicationSha256 = $Register.application.sha256
         runtimeIdentity = $Register.runtimeIdentity; resourceIdentity = $Register.resourceIdentity
-        runtimeManifestSha256 = $Register.runtimeManifestSha256; runtimePayloadSha256 = $Register.runtimePayloadSha256; resourceLayoutSha256 = $Register.resourceLayoutSha256
+        runtimeManifestSha256 = $Register.runtimeManifestSha256; runtimePayloadSha256 = $Register.runtimePayloadSha256; resourceLayoutSha256 = $Register.resourceLayoutSha256; resourcePayloadSha256 = $Register.resourcePayloadSha256
         inventorySha256 = $Register.inventorySha256; noticesSha256 = $Register.noticesSha256; fixtureSha256 = $Register.fixtureSha256
         testKitSourceSha = $Register.testKitSourceSha; testKitSha256 = $Register.testKitSha256
         artifactRegisterSha256 = $RegisterHash; matrixPolicySha256 = $MatrixHash
@@ -1501,6 +1773,380 @@ function Invoke-LifecycleScenario(
     if ($cleanupErrors.Count -gt 0) { throw ("Lifecycle cleanup failed:`n- " + ($cleanupErrors -join "`n- ")) }
 }
 
+function Assert-StartupRoots {
+    foreach ($entry in @(
+        @("StartupInstallRoot", $StartupInstallRoot), @("StartupWorkspaceRoot", $StartupWorkspaceRoot), @("StartupAppDataRoot", $StartupAppDataRoot)
+    )) {
+        if ([string]::IsNullOrWhiteSpace([string]$entry[1])) { throw "$($entry[0]) is required for Startup" }
+    }
+    $script:StartupInstallRoot = Assert-AbsolutePath $StartupInstallRoot "StartupInstallRoot"
+    $script:StartupWorkspaceRoot = Assert-AbsolutePath $StartupWorkspaceRoot "StartupWorkspaceRoot"
+    $script:StartupAppDataRoot = Assert-AbsolutePath $StartupAppDataRoot "StartupAppDataRoot"
+    $roots = @($ArtifactRoot, $GateRoot, $script:StartupInstallRoot, $script:StartupWorkspaceRoot, $script:StartupAppDataRoot)
+    foreach ($root in $roots) { Assert-NoReparsePath $root "Startup root" }
+    for ($left = 0; $left -lt $roots.Count; $left++) {
+        for ($right = $left + 1; $right -lt $roots.Count; $right++) {
+            if (Test-PathOverlap $roots[$left] $roots[$right]) { throw "Startup roots overlap" }
+        }
+    }
+    if ((Test-PathOverlap $ReportPath $script:StartupInstallRoot) -or (Test-PathOverlap $ReportPath $script:StartupWorkspaceRoot) -or
+        (Test-PathOverlap $ReportPath $script:StartupAppDataRoot)) { throw "Startup root overlaps GateRoot metadata" }
+}
+
+function Invoke-OwnedStartupNsis([string]$Executable, [string[]]$Arguments, [string]$Name) {
+    $owned = Start-OwnedStartupProcess $Executable (Split-Path -Parent $Executable) @{} $Arguments
+    try {
+        if (-not $owned.process.WaitForExit(180000)) { throw "$Name exceeded its fixed 180-second deadline" }
+        if ($owned.process.ExitCode -ne 0) { throw "$Name failed with exit code $($owned.process.ExitCode)" }
+        Close-OwnedStartupJob $owned
+    } catch {
+        if ($owned.jobHandle -ne [IntPtr]::Zero) { try { Close-OwnedStartupJob $owned $true } catch {} }
+        throw
+    }
+}
+
+function New-StartupEnvironment([int]$Port, [int]$GuardHoldMilliseconds = 0) {
+    $environment = @{
+        ECD_TAURI_APP_DATA_ROOT = $script:StartupAppDataRoot
+        ECD_TAURI_WORKSPACE = $script:StartupWorkspaceRoot
+        ECD_TAURI_PORT = $Port.ToString()
+        ECD_TAURI_HEALTH_TIMEOUT_MS = "120000"
+        ECD_TAURI_RESOURCE_ROOT = $null
+        ECD_TAURI_TEST_STARTUP_GUARD_HOLD_MS = $null
+        ECD_TAURI_BACKEND_ROOT = $null
+        ECD_TAURI_RUNTIME_ROOT = $null
+        ECD_TAURI_WEB_ROOT = $null
+        ECD_TAURI_SCHEMA_CATALOG_ROOT = $null
+        ECD_TAURI_SCHEMA_CATALOG_MANIFEST = $null
+        ECD_TAURI_BACKEND_EXECUTABLE = $null
+        ECD_TAURI_BACKEND_SCRIPT = $null
+        ECD_TAURI_APPLICATION_STORE = $null
+        ECD_TAURI_BACKEND_BINARY = $null
+        ECD_TAURI_WEBVIEW_DEBUG_PORT = $null
+    }
+    if ($GuardHoldMilliseconds -gt 0) { $environment.ECD_TAURI_TEST_STARTUP_GUARD_HOLD_MS = $GuardHoldMilliseconds.ToString() }
+    return $environment
+}
+
+function Get-StartupPayloadHash([string]$Root, [bool]$ExcludeRuntimeMetadata) {
+    $metadataProjections = @("git-manifest.json", "python-manifest.json", "requirements-bootstrap.lock", "requirements-runtime.lock")
+    $entries = New-Object Collections.Generic.List[string]
+    function Add-PayloadDirectory([string]$Directory, [string]$Prefix) {
+        $names = [string[]]@(Get-ChildItem -LiteralPath $Directory -Force | ForEach-Object { $_.Name })
+        [Array]::Sort($names, [StringComparer]::Ordinal)
+        foreach ($name in $names) {
+            $item = Get-Item -LiteralPath (Join-Path $Directory $name) -Force
+            $relative = if ($Prefix) { "$Prefix/$name" } else { $name }
+            if ($item.PSIsContainer) {
+                if ($name -ieq "__pycache__") { continue }
+                Assert-NoReparsePath $item.FullName "Installed payload directory"
+                Assert-NoAlternateStreams $item.FullName "Installed payload directory"
+                Add-PayloadDirectory $item.FullName $relative
+                continue
+            }
+            if ($name -match '(?i)\.py[co]$' -or
+                ($ExcludeRuntimeMetadata -and -not $Prefix -and $metadataProjections -ccontains $name)) { continue }
+            Assert-NoReparsePath $item.FullName "Installed payload file"
+            Assert-NoAlternateStreams $item.FullName "Installed payload file"
+            $hash = (Get-FileHash -LiteralPath $item.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            $entries.Add("$relative`0$($item.Length)`0$hash`n")
+        }
+    }
+    Add-PayloadDirectory $Root ""
+    $bytes = (New-Object Text.UTF8Encoding($false)).GetBytes(($entries -join ""))
+    $hasher = [Security.Cryptography.SHA256]::Create()
+    try { return ([BitConverter]::ToString($hasher.ComputeHash($bytes))).Replace("-", "").ToLowerInvariant() } finally { $hasher.Dispose() }
+}
+
+function Assert-StartupInstalledResources([object]$Register) {
+    $resourceRoot = Join-Path $script:StartupInstallRoot "ecd-app"
+    $layoutPath = Join-Path $resourceRoot "resource-layout.json"
+    $runtimeManifest = Join-Path $resourceRoot "runtime\runtime-manifest.json"
+    $python = Join-Path $resourceRoot "runtime\python.exe"
+    $inventory = Join-Path $resourceRoot "supply-chain\inventory.json"
+    $notices = Join-Path $resourceRoot "supply-chain\THIRD-PARTY-NOTICES.md"
+    foreach ($path in @($layoutPath, $runtimeManifest, $python, $inventory, $notices, (Join-Path $resourceRoot "backend\server.py"))) {
+        if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Installed resource is missing: $path" }
+        Assert-NoReparsePath $path "Installed Startup resource"
+        Assert-NoAlternateStreams $path "Installed Startup resource"
+    }
+    Assert-Hash $layoutPath $Register.resourceLayoutSha256 "installed resource layout" | Out-Null
+    $layout = Read-JsonObject $layoutPath "Installed resource layout"
+    if ($layout.schemaVersion -ne 1 -or $layout.kind -ne "ecd-tauri-resource-layout" -or
+        $layout.backend -ne "backend" -or $layout.webRoot -ne "backend/web" -or
+        $layout.schemaCatalogRoot -ne "backend/schema-catalog" -or
+        $layout.schemaCatalogManifest -ne "backend/schema-catalog-manifest.json" -or
+        $layout.runtime -ne "runtime" -or $layout.mutableDataPolicy -ne "app-data-only" -or
+        $layout.workspacePolicy -ne "user-selected-outside-app-data") {
+        throw "Installed resource layout contract is invalid"
+    }
+    Assert-Hash $runtimeManifest $Register.runtimeManifestSha256 "installed runtime manifest" | Out-Null
+    Assert-Hash $inventory $Register.inventorySha256 "installed supply-chain inventory" | Out-Null
+    Assert-Hash $notices $Register.noticesSha256 "installed third-party notices" | Out-Null
+    if ((Get-StartupPayloadHash (Join-Path $resourceRoot "runtime") $true) -ne $Register.runtimePayloadSha256) {
+        throw "Installed runtime payload SHA-256 mismatch"
+    }
+    if ((Get-StartupPayloadHash $resourceRoot $false) -ne $Register.resourcePayloadSha256) {
+        throw "Installed resource payload SHA-256 mismatch"
+    }
+    return [ordered]@{ root = $resourceRoot; python = $python }
+}
+
+function New-StartupReport([object]$Register, [object]$Observed, [string]$MatrixEntry, [string]$RunId, [string]$RegisterHash,
+    [string]$MatrixHash, [DateTime]$StartedAt, [object[]]$Checks, [object]$CleanVm) {
+    $script:LifecycleNetworkState = if ($ContractTest) { "contract_test_not_observed" } else { "production_startup_observed" }
+    $report = New-LifecycleReport $Register $Observed $MatrixEntry $RunId $RegisterHash $MatrixHash $StartedAt $Checks $CleanVm.sha256 $CleanVm.runNonce
+    $report.scenario = "Startup"
+    return $report
+}
+
+function Invoke-StartupScenario([object]$Register, [object]$Observed, [string]$MatrixEntry, [string]$RunId, [string]$RegisterHash, [string]$MatrixHash) {
+    $account = Get-AccountContext
+    if (-not $ContractTest -and ($account.isElevated -or $account.isAdministratorMember -or -not $account.isInteractive)) {
+        throw "Startup must run in an interactive session as a non-administrator standard user"
+    }
+    Assert-StartupRoots
+    Assert-LifecycleArtifactSet $Register
+    $cleanVm = Assert-CleanVmAttestation $Register $MatrixEntry "Startup"
+    $statePath = Join-Path $GateRoot "startup-owned-resources.json"
+    if ((Test-Path -LiteralPath $statePath) -or (Test-Path -LiteralPath $script:StartupInstallRoot) -or
+        (Test-Path -LiteralPath $script:StartupWorkspaceRoot) -or (Test-Path -LiteralPath $script:StartupAppDataRoot)) {
+        throw "Startup requires new, absent owned roots and state"
+    }
+    $startedAt = [DateTime]::UtcNow
+    $nonce = [guid]::NewGuid().ToString("N")
+    $state = [ordered]@{
+        schemaVersion = 1; kind = "ecd-startup-owned-resources"; state = "active"; runId = $RunId
+        sourceCommit = $Register.sourceCommit; artifactRegisterSha256 = $RegisterHash; testKitSha256 = $Register.testKitSha256
+        matrixPolicySha256 = $MatrixHash; nonce = $nonce; installRoot = $script:StartupInstallRoot
+        workspaceRoot = $script:StartupWorkspaceRoot; appDataRoot = $script:StartupAppDataRoot
+        cleanVmAttestationSha256 = $cleanVm.sha256; hostRunNonce = $cleanVm.runNonce; scenario = "Startup"
+    }
+    Write-StartupOwnedState $statePath $state
+    $ownedProcesses = New-Object Collections.Generic.List[object]
+    $foreignListener = $null
+    $externalMutex = [IntPtr]::Zero
+    $scenarioFailure = $null
+    $cleanupErrors = New-Object Collections.Generic.List[string]
+    try {
+        New-OwnedLifecycleRoot $script:StartupInstallRoot "install" $RunId $nonce
+        New-OwnedLifecycleRoot $script:StartupWorkspaceRoot "workspace" $RunId $nonce
+        New-OwnedLifecycleRoot $script:StartupAppDataRoot "app-data" $RunId $nonce
+        if ($ContractTest) {
+            foreach ($root in @(
+                @($script:StartupInstallRoot, "install"), @($script:StartupWorkspaceRoot, "workspace"), @($script:StartupAppDataRoot, "app-data")
+            )) { Assert-OwnedLifecycleRoot $root[0] $root[1] $RunId $nonce }
+        } else {
+            Invoke-OwnedStartupNsis $Installer @("/S", "/D=$script:StartupInstallRoot") "Startup silent per-user install"
+            $installedExecutable = Join-Path $script:StartupInstallRoot ([string]$Register.application.file)
+            Assert-Hash $installedExecutable $Register.application.sha256 "Startup installed application" | Out-Null
+            $resources = Assert-StartupInstalledResources $Register
+            $installedTreeIdentity = Get-TreeIdentity $script:StartupInstallRoot
+            $port = 8099
+            if (@(Get-NetTCPConnection -LocalAddress "127.0.0.1" -LocalPort $port -State Listen -ErrorAction SilentlyContinue).Count -ne 0) {
+                throw "Startup requires unused production port 127.0.0.1:8099"
+            }
+
+            Assert-StartupMutexAbsent
+            $coldOne = Prepare-OwnedStartupProcess $installedExecutable $script:StartupInstallRoot (New-StartupEnvironment $port)
+            $ownedProcesses.Add($coldOne)
+            $coldTwo = Prepare-OwnedStartupProcess $installedExecutable $script:StartupInstallRoot (New-StartupEnvironment $port)
+            $ownedProcesses.Add($coldTwo)
+            if ($coldOne.resumed -or $coldTwo.resumed -or $coldOne.jobHandle -eq $coldTwo.jobHandle -or
+                @([CleanMachinePathNative]::GetJobProcessIds($coldOne.jobHandle)) -notcontains $coldOne.process.Id -or
+                @([CleanMachinePathNative]::GetJobProcessIds($coldTwo.jobHandle)) -notcontains $coldTwo.process.Id) {
+                throw "Cold Startup processes were not separately owned and suspended before resume"
+            }
+            $coldBurstStarted = [DateTime]::UtcNow
+            Resume-OwnedStartupProcess $coldOne | Out-Null
+            Resume-OwnedStartupProcess $coldTwo | Out-Null
+            if (([DateTime]::UtcNow - $coldBurstStarted).TotalSeconds -ge 1) { throw "Cold Startup resume burst was not near-simultaneous" }
+            $primary = Wait-StartupHealth @($coldOne, $coldTwo) $port
+            $secondary = if ($primary.process.Id -eq $coldOne.process.Id) { $coldTwo } else { $coldOne }
+            if (-not $secondary.process.WaitForExit(30000) -or $secondary.process.ExitCode -ne 0) { throw "Cold secondary did not exit zero" }
+            Close-OwnedStartupJob $secondary
+            $startupListeners = @(Get-NetTCPConnection -LocalAddress "127.0.0.1" -LocalPort $port -State Listen)
+            if ($startupListeners.Count -ne 1) { throw "Startup did not produce exactly one listener" }
+            $jobIds = @([CleanMachinePathNative]::GetJobProcessIds($primary.jobHandle))
+            $pythonProcesses = @(Get-CimInstance Win32_Process | Where-Object { $jobIds -contains [int]$_.ProcessId -and [string]::Equals([string]$_.ExecutablePath, $resources.python, [StringComparison]::OrdinalIgnoreCase) })
+            if ($pythonProcesses.Count -ne 1) { throw "Startup did not use exactly one installed embedded Python backend" }
+            if ([int]$startupListeners[0].OwningProcess -ne [int]$pythonProcesses[0].ProcessId) {
+                throw "Exact 127.0.0.1:8099 listener is not owned by the exact installed embedded Python backend"
+            }
+
+            $primaryWindow = Minimize-ExactStartupWindow $primary
+            $warm = Start-OwnedStartupProcess $installedExecutable $script:StartupInstallRoot (New-StartupEnvironment $port)
+            $ownedProcesses.Add($warm)
+            if (-not $warm.process.WaitForExit(30000) -or $warm.process.ExitCode -ne 0) { throw "Warm launch did not exit zero" }
+            Close-OwnedStartupJob $warm
+            $challenge = "FOCUS-" + ([guid]::NewGuid().ToString("N").Substring(0, 8).ToUpperInvariant())
+            if ([CleanMachinePathNative]::IsIconic($primaryWindow) -or -not [CleanMachinePathNative]::IsWindowVisible($primaryWindow) -or
+                [CleanMachinePathNative]::FindVisibleWindow([uint32]$primary.process.Id, "ESPConfig Designer") -ne $primaryWindow) {
+                throw "Warm launch did not visibly restore the exact minimized primary window"
+            }
+            Write-Host "[manual] Confirm the exact ESPConfig Designer window was visibly restored and focused by entering: $challenge"
+            if ((Read-Host "Startup focus challenge") -cne $challenge) { throw "Warm restore/focus challenge was not confirmed exactly" }
+            Stop-ExactStartupPrimary $primary $port
+
+            $beforeInstall = Get-TreeIdentity $script:StartupInstallRoot
+            $beforeWorkspace = Get-TreeIdentity $script:StartupWorkspaceRoot
+            $beforeAppData = Get-TreeIdentity $script:StartupAppDataRoot
+            Assert-StartupMutexAbsent
+            $heldPrimary = Start-OwnedStartupProcess $installedExecutable $script:StartupInstallRoot (New-StartupEnvironment $port 5000)
+            $ownedProcesses.Add($heldPrimary)
+            Wait-StartupGuardOwned $heldPrimary
+            $heldSecondary = Start-OwnedStartupProcess $installedExecutable $script:StartupInstallRoot (New-StartupEnvironment $port 5000)
+            $ownedProcesses.Add($heldSecondary)
+            Start-Sleep -Milliseconds 750
+            if ($heldPrimary.process.HasExited -or $heldSecondary.process.HasExited) { throw "Both widened-guard Startup processes must remain alive while the guard is held" }
+            Assert-TreeIdentity $beforeInstall $script:StartupInstallRoot "Install tree before Startup guard release"
+            Assert-TreeIdentity $beforeWorkspace $script:StartupWorkspaceRoot "Workspace tree before Startup guard release"
+            Assert-TreeIdentity $beforeAppData $script:StartupAppDataRoot "App-data tree before Startup guard release"
+            if (@(Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue).Count -ne 0) { throw "Backend listened before Startup guard release" }
+            Stop-ExactStartupPrimary $heldPrimary $port
+            $takeover = Wait-StartupHealth @($heldSecondary) $port
+
+            Close-ExactStartupWindow $takeover "ESPConfig Designer" $true
+            $foreignListener = [Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback, 8099)
+            $foreignListener.Start()
+            $conflict = Start-OwnedStartupProcess $installedExecutable $script:StartupInstallRoot (New-StartupEnvironment 8099)
+            $ownedProcesses.Add($conflict)
+            Close-ExactStartupWindow $conflict "ESPConfig Designer could not start" $false "Desktop backend port 127.0.0.1:8099 is already in use"
+            if ($conflict.process.ExitCode -eq 0 -or -not $foreignListener.Server.IsBound) { throw "Exact foreign 127.0.0.1:8099 listener was not preserved with a controlled error" }
+            $foreignListener.Stop(); $foreignListener = $null
+
+            $jobPrimary = Start-OwnedStartupProcess $installedExecutable $script:StartupInstallRoot (New-StartupEnvironment $port)
+            $ownedProcesses.Add($jobPrimary)
+            Wait-StartupHealth @($jobPrimary) $port | Out-Null
+            $fixtureSource = Join-Path $TestKitRoot "fixtures\compile-only.yaml"
+            Assert-Hash $fixtureSource $Register.fixtureSha256 "approved compile-only fixture" | Out-Null
+            $fixtureDestination = Join-Path $script:StartupWorkspaceRoot "compile-only.yaml"
+            Copy-Item -LiteralPath $fixtureSource -Destination $fixtureDestination
+            Assert-Hash $fixtureDestination $Register.fixtureSha256 "copied compile-only fixture" | Out-Null
+            $body = @{ yaml = "compile-only.yaml"; action = "validate" } | ConvertTo-Json -Compress
+            $startedJob = Invoke-RestMethod "http://127.0.0.1:$port/api/install" -Method Post -ContentType "application/json" -Body $body -TimeoutSec 5
+            $jobDeadline = [DateTime]::UtcNow.AddSeconds(30)
+            $observedRunning = $false
+            while ([DateTime]::UtcNow -lt $jobDeadline) {
+                $jobStatus = Invoke-RestMethod "http://127.0.0.1:$port/api/jobs/$($startedJob.job_id)" -TimeoutSec 2
+                $ids = @([CleanMachinePathNative]::GetJobProcessIds($jobPrimary.jobHandle))
+                $esphome = @(Get-CimInstance Win32_Process | Where-Object { $ids -contains [int]$_.ProcessId -and ([string]$_.CommandLine -match '(?i)esphome') })
+                $persistedJobPath = Join-Path $script:StartupAppDataRoot ("j\" + [string]$startedJob.job_id + ".json")
+                if ($jobStatus.job.state -eq "running" -and $esphome.Count -gt 0 -and (Test-Path -LiteralPath $persistedJobPath -PathType Leaf)) {
+                    $observedRunning = $true
+                    break
+                }
+                if ($jobStatus.job.state -notin @("queued", "running")) { break }
+                Start-Sleep -Milliseconds 50
+            }
+            if (-not $observedRunning) { throw "Did not observe persisted running validate job and its ESPHome child" }
+            Stop-ExactStartupPrimary $jobPrimary $port
+            $jobLogPath = Join-Path $script:StartupAppDataRoot ("j\" + [string]$startedJob.job_id + ".log")
+            $jobLogBeforeRestart = Get-StartupFileIdentity $jobLogPath
+            $restarted = Start-OwnedStartupProcess $installedExecutable $script:StartupInstallRoot (New-StartupEnvironment $port)
+            $ownedProcesses.Add($restarted)
+            Wait-StartupHealth @($restarted) $port | Out-Null
+            $interrupted = Invoke-RestMethod "http://127.0.0.1:$port/api/jobs/$($startedJob.job_id)" -TimeoutSec 5
+            $active = Invoke-RestMethod "http://127.0.0.1:$port/api/jobs/active" -TimeoutSec 5
+            $persistedInterrupted = Read-JsonObject $persistedJobPath "Persisted interrupted Startup job"
+            Assert-StartupFileIdentity $jobLogBeforeRestart $jobLogPath
+            if ($interrupted.job.state -ne "failed" -or $interrupted.job.exit_code -ne 1 -or
+                $interrupted.job.error_summary -ne "Interrupted by backend restart" -or
+                [string]::IsNullOrWhiteSpace([string]$interrupted.job.ended_at) -or
+                $persistedInterrupted.id -ne $startedJob.job_id -or $persistedInterrupted.state -ne "failed" -or
+                $persistedInterrupted.exit_code -ne 1 -or $persistedInterrupted.error_summary -ne "Interrupted by backend restart" -or
+                [string]::IsNullOrWhiteSpace([string]$persistedInterrupted.ended_at) -or @($active.jobs).Count -ne 0) {
+                throw "Interrupted job reconciliation contract failed"
+            }
+            Assert-Hash $fixtureDestination $Register.fixtureSha256 "compile-only fixture after interrupted job" | Out-Null
+            Close-ExactStartupWindow $restarted "ESPConfig Designer" $true
+
+            Assert-StartupMutexAbsent
+            $externalMutex = [CleanMachinePathNative]::CreateMutexW([IntPtr]::Zero, $true, "Local\com.espconfigdesigner.desktop.startup-guard")
+            if ($externalMutex -eq [IntPtr]::Zero) { throw "Could not create external production Startup mutex" }
+            if ([CleanMachinePathNative]::LastError() -eq 183) { throw "External production Startup mutex unexpectedly already existed" }
+            $timeoutWorkspaceBefore = Get-TreeIdentity $script:StartupWorkspaceRoot
+            $timeoutAppDataBefore = Get-TreeIdentity $script:StartupAppDataRoot
+            $timedOut = Start-OwnedStartupProcess $installedExecutable $script:StartupInstallRoot (New-StartupEnvironment $port)
+            $ownedProcesses.Add($timedOut)
+            $timeoutStarted = [DateTime]::UtcNow
+            Close-ExactStartupWindow $timedOut "ESPConfig Designer could not start" $false "Another ESPConfig Designer startup is still in progress or is blocked. Wait a moment and try again." $port
+            if (([DateTime]::UtcNow - $timeoutStarted).TotalSeconds -le 10 -or $timedOut.process.ExitCode -eq 0) { throw "Startup mutex timeout was not controlled and nonzero after more than ten seconds" }
+            Assert-TreeIdentity $timeoutWorkspaceBefore $script:StartupWorkspaceRoot "Workspace tree during external Startup guard timeout"
+            Assert-TreeIdentity $timeoutAppDataBefore $script:StartupAppDataRoot "App-data tree during external Startup guard timeout"
+            if (@(Get-NetTCPConnection -LocalAddress "127.0.0.1" -LocalPort $port -State Listen -ErrorAction SilentlyContinue).Count -ne 0) {
+                throw "Startup timeout wrote a production listener while the external guard remained held"
+            }
+            if (-not [CleanMachinePathNative]::ReleaseMutex($externalMutex)) { throw "Could not release external Startup mutex" }
+            if (-not [CleanMachinePathNative]::CloseOwnedHandle($externalMutex)) { throw "Could not close external Startup mutex" }
+            $externalMutex = [IntPtr]::Zero
+            $recovery = Start-OwnedStartupProcess $installedExecutable $script:StartupInstallRoot (New-StartupEnvironment $port)
+            $ownedProcesses.Add($recovery)
+            Wait-StartupHealth @($recovery) $port | Out-Null
+            Close-ExactStartupWindow $recovery "ESPConfig Designer" $true
+            Assert-TreeIdentity $installedTreeIdentity $script:StartupInstallRoot "Immutable installed Startup resources"
+
+            $uninstaller = Join-Path $script:StartupInstallRoot "uninstall.exe"
+            if (-not (Test-Path -LiteralPath $uninstaller -PathType Leaf)) { throw "Startup installation has no exact uninstaller" }
+            Invoke-OwnedStartupNsis $uninstaller @("/S") "Startup uninstall"
+            Complete-LifecycleUninstall $script:StartupInstallRoot $RunId $nonce "Startup uninstall did not remove the install root"
+        }
+
+        foreach ($root in @(
+            @($script:StartupInstallRoot, "install"), @($script:StartupWorkspaceRoot, "workspace"), @($script:StartupAppDataRoot, "app-data")
+        )) {
+            Remove-OwnedStartupRoot $root[0] $root[1] $RunId $nonce
+        }
+        if (@(Get-NetTCPConnection -LocalAddress "127.0.0.1" -LocalPort 8099 -State Listen -ErrorAction SilentlyContinue).Count -ne 0) {
+            throw "Startup final cleanup left listener 127.0.0.1:8099"
+        }
+        $evidence = if ($ContractTest) { "Contract simulation" } else { "Production execution" }
+        $requiredChecks = @(
+            "artifact_identity", "preflight_receipt", "clean_vm_attestation", "root_ownership", "isolated_roots",
+            "installed_application_hash", "installed_resources", "natural_cold_burst", "widened_startup_guard", "no_early_writes",
+            "single_primary_backend_listener", "secondary_exit_zero", "warm_focus_restore_manual", "foreign_listener_8099",
+            "forced_primary_job_cleanup", "abandoned_guard_takeover", "interrupted_job_reconciliation", "graceful_close",
+            "startup_guard_timeout", "final_cleanup"
+        )
+        $checks = @($requiredChecks | ForEach-Object { [ordered]@{ name = $_; status = "pass"; summary = "$evidence verified the Startup contract: $_" } })
+        $state.state = "completed"
+        $state | Add-Member -NotePropertyName completedAtUtc -NotePropertyValue ([DateTime]::UtcNow.ToString("o"))
+        Write-StartupOwnedState $statePath $state
+        $report = New-StartupReport $Register $Observed $MatrixEntry $RunId $RegisterHash $MatrixHash $startedAt $checks $cleanVm
+        Assert-Report ([pscustomobject]$report) $Register $Observed $MatrixEntry $RunId
+        Write-NewJsonFile $ReportPath $report
+        Write-Host "[info] Startup scenario: PASS"
+    } catch { $scenarioFailure = $_ } finally {
+        if ($foreignListener) { try { $foreignListener.Stop() } catch { $cleanupErrors.Add($_.Exception.Message) } }
+        if ($externalMutex -ne [IntPtr]::Zero) {
+            try { if (-not [CleanMachinePathNative]::ReleaseMutex($externalMutex)) { throw "release failed" } } catch { $cleanupErrors.Add("Could not release external Startup mutex: $($_.Exception.Message)") }
+            try { if (-not [CleanMachinePathNative]::CloseOwnedHandle($externalMutex)) { throw "close failed" } } catch { $cleanupErrors.Add("Could not close external Startup mutex: $($_.Exception.Message)") }
+        }
+        foreach ($owned in $ownedProcesses) {
+            if ($owned.jobHandle -ne [IntPtr]::Zero) { try { Close-OwnedStartupJob $owned $true } catch { $cleanupErrors.Add($_.Exception.Message) } }
+        }
+        if ($scenarioFailure -and (Test-Path -LiteralPath $statePath -PathType Leaf)) {
+            foreach ($root in @(
+                @($script:StartupInstallRoot, "install"), @($script:StartupWorkspaceRoot, "workspace"), @($script:StartupAppDataRoot, "app-data")
+            )) {
+                try {
+                    Remove-OwnedStartupRoot $root[0] $root[1] $RunId $nonce
+                } catch { $cleanupErrors.Add("Could not clean owned Startup root '$($root[0])': $($_.Exception.Message)") }
+            }
+            try {
+                $state.state = if ($cleanupErrors.Count -eq 0) { "failed_cleaned" } else { "failed_cleanup_incomplete" }
+                $state | Add-Member -NotePropertyName failedAtUtc -NotePropertyValue ([DateTime]::UtcNow.ToString("o"))
+                Write-StartupOwnedState $statePath $state
+            } catch { $cleanupErrors.Add("Could not finalize failed Startup state: $($_.Exception.Message)") }
+        }
+    }
+    if ($scenarioFailure) {
+        if ($cleanupErrors.Count -gt 0) { Write-Warning ("Startup cleanup also failed:`n- " + ($cleanupErrors -join "`n- ")) }
+        throw $scenarioFailure
+    }
+    if ($cleanupErrors.Count -gt 0) { throw ("Startup cleanup failed:`n- " + ($cleanupErrors -join "`n- ")) }
+}
+
 function Assert-Report([object]$Report, [object]$Register, [object]$Observed, [string]$MatrixEntry, [string]$ExpectedRunId = "") {
     if ($Report.schemaVersion -ne 1 -or $Report.scenario -notin @("Preflight", "Lifecycle", "Startup", "FirmwareOnline", "FirmwareOffline", "Capabilities")) {
         throw "Report schema identity is invalid"
@@ -1511,17 +2157,17 @@ function Assert-Report([object]$Report, [object]$Register, [object]$Observed, [s
         "startedAtUtc", "endedAtUtc", "sourceCommit", "productVersion", "candidateKind", "candidateStatus",
         "artifactId", "artifactName", "archiveDigest", "sha256SumsSha256", "provenanceSha256", "installerSha256",
         "applicationSha256", "runtimeIdentity", "resourceIdentity", "inventorySha256", "noticesSha256", "fixtureSha256",
-        "runtimeManifestSha256", "runtimePayloadSha256", "resourceLayoutSha256", "testKitSourceSha", "testKitSha256",
+        "runtimeManifestSha256", "runtimePayloadSha256", "resourceLayoutSha256", "resourcePayloadSha256", "testKitSourceSha", "testKitSha256",
         "artifactRegisterSha256", "matrixPolicySha256", "authenticodeStatus", "osCaption", "osEdition", "osVersion", "osBuild",
         "architecture", "accountType", "isElevated", "webView2Version", "networkState", "workspaceRootCategory",
         "appDataRootCategory", "matrixEntryId", "evidenceClass", "gateRunId", "checks"
     )) {
         if ($Report.PSObject.Properties.Name -notcontains $property) { throw "Report is missing required field: $property" }
     }
-    if ($Report.scenario -eq "Lifecycle") {
+    if ($Report.scenario -in @("Lifecycle", "Startup")) {
         foreach ($property in @("cleanVmAttestationSha256", "hostRunNonce")) {
             if ($Report.PSObject.Properties.Name -notcontains $property -or [string]::IsNullOrWhiteSpace([string]$Report.$property)) {
-                throw "Lifecycle report is missing required field: $property"
+                throw "$($Report.scenario) report is missing required field: $property"
             }
         }
     }
@@ -1541,6 +2187,7 @@ function Assert-Report([object]$Report, [object]$Register, [object]$Observed, [s
         $Report.resourceIdentity -ne $Register.resourceIdentity -or $Report.inventorySha256 -ne $Register.inventorySha256 -or
         $Report.runtimeManifestSha256 -ne $Register.runtimeManifestSha256 -or $Report.runtimePayloadSha256 -ne $Register.runtimePayloadSha256 -or
         $Report.resourceLayoutSha256 -ne $Register.resourceLayoutSha256 -or
+        $Report.resourcePayloadSha256 -ne $Register.resourcePayloadSha256 -or
         $Report.noticesSha256 -ne $Register.noticesSha256 -or $Report.fixtureSha256 -ne $Register.fixtureSha256 -or
         $Report.testKitSourceSha -ne $Register.testKitSourceSha -or $Report.testKitSha256 -ne $Register.testKitSha256 -or
         $Report.artifactRegisterSha256 -ne $ExpectedArtifactRegisterSha256 -or $Report.matrixPolicySha256 -ne $ExpectedMatrixPolicySha256) {
@@ -1567,6 +2214,14 @@ function Assert-Report([object]$Report, [object]$Register, [object]$Observed, [s
             "same_version_reinstall", "reboot_resume", "uninstall_removed_install",
             "uninstall_preserved_data", "reinstall_retained_data", "unicode_paths", "final_cleanup"
         )
+    } elseif ($Report.scenario -eq "Startup") {
+        @(
+            "artifact_identity", "preflight_receipt", "clean_vm_attestation", "root_ownership", "isolated_roots",
+            "installed_application_hash", "installed_resources", "natural_cold_burst", "widened_startup_guard",
+            "no_early_writes", "single_primary_backend_listener", "secondary_exit_zero", "warm_focus_restore_manual",
+            "foreign_listener_8099", "forced_primary_job_cleanup", "abandoned_guard_takeover",
+            "interrupted_job_reconciliation", "graceful_close", "startup_guard_timeout", "final_cleanup"
+        )
     } else {
         @("scenario_implementation")
     }
@@ -1576,6 +2231,13 @@ function Assert-Report([object]$Report, [object]$Register, [object]$Observed, [s
         if ($Report.result -eq "pass" -and $matches[0].status -ne "pass") {
             throw "Report pass contains a non-pass required check: $requiredCheck"
         }
+    }
+    if ($Report.scenario -eq "Startup" -and $checks.Count -ne $required.Count) {
+        throw "Startup report must contain exactly the 20 required checks"
+    }
+    if ($ContractTest -and $Report.scenario -eq "Startup" -and
+        @($checks | Where-Object { -not ([string]$_.summary).StartsWith("Contract simulation", [StringComparison]::Ordinal) }).Count -gt 0) {
+        throw "Contract-test Startup summaries must be labelled Contract simulation"
     }
     foreach ($check in $checks) {
         if (-not (Test-ExactStatus ([string]$check.status)) -or [string]::IsNullOrWhiteSpace([string]$check.summary)) {
@@ -1613,6 +2275,27 @@ function Assert-Report([object]$Report, [object]$Register, [object]$Observed, [s
             $checkpoint.cleanVmAttestationSha256 -ne $Report.cleanVmAttestationSha256 -or
             $state.hostRunNonce -ne $Report.hostRunNonce -or $checkpoint.hostRunNonce -ne $Report.hostRunNonce) {
             throw "Lifecycle PASS report does not have a completed bound state"
+        }
+    }
+    if ($Report.scenario -eq "Startup" -and $Report.result -eq "pass") {
+        $statePath = Join-Path $GateRoot "startup-owned-resources.json"
+        $state = Read-JsonObject $statePath "Startup owned-resource state"
+        $completedAt = [DateTimeOffset]::MinValue
+        if ($state.schemaVersion -ne 1 -or $state.kind -ne "ecd-startup-owned-resources" -or $state.state -ne "completed" -or
+            $state.scenario -ne "Startup" -or $state.runId -ne $Report.gateRunId -or $state.sourceCommit -ne $Report.sourceCommit -or
+            $state.artifactRegisterSha256 -ne $Report.artifactRegisterSha256 -or $state.matrixPolicySha256 -ne $Report.matrixPolicySha256 -or
+            $state.testKitSha256 -ne $Report.testKitSha256 -or $state.cleanVmAttestationSha256 -ne $Report.cleanVmAttestationSha256 -or
+            $state.hostRunNonce -ne $Report.hostRunNonce -or [string]$state.nonce -notmatch '^[0-9a-f]{32}$' -or
+            -not [DateTimeOffset]::TryParse([string]$state.completedAtUtc, [ref]$completedAt) -or
+            $completedAt.Offset -ne [TimeSpan]::Zero -or $completedAt -gt [DateTimeOffset]::UtcNow -or
+            [string]::IsNullOrWhiteSpace([string]$state.installRoot) -or
+            [string]::IsNullOrWhiteSpace([string]$state.workspaceRoot) -or
+            [string]::IsNullOrWhiteSpace([string]$state.appDataRoot)) {
+            throw "Startup PASS report does not have a completed bound startup state"
+        }
+        if (($ContractTest -and ($Report.cleanVmAttestationSha256 -ne "contract_test" -or $Report.hostRunNonce -ne "contract_test")) -or
+            (-not $ContractTest -and ($Report.cleanVmAttestationSha256 -notmatch $sha256Pattern -or $Report.hostRunNonce -notmatch $sha256Pattern))) {
+            throw "Startup report attestation fields do not match its evidence class"
         }
     }
 }
@@ -1684,6 +2367,10 @@ if ($Scenario -ne "Preflight") {
         Invoke-LifecycleScenario $register $observed $matrixEntry $runId $registerHash $matrixHash
         exit 0
     }
+    if ($Scenario -eq "Startup") {
+        Invoke-StartupScenario $register $observed $matrixEntry $runId $registerHash $matrixHash
+        exit 0
+    }
     $notRunReport = [ordered]@{
         schemaVersion = 1; scenario = $Scenario; startedAtUtc = [DateTime]::UtcNow.ToString("o"); endedAtUtc = [DateTime]::UtcNow.ToString("o")
         result = "not_run"; sourceCommit = $register.sourceCommit; productVersion = $register.productVersion
@@ -1692,7 +2379,7 @@ if ($Scenario -ne "Preflight") {
         sha256SumsSha256 = $register.sha256SumsSha256; provenanceSha256 = $register.provenanceSha256
         installerSha256 = $register.installer.sha256; applicationSha256 = $register.application.sha256
         runtimeIdentity = $register.runtimeIdentity; resourceIdentity = $register.resourceIdentity
-        runtimeManifestSha256 = $register.runtimeManifestSha256; runtimePayloadSha256 = $register.runtimePayloadSha256; resourceLayoutSha256 = $register.resourceLayoutSha256
+        runtimeManifestSha256 = $register.runtimeManifestSha256; runtimePayloadSha256 = $register.runtimePayloadSha256; resourceLayoutSha256 = $register.resourceLayoutSha256; resourcePayloadSha256 = $register.resourcePayloadSha256
         inventorySha256 = $register.inventorySha256; noticesSha256 = $register.noticesSha256; fixtureSha256 = $register.fixtureSha256
         testKitSourceSha = $register.testKitSourceSha; testKitSha256 = $register.testKitSha256
         artifactRegisterSha256 = $registerHash; matrixPolicySha256 = $matrixHash
@@ -1771,7 +2458,7 @@ $report = [ordered]@{
     sha256SumsSha256 = $register.sha256SumsSha256; provenanceSha256 = $register.provenanceSha256
     installerSha256 = $register.installer.sha256; applicationSha256 = $register.application.sha256
     runtimeIdentity = $register.runtimeIdentity; resourceIdentity = $register.resourceIdentity
-    runtimeManifestSha256 = $register.runtimeManifestSha256; runtimePayloadSha256 = $register.runtimePayloadSha256; resourceLayoutSha256 = $register.resourceLayoutSha256
+    runtimeManifestSha256 = $register.runtimeManifestSha256; runtimePayloadSha256 = $register.runtimePayloadSha256; resourceLayoutSha256 = $register.resourceLayoutSha256; resourcePayloadSha256 = $register.resourcePayloadSha256
     inventorySha256 = $register.inventorySha256; noticesSha256 = $register.noticesSha256; fixtureSha256 = $register.fixtureSha256
     testKitSourceSha = $register.testKitSourceSha; testKitSha256 = $register.testKitSha256
     artifactRegisterSha256 = $registerHash; matrixPolicySha256 = $matrixHash

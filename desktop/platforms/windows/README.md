@@ -38,8 +38,8 @@ Current coverage inventory:
 | Source firmware compile/cache/restart | `clean-machine-gate.ps1` | Requires a prepared checkout and fixture; not installed-artifact evidence | Source-development gate |
 | Hosted packaged startup/CSP | Tauri first-start, simultaneous-start, and smoke tests | Uses Node/CDP and hosted resources; not PowerShell-only clean-VM evidence | Hosted Desktop gate |
 | Candidate identity and provenance | Release build provenance and `SHA256SUMS` | Clean VM must receive an external candidate-bound artifact register | Release orchestrator preflight |
-| Installed lifecycle | Hosted silent install and installed smoke; portable `Lifecycle` orchestration contract | Execution on the clean Windows matrix, including a real reboot and interactive close, remains `NOT RUN` | `Lifecycle` scenario |
-| Startup/process matrix | Hosted simultaneous-start gate | Natural/visible clean-machine cases remain `NOT RUN` | `Startup` scenario |
+| Installed lifecycle | Hosted silent install and installed smoke; portable `Lifecycle` orchestration contract | Requires separate exact-artifact execution on every declared clean Windows matrix entry | `Lifecycle` scenario |
+| Startup/process matrix | Hosted simultaneous-start gate; portable installed-artifact `Startup` orchestration contract | Exact-artifact clean-machine execution and manual visible-focus observation remain required | `Startup` scenario |
 | Firmware online/offline | Source manual gate | Installed exact-artifact flow and physical NIC control remain `NOT RUN` | `FirmwareOnline`/`FirmwareOffline` plus host control |
 | WebView2, low disk, Defender, physical device | Documentation and partial hosted checks | Dedicated VM snapshots/disks and owner-approved hardware remain `NOT RUN` | Host/manual gates |
 
@@ -54,7 +54,7 @@ An existing root without its exact marker is rejected and is never cleaned.
 Reports use schema version `1` and one status vocabulary:
 `pass`, `fail`, or `not_run`. A top-level `pass` requires every scenario-specific
 check. Every `not_run` check requires a stable reason code. Scenarios other than
-`Preflight` and `Lifecycle` that are not yet implemented emit `not_run` with
+`Preflight`, `Lifecycle`, and `Startup` that are not yet implemented emit `not_run` with
 `scenario_not_implemented`; their presence in the script is not a clean-machine
 PASS.
 
@@ -109,6 +109,28 @@ The executable contract uses explicit synthetic boot identities only with
 ownership, retained synthetic data trees, state-machine, independent cleanup,
 and report behavior. It is not evidence of an NSIS lifecycle or real reboot on a
 clean VM.
+
+`Startup` requires separate new install, workspace, and app-data roots plus a
+Startup-specific clean-VM attestation and host nonce. Production execution
+installs the exact registered NSIS package and verifies the installed executable,
+complete resource payload, resource layout, runtime payload, and supply-chain
+projections. It then runs the
+natural and deterministically widened cold-start cases, warm restore/focus,
+foreign port `8099`, forced-primary Job Object cleanup, abandoned-guard takeover,
+interrupted validation-job reconciliation, graceful close, and fail-closed guard
+timeout. Every application process is created suspended and assigned to a
+separate kill-on-close Job Object before resume. Manual focus confirmation is
+required in the interactive session; automated process evidence cannot replace
+it.
+
+The Startup contract copies and hashes the approved synthetic fixture without
+printing or parsing its YAML. Its one real interrupted action is `validate`, not
+compile, OTA, serial, logs, or an offline flow. A final PASS requires all twenty
+Startup checks, completed bound state, no owned processes or listener, successful
+uninstall, and marker-verified cleanup. `-ContractTest` exercises only parser,
+state, ownership, report, and cleanup behavior and labels every check as a
+contract simulation; it does not launch the synthetic executable or claim GUI,
+Job Object, NSIS, or clean-machine evidence.
 
 `desktop/scripts/build-clean-machine-kit.ps1` creates a separate portable test
 artifact from a fixed allowlist read from the exact committed Git archive. The

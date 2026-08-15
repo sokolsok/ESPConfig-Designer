@@ -396,6 +396,11 @@ file. Do not trust the adjacent sidecar alone. Safe ZIP inventory and extraction
 follow that authenticated byte check; orchestrator self-checks are additional
 post-launch validation, not the pre-execution trust boundary.
 
+The unsigned candidate provenance records both the resource-layout file hash and
+an ordinal, path/size/content aggregate SHA-256 for the complete packaged
+`ecd-app` payload. The artifact register carries that aggregate so an installed
+Startup gate can compare the resource bytes independently after NSIS extraction.
+
 Run the maintained contract through the normal package gate:
 
 ```powershell
@@ -445,6 +450,16 @@ lifecycle PASS. Version `1.4.0` is the first supported Windows Desktop release,
 so it has no supported Desktop predecessor and no predecessor-update scenario.
 Future Desktop releases must add that scenario using the latest previously
 published controlled installer with verified provenance.
+
+The `Startup` scenario uses the same verified Preflight receipt but takes its own
+new `StartupInstallRoot`, `StartupWorkspaceRoot`, and `StartupAppDataRoot`. A
+production run requires a fresh clean-VM attestation whose scenario is exactly
+`Startup`; Lifecycle attestations and consumed nonces are not interchangeable.
+The scenario installs the registered candidate and executes the complete
+single-instance/startup-process matrix against installed resources on port
+`8099`. It includes one operator-confirmed visible restore/focus step. The local
+contract mode does not launch a GUI or installer and cannot be reported as
+clean-machine Startup evidence.
 
 See the [Windows platform reference](../../desktop/platforms/windows/README.md)
 for runtime, capabilities, diagnostics, and cache/update contracts.
