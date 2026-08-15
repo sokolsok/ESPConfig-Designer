@@ -59,6 +59,7 @@ foreach ($requiredContract in @(
 Assert-True ($builderSource.Contains('archive --format=tar')) "Production kit builder must read payload bytes from the exact committed source"
 Assert-True ($builderSource.Contains('status --porcelain=v1 --untracked-files=all')) "Production kit builder must recheck source drift after staging"
 Assert-True ($orchestratorSource.Contains('$attestation.matrixPolicySha256 -ne $ExpectedMatrixPolicySha256')) "Clean-VM attestation must bind the exact matrix policy"
+Assert-True ($orchestratorSource.Contains('with code $exitCode (0x$exitCodeHex)')) "Graceful-close failures must report the exact decimal and hexadecimal application exit code"
 
 $trackedPolicy = Get-Content -LiteralPath $matrixPolicy -Raw | ConvertFrom-Json
 $expectedMatrixEntries = @(

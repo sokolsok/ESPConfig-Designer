@@ -965,7 +965,11 @@ function Stop-LifecycleApplicationGracefully([object]$OwnedProcess) {
         throw "A real interactive application window was unavailable for graceful close"
     }
     if (-not $process.WaitForExit(30000)) { throw "Application did not exit after its real window was closed" }
-    if ($process.ExitCode -ne 0) { throw "Application exited nonzero after its real window was closed" }
+    $exitCode = [int]$process.ExitCode
+    if ($exitCode -ne 0) {
+        $exitCodeHex = [Convert]::ToString($exitCode, 16).PadLeft(8, "0")
+        throw "Application exited nonzero after its real window was closed with code $exitCode (0x$exitCodeHex)"
+    }
     $deadline = [DateTime]::UtcNow.AddSeconds(30)
     while ([DateTime]::UtcNow -lt $deadline) {
         if (@(Get-NetTCPConnection -LocalPort $OwnedProcess.port -State Listen -ErrorAction SilentlyContinue).Count -eq 0) {
