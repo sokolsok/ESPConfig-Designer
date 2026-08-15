@@ -50,6 +50,7 @@ $builderSource = Get-Content -LiteralPath $builder -Raw
 foreach ($requiredContract in @(
     "New-OwnedLifecycleRoot",
     "Assert-OwnedLifecycleRoot",
+    "Complete-LifecycleUninstall",
     "Get-AccountContext",
     "GetJobProcessIds",
     "Close-LifecycleJobAndWait"

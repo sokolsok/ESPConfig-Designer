@@ -737,6 +737,25 @@ function Assert-OwnedLifecycleRoot([string]$Root, [string]$Category, [string]$Ru
     }
 }
 
+function Complete-LifecycleUninstall([string]$Root, [string]$RunId, [string]$Nonce, [string]$FailureMessage) {
+    if (-not (Test-Path -LiteralPath $Root)) { return }
+    Assert-NoReparsePath $Root "Uninstalled Lifecycle root"
+    $markerPath = Join-Path $Root $lifecycleRootMarkerName
+    $remaining = @(Get-ChildItem -LiteralPath $Root -Force)
+    if ($remaining.Count -ne 1 -or $remaining[0].FullName -ne $markerPath -or
+        -not (Test-Path -LiteralPath $markerPath -PathType Leaf)) {
+        throw $FailureMessage
+    }
+    Assert-OwnedLifecycleRoot $Root "install" $RunId $Nonce
+    Remove-Item -LiteralPath $markerPath -Force
+    try {
+        Remove-Item -LiteralPath $Root -Force -ErrorAction Stop
+    } catch {
+        throw "$FailureMessage; the gate-owned empty root could not be removed: $($_.Exception.Message)"
+    }
+    if (Test-Path -LiteralPath $Root) { throw $FailureMessage }
+}
+
 function Assert-TreeIdentity([object]$Expected, [string]$Root, [string]$Name) {
     $actual = Get-TreeIdentity $Root
     if ($actual.fileCount -ne $Expected.fileCount -or $actual.aggregateSha256 -ne $Expected.aggregateSha256) {
@@ -1274,7 +1293,11 @@ function Invoke-LifecycleScenario(
         } else {
             $workspaceBeforeUninstall = Get-TreeIdentity $script:LifecycleWorkspaceRoot
             $appDataBeforeUninstall = Get-TreeIdentity $script:LifecycleAppDataRoot
-            if ($ContractLifecycleFault -ne "UninstallLeavesInstall") { Remove-Item -LiteralPath $script:LifecycleInstallRoot -Recurse -Force }
+            if ($ContractLifecycleFault -ne "UninstallLeavesInstall") {
+                foreach ($entry in @(Get-ChildItem -LiteralPath $script:LifecycleInstallRoot -Force | Where-Object { $_.Name -ne $lifecycleRootMarkerName })) {
+                    Remove-Item -LiteralPath $entry.FullName -Recurse -Force
+                }
+            }
         }
         if ($ContractLifecycleFault -eq "UninstallDeletesWorkspace") { Remove-Item -LiteralPath $script:LifecycleWorkspaceRoot -Recurse -Force }
         if ($ContractLifecycleFault -eq "UninstallDeletesAppData") { Remove-Item -LiteralPath $script:LifecycleAppDataRoot -Recurse -Force }
@@ -1284,7 +1307,7 @@ function Invoke-LifecycleScenario(
         if ($ContractLifecycleFault -eq "UninstallRemovesEmptyWorkspaceDirectory") {
             Remove-Item -LiteralPath (Join-Path $script:LifecycleWorkspaceRoot ".ecd-lifecycle-retained\empty") -Force
         }
-        if (Test-Path -LiteralPath $script:LifecycleInstallRoot) { throw "Uninstall did not remove the install root" }
+        Complete-LifecycleUninstall $script:LifecycleInstallRoot $RunId ([string]$state.nonce) "Uninstall did not remove the install root"
         Assert-TreeIdentity $workspaceBeforeUninstall $script:LifecycleWorkspaceRoot "Workspace tree during uninstall"
         Assert-TreeIdentity $appDataBeforeUninstall $script:LifecycleAppDataRoot "App-data tree during uninstall"
         Assert-SyntheticMarker (Join-Path $script:LifecycleWorkspaceRoot $workspaceMarkerName) $RunId
@@ -1336,11 +1359,13 @@ function Invoke-LifecycleScenario(
         $unicodeWorkspaceBeforeFinalUninstall = Get-TreeIdentity $unicodeWorkspace
         $unicodeAppDataBeforeFinalUninstall = Get-TreeIdentity $unicodeAppData
         if ($ContractTest) {
-            Remove-Item -LiteralPath $script:LifecycleInstallRoot -Recurse -Force
+            foreach ($entry in @(Get-ChildItem -LiteralPath $script:LifecycleInstallRoot -Force | Where-Object { $_.Name -ne $lifecycleRootMarkerName })) {
+                Remove-Item -LiteralPath $entry.FullName -Recurse -Force
+            }
         } else {
             Invoke-Nsis (Join-Path $script:LifecycleInstallRoot "uninstall.exe") @("/S") "Final uninstall"
         }
-        if (Test-Path -LiteralPath $script:LifecycleInstallRoot) { throw "Final cleanup left the install root" }
+        Complete-LifecycleUninstall $script:LifecycleInstallRoot $RunId ([string]$state.nonce) "Final cleanup left the install root"
         Assert-TreeIdentity $workspaceBeforeFinalUninstall $script:LifecycleWorkspaceRoot "Workspace tree during final uninstall"
         Assert-TreeIdentity $appDataBeforeFinalUninstall $script:LifecycleAppDataRoot "App-data tree during final uninstall"
         Assert-TreeIdentity $unicodeWorkspaceBeforeFinalUninstall $unicodeWorkspace "Unicode workspace tree during final uninstall"
