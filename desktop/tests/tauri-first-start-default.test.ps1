@@ -48,6 +48,16 @@ function Wait-Backend([System.Diagnostics.Process]$process, [int]$port) {
     throw "Tauri backend did not become ready"
 }
 
+function Wait-WebViewDataDirectory([string]$appDataRoot) {
+    $path = Join-Path $appDataRoot "webview"
+    $deadline = [DateTime]::UtcNow.AddSeconds(30)
+    while ([DateTime]::UtcNow -lt $deadline) {
+        if (Test-Path -LiteralPath $path -PathType Container) { return }
+        Start-Sleep -Milliseconds 100
+    }
+    throw "WebView data directory was not created under external app data"
+}
+
 $desktopRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 if (-not $Executable) {
     $Executable = Join-Path $desktopRoot "src-tauri\target\debug\esp-config-designer-desktop.exe"
@@ -78,6 +88,7 @@ $process = $null
 try {
     $process = [System.Diagnostics.Process]::Start($startInfo)
     Wait-Backend $process $port
+    Wait-WebViewDataDirectory $appDataRoot
     Assert-True (Test-Path -LiteralPath $expectedWorkspace -PathType Container) "Default workspace was not created"
     foreach ($relativePath in @("esp_projects", "esp_assets\fonts", "esp_assets\images", "esp_assets\audio")) {
         Assert-True (Test-Path -LiteralPath (Join-Path $expectedWorkspace $relativePath) -PathType Container) "Missing default workspace directory: $relativePath"

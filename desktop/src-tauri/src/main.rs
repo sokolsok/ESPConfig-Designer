@@ -960,15 +960,14 @@ fn parse_webview_debug_port(value: Option<&str>) -> Result<Option<u16>, String> 
 fn open_window(app: &AppHandle, port: u16, app_data_root: &Path) -> Result<(), String> {
     let url = format!("http://127.0.0.1:{port}/");
     let target_url = tauri::Url::parse(&url).map_err(|_| "Invalid backend URL".to_string())?;
-    let mut builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::External(target_url));
+    let mut builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::External(target_url))
+        .data_directory(app_data_root.join("webview"));
     let webview_debug_port = env::var("ECD_TAURI_WEBVIEW_DEBUG_PORT").ok();
     if let Some(debug_port) = parse_webview_debug_port(webview_debug_port.as_deref())? {
         let browser_arguments = format!(
             "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --remote-debugging-port={debug_port}"
         );
-        builder = builder
-            .additional_browser_args(&browser_arguments)
-            .data_directory(app_data_root.join("webview"));
+        builder = builder.additional_browser_args(&browser_arguments);
     }
     builder
         .title("ESPConfig Designer")

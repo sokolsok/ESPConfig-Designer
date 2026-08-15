@@ -46,7 +46,12 @@ $simultaneousStartTestSource = Get-Content -LiteralPath $simultaneousStartTestPa
 $tauriSmokeSource = Get-Content -LiteralPath (Join-Path $desktopRoot "tests\tauri-smoke.test.ps1") -Raw
 $webviewCspGateSource = Get-Content -LiteralPath (Join-Path $desktopRoot "tests\webview-csp-gate.mjs") -Raw
 Assert-True ($tauriMainSource.Contains('.additional_browser_args(')) "WebView smoke debugging must use Tauri browser arguments on elevated Windows runners"
-Assert-True ($tauriMainSource.Contains('.data_directory(')) "WebView smoke must use an isolated programmatic data directory"
+$openWindowMatch = [regex]::Match($tauriMainSource, 'fn open_window[\s\S]*?\r?\n\}')
+Assert-True ($openWindowMatch.Success) "Tauri window builder is missing"
+$webviewDataDirectoryIndex = $openWindowMatch.Value.IndexOf('.data_directory(app_data_root.join("webview"))')
+$webviewDebugBranchIndex = $openWindowMatch.Value.IndexOf('if let Some(debug_port)')
+Assert-True ($webviewDataDirectoryIndex -ge 0) "Every Desktop WebView must use the external app-data directory"
+Assert-True ($webviewDataDirectoryIndex -lt $webviewDebugBranchIndex) "Production WebView data must not depend on the optional debug-port branch"
 Assert-True ($tauriSmokeSource.Contains('ECD_TAURI_WEBVIEW_DEBUG_PORT')) "WebView smoke must pass the scoped Tauri debug port"
 Assert-True (-not $tauriSmokeSource.Contains('WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS')) "WebView smoke must not rely on WebView2 environment overrides ignored by elevated hosts"
 Assert-True (-not $tauriSmokeSource.Contains('WEBVIEW2_USER_DATA_FOLDER')) "WebView smoke must not rely on the WebView2 environment data-directory override"
