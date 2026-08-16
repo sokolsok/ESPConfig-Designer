@@ -81,6 +81,8 @@ public static class CleanMachinePathNative {
     private static extern bool TerminateProcess(IntPtr process, uint exitCode);
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     public static extern IntPtr CreateMutexW(IntPtr attributes, bool initialOwner, string name);
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern IntPtr CreateEventW(IntPtr attributes, bool manualReset, bool initialState, string name);
     [DllImport("kernel32.dll", SetLastError = true)]
     public static extern bool ReleaseMutex(IntPtr handle);
     [DllImport("kernel32.dll", SetLastError = true)]
@@ -1073,14 +1075,13 @@ function Stop-ExactStartupPrimary([object]$OwnedProcess, [int]$Port) {
         @([CleanMachinePathNative]::GetJobProcessIds($OwnedProcess.jobHandle)) -notcontains $OwnedProcess.process.Id) {
         throw "Exact Startup primary is not owned by an open outer harness Job Object"
     }
-    if (-not $OwnedProcess.process.HasExited) {
-        $actual = Get-Process -Id $OwnedProcess.process.Id -ErrorAction SilentlyContinue
-        if ($null -eq $actual -or $actual.StartTime.ToUniversalTime() -ne $OwnedProcess.process.StartTime.ToUniversalTime()) {
-            throw "Refusing to terminate a Startup primary whose identity is no longer owned"
-        }
-        $OwnedProcess.process.Kill()
-        if (-not $OwnedProcess.process.WaitForExit(30000)) { throw "Exact Startup primary did not terminate" }
+    if ($OwnedProcess.process.HasExited) { throw "Exact Startup primary exited before forced termination evidence" }
+    $actual = Get-Process -Id $OwnedProcess.process.Id -ErrorAction SilentlyContinue
+    if ($null -eq $actual -or $actual.StartTime.ToUniversalTime() -ne $OwnedProcess.process.StartTime.ToUniversalTime()) {
+        throw "Refusing to terminate a Startup primary whose identity is no longer owned"
     }
+    $OwnedProcess.process.Kill()
+    if (-not $OwnedProcess.process.WaitForExit(30000)) { throw "Exact Startup primary did not terminate" }
     $deadline = [DateTime]::UtcNow.AddSeconds(30)
     while ([DateTime]::UtcNow -lt $deadline) {
         $jobPids = @([CleanMachinePathNative]::GetJobProcessIds($OwnedProcess.jobHandle))
@@ -1834,7 +1835,7 @@ function Invoke-OwnedStartupNsis([string]$Executable, [string[]]$Arguments, [str
     }
 }
 
-function New-StartupEnvironment([int]$Port, [int]$GuardHoldMilliseconds = 0) {
+function New-StartupEnvironment([int]$Port, [int]$GuardHoldMilliseconds = 0, [string]$GuardReleaseEvent = "", [string]$GuardOwnedEvent = "") {
     $environment = @{
         ECD_TAURI_APP_DATA_ROOT = $script:StartupAppDataRoot
         ECD_TAURI_WORKSPACE = $script:StartupWorkspaceRoot
@@ -1842,6 +1843,8 @@ function New-StartupEnvironment([int]$Port, [int]$GuardHoldMilliseconds = 0) {
         ECD_TAURI_HEALTH_TIMEOUT_MS = "120000"
         ECD_TAURI_RESOURCE_ROOT = $null
         ECD_TAURI_TEST_STARTUP_GUARD_HOLD_MS = $null
+        ECD_TAURI_TEST_STARTUP_GUARD_RELEASE_EVENT = $null
+        ECD_TAURI_TEST_STARTUP_GUARD_OWNED_EVENT = $null
         ECD_TAURI_BACKEND_ROOT = $null
         ECD_TAURI_RUNTIME_ROOT = $null
         ECD_TAURI_WEB_ROOT = $null
@@ -1854,6 +1857,8 @@ function New-StartupEnvironment([int]$Port, [int]$GuardHoldMilliseconds = 0) {
         ECD_TAURI_WEBVIEW_DEBUG_PORT = $null
     }
     if ($GuardHoldMilliseconds -gt 0) { $environment.ECD_TAURI_TEST_STARTUP_GUARD_HOLD_MS = $GuardHoldMilliseconds.ToString() }
+    if ($GuardReleaseEvent) { $environment.ECD_TAURI_TEST_STARTUP_GUARD_RELEASE_EVENT = $GuardReleaseEvent }
+    if ($GuardOwnedEvent) { $environment.ECD_TAURI_TEST_STARTUP_GUARD_OWNED_EVENT = $GuardOwnedEvent }
     return $environment
 }
 
@@ -1955,6 +1960,8 @@ function Invoke-StartupScenario([object]$Register, [object]$Observed, [string]$M
     $ownedProcesses = New-Object Collections.Generic.List[object]
     $foreignListener = $null
     $externalMutex = [IntPtr]::Zero
+    $releaseEvent = [IntPtr]::Zero
+    $ownedEvent = [IntPtr]::Zero
     $scenarioFailure = $null
     $cleanupErrors = New-Object Collections.Generic.List[string]
     try {
@@ -2014,23 +2021,42 @@ function Invoke-StartupScenario([object]$Register, [object]$Observed, [string]$M
             if ((Read-Host "Startup focus challenge") -cne $challenge) { throw "Warm restore/focus challenge was not confirmed exactly" }
             Stop-ExactStartupPrimary $primary $port
 
-            $beforeInstall = Get-TreeIdentity $script:StartupInstallRoot
             $beforeWorkspace = Get-TreeIdentity $script:StartupWorkspaceRoot
             $beforeAppData = Get-TreeIdentity $script:StartupAppDataRoot
             Assert-StartupMutexAbsent
-            $heldPrimary = Start-OwnedStartupProcess $installedExecutable $script:StartupInstallRoot (New-StartupEnvironment $port 5000)
+            $releaseEventName = "Local\com.espconfigdesigner.desktop.startup-guard.test-release.$RunId"
+            $ownedEventName = "Local\com.espconfigdesigner.desktop.startup-guard.test-owned.$RunId"
+            $releaseEvent = [CleanMachinePathNative]::CreateEventW([IntPtr]::Zero, $true, $false, $releaseEventName)
+            $releaseEventError = [CleanMachinePathNative]::LastError()
+            $ownedEvent = [CleanMachinePathNative]::CreateEventW([IntPtr]::Zero, $true, $false, $ownedEventName)
+            $ownedEventError = [CleanMachinePathNative]::LastError()
+            if ($releaseEvent -eq [IntPtr]::Zero -or $releaseEventError -eq 183 -or
+                $ownedEvent -eq [IntPtr]::Zero -or $ownedEventError -eq 183) {
+                throw "Could not create new harness-owned Startup guard events"
+            }
+            $releaseEventProofDeadline = [DateTime]::UtcNow.AddSeconds(25)
+            $heldPrimary = Start-OwnedStartupProcess $installedExecutable $script:StartupInstallRoot (New-StartupEnvironment $port 0 $releaseEventName $ownedEventName)
             $ownedProcesses.Add($heldPrimary)
+            if ([CleanMachinePathNative]::WaitForSingleObject($ownedEvent, 5000) -ne 0) {
+                throw "Startup guard owner acknowledgement was not signaled by the held primary"
+            }
             Wait-StartupGuardOwned $heldPrimary
-            $heldSecondary = Start-OwnedStartupProcess $installedExecutable $script:StartupInstallRoot (New-StartupEnvironment $port 5000)
+            $heldSecondary = Start-OwnedStartupProcess $installedExecutable $script:StartupInstallRoot (New-StartupEnvironment $port)
             $ownedProcesses.Add($heldSecondary)
             Start-Sleep -Milliseconds 750
             if ($heldPrimary.process.HasExited -or $heldSecondary.process.HasExited) { throw "Both widened-guard Startup processes must remain alive while the guard is held" }
-            Assert-TreeIdentity $beforeInstall $script:StartupInstallRoot "Install tree before Startup guard release"
-            Assert-TreeIdentity $beforeWorkspace $script:StartupWorkspaceRoot "Workspace tree before Startup guard release"
-            Assert-TreeIdentity $beforeAppData $script:StartupAppDataRoot "App-data tree before Startup guard release"
+            Assert-TreeIdentity $beforeWorkspace $script:StartupWorkspaceRoot "Workspace tree while Startup guard is held"
+            Assert-TreeIdentity $beforeAppData $script:StartupAppDataRoot "App-data tree while Startup guard is held"
             if (@(Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue).Count -ne 0) { throw "Backend listened before Startup guard release" }
+            if ([DateTime]::UtcNow -ge $releaseEventProofDeadline) { throw "Startup guard release-event ownership proof exceeded its 25-second deadline" }
+            Wait-StartupGuardOwned $heldPrimary
+            if ([DateTime]::UtcNow -ge $releaseEventProofDeadline) { throw "Startup guard owner could not be terminated within its release-event proof window" }
             Stop-ExactStartupPrimary $heldPrimary $port
             $takeover = Wait-StartupHealth @($heldSecondary) $port
+            if (-not [CleanMachinePathNative]::CloseOwnedHandle($releaseEvent)) { throw "Could not close the Startup guard release event" }
+            $releaseEvent = [IntPtr]::Zero
+            if (-not [CleanMachinePathNative]::CloseOwnedHandle($ownedEvent)) { throw "Could not close the Startup guard ownership event" }
+            $ownedEvent = [IntPtr]::Zero
 
             Close-ExactStartupWindow $takeover "ESPConfig Designer" $true
             $foreignListener = [Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback, 8099)
@@ -2147,6 +2173,12 @@ function Invoke-StartupScenario([object]$Register, [object]$Observed, [string]$M
         if ($externalMutex -ne [IntPtr]::Zero) {
             try { if (-not [CleanMachinePathNative]::ReleaseMutex($externalMutex)) { throw "release failed" } } catch { $cleanupErrors.Add("Could not release external Startup mutex: $($_.Exception.Message)") }
             try { if (-not [CleanMachinePathNative]::CloseOwnedHandle($externalMutex)) { throw "close failed" } } catch { $cleanupErrors.Add("Could not close external Startup mutex: $($_.Exception.Message)") }
+        }
+        if ($releaseEvent -ne [IntPtr]::Zero) {
+            try { if (-not [CleanMachinePathNative]::CloseOwnedHandle($releaseEvent)) { throw "close failed" } } catch { $cleanupErrors.Add("Could not close Startup guard release event: $($_.Exception.Message)") }
+        }
+        if ($ownedEvent -ne [IntPtr]::Zero) {
+            try { if (-not [CleanMachinePathNative]::CloseOwnedHandle($ownedEvent)) { throw "close failed" } } catch { $cleanupErrors.Add("Could not close Startup guard ownership event: $($_.Exception.Message)") }
         }
         foreach ($owned in $ownedProcesses) {
             if ($owned.jobHandle -ne [IntPtr]::Zero) { try { Close-OwnedStartupJob $owned $true } catch { $cleanupErrors.Add($_.Exception.Message) } }

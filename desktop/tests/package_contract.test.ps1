@@ -83,6 +83,8 @@ Assert-True ($startupGuardSource.Contains('WAIT_ABANDONED')) "Startup guard must
 Assert-True ($startupGuardSource.Contains('WAIT_FAILED')) "Startup guard must report Windows wait failures"
 Assert-True ($startupGuardSource -match 'Duration::from_secs\(10\)') "Startup guard wait must have a stable ten-second bound"
 Assert-True ($startupGuardSource -match 'Timeout[\s\S]{0,500}Err\(') "Startup guard timeout must fail closed"
+Assert-True ($startupGuardSource.Contains('ECD_TAURI_TEST_STARTUP_GUARD_RELEASE_EVENT') -and $startupGuardSource.Contains('ECD_TAURI_TEST_STARTUP_GUARD_OWNED_EVENT') -and $startupGuardSource.Contains('OpenEventW') -and $startupGuardSource.Contains('SetEvent')) "Startup guard test barrier must acknowledge ownership before waiting for harness release"
+Assert-True ($startupGuardSource -match 'TEST_RELEASE_EVENT_TIMEOUT[\s\S]*?WaitForSingleObject') "Startup guard test barrier must remain bounded"
 Assert-True (-not $config.PSObject.Properties.Name.Contains('allowMultipleInstances')) "Desktop must not enable multiple instances"
 Assert-True ($tauriMainSource -match 'fn handle_second_instance[\s\S]*?activate_main_window') "Single-instance callback must continue to activate the main window"
 $secondInstanceBody = [regex]::Match($tauriMainSource, '(?s)fn handle_second_instance\b.*?(?=\r?\nfn )').Value
