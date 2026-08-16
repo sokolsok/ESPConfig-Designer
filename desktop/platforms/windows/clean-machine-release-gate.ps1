@@ -969,6 +969,17 @@ function ConvertTo-WindowsCommandLine([string]$Executable, [string[]]$Arguments)
     }) -join " ")
 }
 
+function Get-PinnedProcessById([int]$ProcessId) {
+    $process = [Diagnostics.Process]::GetProcessById($ProcessId)
+    try {
+        $null = $process.Handle
+        return $process
+    } catch {
+        $process.Dispose()
+        throw
+    }
+}
+
 function Prepare-OwnedStartupProcess(
     [string]$Executable,
     [string]$WorkingDirectory,
@@ -978,6 +989,7 @@ function Prepare-OwnedStartupProcess(
     $previousEnvironment = @{}
     $jobHandle = [IntPtr]::Zero
     $suspended = $null
+    $process = $null
     try {
         $jobHandle = [CleanMachinePathNative]::CreateKillOnCloseJob()
         foreach ($name in $Environment.Keys) {
@@ -987,13 +999,14 @@ function Prepare-OwnedStartupProcess(
         $commandLine = ConvertTo-WindowsCommandLine $Executable $Arguments
         $suspended = [CleanMachinePathNative]::CreateSuspendedProcess($Executable, $commandLine, $WorkingDirectory)
         [CleanMachinePathNative]::AssignToJob($jobHandle, $suspended.ProcessHandle)
-        $process = [Diagnostics.Process]::GetProcessById($suspended.ProcessId)
+        $process = Get-PinnedProcessById $suspended.ProcessId
         return [pscustomobject]@{ process = $process; jobHandle = $jobHandle; port = 0; suspended = $suspended; resumed = $false }
     } catch {
         $message = $_.Exception.Message
         if ($suspended) { [CleanMachinePathNative]::TerminateSuspendedProcess($suspended) | Out-Null }
         if ($jobHandle -ne [IntPtr]::Zero) { [CleanMachinePathNative]::CloseOwnedHandle($jobHandle) | Out-Null }
         if ($suspended) { [CleanMachinePathNative]::CloseSuspendedProcessHandles($suspended) }
+        if ($process) { $process.Dispose() }
         throw "Could not launch owned Startup process: $message"
     } finally {
         foreach ($name in $previousEnvironment.Keys) {
@@ -1206,6 +1219,7 @@ function Start-LifecycleApplication([string]$Executable, [string]$Workspace, [st
     }
     $jobHandle = [IntPtr]::Zero
     $suspended = $null
+    $process = $null
     try {
         $jobHandle = [CleanMachinePathNative]::CreateKillOnCloseJob()
         foreach ($name in $environment.Keys) {
@@ -1213,7 +1227,7 @@ function Start-LifecycleApplication([string]$Executable, [string]$Workspace, [st
         }
         $suspended = [CleanMachinePathNative]::CreateSuspendedProcess($Executable, $script:LifecycleInstallRoot)
         [CleanMachinePathNative]::AssignToJob($jobHandle, $suspended.ProcessHandle)
-        $process = [Diagnostics.Process]::GetProcessById($suspended.ProcessId)
+        $process = Get-PinnedProcessById $suspended.ProcessId
         [CleanMachinePathNative]::ResumeSuspendedProcess($suspended)
     } catch {
         $startError = $_.Exception.Message
@@ -1221,6 +1235,7 @@ function Start-LifecycleApplication([string]$Executable, [string]$Workspace, [st
             $startError += "; suspended-process termination also failed"
         }
         if ($jobHandle -ne [IntPtr]::Zero) { [CleanMachinePathNative]::CloseOwnedHandle($jobHandle) | Out-Null }
+        if ($process) { $process.Dispose() }
         throw "Could not start the Lifecycle application in its cleanup Job Object: $startError"
     } finally {
         foreach ($name in $previousEnvironment.Keys) {

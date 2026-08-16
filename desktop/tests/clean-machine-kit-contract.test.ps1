@@ -62,6 +62,12 @@ Assert-True ($builderSource.Contains('status --porcelain=v1 --untracked-files=al
 Assert-True ($orchestratorSource.Contains('$attestation.matrixPolicySha256 -ne $ExpectedMatrixPolicySha256')) "Clean-VM attestation must bind the exact matrix policy"
 Assert-True ($orchestratorSource.Contains('$attestation.scenario -ne $AttestationScenario')) "Clean-VM attestations must bind the exact Lifecycle or Startup scenario"
 Assert-True ($orchestratorSource.Contains('with code $exitCode (0x$exitCodeHex)')) "Graceful-close failures must report the exact decimal and hexadecimal application exit code"
+$pinnedProcessBody = [regex]::Match($orchestratorSource, '(?s)function Get-PinnedProcessById\b.*?(?=\r?\nfunction )').Value
+Assert-True ($pinnedProcessBody -match 'GetProcessById\(\$ProcessId\)[\s\S]*?\$null = \$process\.Handle[\s\S]*?return') "Managed process ownership must pin the handle while the process is still suspended"
+$prepareOwnedStartupBody = [regex]::Match($orchestratorSource, '(?s)function Prepare-OwnedStartupProcess\b.*?(?=\r?\nfunction )').Value
+Assert-True ($prepareOwnedStartupBody.Contains('Get-PinnedProcessById $suspended.ProcessId')) "Suspended Startup processes must pin their managed handle before resume"
+$lifecycleStartBody = [regex]::Match($orchestratorSource, '(?s)function Start-LifecycleApplication\b.*?(?=\r?\nfunction )').Value
+Assert-True ($lifecycleStartBody.Contains('Get-PinnedProcessById $suspended.ProcessId')) "Suspended Lifecycle processes must pin their managed handle before resume"
 $stopExactStartupBody = [regex]::Match($orchestratorSource, '(?s)function Stop-ExactStartupPrimary\b.*?(?=\r?\nfunction )').Value
 Assert-True ($stopExactStartupBody.Contains('GetJobProcessIds') -and $stopExactStartupBody.Contains('Get-NetTCPConnection')) "Forced Startup cleanup must observe owned Job PIDs and the exact listener"
 Assert-True (-not $stopExactStartupBody.Contains('TerminateJob')) "Forced Startup evidence must not terminate the outer harness Job"
@@ -83,6 +89,22 @@ foreach ($forbiddenStartupOverride in @(
 }
 Assert-True ($startupScenarioBody.Contains('Assert-StartupMutexAbsent') -and $orchestratorSource.Contains('LastError() -eq 183')) "Startup controlled mutex cases must reject a pre-existing production mutex"
 Assert-True ($orchestratorSource.Contains('resourcePayloadSha256')) "Startup artifact/report contract must bind the complete resource payload"
+
+$exitProbe = Start-Process -FilePath "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" `
+    -ArgumentList @("-NoProfile", "-Command", "Start-Sleep -Milliseconds 300; exit 37") -PassThru
+try {
+    $observedExitProbe = [Diagnostics.Process]::GetProcessById($exitProbe.Id)
+    $null = $observedExitProbe.Handle
+    $exitProbe.Dispose()
+    $exitProbe = $null
+    Start-Sleep -Seconds 1
+    Assert-True ($observedExitProbe.WaitForExit(5000)) "Pinned fast-exit process did not exit"
+    Assert-True ($observedExitProbe.ExitCode -eq 37) "Pinned fast-exit process did not retain its exact exit code"
+} finally {
+    if ($observedExitProbe -and -not $observedExitProbe.HasExited) { $observedExitProbe.Kill() }
+    if ($observedExitProbe) { $observedExitProbe.Dispose() }
+    if ($exitProbe) { $exitProbe.Dispose() }
+}
 
 $trackedPolicy = Get-Content -LiteralPath $matrixPolicy -Raw | ConvertFrom-Json
 $expectedMatrixEntries = @(
