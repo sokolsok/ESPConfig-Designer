@@ -85,6 +85,10 @@ Assert-True ($startupGuardSource -match 'Duration::from_secs\(10\)') "Startup gu
 Assert-True ($startupGuardSource -match 'Timeout[\s\S]{0,500}Err\(') "Startup guard timeout must fail closed"
 Assert-True (-not $config.PSObject.Properties.Name.Contains('allowMultipleInstances')) "Desktop must not enable multiple instances"
 Assert-True ($tauriMainSource -match 'fn handle_second_instance[\s\S]*?activate_main_window') "Single-instance callback must continue to activate the main window"
+$secondInstanceBody = [regex]::Match($tauriMainSource, '(?s)fn handle_second_instance\b.*?(?=\r?\nfn )').Value
+Assert-True ($secondInstanceBody.Contains('run_on_main_thread')) "Single-instance activation must cross the Tauri main-thread boundary"
+Assert-True ($tauriMainSource.Contains('IsIconic') -and $tauriMainSource.Contains('ShowWindow') -and $tauriMainSource.Contains('SW_RESTORE')) "Windows single-instance activation must restore the exact minimized native window"
+Assert-True ($tauriMainSource -match 'fn focus\(&self\)[\s\S]{0,200}WebviewWindow::set_focus') "Single-instance activation must retain Tauri's Windows focus fallback"
 Assert-True ($desktopPackage.scripts.'test:tauri-simultaneous-start' -eq "powershell -ExecutionPolicy Bypass -File tests/tauri-simultaneous-start.test.ps1") "Simultaneous startup command is missing"
 Assert-True ($simultaneousStartTestSource.Contains('ECD_TAURI_TEST_STARTUP_GUARD_HOLD_MS')) "Simultaneous startup gate must widen the guarded window deterministically"
 Assert-True ($simultaneousStartTestSource.Contains('Wait-StartupGuardOwned $primary')) "Simultaneous startup gate must prove primary guard ownership before launching secondary"

@@ -992,6 +992,18 @@ impl<R: tauri::Runtime> MainWindowActivation for tauri::WebviewWindow<R> {
     }
 
     fn unminimize(&self) {
+        #[cfg(windows)]
+        {
+            use windows_sys::Win32::UI::WindowsAndMessaging::{IsIconic, ShowWindow, SW_RESTORE};
+
+            match self.hwnd() {
+                Ok(hwnd) if unsafe { IsIconic(hwnd.0) } != 0 => unsafe {
+                    ShowWindow(hwnd.0, SW_RESTORE);
+                },
+                Ok(_) => {}
+                Err(error) => eprintln!("Could not resolve the existing desktop HWND: {error}"),
+            }
+        }
         if let Err(error) = tauri::WebviewWindow::unminimize(self) {
             eprintln!("Could not restore the existing desktop window: {error}");
         }
@@ -1013,8 +1025,12 @@ fn activate_main_window<W: MainWindowActivation>(window: Option<&W>) {
 }
 
 fn handle_second_instance(app: &AppHandle) {
-    let window = app.get_webview_window("main");
-    activate_main_window(window.as_ref());
+    let Some(window) = app.get_webview_window("main") else {
+        return;
+    };
+    if let Err(error) = app.run_on_main_thread(move || activate_main_window(Some(&window))) {
+        eprintln!("Could not schedule existing desktop window activation: {error}");
+    }
 }
 
 fn env_path(name: &str, default: PathBuf) -> PathBuf {
