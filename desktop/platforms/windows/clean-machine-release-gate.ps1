@@ -1106,6 +1106,20 @@ function Minimize-ExactStartupWindow([object]$OwnedProcess) {
     return $window
 }
 
+function Wait-ExactStartupWindowRestored([object]$OwnedProcess, [IntPtr]$Window) {
+    $deadline = [DateTime]::UtcNow.AddSeconds(10)
+    while ([DateTime]::UtcNow -lt $deadline) {
+        if ($OwnedProcess.process.HasExited) { throw "Startup primary exited while waiting for warm restore" }
+        if (-not [CleanMachinePathNative]::IsIconic($Window) -and
+            [CleanMachinePathNative]::IsWindowVisible($Window) -and
+            [CleanMachinePathNative]::FindVisibleWindow([uint32]$OwnedProcess.process.Id, "ESPConfig Designer") -eq $Window) {
+            return
+        }
+        Start-Sleep -Milliseconds 50
+    }
+    throw "Warm launch did not visibly restore the exact minimized primary window"
+}
+
 function Get-StartupFileIdentity([string]$Path) {
     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { return [ordered]@{ exists = $false; length = [int64]0; sha256 = "" } }
     Assert-NoReparsePath $Path "Startup job log"
@@ -1995,10 +2009,7 @@ function Invoke-StartupScenario([object]$Register, [object]$Observed, [string]$M
             if (-not $warm.process.WaitForExit(30000) -or $warm.process.ExitCode -ne 0) { throw "Warm launch did not exit zero" }
             Close-OwnedStartupJob $warm
             $challenge = "FOCUS-" + ([guid]::NewGuid().ToString("N").Substring(0, 8).ToUpperInvariant())
-            if ([CleanMachinePathNative]::IsIconic($primaryWindow) -or -not [CleanMachinePathNative]::IsWindowVisible($primaryWindow) -or
-                [CleanMachinePathNative]::FindVisibleWindow([uint32]$primary.process.Id, "ESPConfig Designer") -ne $primaryWindow) {
-                throw "Warm launch did not visibly restore the exact minimized primary window"
-            }
+            Wait-ExactStartupWindowRestored $primary $primaryWindow
             Write-Host "[manual] Confirm the exact ESPConfig Designer window was visibly restored and focused by entering: $challenge"
             if ((Read-Host "Startup focus challenge") -cne $challenge) { throw "Warm restore/focus challenge was not confirmed exactly" }
             Stop-ExactStartupPrimary $primary $port
