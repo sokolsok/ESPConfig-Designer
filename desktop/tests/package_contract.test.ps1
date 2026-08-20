@@ -102,6 +102,8 @@ Assert-True ($simultaneousStartTestSource.Contains('Test-WarmSecondLaunch') -and
 Assert-True (-not $simultaneousStartTestSource.Contains('foreach ($iteration in 1..5)')) "Simultaneous startup gate must not spend repeated cycles trying to prove exact-HWND restore"
 Assert-True ($simultaneousStartTestSource.Contains('Get-SyntheticTreeIdentity') -and $simultaneousStartTestSource.Contains('Warm second launch changed workspace or app-data') -and $simultaneousStartTestSource.Contains('Warm second launch changed listener ownership')) "Simultaneous startup gate must preserve synthetic data trees and exact listener ownership across warm launch"
 Assert-True (-not $simultaneousStartTestSource.Contains('$hash = "locked"')) "Warm-launch data identity must fail closed on unexpected unreadable files"
+$stableTreesBody = [regex]::Match($simultaneousStartTestSource, '(?s)function Wait-SyntheticTreesStable\b.*?(?=\r?\nfunction )').Value
+Assert-True ($stableTreesBody.Contains('esp_projects\projects.json') -and $stableTreesBody.Contains('AddSeconds(30)') -and $stableTreesBody.Contains('stableSince') -and $stableTreesBody.Contains('TotalSeconds -ge 2')) "Warm-launch baseline must wait boundedly for Dashboard bootstrap and sustained tree quiescence"
 Assert-True ($simultaneousStartTestSource.Contains('Process did not recover the abandoned startup guard')) "Simultaneous startup gate must cover primary crash recovery"
 Assert-True ($simultaneousStartTestSource.Contains('Startup guard timeout failed open')) "Simultaneous startup gate must cover fail-closed timeout"
 Assert-True (-not $simultaneousStartTestSource.Contains('MainWindowHandle')) "Startup error cleanup must not target the plugin IPC window through Process.MainWindowHandle"

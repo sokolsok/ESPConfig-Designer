@@ -159,22 +159,36 @@ function Get-SyntheticTreeIdentity([string]$Root, [bool]$IsAppData = $false) {
 }
 
 function Wait-SyntheticTreesStable([string]$Root) {
-    $deadline = [DateTime]::UtcNow.AddSeconds(10)
+    $deadline = [DateTime]::UtcNow.AddSeconds(30)
     $workspaceRoot = Join-Path $Root "workspace"
     $appDataRoot = Join-Path $Root "appdata"
-    $previousWorkspace = Get-SyntheticTreeIdentity $workspaceRoot
-    $previousAppData = Get-SyntheticTreeIdentity $appDataRoot $true
+    $bootstrapPath = Join-Path $workspaceRoot "esp_projects\projects.json"
+    $previousWorkspace = $null
+    $previousAppData = $null
+    $stableSince = $null
     while ([DateTime]::UtcNow -lt $deadline) {
-        Start-Sleep -Milliseconds 500
+        if (-not (Test-Path -LiteralPath $bootstrapPath -PathType Leaf)) {
+            $previousWorkspace = $null
+            $previousAppData = $null
+            $stableSince = $null
+            Start-Sleep -Milliseconds 100
+            continue
+        }
         $workspace = Get-SyntheticTreeIdentity $workspaceRoot
         $appData = Get-SyntheticTreeIdentity $appDataRoot $true
-        if ($workspace -ceq $previousWorkspace -and $appData -ceq $previousAppData) {
-            return [pscustomobject]@{ workspace = $workspace; appData = $appData }
+        if ($null -ne $previousWorkspace -and $workspace -ceq $previousWorkspace -and $appData -ceq $previousAppData) {
+            if ($null -eq $stableSince) { $stableSince = [DateTime]::UtcNow }
+            if ([DateTime]::UtcNow -lt $deadline -and ([DateTime]::UtcNow - $stableSince).TotalSeconds -ge 2) {
+                return [pscustomobject]@{ workspace = $workspace; appData = $appData }
+            }
+        } else {
+            $stableSince = $null
         }
         $previousWorkspace = $workspace
         $previousAppData = $appData
+        Start-Sleep -Milliseconds 250
     }
-    throw "Synthetic workspace and app-data did not become stable before warm launch"
+    throw "Synthetic Dashboard bootstrap and data trees did not become stable before warm launch"
 }
 
 function Test-WarmSecondLaunch([System.Diagnostics.Process]$Primary, [string]$Root, [int]$Port) {
