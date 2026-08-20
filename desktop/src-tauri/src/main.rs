@@ -992,18 +992,6 @@ impl<R: tauri::Runtime> MainWindowActivation for tauri::WebviewWindow<R> {
     }
 
     fn unminimize(&self) {
-        #[cfg(windows)]
-        {
-            use windows_sys::Win32::UI::WindowsAndMessaging::{IsIconic, ShowWindow, SW_RESTORE};
-
-            match self.hwnd() {
-                Ok(hwnd) if unsafe { IsIconic(hwnd.0) } != 0 => unsafe {
-                    ShowWindow(hwnd.0, SW_RESTORE);
-                },
-                Ok(_) => {}
-                Err(error) => eprintln!("Could not resolve the existing desktop HWND: {error}"),
-            }
-        }
         if let Err(error) = tauri::WebviewWindow::unminimize(self) {
             eprintln!("Could not restore the existing desktop window: {error}");
         }
@@ -1013,6 +1001,21 @@ impl<R: tauri::Runtime> MainWindowActivation for tauri::WebviewWindow<R> {
         if let Err(error) = tauri::WebviewWindow::set_focus(self) {
             eprintln!("Could not focus the existing desktop window: {error}");
         }
+    }
+}
+
+#[cfg(windows)]
+fn restore_minimized_window_on_windows<R: tauri::Runtime>(window: &tauri::WebviewWindow<R>) {
+    use windows_sys::Win32::UI::WindowsAndMessaging::{IsIconic, ShowWindow, SW_RESTORE};
+
+    match window.hwnd() {
+        Ok(hwnd) => {
+            let before = unsafe { IsIconic(hwnd.0) };
+            if before != 0 {
+                unsafe { ShowWindow(hwnd.0, SW_RESTORE) };
+            }
+        }
+        Err(error) => eprintln!("Could not resolve the existing desktop HWND: {error}"),
     }
 }
 
@@ -1028,6 +1031,8 @@ fn handle_second_instance(app: &AppHandle) {
     let Some(window) = app.get_webview_window("main") else {
         return;
     };
+    #[cfg(windows)]
+    restore_minimized_window_on_windows(&window);
     if let Err(error) = app.run_on_main_thread(move || activate_main_window(Some(&window))) {
         eprintln!("Could not schedule existing desktop window activation: {error}");
     }

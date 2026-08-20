@@ -27,3 +27,4 @@ future signed release artifact.
 - [Desktop development, build, and tests](../docs/development/desktop.md)
 - [Windows installation and release status](../docs/installation/windows.md)
 - [Windows runtime and platform reference](platforms/windows/README.md)
+- [Known release issues](../KNOWN_ISSUES.md)

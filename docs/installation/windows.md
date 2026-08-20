@@ -11,6 +11,8 @@ Desktop Windows gate or a local development build.
 - No public Desktop updater or update notification is configured.
 - The installer requires network access to bootstrap WebView2 if it is absent.
 - The first firmware compile can require network access for PlatformIO content.
+- A second launch may not reliably restore or focus an already minimized main
+  window; see [Known Issues](../../KNOWN_ISSUES.md).
 - Windows 10 clean-machine release coverage and signed release verification are
   incomplete.
 
@@ -171,6 +173,16 @@ A future official plugin fix can be adopted separately. ECD may retain this
 guard as defense in depth or remove it only after separate packaged and installed
 regression verification.
 
+Automatic restore/focus of an already minimized primary window is an accepted
+non-blocking issue for Windows Desktop `1.4.0`. This exception does not weaken
+the single-instance safety contract: the primary must remain running, the
+secondary must exit successfully, and no duplicate backend, listener, or early
+workspace/app-data write is permitted. The clean-machine report must record an
+unobserved restore/focus result as an accepted warning rather than claim an
+unconditional `20/20 PASS`. Its machine-readable outcome is
+`pass_with_accepted_warning` even though the blocking-check result remains
+`pass`. See [Known Issues](../../KNOWN_ISSUES.md).
+
 ## Network requirements
 
 The NSIS installer explicitly uses Tauri's official online
@@ -240,6 +252,10 @@ certificate, signing workflow, publisher result, or approval exists yet.
 The planned provider's current eligibility and operating requirements are
 defined by the [SignPath Foundation terms](https://signpath.org/terms). Provider
 acceptance remains discretionary.
+
+Pre-signing acceptance may contain the documented minimized-window activation
+warning. All installation, process ownership, single-backend, data-integrity,
+shutdown, cleanup, provenance, and security checks remain blocking.
 
 The final installer and project-owned PE files must be signed with SHA-256 and a
 trusted RFC 3161 timestamp, checked after installation with

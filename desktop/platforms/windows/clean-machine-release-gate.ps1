@@ -97,6 +97,8 @@ public static class CleanMachinePathNative {
     public static extern bool IsWindowVisible(IntPtr window);
     [DllImport("user32.dll")]
     public static extern bool IsIconic(IntPtr window);
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetForegroundWindow();
     [DllImport("user32.dll", SetLastError = true)]
     public static extern bool ShowWindow(IntPtr window, int command);
     [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
@@ -699,27 +701,31 @@ function Get-BootIdentity {
     try { return ([BitConverter]::ToString($hasher.ComputeHash($bytes))).Replace("-", "").ToLowerInvariant() } finally { $hasher.Dispose() }
 }
 
-function Get-TreeIdentity([string]$Root) {
+function Get-TreeIdentity([string]$Root, [string[]]$ExcludedRelativePaths = @()) {
     if (-not (Test-Path -LiteralPath $Root -PathType Container)) { throw "Tree root is missing: $Root" }
     Assert-NoReparsePath $Root "Tree root"
     Assert-NoAlternateStreams $Root "Tree root"
     $entries = New-Object Collections.Generic.List[object]
     foreach ($directory in @(Get-ChildItem -LiteralPath $Root -Directory -Recurse -Force | Sort-Object FullName)) {
+        $relativePath = $directory.FullName.Substring($Root.Length + 1).Replace("\", "/")
+        if (@($ExcludedRelativePaths | Where-Object { $relativePath -eq $_ -or $relativePath.StartsWith("$_/", [StringComparison]::OrdinalIgnoreCase) }).Count -gt 0) { continue }
         Assert-NoReparsePath $directory.FullName "Tree directory"
         Assert-NoAlternateStreams $directory.FullName "Tree directory"
         $entries.Add([ordered]@{
             type = "directory"
-            path = $directory.FullName.Substring($Root.Length + 1).Replace("\", "/")
+            path = $relativePath
             length = [int64]0
             sha256 = ""
         })
     }
     foreach ($file in @(Get-ChildItem -LiteralPath $Root -File -Recurse -Force | Sort-Object FullName)) {
+        $relativePath = $file.FullName.Substring($Root.Length + 1).Replace("\", "/")
+        if (@($ExcludedRelativePaths | Where-Object { $relativePath -eq $_ -or $relativePath.StartsWith("$_/", [StringComparison]::OrdinalIgnoreCase) }).Count -gt 0) { continue }
         Assert-NoReparsePath $file.FullName "Tree file"
         Assert-NoAlternateStreams $file.FullName "Tree file"
         $entries.Add([ordered]@{
             type = "file"
-            path = $file.FullName.Substring($Root.Length + 1).Replace("\", "/")
+            path = $relativePath
             length = [int64]$file.Length
             sha256 = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
         })
@@ -796,8 +802,8 @@ function Complete-LifecycleUninstall([string]$Root, [string]$RunId, [string]$Non
     if (Test-Path -LiteralPath $Root) { throw $FailureMessage }
 }
 
-function Assert-TreeIdentity([object]$Expected, [string]$Root, [string]$Name) {
-    $actual = Get-TreeIdentity $Root
+function Assert-TreeIdentity([object]$Expected, [string]$Root, [string]$Name, [string[]]$ExcludedRelativePaths = @()) {
+    $actual = Get-TreeIdentity $Root $ExcludedRelativePaths
     if ($actual.fileCount -ne $Expected.fileCount -or $actual.aggregateSha256 -ne $Expected.aggregateSha256) {
         throw "$Name changed"
     }
@@ -1113,12 +1119,13 @@ function Wait-ExactStartupWindowRestored([object]$OwnedProcess, [IntPtr]$Window)
         if ($OwnedProcess.process.HasExited) { throw "Startup primary exited while waiting for warm restore" }
         if (-not [CleanMachinePathNative]::IsIconic($Window) -and
             [CleanMachinePathNative]::IsWindowVisible($Window) -and
-            [CleanMachinePathNative]::FindVisibleWindow([uint32]$OwnedProcess.process.Id, "ESPConfig Designer") -eq $Window) {
-            return
+            [CleanMachinePathNative]::FindVisibleWindow([uint32]$OwnedProcess.process.Id, "ESPConfig Designer") -eq $Window -and
+            [CleanMachinePathNative]::GetForegroundWindow() -eq $Window) {
+            return $true
         }
         Start-Sleep -Milliseconds 50
     }
-    throw "Warm launch did not visibly restore the exact minimized primary window"
+    return $false
 }
 
 function Get-StartupFileIdentity([string]$Path) {
@@ -1927,10 +1934,14 @@ function Assert-StartupInstalledResources([object]$Register) {
 }
 
 function New-StartupReport([object]$Register, [object]$Observed, [string]$MatrixEntry, [string]$RunId, [string]$RegisterHash,
-    [string]$MatrixHash, [DateTime]$StartedAt, [object[]]$Checks, [object]$CleanVm) {
+    [string]$MatrixHash, [DateTime]$StartedAt, [object[]]$Checks, [object[]]$AcceptedWarnings, [object]$CleanVm) {
     $script:LifecycleNetworkState = if ($ContractTest) { "contract_test_not_observed" } else { "production_startup_observed" }
     $report = New-LifecycleReport $Register $Observed $MatrixEntry $RunId $RegisterHash $MatrixHash $StartedAt $Checks $CleanVm.sha256 $CleanVm.runNonce
     $report.scenario = "Startup"
+    $report.acceptedWarnings = @($AcceptedWarnings)
+    $report.blockingChecksPassed = @($Checks | Where-Object { $_.status -eq "pass" }).Count
+    $report.blockingChecksTotal = @($Checks).Count
+    $report.outcome = if (@($AcceptedWarnings).Count -gt 0) { "pass_with_accepted_warning" } else { "pass" }
     return $report
 }
 
@@ -1964,6 +1975,8 @@ function Invoke-StartupScenario([object]$Register, [object]$Observed, [string]$M
     $ownedEvent = [IntPtr]::Zero
     $scenarioFailure = $null
     $cleanupErrors = New-Object Collections.Generic.List[string]
+    $acceptedWarnings = @()
+    $automaticWarmRestoreObserved = $true
     try {
         New-OwnedLifecycleRoot $script:StartupInstallRoot "install" $RunId $nonce
         New-OwnedLifecycleRoot $script:StartupWorkspaceRoot "workspace" $RunId $nonce
@@ -2010,15 +2023,43 @@ function Invoke-StartupScenario([object]$Register, [object]$Observed, [string]$M
                 throw "Exact 127.0.0.1:8099 listener is not owned by the exact installed embedded Python backend"
             }
 
+            $warmWorkspaceBefore = Get-TreeIdentity $script:StartupWorkspaceRoot
+            $warmAppDataExclusions = @("webview", "j/.ecd-job-directory.lock")
+            $warmAppDataBefore = Get-TreeIdentity $script:StartupAppDataRoot $warmAppDataExclusions
             $primaryWindow = Minimize-ExactStartupWindow $primary
             $warm = Start-OwnedStartupProcess $installedExecutable $script:StartupInstallRoot (New-StartupEnvironment $port)
             $ownedProcesses.Add($warm)
             if (-not $warm.process.WaitForExit(30000) -or $warm.process.ExitCode -ne 0) { throw "Warm launch did not exit zero" }
             Close-OwnedStartupJob $warm
+            if ($primary.process.HasExited) { throw "Warm launch terminated the exact primary" }
+            $warmListeners = @(Get-NetTCPConnection -LocalAddress "127.0.0.1" -LocalPort $port -State Listen -ErrorAction SilentlyContinue)
+            $warmJobIds = @([CleanMachinePathNative]::GetJobProcessIds($primary.jobHandle))
+            $warmPythonProcesses = @(Get-CimInstance Win32_Process | Where-Object { $warmJobIds -contains [int]$_.ProcessId -and [string]::Equals([string]$_.ExecutablePath, $resources.python, [StringComparison]::OrdinalIgnoreCase) })
+            if ($warmListeners.Count -ne 1 -or $warmPythonProcesses.Count -ne 1 -or
+                [int]$warmListeners[0].OwningProcess -ne [int]$pythonProcesses[0].ProcessId -or
+                [int]$warmPythonProcesses[0].ProcessId -ne [int]$pythonProcesses[0].ProcessId) {
+                throw "Warm launch changed the exact backend or listener ownership"
+            }
+            Assert-TreeIdentity $warmWorkspaceBefore $script:StartupWorkspaceRoot "Workspace tree during warm launch"
+            Assert-TreeIdentity $warmAppDataBefore $script:StartupAppDataRoot "App-data tree during warm launch" $warmAppDataExclusions
             $challenge = "FOCUS-" + ([guid]::NewGuid().ToString("N").Substring(0, 8).ToUpperInvariant())
-            Wait-ExactStartupWindowRestored $primary $primaryWindow
-            Write-Host "[manual] Confirm the exact ESPConfig Designer window was visibly restored and focused by entering: $challenge"
+            $automaticWarmRestoreObserved = Wait-ExactStartupWindowRestored $primary $primaryWindow
+            if (-not $automaticWarmRestoreObserved) {
+                $acceptedWarnings += [pscustomobject][ordered]@{
+                    name = "automatic_warm_restore_focus"
+                    status = "accepted_warning"
+                    reasonCode = "windows_minimized_activation_not_observed"
+                    summary = "Automatic restore/focus was not observed; manual taskbar restore passed"
+                }
+                Write-Warning "Accepted warning: automatic warm restore/focus was not observed. Restore the existing window manually from the Windows taskbar."
+            }
+            Write-Host "[manual] Confirm the exact ESPConfig Designer window is visibly restored and focused by entering: $challenge"
             if ((Read-Host "Startup focus challenge") -cne $challenge) { throw "Warm restore/focus challenge was not confirmed exactly" }
+            if ([CleanMachinePathNative]::IsIconic($primaryWindow) -or
+                -not [CleanMachinePathNative]::IsWindowVisible($primaryWindow) -or
+                [CleanMachinePathNative]::FindVisibleWindow([uint32]$primary.process.Id, "ESPConfig Designer") -ne $primaryWindow) {
+                throw "Manual window restore did not recover the exact primary window"
+            }
             Stop-ExactStartupPrimary $primary $port
 
             $beforeWorkspace = Get-TreeIdentity $script:StartupWorkspaceRoot
@@ -2156,18 +2197,23 @@ function Invoke-StartupScenario([object]$Register, [object]$Observed, [string]$M
         $requiredChecks = @(
             "artifact_identity", "preflight_receipt", "clean_vm_attestation", "root_ownership", "isolated_roots",
             "installed_application_hash", "installed_resources", "natural_cold_burst", "widened_startup_guard", "no_early_writes",
-            "single_primary_backend_listener", "secondary_exit_zero", "warm_focus_restore_manual", "foreign_listener_8099",
+            "single_primary_backend_listener", "secondary_exit_zero", "manual_window_restore", "foreign_listener_8099",
             "forced_primary_job_cleanup", "abandoned_guard_takeover", "interrupted_job_reconciliation", "graceful_close",
             "startup_guard_timeout", "final_cleanup"
         )
         $checks = @($requiredChecks | ForEach-Object { [ordered]@{ name = $_; status = "pass"; summary = "$evidence verified the Startup contract: $_" } })
+        $state | Add-Member -NotePropertyName automaticWarmRestoreObserved -NotePropertyValue ([bool]$automaticWarmRestoreObserved)
         $state.state = "completed"
         $state | Add-Member -NotePropertyName completedAtUtc -NotePropertyValue ([DateTime]::UtcNow.ToString("o"))
         Write-StartupOwnedState $statePath $state
-        $report = New-StartupReport $Register $Observed $MatrixEntry $RunId $RegisterHash $MatrixHash $startedAt $checks $cleanVm
+        $report = New-StartupReport $Register $Observed $MatrixEntry $RunId $RegisterHash $MatrixHash $startedAt $checks $acceptedWarnings $cleanVm
         Assert-Report ([pscustomobject]$report) $Register $Observed $MatrixEntry $RunId
         Write-NewJsonFile $ReportPath $report
-        Write-Host "[info] Startup scenario: PASS"
+        if ($acceptedWarnings.Count -gt 0) {
+            Write-Host "[info] Startup blocking checks: 20 passed; accepted warnings: $($acceptedWarnings.Count)"
+        } else {
+            Write-Host "[info] Startup scenario: PASS (20 blocking checks passed)"
+        }
     } catch { $scenarioFailure = $_ } finally {
         if ($foreignListener) { try { $foreignListener.Stop() } catch { $cleanupErrors.Add($_.Exception.Message) } }
         if ($externalMutex -ne [IntPtr]::Zero) {
@@ -2276,7 +2322,7 @@ function Assert-Report([object]$Report, [object]$Register, [object]$Observed, [s
         @(
             "artifact_identity", "preflight_receipt", "clean_vm_attestation", "root_ownership", "isolated_roots",
             "installed_application_hash", "installed_resources", "natural_cold_burst", "widened_startup_guard",
-            "no_early_writes", "single_primary_backend_listener", "secondary_exit_zero", "warm_focus_restore_manual",
+            "no_early_writes", "single_primary_backend_listener", "secondary_exit_zero", "manual_window_restore",
             "foreign_listener_8099", "forced_primary_job_cleanup", "abandoned_guard_takeover",
             "interrupted_job_reconciliation", "graceful_close", "startup_guard_timeout", "final_cleanup"
         )
@@ -2292,6 +2338,22 @@ function Assert-Report([object]$Report, [object]$Register, [object]$Observed, [s
     }
     if ($Report.scenario -eq "Startup" -and $checks.Count -ne $required.Count) {
         throw "Startup report must contain exactly the 20 required checks"
+    }
+    if ($Report.scenario -eq "Startup") {
+        if ($null -eq $Report.acceptedWarnings) { throw "Startup report is missing acceptedWarnings" }
+        $acceptedWarnings = @($Report.acceptedWarnings)
+        if ($acceptedWarnings.Count -gt 1) { throw "Startup accepted warning contract is invalid" }
+        foreach ($warning in $acceptedWarnings) {
+            if ($warning.name -ne "automatic_warm_restore_focus" -or $warning.status -ne "accepted_warning" -or
+                $warning.reasonCode -ne "windows_minimized_activation_not_observed" -or
+                [string]::IsNullOrWhiteSpace([string]$warning.summary)) {
+                throw "Startup accepted warning contract is invalid"
+            }
+        }
+        $expectedOutcome = if ($acceptedWarnings.Count -eq 1) { "pass_with_accepted_warning" } else { "pass" }
+        if ($Report.outcome -ne $expectedOutcome -or $Report.blockingChecksPassed -ne 20 -or $Report.blockingChecksTotal -ne 20) {
+            throw "Startup blocking-result summary is invalid"
+        }
     }
     if ($ContractTest -and $Report.scenario -eq "Startup" -and
         @($checks | Where-Object { -not ([string]$_.summary).StartsWith("Contract simulation", [StringComparison]::Ordinal) }).Count -gt 0) {
@@ -2350,6 +2412,11 @@ function Assert-Report([object]$Report, [object]$Register, [object]$Observed, [s
             [string]::IsNullOrWhiteSpace([string]$state.workspaceRoot) -or
             [string]::IsNullOrWhiteSpace([string]$state.appDataRoot)) {
             throw "Startup PASS report does not have a completed bound startup state"
+        }
+        if ($null -eq $state.automaticWarmRestoreObserved -or $state.automaticWarmRestoreObserved.GetType() -ne [bool] -or
+            ([bool]$state.automaticWarmRestoreObserved -and @($Report.acceptedWarnings).Count -ne 0) -or
+            (-not [bool]$state.automaticWarmRestoreObserved -and @($Report.acceptedWarnings).Count -ne 1)) {
+            throw "Startup report does not match the bound automatic restore observation"
         }
         if (($ContractTest -and ($Report.cleanVmAttestationSha256 -ne "contract_test" -or $Report.hostRunNonce -ne "contract_test")) -or
             (-not $ContractTest -and ($Report.cleanVmAttestationSha256 -notmatch $sha256Pattern -or $Report.hostRunNonce -notmatch $sha256Pattern))) {

@@ -90,11 +90,18 @@ Assert-True ($tauriMainSource -match 'fn handle_second_instance[\s\S]*?activate_
 $secondInstanceBody = [regex]::Match($tauriMainSource, '(?s)fn handle_second_instance\b.*?(?=\r?\nfn )').Value
 Assert-True ($secondInstanceBody.Contains('run_on_main_thread')) "Single-instance activation must cross the Tauri main-thread boundary"
 Assert-True ($tauriMainSource.Contains('IsIconic') -and $tauriMainSource.Contains('ShowWindow') -and $tauriMainSource.Contains('SW_RESTORE')) "Windows single-instance activation must restore the exact minimized native window"
+$nativeRestoreIndex = $secondInstanceBody.IndexOf('restore_minimized_window_on_windows(&window)')
+$mainThreadActivationIndex = $secondInstanceBody.IndexOf('run_on_main_thread')
+Assert-True ($nativeRestoreIndex -ge 0 -and $nativeRestoreIndex -lt $mainThreadActivationIndex) "Windows minimized restore must complete synchronously before queued Tauri activation"
 Assert-True ($tauriMainSource -match 'fn focus\(&self\)[\s\S]{0,200}WebviewWindow::set_focus') "Single-instance activation must retain Tauri's Windows focus fallback"
 Assert-True ($desktopPackage.scripts.'test:tauri-simultaneous-start' -eq "powershell -ExecutionPolicy Bypass -File tests/tauri-simultaneous-start.test.ps1") "Simultaneous startup command is missing"
 Assert-True ($simultaneousStartTestSource.Contains('ECD_TAURI_TEST_STARTUP_GUARD_HOLD_MS')) "Simultaneous startup gate must widen the guarded window deterministically"
 Assert-True ($simultaneousStartTestSource.Contains('Wait-StartupGuardOwned $primary')) "Simultaneous startup gate must prove primary guard ownership before launching secondary"
 Assert-True ($simultaneousStartTestSource.Contains('Wait-StartupGuardOwned $crashedPrimary')) "Crash gate must prove primary guard ownership before launching takeover"
+Assert-True ($simultaneousStartTestSource.Contains('Test-WarmSecondLaunch') -and $simultaneousStartTestSource.Contains('accepted warning') -and $simultaneousStartTestSource.Contains('IsIconic($window)')) "Simultaneous startup gate must retain warm-launch safety checks while accepting an unobserved restore warning"
+Assert-True (-not $simultaneousStartTestSource.Contains('foreach ($iteration in 1..5)')) "Simultaneous startup gate must not spend repeated cycles trying to prove exact-HWND restore"
+Assert-True ($simultaneousStartTestSource.Contains('Get-SyntheticTreeIdentity') -and $simultaneousStartTestSource.Contains('Warm second launch changed workspace or app-data') -and $simultaneousStartTestSource.Contains('Warm second launch changed listener ownership')) "Simultaneous startup gate must preserve synthetic data trees and exact listener ownership across warm launch"
+Assert-True (-not $simultaneousStartTestSource.Contains('$hash = "locked"')) "Warm-launch data identity must fail closed on unexpected unreadable files"
 Assert-True ($simultaneousStartTestSource.Contains('Process did not recover the abandoned startup guard')) "Simultaneous startup gate must cover primary crash recovery"
 Assert-True ($simultaneousStartTestSource.Contains('Startup guard timeout failed open')) "Simultaneous startup gate must cover fail-closed timeout"
 Assert-True (-not $simultaneousStartTestSource.Contains('MainWindowHandle')) "Startup error cleanup must not target the plugin IPC window through Process.MainWindowHandle"

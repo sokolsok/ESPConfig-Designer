@@ -66,7 +66,8 @@ updates, and Watchtower.
 There is no public Windows release yet. The current NSIS package is an unsigned
 development/test artifact and must not be presented or redistributed as a
 release. See the [Windows installation status](docs/installation/windows.md) or
-the [Desktop development guide](docs/development/desktop.md).
+the [Desktop development guide](docs/development/desktop.md). Accepted release
+limitations are listed in [Known Issues](KNOWN_ISSUES.md).
 
 The planned `1.4.0` target is Windows 10 22H2 Home and Pro x64 and Windows 11
 25H2 Home and Pro x64, subject to final clean-machine verification. Windows

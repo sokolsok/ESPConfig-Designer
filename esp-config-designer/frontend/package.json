@@ -22,7 +22,7 @@
     "@tauri-apps/plugin-opener": "2.2.6",
     "esptool-js": "^0.6.0",
     "highlight.js": "^11.11.1",
-    "js-yaml": "^5.2.1",
+    "js-yaml": "^5.3.0",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },

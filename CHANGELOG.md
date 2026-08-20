@@ -9,7 +9,7 @@
 * Reconciled interrupted jobs safely after backend restarts and prevented multiple backend processes from sharing one job directory.
 * Added fail-closed 30-day cleanup for verified incompatible-cache recovery records while preserving active cache, builds, and workspace data.
 * Aligned the direct Windows launcher with the normal `%USERPROFILE%\Documents\ecd_workspace` default.
-* Added normal warm second-launch handling that activates the existing Desktop window without starting a second backend.
+* Added warm second-launch handling that preserves one Desktop backend; restoring or focusing an already minimized window remains a known Windows limitation.
 * Added a bounded Windows startup serialization guard around single-instance plugin initialization, including crash recovery, fail-closed timeout handling, and simultaneous-start process gates.
 * Added a restrictive Desktop Content Security Policy for the loopback-hosted UI and a WebView2 enforcement gate without changing Home Assistant or standalone responses.
 * Configured the Windows installer to obtain the official Microsoft WebView2 bootstrapper when the runtime is missing.

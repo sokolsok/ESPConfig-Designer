@@ -132,6 +132,84 @@ function Close-StartupErrorDialog([System.Diagnostics.Process]$Process) {
     throw "Controlled startup error dialog did not appear"
 }
 
+function Get-SyntheticTreeIdentity([string]$Root, [bool]$IsAppData = $false) {
+    $entries = @()
+    foreach ($directory in @(Get-ChildItem -LiteralPath $Root -Directory -Recurse -Force | Sort-Object FullName)) {
+        $relativePath = $directory.FullName.Substring($Root.Length + 1).Replace("\", "/")
+        if ($IsAppData -and ($relativePath -eq "webview" -or $relativePath.StartsWith("webview/", [StringComparison]::OrdinalIgnoreCase))) { continue }
+        $entries += [ordered]@{
+            type = "directory"
+            path = $relativePath
+            length = [int64]0
+            sha256 = ""
+        }
+    }
+    foreach ($file in @(Get-ChildItem -LiteralPath $Root -File -Recurse -Force | Sort-Object FullName)) {
+        $relativePath = $file.FullName.Substring($Root.Length + 1).Replace("\", "/")
+        if ($IsAppData -and (($relativePath.StartsWith("webview/", [StringComparison]::OrdinalIgnoreCase)) -or
+            $relativePath -eq "j/.ecd-job-directory.lock")) { continue }
+        $entries += [ordered]@{
+            type = "file"
+            path = $relativePath
+            length = [int64]$file.Length
+            sha256 = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256 -ErrorAction Stop).Hash
+        }
+    }
+    return ($entries | ConvertTo-Json -Depth 4 -Compress)
+}
+
+function Wait-SyntheticTreesStable([string]$Root) {
+    $deadline = [DateTime]::UtcNow.AddSeconds(10)
+    $workspaceRoot = Join-Path $Root "workspace"
+    $appDataRoot = Join-Path $Root "appdata"
+    $previousWorkspace = Get-SyntheticTreeIdentity $workspaceRoot
+    $previousAppData = Get-SyntheticTreeIdentity $appDataRoot $true
+    while ([DateTime]::UtcNow -lt $deadline) {
+        Start-Sleep -Milliseconds 500
+        $workspace = Get-SyntheticTreeIdentity $workspaceRoot
+        $appData = Get-SyntheticTreeIdentity $appDataRoot $true
+        if ($workspace -ceq $previousWorkspace -and $appData -ceq $previousAppData) {
+            return [pscustomobject]@{ workspace = $workspace; appData = $appData }
+        }
+        $previousWorkspace = $workspace
+        $previousAppData = $appData
+    }
+    throw "Synthetic workspace and app-data did not become stable before warm launch"
+}
+
+function Test-WarmSecondLaunch([System.Diagnostics.Process]$Primary, [string]$Root, [int]$Port) {
+    $window = [StartupGuardNative]::FindVisibleWindowByTitle([uint32]$Primary.Id, "ESPConfig Designer")
+    Assert-True ($window -ne [IntPtr]::Zero) "Warm launch could not resolve the exact primary window"
+    $stableTrees = Wait-SyntheticTreesStable $Root
+    $workspaceBefore = $stableTrees.workspace
+    $appDataBefore = $stableTrees.appData
+    $listenerBefore = @(Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue)
+    Assert-True ($listenerBefore.Count -eq 1) "Warm second launch requires one exact listener before launch"
+    $listenerOwnerBefore = [int]$listenerBefore[0].OwningProcess
+    [StartupGuardNative]::ShowWindow($window, 6) | Out-Null
+    Assert-True ([StartupGuardNative]::IsIconic($window)) "Warm launch did not minimize the exact primary window"
+    $warm = [System.Diagnostics.Process]::Start((New-TauriStartInfo $Root $Port))
+    $processes.Add($warm)
+    Assert-True ($warm.WaitForExit(30000)) "Warm second launch did not exit"
+    Assert-True ($warm.ExitCode -eq 0) "Warm second launch failed with code $($warm.ExitCode)"
+    Assert-True (-not $Primary.HasExited) "Warm second launch terminated the exact primary"
+    $listenerAfter = @(Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue)
+    Assert-True ($listenerAfter.Count -eq 1 -and [int]$listenerAfter[0].OwningProcess -eq $listenerOwnerBefore) "Warm second launch changed listener ownership"
+    $workspaceAfter = Get-SyntheticTreeIdentity (Join-Path $Root "workspace")
+    $appDataAfter = Get-SyntheticTreeIdentity (Join-Path $Root "appdata") $true
+    Assert-True ($workspaceAfter -ceq $workspaceBefore -and $appDataAfter -ceq $appDataBefore) "Warm second launch changed workspace or app-data"
+    $restoreDeadline = [DateTime]::UtcNow.AddSeconds(10)
+    while ([DateTime]::UtcNow -lt $restoreDeadline -and
+        ([StartupGuardNative]::IsIconic($window) -or [StartupGuardNative]::GetForegroundWindow() -ne $window)) {
+        Start-Sleep -Milliseconds 25
+    }
+    if ([StartupGuardNative]::IsIconic($window) -or [StartupGuardNative]::GetForegroundWindow() -ne $window) {
+        Write-Warning "Warm restore/focus accepted warning: the exact minimized primary window was not restored within ten seconds"
+        return $false
+    }
+    return $true
+}
+
 if (-not ("StartupGuardNative" -as [type])) {
     Add-Type @"
 using System;
@@ -154,6 +232,12 @@ public static class StartupGuardNative {
     private static extern uint GetWindowThreadProcessId(IntPtr window, out uint processId);
     [DllImport("user32.dll")]
     private static extern bool IsWindowVisible(IntPtr window);
+    [DllImport("user32.dll")]
+    public static extern bool IsIconic(IntPtr window);
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetForegroundWindow();
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern bool ShowWindow(IntPtr window, int command);
     [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern int GetWindowTextLengthW(IntPtr window);
     [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
@@ -209,6 +293,7 @@ $externalMutex = [IntPtr]::Zero
 $foreignListener = $null
 $cleanupErrors = New-Object System.Collections.Generic.List[string]
 $testFailure = $null
+$warmRestoreObserved = $true
 try {
     $simultaneousRoot = New-TestRoot "simultaneous"
     $roots.Add($simultaneousRoot)
@@ -260,11 +345,7 @@ try {
     $crashHealth = Wait-DesktopHealth $takeover $crashPort
     Assert-True ($crashHealth.mode -eq "desktop") "Process did not recover the abandoned startup guard"
     Assert-OneListener $crashPort
-    $warm = [System.Diagnostics.Process]::Start((New-TauriStartInfo $crashRoot $crashPort))
-    $processes.Add($warm)
-    Assert-True ($warm.WaitForExit(30000)) "Warm second launch did not exit"
-    Assert-True ($warm.ExitCode -eq 0) "Warm second launch failed with code $($warm.ExitCode)"
-    Assert-True (-not $takeover.HasExited) "Warm second launch terminated the recovered primary"
+    $warmRestoreObserved = Test-WarmSecondLaunch $takeover $crashRoot $crashPort
     Assert-OneListener $crashPort
     Stop-ProcessTree $takeover
     Wait-NoListener $crashPort
@@ -365,4 +446,8 @@ if ($cleanupErrors.Count -gt 0) {
     throw ("Simultaneous-start cleanup failed:`n- " + ($cleanupErrors -join "`n- "))
 }
 
-Write-Host "tauri simultaneous startup guard: PASS"
+if ($warmRestoreObserved) {
+    Write-Host "tauri simultaneous startup guard: PASS"
+} else {
+    Write-Host "tauri simultaneous startup guard: blocking checks PASS; accepted warning: automatic warm restore/focus not observed"
+}

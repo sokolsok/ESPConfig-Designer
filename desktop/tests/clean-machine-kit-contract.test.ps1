@@ -75,8 +75,13 @@ $startupScenarioBody = [regex]::Match($orchestratorSource, '(?s)function Invoke-
 Assert-True ($startupScenarioBody -match '(?s)\$coldOne = Prepare-OwnedStartupProcess.*?\$coldTwo = Prepare-OwnedStartupProcess.*?Resume-OwnedStartupProcess \$coldOne.*?Resume-OwnedStartupProcess \$coldTwo') "Natural cold burst must prepare two separately owned suspended processes before either resume"
 Assert-True ($orchestratorSource.Contains('public static extern bool ShowWindow') -and $orchestratorSource.Contains('public static extern bool IsIconic') -and $startupScenarioBody.Contains('Minimize-ExactStartupWindow $primary')) "Warm focus evidence must minimize the exact primary window"
 $waitRestoredWindowBody = [regex]::Match($orchestratorSource, '(?s)function Wait-ExactStartupWindowRestored\b.*?(?=\r?\nfunction )').Value
-Assert-True ($waitRestoredWindowBody.Contains('AddSeconds(10)') -and $waitRestoredWindowBody.Contains('IsIconic') -and $waitRestoredWindowBody.Contains('IsWindowVisible') -and $waitRestoredWindowBody.Contains('FindVisibleWindow')) "Warm restore evidence must wait boundedly for the exact primary HWND and PID"
-Assert-True ($startupScenarioBody.Contains('Wait-ExactStartupWindowRestored $primary $primaryWindow')) "Warm launch must wait for its exact minimized primary window to be restored"
+Assert-True ($waitRestoredWindowBody.Contains('AddSeconds(10)') -and $waitRestoredWindowBody.Contains('IsIconic') -and $waitRestoredWindowBody.Contains('IsWindowVisible') -and $waitRestoredWindowBody.Contains('FindVisibleWindow') -and $waitRestoredWindowBody.Contains('GetForegroundWindow')) "Warm restore/focus evidence must wait boundedly for the exact primary HWND, PID, and foreground ownership"
+Assert-True ($waitRestoredWindowBody.Contains('return $false')) "An unobserved automatic warm restore must return an accepted-warning result instead of aborting Startup"
+Assert-True ($startupScenarioBody.Contains('$automaticWarmRestoreObserved = Wait-ExactStartupWindowRestored $primary $primaryWindow')) "Warm launch must record its bounded automatic restore observation"
+Assert-True ($startupScenarioBody.Contains('accepted_warning') -and $startupScenarioBody.Contains('automatic_warm_restore_focus')) "Startup must report an unobserved automatic restore/focus as an explicit accepted warning"
+Assert-True ($startupScenarioBody.Contains('Restore the existing window manually from the Windows taskbar')) "Startup must require manual taskbar recovery when automatic activation is not observed"
+Assert-True ($startupScenarioBody.Contains('Assert-TreeIdentity $warmWorkspaceBefore') -and $startupScenarioBody.Contains('Assert-TreeIdentity $warmAppDataBefore')) "Warm launch must preserve the workspace and app-data trees"
+Assert-True ($startupScenarioBody.Contains('Warm launch terminated the exact primary') -and $startupScenarioBody.Contains('Warm launch changed the exact backend or listener ownership')) "Warm launch must reverify the exact primary and backend/listener ownership"
 Assert-True ($startupScenarioBody.Contains('$startupListeners[0].OwningProcess') -and $startupScenarioBody.Contains('$pythonProcesses[0].ProcessId')) "Startup listener ownership must bind to the exact embedded Python backend PID"
 Assert-True ($startupScenarioBody.Contains('Both widened-guard Startup processes must remain alive while the guard is held')) "Widened Startup guard must require both processes to remain alive"
 Assert-True ($orchestratorSource.Contains('public static extern IntPtr CreateEventW') -and $orchestratorSource.Contains('ECD_TAURI_TEST_STARTUP_GUARD_RELEASE_EVENT') -and $orchestratorSource.Contains('ECD_TAURI_TEST_STARTUP_GUARD_OWNED_EVENT') -and ([regex]::Matches($startupScenarioBody, '\[CleanMachinePathNative\]::CreateEventW').Count -ge 2)) "Widened Startup guard must use harness-owned release and ownership events"
@@ -345,13 +350,15 @@ try {
     $requiredStartupChecks = @(
         "artifact_identity", "preflight_receipt", "clean_vm_attestation", "root_ownership", "isolated_roots",
         "installed_application_hash", "installed_resources", "natural_cold_burst", "widened_startup_guard",
-        "no_early_writes", "single_primary_backend_listener", "secondary_exit_zero", "warm_focus_restore_manual",
+        "no_early_writes", "single_primary_backend_listener", "secondary_exit_zero", "manual_window_restore",
         "foreign_listener_8099", "forced_primary_job_cleanup", "abandoned_guard_takeover",
         "interrupted_job_reconciliation", "graceful_close", "startup_guard_timeout", "final_cleanup"
     )
     Assert-True ($startupReport.result -eq "pass" -and $startupReport.evidenceClass -eq "contract_test") "Synthetic Startup did not produce a contract-test PASS"
     Assert-True ($startupReport.cleanVmAttestationSha256 -eq "contract_test" -and $startupReport.hostRunNonce -eq "contract_test") "Contract-test Startup attestation fields are invalid"
     Assert-True (@($startupReport.checks).Count -eq $requiredStartupChecks.Count) "Synthetic Startup report check count is invalid"
+    Assert-True (@($startupReport.acceptedWarnings).Count -eq 0) "Synthetic Startup PASS unexpectedly contains an accepted warning"
+    Assert-True ($startupReport.outcome -eq "pass" -and $startupReport.blockingChecksPassed -eq 20 -and $startupReport.blockingChecksTotal -eq 20) "Synthetic Startup blocking-result summary is invalid"
     foreach ($requiredCheck in $requiredStartupChecks) {
         Assert-True (@($startupReport.checks | Where-Object { $_.name -eq $requiredCheck -and $_.status -eq "pass" }).Count -eq 1) "Synthetic Startup report is missing required check: $requiredCheck"
     }
@@ -360,16 +367,48 @@ try {
     $startupReportArguments[[Array]::IndexOf($startupReportArguments, "-Scenario") + 1] = "Report"
     Invoke-Gate ($startupReportArguments + @("-GateRoot", $startupGate, "-ReportPath", $startupReportPath, "-ExpectedReportScenario", "Startup")) $true
 
+    $startupStatePath = Join-Path $startupGate "startup-owned-resources.json"
+    $startupOwnerPath = Join-Path $startupGate ".ecd-clean-machine-owner.json"
+    $startupStateBytes = [IO.File]::ReadAllBytes($startupStatePath)
+    $startupOwnerBytes = [IO.File]::ReadAllBytes($startupOwnerPath)
+
+    $acceptedWarningReport = Get-Content -LiteralPath $startupReportPath -Raw | ConvertFrom-Json
+    $acceptedWarningReport.acceptedWarnings = @([pscustomobject]@{
+        name = "automatic_warm_restore_focus"
+        status = "accepted_warning"
+        reasonCode = "windows_minimized_activation_not_observed"
+        summary = "Automatic restore/focus was not observed; manual taskbar restore passed"
+    })
+    $acceptedWarningReport.outcome = "pass_with_accepted_warning"
+    $acceptedWarningReportPath = Join-Path $startupGate "startup-accepted-warning.json"
+    Write-JsonFile $acceptedWarningReportPath $acceptedWarningReport
+    Invoke-Gate ($startupReportArguments + @("-GateRoot", $startupGate, "-ReportPath", $acceptedWarningReportPath, "-ExpectedReportScenario", "Startup")) $false "Startup report does not match"
+
+    $warningStartupState = Get-Content -LiteralPath $startupStatePath -Raw | ConvertFrom-Json
+    $warningStartupState.automaticWarmRestoreObserved = $false
+    Write-JsonFile $startupStatePath $warningStartupState
+    $warningStartupOwner = Get-Content -LiteralPath $startupOwnerPath -Raw | ConvertFrom-Json
+    $warningStartupOwner.startupStateSha256 = (Get-FileHash -LiteralPath $startupStatePath -Algorithm SHA256).Hash.ToLowerInvariant()
+    Write-JsonFile $startupOwnerPath $warningStartupOwner
+    Invoke-Gate ($startupReportArguments + @("-GateRoot", $startupGate, "-ReportPath", $acceptedWarningReportPath, "-ExpectedReportScenario", "Startup")) $true
+
+    Invoke-Gate ($startupReportArguments + @("-GateRoot", $startupGate, "-ReportPath", $startupReportPath, "-ExpectedReportScenario", "Startup")) $false "Startup report does not match"
+
+    $invalidWarningReport = Get-Content -LiteralPath $acceptedWarningReportPath -Raw | ConvertFrom-Json
+    $invalidWarningReport.acceptedWarnings[0].name = "duplicate_backend"
+    $invalidWarningReportPath = Join-Path $startupGate "startup-invalid-warning.json"
+    Write-JsonFile $invalidWarningReportPath $invalidWarningReport
+    Invoke-Gate ($startupReportArguments + @("-GateRoot", $startupGate, "-ReportPath", $invalidWarningReportPath, "-ExpectedReportScenario", "Startup")) $false "accepted warning contract"
+
+    [IO.File]::WriteAllBytes($startupStatePath, $startupStateBytes)
+    [IO.File]::WriteAllBytes($startupOwnerPath, $startupOwnerBytes)
+
     $missingStartupCheck = Get-Content -LiteralPath $startupReportPath -Raw | ConvertFrom-Json
     $missingStartupCheck.checks = @($missingStartupCheck.checks | Where-Object { $_.name -ne "abandoned_guard_takeover" })
     $missingStartupCheckPath = Join-Path $startupGate "startup-missing-check.json"
     Write-JsonFile $missingStartupCheckPath $missingStartupCheck
     Invoke-Gate ($startupReportArguments + @("-GateRoot", $startupGate, "-ReportPath", $missingStartupCheckPath, "-ExpectedReportScenario", "Startup")) $false "required check"
 
-    $startupStatePath = Join-Path $startupGate "startup-owned-resources.json"
-    $startupOwnerPath = Join-Path $startupGate ".ecd-clean-machine-owner.json"
-    $startupStateBytes = [IO.File]::ReadAllBytes($startupStatePath)
-    $startupOwnerBytes = [IO.File]::ReadAllBytes($startupOwnerPath)
     $tamperedStartupState = Get-Content -LiteralPath $startupStatePath -Raw | ConvertFrom-Json
     $tamperedStartupState.state = "active"
     Write-JsonFile $startupStatePath $tamperedStartupState

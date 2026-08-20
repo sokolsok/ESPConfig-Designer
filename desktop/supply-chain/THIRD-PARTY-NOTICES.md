@@ -182,7 +182,7 @@ All 98 records are shipped in the portable runtime. ESPHome and PlatformIO are d
 | fdir | 6.5.0 | MIT | build-only |
 | fsevents | 2.3.3 | MIT | build-only |
 | highlight.js | 11.11.1 | BSD-3-Clause | shipped |
-| js-yaml | 5.2.1 | MIT | shipped |
+| js-yaml | 5.3.0 | MIT | shipped |
 | lightningcss-android-arm64 | 1.32.0 | MPL-2.0 | build-only |
 | lightningcss-darwin-arm64 | 1.32.0 | MPL-2.0 | build-only |
 | lightningcss-darwin-x64 | 1.32.0 | MPL-2.0 | build-only |
@@ -196,11 +196,11 @@ All 98 records are shipped in the portable runtime. ESPHome and PlatformIO are d
 | lightningcss-win32-x64-msvc | 1.32.0 | MPL-2.0 | build-only |
 | lightningcss | 1.32.0 | MPL-2.0 | build-only |
 | magic-string | 0.30.21 | MIT | shipped |
-| nanoid | 3.3.15 | MIT | shipped |
+| nanoid | 3.3.18 | MIT | shipped |
 | pako | 2.1.0 | (MIT AND Zlib) | shipped |
 | picocolors | 1.1.1 | ISC | shipped |
 | picomatch | 4.0.5 | MIT | build-only |
-| postcss | 8.5.16 | MIT | shipped |
+| postcss | 8.5.26 | MIT | shipped |
 | rolldown | 1.1.4 | MIT | build-only |
 | source-map-js | 1.2.1 | BSD-3-Clause | shipped |
 | tinyglobby | 0.2.17 | MIT | build-only |

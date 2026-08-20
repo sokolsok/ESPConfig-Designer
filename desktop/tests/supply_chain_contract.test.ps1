@@ -114,6 +114,9 @@ foreach ($lockedLine in $lockLines) {
     Assert-True ($matches.Count -eq 1) "Supply-chain inventory does not match Python lock entry: $lockedLine"
     Assert-True ($matches[0].integrity.algorithm -eq "SHA-256" -and $matches[0].integrity.value -eq $lockHashes[$lockedLine]) "Supply-chain inventory hash does not match Python lock entry: $lockedLine"
 }
+$npmSupplyChainContract = Join-Path $PSScriptRoot "npm-supply-chain-contract.test.mjs"
+& node --test $npmSupplyChainContract
+Assert-True ($LASTEXITCODE -eq 0) "Supply-chain inventory does not match the npm lockfiles"
 foreach ($lockedCargo in @(
     @{ name = "tauri"; version = "2.11.5" },
     @{ name = "tauri-runtime-wry"; version = "2.11.4" },

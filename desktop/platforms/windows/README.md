@@ -114,23 +114,28 @@ clean VM.
 Startup-specific clean-VM attestation and host nonce. Production execution
 installs the exact registered NSIS package and verifies the installed executable,
 complete resource payload, resource layout, runtime payload, and supply-chain
-projections. It then runs the
-natural and deterministically widened cold-start cases, warm restore/focus,
-foreign port `8099`, forced-primary Job Object cleanup, abandoned-guard takeover,
-interrupted validation-job reconciliation, graceful close, and fail-closed guard
-timeout. Every application process is created suspended and assigned to a
-separate kill-on-close Job Object before resume. Manual focus confirmation is
-required in the interactive session; automated process evidence cannot replace
-it.
+projections. It then runs the natural and deterministically widened cold-start
+cases, warm second launch, foreign port `8099`, forced-primary Job Object
+cleanup, abandoned-guard takeover, interrupted validation-job reconciliation,
+graceful close, and fail-closed guard timeout. Every application process is
+created suspended and assigned to a separate kill-on-close Job Object before
+resume. Interactive focus evidence remains useful, but failure to restore or
+focus an already minimized primary is an accepted `1.4.0` warning when all
+single-instance safety assertions pass.
 
 The Startup contract copies and hashes the approved synthetic fixture without
 printing or parsing its YAML. Its one real interrupted action is `validate`, not
-compile, OTA, serial, logs, or an offline flow. A final PASS requires all twenty
-Startup checks, completed bound state, no owned processes or listener, successful
-uninstall, and marker-verified cleanup. `-ContractTest` exercises only parser,
-state, ownership, report, and cleanup behavior and labels every check as a
-contract simulation; it does not launch the synthetic executable or claim GUI,
-Job Object, NSIS, or clean-machine evidence.
+compile, OTA, serial, logs, or an offline flow. Pre-signing acceptance requires
+every blocking check, completed bound state, no owned processes or listener,
+successful uninstall, and marker-verified cleanup. An unobserved minimized-window
+restore/focus may be recorded only as the accepted warning documented in
+`KNOWN_ISSUES.md`; the report uses `outcome=pass_with_accepted_warning`, binds
+the observation into the completed Startup state, and must not call that result
+`20/20 PASS`. The top-level `result=pass` means only that all blocking checks
+passed; consumers must also inspect `outcome` and `acceptedWarnings`.
+`-ContractTest` exercises only parser, state, ownership, report, and cleanup
+behavior and labels every check as a contract simulation; it does not launch the
+synthetic executable or claim GUI, Job Object, NSIS, or clean-machine evidence.
 
 `desktop/scripts/build-clean-machine-kit.ps1` creates a separate portable test
 artifact from a fixed allowlist read from the exact committed Git archive. The
@@ -472,6 +477,11 @@ discovery, download, notification, or updater UI.
 - first-compile PlatformIO downloads still require network and clean-machine
   verification;
 - no Linux or macOS Desktop runtime/package gates.
+
+The intermittent failure to restore or focus an already minimized primary
+window is not a `1.4.0` signing blocker. It is an accepted warning documented in
+`KNOWN_ISSUES.md`. Duplicate backend/listener creation, primary termination,
+data-safety failures, or incomplete cleanup remain release blockers.
 
 The planned public matrix is Windows 10 22H2 Home and Pro x64 and Windows 11
 25H2 Home and Pro x64. It does not become a support claim until the exact final
