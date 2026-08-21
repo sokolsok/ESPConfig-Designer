@@ -1245,15 +1245,29 @@ function Assert-StartupMutexAbsent {
 function Close-ExactStartupWindow([object]$OwnedProcess, [string]$Title, [bool]$RequireZeroExit, [string]$RequiredText = "", [int]$GuardedPort = 0) {
     $deadline = [DateTime]::UtcNow.AddSeconds(30)
     $window = [IntPtr]::Zero
+    $windowReady = $false
     while ([DateTime]::UtcNow -lt $deadline -and -not $OwnedProcess.process.HasExited) {
         if ($GuardedPort -gt 0 -and @(Get-NetTCPConnection -LocalAddress "127.0.0.1" -LocalPort $GuardedPort -State Listen -ErrorAction SilentlyContinue).Count -ne 0) {
             throw "Startup created a listener while the external guard remained held"
         }
         $window = [CleanMachinePathNative]::FindVisibleWindow([uint32]$OwnedProcess.process.Id, $Title)
-        if ($window -ne [IntPtr]::Zero) { break }
+        if ($window -ne [IntPtr]::Zero -and
+            (-not $RequiredText -or [CleanMachinePathNative]::WindowHasChildTextContaining($window, $RequiredText))) {
+            if ($OwnedProcess.process.HasExited -or [DateTime]::UtcNow -ge $deadline) { break }
+            $windowReady = $true
+            break
+        }
         Start-Sleep -Milliseconds 100
     }
-    if ($window -eq [IntPtr]::Zero) { throw "Exact Startup window '$Title' was unavailable" }
+    if (-not $windowReady) {
+        if ($window -eq [IntPtr]::Zero) { throw "Exact Startup window '$Title' was unavailable" }
+        if ($RequiredText) { throw "Exact Startup window '$Title' did not contain the required controlled error" }
+        throw "Exact Startup window '$Title' was not ready before the deadline"
+    }
+    if ($OwnedProcess.process.HasExited -or
+        [CleanMachinePathNative]::FindVisibleWindow([uint32]$OwnedProcess.process.Id, $Title) -ne $window) {
+        throw "Exact Startup window '$Title' no longer belongs to the expected live process"
+    }
     if ($RequiredText -and -not [CleanMachinePathNative]::WindowHasChildTextContaining($window, $RequiredText)) {
         throw "Exact Startup window '$Title' did not contain the required controlled error"
     }
