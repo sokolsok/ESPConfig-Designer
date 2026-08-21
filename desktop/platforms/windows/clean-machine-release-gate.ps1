@@ -56,7 +56,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 public static class CleanMachinePathNative {
     private delegate bool EnumWindowsProc(IntPtr window, IntPtr parameter);
-    private delegate bool EnumChildProc(IntPtr window, IntPtr parameter);
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern IntPtr CreateFileW(string name, uint access, uint share, IntPtr security, uint creation, uint flags, IntPtr template);
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
@@ -89,8 +88,6 @@ public static class CleanMachinePathNative {
     public static extern uint WaitForSingleObject(IntPtr handle, uint milliseconds);
     [DllImport("user32.dll", SetLastError = true)]
     private static extern bool EnumWindows(EnumWindowsProc callback, IntPtr parameter);
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern bool EnumChildWindows(IntPtr parent, EnumChildProc callback, IntPtr parameter);
     [DllImport("user32.dll")]
     private static extern uint GetWindowThreadProcessId(IntPtr window, out uint processId);
     [DllImport("user32.dll")]
@@ -160,20 +157,6 @@ public static class CleanMachinePathNative {
         }, IntPtr.Zero);
         return found;
     }
-    public static bool WindowHasChildTextContaining(IntPtr parent, string expectedText) {
-        bool found = false;
-        EnumChildWindows(parent, delegate(IntPtr window, IntPtr parameter) {
-            int length = GetWindowTextLengthW(window);
-            if (length == 0) return true;
-            StringBuilder text = new StringBuilder(length + 1);
-            if (GetWindowTextW(window, text, text.Capacity) == length && text.ToString().Contains(expectedText)) {
-                found = true;
-                return false;
-            }
-            return true;
-        }, IntPtr.Zero);
-        return found;
-    }
     public static IntPtr CreateKillOnCloseJob() {
         IntPtr job = CreateJobObjectW(IntPtr.Zero, null);
         if (job == IntPtr.Zero) throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
@@ -238,6 +221,46 @@ public static class CleanMachinePathNative {
     }
     public static bool CloseOwnedHandle(IntPtr handle) { return CloseHandle(handle); }
     public static int LastError() { return Marshal.GetLastWin32Error(); }
+}
+"@
+}
+
+if (-not ("CleanMachineUiAutomation" -as [type])) {
+    Add-Type -AssemblyName UIAutomationClient
+    Add-Type -AssemblyName UIAutomationTypes
+    $uiAutomationReferences = @(
+        [System.Windows.Automation.AutomationElement].Assembly.Location,
+        [System.Windows.Automation.Condition].Assembly.Location,
+        [System.Windows.Automation.TreeScope].Assembly.Location,
+        [System.Windows.Automation.ElementNotAvailableException].Assembly.Location
+    ) | Select-Object -Unique
+    Add-Type -ReferencedAssemblies $uiAutomationReferences -TypeDefinition @"
+using System;
+using System.Windows.Automation;
+public static class CleanMachineUiAutomation {
+    public static bool WindowHasDescendantTextContaining(IntPtr parent, string expectedText) {
+        if (parent == IntPtr.Zero || String.IsNullOrEmpty(expectedText)) return false;
+        try {
+            AutomationElement root = AutomationElement.FromHandle(parent);
+            if (root == null) return false;
+            AutomationElementCollection descendants = root.FindAll(TreeScope.Descendants, Condition.TrueCondition);
+            foreach (AutomationElement element in descendants) {
+                try {
+                    string name = element.Current.Name;
+                    if (name != null && name.StartsWith(expectedText, StringComparison.Ordinal)) return true;
+                } catch (ElementNotAvailableException) {
+                    continue;
+                }
+            }
+        } catch (ElementNotAvailableException) {
+            return false;
+        } catch (InvalidOperationException) {
+            return false;
+        } catch (ArgumentException) {
+            return false;
+        }
+        return false;
+    }
 }
 "@
 }
@@ -1252,7 +1275,7 @@ function Close-ExactStartupWindow([object]$OwnedProcess, [string]$Title, [bool]$
         }
         $window = [CleanMachinePathNative]::FindVisibleWindow([uint32]$OwnedProcess.process.Id, $Title)
         if ($window -ne [IntPtr]::Zero -and
-            (-not $RequiredText -or [CleanMachinePathNative]::WindowHasChildTextContaining($window, $RequiredText))) {
+            (-not $RequiredText -or [CleanMachineUiAutomation]::WindowHasDescendantTextContaining($window, $RequiredText))) {
             if ($OwnedProcess.process.HasExited -or [DateTime]::UtcNow -ge $deadline) { break }
             $windowReady = $true
             break
@@ -1268,7 +1291,7 @@ function Close-ExactStartupWindow([object]$OwnedProcess, [string]$Title, [bool]$
         [CleanMachinePathNative]::FindVisibleWindow([uint32]$OwnedProcess.process.Id, $Title) -ne $window) {
         throw "Exact Startup window '$Title' no longer belongs to the expected live process"
     }
-    if ($RequiredText -and -not [CleanMachinePathNative]::WindowHasChildTextContaining($window, $RequiredText)) {
+    if ($RequiredText -and -not [CleanMachineUiAutomation]::WindowHasDescendantTextContaining($window, $RequiredText)) {
         throw "Exact Startup window '$Title' did not contain the required controlled error"
     }
     if (-not [CleanMachinePathNative]::PostMessageW($window, 0x0010, [UIntPtr]::Zero, [IntPtr]::Zero)) { throw "Could not close exact Startup window '$Title'" }
