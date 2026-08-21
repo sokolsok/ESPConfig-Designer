@@ -740,6 +740,57 @@ function Get-TreeIdentity([string]$Root, [string[]]$ExcludedRelativePaths = @())
     return [ordered]@{ fileCount = $entryArray.Count; aggregateSha256 = $aggregate; files = $entryArray }
 }
 
+function Wait-StartupDataTreesStable([object]$Primary, [string]$WorkspaceRoot, [string]$AppDataRoot, [string[]]$AppDataExclusions) {
+    $deadline = [DateTime]::UtcNow.AddSeconds(30)
+    $bootstrapPath = Join-Path $WorkspaceRoot "esp_projects\projects.json"
+    $previousWorkspace = $null
+    $previousAppData = $null
+    $stableSince = $null
+    while ([DateTime]::UtcNow -lt $deadline) {
+        if ($Primary.process.HasExited) { throw "Startup primary exited before its data trees became stable" }
+        if (-not (Test-Path -LiteralPath $bootstrapPath -PathType Leaf)) {
+            $previousWorkspace = $null
+            $previousAppData = $null
+            $stableSince = $null
+            Start-Sleep -Milliseconds 100
+            continue
+        }
+        $workspace = Get-TreeIdentity $WorkspaceRoot
+        $appData = Get-TreeIdentity $AppDataRoot $AppDataExclusions
+        if ([DateTime]::UtcNow -ge $deadline) { break }
+        if ($Primary.process.HasExited) { throw "Startup primary exited before its data trees became stable" }
+        if (-not (Test-Path -LiteralPath $bootstrapPath -PathType Leaf)) {
+            $previousWorkspace = $null
+            $previousAppData = $null
+            $stableSince = $null
+            Start-Sleep -Milliseconds 100
+            continue
+        }
+        if ($null -ne $previousWorkspace -and
+            $workspace.fileCount -eq $previousWorkspace.fileCount -and $workspace.aggregateSha256 -eq $previousWorkspace.aggregateSha256 -and
+            $appData.fileCount -eq $previousAppData.fileCount -and $appData.aggregateSha256 -eq $previousAppData.aggregateSha256) {
+            if ($null -eq $stableSince) { $stableSince = [DateTime]::UtcNow }
+            if ([DateTime]::UtcNow -lt $deadline -and ([DateTime]::UtcNow - $stableSince).TotalSeconds -ge 2) {
+                if (-not (Test-Path -LiteralPath $bootstrapPath -PathType Leaf)) {
+                    $previousWorkspace = $null
+                    $previousAppData = $null
+                    $stableSince = $null
+                    continue
+                }
+                if ($Primary.process.HasExited) { throw "Startup primary exited before its data trees became stable" }
+                if ([DateTime]::UtcNow -ge $deadline) { break }
+                return [pscustomobject]@{ workspace = $workspace; appData = $appData }
+            }
+        } else {
+            $stableSince = $null
+        }
+        $previousWorkspace = $workspace
+        $previousAppData = $appData
+        Start-Sleep -Milliseconds 250
+    }
+    throw "Startup Dashboard bootstrap and data trees did not become stable before warm launch"
+}
+
 function New-OwnedLifecycleRoot([string]$Root, [string]$Category, [string]$RunId, [string]$Nonce) {
     $parent = Split-Path -Parent $Root
     if (-not (Test-Path -LiteralPath $parent -PathType Container)) {
@@ -2023,9 +2074,10 @@ function Invoke-StartupScenario([object]$Register, [object]$Observed, [string]$M
                 throw "Exact 127.0.0.1:8099 listener is not owned by the exact installed embedded Python backend"
             }
 
-            $warmWorkspaceBefore = Get-TreeIdentity $script:StartupWorkspaceRoot
             $warmAppDataExclusions = @("webview", "j/.ecd-job-directory.lock")
-            $warmAppDataBefore = Get-TreeIdentity $script:StartupAppDataRoot $warmAppDataExclusions
+            $warmTrees = Wait-StartupDataTreesStable $primary $script:StartupWorkspaceRoot $script:StartupAppDataRoot $warmAppDataExclusions
+            $warmWorkspaceBefore = $warmTrees.workspace
+            $warmAppDataBefore = $warmTrees.appData
             $primaryWindow = Minimize-ExactStartupWindow $primary
             $warm = Start-OwnedStartupProcess $installedExecutable $script:StartupInstallRoot (New-StartupEnvironment $port)
             $ownedProcesses.Add($warm)
