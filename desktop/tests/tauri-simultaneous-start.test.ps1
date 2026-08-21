@@ -191,9 +191,19 @@ function Wait-SyntheticTreesStable([string]$Root) {
     throw "Synthetic Dashboard bootstrap and data trees did not become stable before warm launch"
 }
 
+function Wait-ExactPrimaryWindow([System.Diagnostics.Process]$Primary) {
+    $deadline = [DateTime]::UtcNow.AddSeconds(10)
+    while ([DateTime]::UtcNow -lt $deadline) {
+        if ($Primary.HasExited) { throw "Primary exited before its exact window became visible" }
+        $window = [StartupGuardNative]::FindVisibleWindowByTitle([uint32]$Primary.Id, "ESPConfig Designer")
+        if ($window -ne [IntPtr]::Zero) { return $window }
+        Start-Sleep -Milliseconds 100
+    }
+    throw "Warm launch could not resolve the exact primary window"
+}
+
 function Test-WarmSecondLaunch([System.Diagnostics.Process]$Primary, [string]$Root, [int]$Port) {
-    $window = [StartupGuardNative]::FindVisibleWindowByTitle([uint32]$Primary.Id, "ESPConfig Designer")
-    Assert-True ($window -ne [IntPtr]::Zero) "Warm launch could not resolve the exact primary window"
+    $window = Wait-ExactPrimaryWindow $Primary
     $stableTrees = Wait-SyntheticTreesStable $Root
     $workspaceBefore = $stableTrees.workspace
     $appDataBefore = $stableTrees.appData
