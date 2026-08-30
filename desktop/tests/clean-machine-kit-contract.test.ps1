@@ -19,13 +19,14 @@ function Invoke-Gate([string[]]$Arguments, [bool]$ShouldPass, [string]$ExpectedE
         $output = & "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" `
             -NoProfile -ExecutionPolicy Bypass -File $script:orchestrator @Arguments 2>&1
         $exitCode = $LASTEXITCODE
+        $script:lastGateOutput = $output
     } finally {
         $ErrorActionPreference = $previousPreference
     }
     if ($ShouldPass) {
         Assert-True ($exitCode -eq 0) "Gate unexpectedly failed: $($output -join "`n")"
     } else {
-        Assert-True ($exitCode -ne 0) "Gate unexpectedly accepted an invalid fixture"
+        Assert-True ($exitCode -ne 0) "Gate unexpectedly accepted an invalid fixture: $($Arguments -join ' ')"
         if ($ExpectedError) {
             $normalizedOutput = (($output -join "`n") -replace '\s+', ' ').Trim()
             $normalizedExpectedError = ($ExpectedError -replace '\s+', ' ').Trim()
@@ -123,6 +124,18 @@ foreach ($forbiddenStartupOverride in @(
 }
 Assert-True ($startupScenarioBody.Contains('Assert-StartupMutexAbsent') -and $orchestratorSource.Contains('LastError() -eq 183')) "Startup controlled mutex cases must reject a pre-existing production mutex"
 Assert-True ($orchestratorSource.Contains('resourcePayloadSha256')) "Startup artifact/report contract must bind the complete resource payload"
+$firmwareScenarioBody = [regex]::Match($orchestratorSource, '(?s)function Invoke-FirmwareScenario\b.*?(?=\r?\nfunction Assert-Report)').Value
+Assert-True (-not [string]::IsNullOrWhiteSpace($firmwareScenarioBody)) "Installed-artifact firmware scenario is missing"
+Assert-True ($firmwareScenarioBody.Contains('Assert-HostNetworkAttestation')) "Firmware phases must require host-controlled NIC attestations"
+Assert-True ($firmwareScenarioBody.Contains('Assert-GuestNetworkState')) "Firmware phases must independently verify guest connectivity state"
+Assert-True (-not $firmwareScenarioBody.Contains('HTTP_PROXY') -and -not $firmwareScenarioBody.Contains('HTTPS_PROXY') -and -not $firmwareScenarioBody.Contains('127.0.0.1:9')) "Firmware offline evidence must not use a hostile proxy"
+Assert-True ($orchestratorSource.Contains('firmware_node') -and $orchestratorSource.Contains('ecd-clean-machine')) "Firmware flow must require the unambiguous approved fixture node mapping"
+Assert-True ($orchestratorSource.Contains('/api/firmware') -and $orchestratorSource.Contains('variant=$variant') -and $orchestratorSource.Contains('@("ota", "factory")')) "Firmware flow must download both OTA and factory artifacts through the product API"
+Assert-True ($firmwareScenarioBody.Contains('/cancel')) "Firmware flow must exercise the product job-cancel API"
+Assert-True ($firmwareScenarioBody.Contains('Assert-Hash $fixtureDestination $Register.fixtureSha256 "firmware fixture after reboot replay"')) "Firmware online evidence must remeasure the fixture after reboot replay compilation"
+Assert-True ($firmwareScenarioBody.Contains('Assert-OwnedTreeSafeForRemoval $script:FirmwareInstallRoot')) "Firmware contract uninstall must reject reparse points and alternate streams"
+Assert-True ($firmwareScenarioBody.Contains('Assert-Hash $installedExecutable $Register.application.sha256 "firmware application before phase execution"')) "Every resumed firmware phase must verify the installed application before execution"
+Assert-True ($firmwareScenarioBody.Contains('"Firmware immutable install tree before phase execution"')) "Every resumed firmware phase must verify the complete install tree before execution"
 
 $exitProbe = Start-Process -FilePath "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" `
     -ArgumentList @("-NoProfile", "-Command", "Start-Sleep -Milliseconds 300; exit 37") -PassThru
@@ -334,6 +347,34 @@ try {
         ))
     }
 
+    function Get-FirmwareArguments(
+        [string]$Gate,
+        [string]$Label,
+        [string]$Stage,
+        [string]$Scenario,
+        [string]$BootId
+    ) {
+        $installRoot = Join-Path $root ("firmware-install-" + $Label)
+        $workspaceRoot = Join-Path $root ("firmware-workspace-" + $Label)
+        $appDataRoot = Join-Path $root ("firmware-appdata-" + $Label)
+        foreach ($ownedRoot in @($installRoot, $workspaceRoot, $appDataRoot)) {
+            $parent = Split-Path -Parent $ownedRoot
+            if (-not (Test-Path -LiteralPath $parent -PathType Container)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
+        }
+        $arguments = @($common)
+        $arguments[[Array]::IndexOf($arguments, "-Scenario") + 1] = $Scenario
+        $reportName = if ($Scenario -eq "FirmwareOnline") { "firmware-online.json" } else { "firmware-offline.json" }
+        return @($arguments + @(
+            "-GateRoot", $Gate,
+            "-ReportPath", (Join-Path $Gate $reportName),
+            "-FirmwareInstallRoot", $installRoot,
+            "-FirmwareWorkspaceRoot", $workspaceRoot,
+            "-FirmwareAppDataRoot", $appDataRoot,
+            "-FirmwareStage", $Stage,
+            "-ContractBootId", $BootId
+        ))
+    }
+
     function Set-ConsistentCheckpointBytes([string]$Gate, [byte[]]$Bytes) {
         $checkpointPath = Join-Path $Gate "lifecycle-reboot-checkpoint.json"
         [IO.File]::WriteAllBytes($checkpointPath, $Bytes)
@@ -385,6 +426,157 @@ try {
     $startupReportArguments = @($common)
     $startupReportArguments[[Array]::IndexOf($startupReportArguments, "-Scenario") + 1] = "Report"
     Invoke-Gate ($startupReportArguments + @("-GateRoot", $startupGate, "-ReportPath", $startupReportPath, "-ExpectedReportScenario", "Startup")) $true
+
+    $firmwareGate = New-PassingContractGate "firmware-pass"
+    $firmwareBegin = Get-FirmwareArguments $firmwareGate "pass" "OnlineBegin" "FirmwareOnline" "firmware-boot-before"
+    Invoke-Gate $firmwareBegin $true
+    $firmwareOnlineReportPath = Join-Path $firmwareGate "firmware-online.json"
+    Assert-True (-not (Test-Path -LiteralPath $firmwareOnlineReportPath)) "Firmware OnlineBegin wrote PASS before the reboot boundary"
+    Assert-True (Test-Path -LiteralPath (Join-Path $firmwareGate "firmware-checkpoint.json") -PathType Leaf) "Firmware OnlineBegin did not persist its checkpoint"
+
+    $firmwareSameBoot = Get-FirmwareArguments $firmwareGate "pass" "RebootResume" "FirmwareOnline" "firmware-boot-before"
+    Invoke-Gate $firmwareSameBoot $false "requires a real system reboot"
+    $firmwareReboot = Get-FirmwareArguments $firmwareGate "pass" "RebootResume" "FirmwareOnline" "firmware-boot-after"
+    Invoke-Gate $firmwareReboot $true
+    $firmwareOnlineReport = Get-Content -LiteralPath $firmwareOnlineReportPath -Raw | ConvertFrom-Json
+    $requiredFirmwareOnlineChecks = @(
+        "artifact_identity", "preflight_receipt", "clean_vm_attestation", "host_network_online", "root_ownership",
+        "isolated_roots", "fresh_cache_build", "approved_fixture", "silent_per_user_install", "installed_application_hash", "installed_resources", "immutable_install_tree",
+        "first_online_compile", "firmware_node_mapping", "firmware_download_hashes", "cache_replay", "application_restart",
+        "reboot_resume", "reboot_replay", "graceful_close"
+    )
+    Assert-True ($firmwareOnlineReport.result -eq "not_run" -and $firmwareOnlineReport.evidenceClass -eq "contract_test") "Synthetic FirmwareOnline did not remain explicitly NOT RUN"
+    Assert-True (@($firmwareOnlineReport.checks).Count -eq $requiredFirmwareOnlineChecks.Count) "Synthetic FirmwareOnline report check count is invalid"
+    foreach ($requiredCheck in $requiredFirmwareOnlineChecks) {
+        Assert-True (@($firmwareOnlineReport.checks | Where-Object { $_.name -eq $requiredCheck -and $_.status -eq "not_run" -and $_.reasonCode -eq "contract_test_no_production_execution" }).Count -eq 1) "Synthetic FirmwareOnline report is missing an explicit NOT RUN check: $requiredCheck"
+    }
+    Assert-True (@($firmwareOnlineReport.checks | Where-Object { -not ([string]$_.summary).StartsWith("Contract simulation") }).Count -eq 0) "Contract-test FirmwareOnline checks overclaim production execution"
+    Assert-True ($firmwareOnlineReport.networkState -eq "contract_test_not_observed" -and $firmwareOnlineReport.networkAttestations.onlineInitialSha256 -eq "contract_test" -and $firmwareOnlineReport.networkAttestations.onlineRebootSha256 -eq "contract_test") "Contract-test FirmwareOnline overclaims real network evidence"
+
+    $firmwareEarlyCancel = Get-FirmwareArguments $firmwareGate "pass" "Cancel" "FirmwareOffline" "firmware-boot-after"
+    Invoke-Gate $firmwareEarlyCancel $false "stale, replayed"
+    $firmwareOffline = Get-FirmwareArguments $firmwareGate "pass" "OfflineReplay" "FirmwareOffline" "firmware-boot-after"
+    Invoke-Gate $firmwareOffline $true
+    $firmwareOfflineReportPath = Join-Path $firmwareGate "firmware-offline.json"
+    Assert-True (-not (Test-Path -LiteralPath $firmwareOfflineReportPath)) "Firmware OfflineReplay wrote PASS before network restoration and cancel"
+
+    $firmwareCancel = Get-FirmwareArguments $firmwareGate "pass" "Cancel" "FirmwareOffline" "firmware-boot-after"
+    Invoke-Gate $firmwareCancel $true
+    $firmwareOfflineReport = Get-Content -LiteralPath $firmwareOfflineReportPath -Raw | ConvertFrom-Json
+    $requiredFirmwareOfflineChecks = @(
+        "artifact_identity", "preflight_receipt", "clean_vm_attestation", "host_network_offline", "guest_connectivity_absent",
+        "checkpoint_binding", "offline_cache_replay", "offline_firmware_hashes", "graceful_close", "host_network_restored",
+        "real_compile_cancel", "canceled_state", "fixture_unchanged", "no_job_descendants", "final_cleanup"
+    )
+    Assert-True ($firmwareOfflineReport.result -eq "not_run" -and $firmwareOfflineReport.evidenceClass -eq "contract_test") "Synthetic FirmwareOffline did not remain explicitly NOT RUN"
+    Assert-True (@($firmwareOfflineReport.checks).Count -eq $requiredFirmwareOfflineChecks.Count) "Synthetic FirmwareOffline report check count is invalid"
+    foreach ($requiredCheck in $requiredFirmwareOfflineChecks) {
+        Assert-True (@($firmwareOfflineReport.checks | Where-Object { $_.name -eq $requiredCheck -and $_.status -eq "not_run" -and $_.reasonCode -eq "contract_test_no_production_execution" }).Count -eq 1) "Synthetic FirmwareOffline report is missing an explicit NOT RUN check: $requiredCheck"
+    }
+    Assert-True (@($firmwareOfflineReport.checks | Where-Object { -not ([string]$_.summary).StartsWith("Contract simulation") }).Count -eq 0) "Contract-test FirmwareOffline checks overclaim production execution"
+    Assert-True ($firmwareOfflineReport.networkState -eq "contract_test_not_observed" -and $firmwareOfflineReport.networkAttestations.offlineDisconnectedSha256 -eq "contract_test" -and $firmwareOfflineReport.networkAttestations.onlineRestoredSha256 -eq "contract_test") "Contract-test FirmwareOffline overclaims real offline or restored-network evidence"
+
+    $firmwareReportArguments = @($common)
+    $firmwareReportArguments[[Array]::IndexOf($firmwareReportArguments, "-Scenario") + 1] = "Report"
+    Invoke-Gate ($firmwareReportArguments + @("-GateRoot", $firmwareGate, "-ReportPath", $firmwareOnlineReportPath, "-ExpectedReportScenario", "FirmwareOnline")) $true
+    Invoke-Gate ($firmwareReportArguments + @("-GateRoot", $firmwareGate, "-ReportPath", $firmwareOfflineReportPath, "-ExpectedReportScenario", "FirmwareOffline")) $true
+
+    $forgedContractPass = Get-Content -LiteralPath $firmwareOnlineReportPath -Raw | ConvertFrom-Json
+    $forgedContractPass.result = "pass"
+    foreach ($check in @($forgedContractPass.checks)) { $check.status = "pass" }
+    $forgedContractPassPath = Join-Path $firmwareGate "firmware-online-forged-pass.json"
+    Write-JsonFile $forgedContractPassPath $forgedContractPass
+    Invoke-Gate ($firmwareReportArguments + @("-GateRoot", $firmwareGate, "-ReportPath", $forgedContractPassPath, "-ExpectedReportScenario", "FirmwareOnline")) $false "must remain NOT RUN"
+
+    $invalidContractReason = Get-Content -LiteralPath $firmwareOnlineReportPath -Raw | ConvertFrom-Json
+    $invalidContractReason.checks[0].reasonCode = "synthetic_unapproved_reason"
+    $invalidContractReasonPath = Join-Path $firmwareGate "firmware-online-invalid-reason.json"
+    Write-JsonFile $invalidContractReasonPath $invalidContractReason
+    Invoke-Gate ($firmwareReportArguments + @("-GateRoot", $firmwareGate, "-ReportPath", $invalidContractReasonPath, "-ExpectedReportScenario", "FirmwareOnline")) $false "production-execution reason code"
+
+    $mixedContractStatus = Get-Content -LiteralPath $firmwareOnlineReportPath -Raw | ConvertFrom-Json
+    $mixedContractStatus.checks[0].status = "pass"
+    $mixedContractStatusPath = Join-Path $firmwareGate "firmware-online-mixed-status.json"
+    Write-JsonFile $mixedContractStatusPath $mixedContractStatus
+    Invoke-Gate ($firmwareReportArguments + @("-GateRoot", $firmwareGate, "-ReportPath", $mixedContractStatusPath, "-ExpectedReportScenario", "FirmwareOnline")) $false "checks must remain NOT RUN"
+
+    $completedOfflineReportHash = (Get-FileHash -LiteralPath $firmwareOfflineReportPath -Algorithm SHA256).Hash
+    Invoke-Gate $firmwareCancel $false "stale, replayed"
+    Assert-True ((Get-FileHash -LiteralPath $firmwareOfflineReportPath -Algorithm SHA256).Hash -ceq $completedOfflineReportHash) "Replayed Cancel replaced completed firmware evidence"
+
+    $missingFirmwareCheck = Get-Content -LiteralPath $firmwareOfflineReportPath -Raw | ConvertFrom-Json
+    $missingFirmwareCheck.checks = @($missingFirmwareCheck.checks | Where-Object { $_.name -ne "guest_connectivity_absent" })
+    $missingFirmwareCheckPath = Join-Path $firmwareGate "firmware-offline-missing-check.json"
+    Write-JsonFile $missingFirmwareCheckPath $missingFirmwareCheck
+    Invoke-Gate ($firmwareReportArguments + @("-GateRoot", $firmwareGate, "-ReportPath", $missingFirmwareCheckPath, "-ExpectedReportScenario", "FirmwareOffline")) $false "required check"
+
+    $overclaimedOfflineReport = Get-Content -LiteralPath $firmwareOfflineReportPath -Raw | ConvertFrom-Json
+    $overclaimedOfflineReport.networkState = "host_detached_guest_connectivity_absent_then_host_restored_guest_online"
+    $overclaimedOfflineReportPath = Join-Path $firmwareGate "firmware-offline-overclaim.json"
+    Write-JsonFile $overclaimedOfflineReportPath $overclaimedOfflineReport
+    Invoke-Gate ($firmwareReportArguments + @("-GateRoot", $firmwareGate, "-ReportPath", $overclaimedOfflineReportPath, "-ExpectedReportScenario", "FirmwareOffline")) $false "network evidence"
+
+    $unsanitizedFirmwareReport = Get-Content -LiteralPath $firmwareOfflineReportPath -Raw | ConvertFrom-Json
+    $unsanitizedFirmwareReport | Add-Member -NotePropertyName rawLog -NotePropertyValue "synthetic secret-bearing output"
+    $unsanitizedFirmwareReportPath = Join-Path $firmwareGate "firmware-offline-unsanitized.json"
+    Write-JsonFile $unsanitizedFirmwareReportPath $unsanitizedFirmwareReport
+    Invoke-Gate ($firmwareReportArguments + @("-GateRoot", $firmwareGate, "-ReportPath", $unsanitizedFirmwareReportPath, "-ExpectedReportScenario", "FirmwareOffline")) $false "sanitized schema allowlist"
+
+    foreach ($faultCase in @(
+        [ordered]@{ fault = "FirmwareNodeMismatch"; error = "firmware_node mapping" },
+        [ordered]@{ fault = "FirmwareHashMismatch"; error = "does not map uniquely to the exact build output" }
+    )) {
+        $label = $faultCase.fault.ToLowerInvariant()
+        $faultGate = New-PassingContractGate ("firmware-" + $label)
+        $faultArguments = Get-FirmwareArguments $faultGate $label "OnlineBegin" "FirmwareOnline" ("firmware-" + $label + "-boot")
+        Invoke-Gate ($faultArguments + @("-ContractFirmwareFault", $faultCase.fault)) $false $faultCase.error
+        $failureReportPath = Join-Path $faultGate "firmware-online.json"
+        Assert-True (Test-Path -LiteralPath $failureReportPath -PathType Leaf) "Firmware failure did not emit a sanitized report: $($script:lastGateOutput -join ' ')"
+        $failureReport = Get-Content -LiteralPath $failureReportPath -Raw | ConvertFrom-Json
+        Assert-True ($failureReport.result -eq "fail" -and @($failureReport.checks | Where-Object { $_.status -eq "fail" }).Count -eq 1) "Firmware failure report does not represent the failed execution"
+        Assert-True (-not ((Get-Content -LiteralPath $failureReportPath -Raw) -match '(?i)(traceback|exception|rawLog|authorization|cookie)')) "Firmware failure report leaked raw diagnostic or secret-bearing fields"
+        Invoke-Gate ($firmwareReportArguments + @("-GateRoot", $faultGate, "-ReportPath", $failureReportPath, "-ExpectedReportScenario", "FirmwareOnline")) $true
+        if ($faultCase.fault -eq "FirmwareNodeMismatch") {
+            $nestedFailureOverclaim = Get-Content -LiteralPath $failureReportPath -Raw | ConvertFrom-Json
+            $nestedFailureOverclaim.networkAttestations | Add-Member -NotePropertyName rawLog -NotePropertyValue "secret-bearing output"
+            $nestedFailureOverclaimPath = Join-Path $faultGate "firmware-online-unsanitized-failure.json"
+            Write-JsonFile $nestedFailureOverclaimPath $nestedFailureOverclaim
+            Invoke-Gate ($firmwareReportArguments + @("-GateRoot", $faultGate, "-ReportPath", $nestedFailureOverclaimPath, "-ExpectedReportScenario", "FirmwareOnline")) $false "sanitized schema allowlist"
+        }
+        Assert-True (-not (Test-Path -LiteralPath (Join-Path $root ("firmware-install-" + $label)))) "Firmware mapping/hash failure left its install root"
+        Assert-True (-not (Test-Path -LiteralPath (Join-Path $root ("firmware-workspace-" + $label)))) "Firmware mapping/hash failure left its workspace root"
+        Assert-True (-not (Test-Path -LiteralPath (Join-Path $root ("firmware-appdata-" + $label)))) "Firmware mapping/hash failure left its app-data root"
+    }
+
+    $offlineFaultGate = New-PassingContractGate "firmware-offline-overclaim"
+    $offlineFaultBegin = Get-FirmwareArguments $offlineFaultGate "offline-overclaim" "OnlineBegin" "FirmwareOnline" "offline-overclaim-before"
+    Invoke-Gate $offlineFaultBegin $true
+    $offlineFaultReboot = Get-FirmwareArguments $offlineFaultGate "offline-overclaim" "RebootResume" "FirmwareOnline" "offline-overclaim-after"
+    Invoke-Gate $offlineFaultReboot $true
+    $offlineFault = Get-FirmwareArguments $offlineFaultGate "offline-overclaim" "OfflineReplay" "FirmwareOffline" "offline-overclaim-after"
+    Invoke-Gate ($offlineFault + @("-ContractFirmwareFault", "OfflineConnectivityOverclaim")) $false "physical NIC disconnection"
+    Assert-True (-not (Test-Path -LiteralPath (Join-Path $root "firmware-workspace-offline-overclaim"))) "Rejected offline overclaim left its workspace root"
+    Assert-True (-not (Test-Path -LiteralPath (Join-Path $root "firmware-appdata-offline-overclaim"))) "Rejected offline overclaim left its app-data root"
+    $offlineFailureReport = Get-Content -LiteralPath (Join-Path $offlineFaultGate "firmware-offline.json") -Raw | ConvertFrom-Json
+    Assert-True ($offlineFailureReport.result -eq "fail") "Rejected offline overclaim did not replace partial evidence with a failure report"
+
+    $firmwareCleanupSentinel = Join-Path $root "firmware-cleanup-unowned-sentinel.txt"
+    [IO.File]::WriteAllText($firmwareCleanupSentinel, "must survive")
+    $firmwareCleanupGate = New-PassingContractGate "firmware-cleanup-independent"
+    $firmwareCleanupArguments = Get-FirmwareArguments $firmwareCleanupGate "cleanup-independent" "OnlineBegin" "FirmwareOnline" "firmware-cleanup-before"
+    Invoke-Gate ($firmwareCleanupArguments + @("-ContractFirmwareFault", "CleanupFirstResourceFailure")) $false "Synthetic firmware scenario failure"
+    Assert-True (Test-Path -LiteralPath $firmwareCleanupSentinel -PathType Leaf) "Firmware cleanup touched an unowned resource"
+    Assert-True (Test-Path -LiteralPath (Join-Path $root "firmware-install-cleanup-independent") -PathType Container) "Synthetic first firmware cleanup failure was not exercised"
+    Assert-True (-not (Test-Path -LiteralPath (Join-Path $root "firmware-workspace-cleanup-independent"))) "First firmware cleanup failure blocked workspace cleanup"
+    Assert-True (-not (Test-Path -LiteralPath (Join-Path $root "firmware-appdata-cleanup-independent"))) "First firmware cleanup failure blocked app-data cleanup"
+
+    $firmwareReparseGate = New-PassingContractGate "firmware-cleanup-reparse"
+    $firmwareReparseArguments = Get-FirmwareArguments $firmwareReparseGate "cleanup-reparse" "OnlineBegin" "FirmwareOnline" "firmware-reparse-before"
+    Invoke-Gate ($firmwareReparseArguments + @("-ContractFirmwareFault", "CleanupReparsePoint")) $false "Owned cleanup tree contains a reparse point"
+    $reparseSentinel = Join-Path $firmwareReparseGate "firmware-reparse-target\sentinel.txt"
+    Assert-True (Test-Path -LiteralPath $reparseSentinel -PathType Leaf) "Firmware cleanup traversed a reparse point into an external sentinel"
+    Assert-True (-not (Test-Path -LiteralPath (Join-Path $root "firmware-install-cleanup-reparse"))) "Unsafe workspace cleanup blocked independent install cleanup"
+    Assert-True (-not (Test-Path -LiteralPath (Join-Path $root "firmware-appdata-cleanup-reparse"))) "Unsafe workspace cleanup blocked independent app-data cleanup"
 
     $startupStatePath = Join-Path $startupGate "startup-owned-resources.json"
     $startupOwnerPath = Join-Path $startupGate ".ecd-clean-machine-owner.json"

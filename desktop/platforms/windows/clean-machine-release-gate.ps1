@@ -25,16 +25,24 @@ param(
     [string]$StartupInstallRoot = "",
     [string]$StartupWorkspaceRoot = "",
     [string]$StartupAppDataRoot = "",
+    [string]$FirmwareInstallRoot = "",
+    [string]$FirmwareWorkspaceRoot = "",
+    [string]$FirmwareAppDataRoot = "",
+    [ValidateSet("", "OnlineBegin", "RebootResume", "OfflineReplay", "Cancel")][string]$FirmwareStage = "",
     [ValidateSet("", "Begin", "Resume")][string]$LifecycleStage = "",
     [string]$ContractBootId = "",
     [string]$CleanVmAttestation = "",
     [string]$ExpectedCleanVmAttestationSha256 = "",
+    [string]$HostNetworkAttestation = "",
+    [string]$ExpectedHostNetworkAttestationSha256 = "",
     [ValidateSet(
         "", "ApplicationHashMismatch", "MutableInstallWrite", "UninstallLeavesInstall",
         "UninstallDeletesWorkspace", "UninstallDeletesAppData", "UninstallCorruptsRetainedData", "ReinstallLosesMarkers", "ForcedCleanupOnly",
         "CleanupFirstResourceFailure", "RootCreatedAfterAbsentCheck", "MutableInstallDirectoryWrite",
         "UninstallRemovesEmptyWorkspaceDirectory", "UnicodeRootCreatedBeforeClaim"
     )][string]$ContractLifecycleFault = "",
+    [ValidateSet("", "FirmwareNodeMismatch", "FirmwareHashMismatch", "OfflineConnectivityOverclaim", "CleanupFirstResourceFailure", "CleanupReparsePoint")]
+    [string]$ContractFirmwareFault = "",
     [switch]$ContractTest
 )
 
@@ -347,6 +355,11 @@ function Test-ExactStatus([string]$Value) {
     return @($statusValues | Where-Object { [string]::Equals($_, $Value, [StringComparison]::Ordinal) }).Count -eq 1
 }
 
+function Get-ReportFieldNames([object]$Value) {
+    if ($Value -is [Collections.IDictionary]) { return @($Value.Keys) }
+    return @($Value.PSObject.Properties.Name)
+}
+
 function Read-JsonObject([string]$Path, [string]$Name) {
     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { throw "$Name is missing: $Path" }
     try {
@@ -640,6 +653,9 @@ function Assert-OwnedGateRoot(
         }
         if ($marker.PSObject.Properties.Name -contains "startupStateSha256") {
             Assert-Hash (Join-Path $Root "startup-owned-resources.json") ([string]$marker.startupStateSha256) "Startup owned-resource state" | Out-Null
+        }
+        if ($marker.PSObject.Properties.Name -contains "firmwareStateSha256") {
+            Assert-Hash (Join-Path $Root "firmware-owned-resources.json") ([string]$marker.firmwareStateSha256) "Firmware owned-resource state" | Out-Null
         }
         return [string]$marker.runId
     }
@@ -964,6 +980,8 @@ function Assert-CleanVmAttestation([object]$Register, [string]$MatrixEntry, [str
     $path = Assert-AbsolutePath $CleanVmAttestation "CleanVmAttestation"
     $scenarioRoots = if ($AttestationScenario -eq "Startup") {
         @($script:StartupInstallRoot, $script:StartupWorkspaceRoot, $script:StartupAppDataRoot)
+    } elseif ($AttestationScenario -eq "Firmware") {
+        @($script:FirmwareInstallRoot, $script:FirmwareWorkspaceRoot, $script:FirmwareAppDataRoot)
     } else {
         @($script:LifecycleInstallRoot, $script:LifecycleWorkspaceRoot, $script:LifecycleAppDataRoot)
     }
@@ -1009,6 +1027,19 @@ function Write-StartupOwnedState([string]$Path, [object]$State) {
         $marker.startupStateSha256 = $stateHash
     } else {
         $marker | Add-Member -NotePropertyName startupStateSha256 -NotePropertyValue $stateHash
+    }
+    Write-JsonAtomic $markerPath $marker
+}
+
+function Write-FirmwareOwnedState([string]$Path, [object]$State) {
+    Write-JsonAtomic $Path $State
+    $markerPath = Join-Path $GateRoot $ownerMarkerName
+    $marker = Read-JsonObject $markerPath "GateRoot ownership marker"
+    $stateHash = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($marker.PSObject.Properties.Name -contains "firmwareStateSha256") {
+        $marker.firmwareStateSha256 = $stateHash
+    } else {
+        $marker | Add-Member -NotePropertyName firmwareStateSha256 -NotePropertyValue $stateHash
     }
     Write-JsonAtomic $markerPath $marker
 }
@@ -1306,7 +1337,7 @@ function Get-FreeLifecyclePort {
     try { return ([Net.IPEndPoint]$listener.LocalEndpoint).Port } finally { $listener.Stop() }
 }
 
-function Start-LifecycleApplication([string]$Executable, [string]$Workspace, [string]$AppData, [bool]$DefaultWorkspace) {
+function Start-LifecycleApplication([string]$Executable, [string]$Workspace, [string]$AppData, [bool]$DefaultWorkspace, [bool]$HardenEnvironment = $false) {
     $port = Get-FreeLifecyclePort
     $environment = [ordered]@{
         ECD_TAURI_APP_DATA_ROOT = $AppData
@@ -1322,6 +1353,26 @@ function Start-LifecycleApplication([string]$Executable, [string]$Workspace, [st
         $environment.USERPROFILE = Split-Path -Parent (Split-Path -Parent $Workspace)
     } else {
         $environment.ECD_TAURI_WORKSPACE = $Workspace
+    }
+    if ($HardenEnvironment) {
+        foreach ($name in @(
+            "ECD_TAURI_RESOURCE_ROOT", "ECD_TAURI_TEST_STARTUP_GUARD_HOLD_MS", "ECD_TAURI_TEST_STARTUP_GUARD_RELEASE_EVENT",
+            "ECD_TAURI_TEST_STARTUP_GUARD_OWNED_EVENT", "ECD_TAURI_BACKEND_ROOT", "ECD_TAURI_RUNTIME_ROOT", "ECD_TAURI_WEB_ROOT",
+            "ECD_TAURI_SCHEMA_CATALOG_ROOT", "ECD_TAURI_SCHEMA_CATALOG_MANIFEST", "ECD_TAURI_BACKEND_EXECUTABLE",
+            "ECD_TAURI_BACKEND_SCRIPT", "ECD_TAURI_APPLICATION_STORE", "ECD_TAURI_BACKEND_BINARY", "ECD_TAURI_WEBVIEW_DEBUG_PORT",
+            "HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "http_proxy", "https_proxy", "all_proxy"
+        )) { $environment[$name] = $null }
+        $allowedInheritedEnvironment = @(
+            "SystemRoot", "WINDIR", "ComSpec", "PATH", "PATHEXT", "TEMP", "TMP", "LOCALAPPDATA", "APPDATA",
+            "ProgramData", "ProgramFiles", "ProgramFiles(x86)", "ProgramW6432", "CommonProgramFiles", "CommonProgramFiles(x86)",
+            "USERNAME", "USERDOMAIN", "USERDOMAIN_ROAMINGPROFILE", "HOMEDRIVE", "HOMEPATH", "LOGONSERVER",
+            "PROCESSOR_ARCHITECTURE", "PROCESSOR_IDENTIFIER", "NUMBER_OF_PROCESSORS", "OS", "PUBLIC"
+        )
+        foreach ($entry in [Environment]::GetEnvironmentVariables([EnvironmentVariableTarget]::Process).GetEnumerator()) {
+            if ($allowedInheritedEnvironment -notcontains [string]$entry.Key -and $environment.Keys -notcontains [string]$entry.Key) {
+                $environment[[string]$entry.Key] = $null
+            }
+        }
     }
     $previousEnvironment = @{}
     foreach ($name in $environment.Keys) {
@@ -1361,7 +1412,13 @@ function Start-LifecycleApplication([string]$Executable, [string]$Workspace, [st
         }
         try {
             $health = Invoke-RestMethod -Uri ("http://127.0.0.1:{0}/api/health" -f $port) -TimeoutSec 2
-            if ($health.mode -eq "desktop") { return [ordered]@{ process = $process; port = $port; jobHandle = $jobHandle } }
+            if ($health.mode -eq "desktop") {
+                $jobIds = @([CleanMachinePathNative]::GetJobProcessIds($jobHandle))
+                $listeners = @(Get-NetTCPConnection -LocalAddress "127.0.0.1" -LocalPort $port -State Listen -ErrorAction SilentlyContinue)
+                if ($listeners.Count -eq 1 -and $jobIds -contains [int]$listeners[0].OwningProcess) {
+                    return [ordered]@{ process = $process; port = $port; jobHandle = $jobHandle; backendProcessId = [int]$listeners[0].OwningProcess }
+                }
+            }
         } catch { Start-Sleep -Milliseconds 200 }
     }
     [CleanMachinePathNative]::CloseOwnedHandle($jobHandle) | Out-Null
@@ -2340,10 +2397,746 @@ function Invoke-StartupScenario([object]$Register, [object]$Observed, [string]$M
     if ($cleanupErrors.Count -gt 0) { throw ("Startup cleanup failed:`n- " + ($cleanupErrors -join "`n- ")) }
 }
 
+function Assert-FirmwareRoots {
+    foreach ($entry in @(
+        @("FirmwareInstallRoot", $FirmwareInstallRoot),
+        @("FirmwareWorkspaceRoot", $FirmwareWorkspaceRoot),
+        @("FirmwareAppDataRoot", $FirmwareAppDataRoot)
+    )) {
+        if ([string]::IsNullOrWhiteSpace([string]$entry[1])) { throw "$($entry[0]) is required for firmware scenarios" }
+    }
+    $script:FirmwareInstallRoot = Assert-AbsolutePath $FirmwareInstallRoot "FirmwareInstallRoot"
+    $script:FirmwareWorkspaceRoot = Assert-AbsolutePath $FirmwareWorkspaceRoot "FirmwareWorkspaceRoot"
+    $script:FirmwareAppDataRoot = Assert-AbsolutePath $FirmwareAppDataRoot "FirmwareAppDataRoot"
+    foreach ($entry in @(
+        @("FirmwareInstallRoot", $script:FirmwareInstallRoot),
+        @("FirmwareWorkspaceRoot", $script:FirmwareWorkspaceRoot),
+        @("FirmwareAppDataRoot", $script:FirmwareAppDataRoot)
+    )) { Assert-NoReparsePath $entry[1] $entry[0] }
+    $roots = @($ArtifactRoot, $GateRoot, $script:FirmwareInstallRoot, $script:FirmwareWorkspaceRoot, $script:FirmwareAppDataRoot)
+    for ($left = 0; $left -lt $roots.Count; $left++) {
+        for ($right = $left + 1; $right -lt $roots.Count; $right++) {
+            if (Test-PathOverlap $roots[$left] $roots[$right]) { throw "Firmware roots overlap" }
+        }
+    }
+    if (@($roots[2..4] | Where-Object { Test-PathOverlap $ReportPath $_ }).Count -gt 0) {
+        throw "Firmware root overlaps GateRoot metadata"
+    }
+}
+
+function Assert-HostNetworkAttestation(
+    [object]$Register,
+    [string]$MatrixEntry,
+    [string]$RunId,
+    [object]$CleanVm,
+    [string]$ExpectedPhase,
+    [bool]$ExpectedAttached
+) {
+    if ($ContractTest) {
+        if ($HostNetworkAttestation -or $ExpectedHostNetworkAttestationSha256) {
+            throw "HostNetworkAttestation is forbidden in contract-test mode"
+        }
+        return [ordered]@{ sha256 = "contract_test"; phase = $ExpectedPhase; controlNonce = "contract_test" }
+    }
+    if ([string]::IsNullOrWhiteSpace($HostNetworkAttestation) -or $ExpectedHostNetworkAttestationSha256 -notmatch $sha256Pattern) {
+        throw "Production firmware phase requires an authenticated host network attestation and expected SHA-256"
+    }
+    $path = Assert-AbsolutePath $HostNetworkAttestation "HostNetworkAttestation"
+    if ((Test-PathOverlap $path $GateRoot) -or (Test-PathOverlap $path $script:FirmwareInstallRoot) -or
+        (Test-PathOverlap $path $script:FirmwareWorkspaceRoot) -or (Test-PathOverlap $path $script:FirmwareAppDataRoot)) {
+        throw "HostNetworkAttestation must be outside firmware-owned roots"
+    }
+    Assert-NoReparsePath $path "HostNetworkAttestation"
+    Assert-NoAlternateStreams $path "HostNetworkAttestation"
+    $hash = Assert-Hash $path $ExpectedHostNetworkAttestationSha256 "host network attestation"
+    $attestation = Read-JsonObject $path "Host network attestation"
+    $observedAt = [DateTimeOffset]::MinValue
+    if ($attestation.schemaVersion -ne 1 -or $attestation.kind -ne "ecd-host-network-attestation" -or
+        $attestation.sourceCommit -ne $Register.sourceCommit -or
+        $attestation.artifactRegisterSha256 -ne $ExpectedArtifactRegisterSha256 -or
+        $attestation.testKitSha256 -ne $Register.testKitSha256 -or
+        $attestation.matrixPolicySha256 -ne $ExpectedMatrixPolicySha256 -or
+        $attestation.matrixEntryId -ne $MatrixEntry -or $attestation.gateRunId -ne $RunId -or
+        $attestation.hostRunNonce -ne $CleanVm.runNonce -or $attestation.phase -ne $ExpectedPhase -or
+        $attestation.hostControlled -ne $true -or $attestation.physicalNicAttached -ne $ExpectedAttached -or
+        [string]$attestation.networkControlNonce -notmatch '^[0-9a-fA-F]{64}$' -or
+        -not [DateTimeOffset]::TryParse([string]$attestation.observedAtUtc, [ref]$observedAt) -or
+        $observedAt.Offset -ne [TimeSpan]::Zero -or $observedAt -gt [DateTimeOffset]::UtcNow.AddMinutes(5) -or
+        $observedAt -lt [DateTimeOffset]::UtcNow.AddHours(-24)) {
+        throw "Host network attestation identity is invalid"
+    }
+    return [ordered]@{ sha256 = $hash; phase = $ExpectedPhase; controlNonce = ([string]$attestation.networkControlNonce).ToLowerInvariant() }
+}
+
+function Assert-GuestNetworkState([ValidateSet("online", "offline")][string]$ExpectedState) {
+    if ($ContractTest) { return "contract_test_not_observed" }
+    $hardwareAdapters = @(Get-NetAdapter -ErrorAction Stop | Where-Object { $_.HardwareInterface -eq $true })
+    if ($hardwareAdapters.Count -eq 0) { throw "Guest has no observable hardware network adapter" }
+    $upAdapters = @($hardwareAdapters | Where-Object { $_.Status -eq "Up" })
+    $defaultRoutes = @(
+        Get-NetRoute -AddressFamily IPv4 -DestinationPrefix "0.0.0.0/0" -ErrorAction SilentlyContinue |
+            Where-Object { $_.State -eq "Alive" -and $_.NextHop -ne "0.0.0.0" }
+        Get-NetRoute -AddressFamily IPv6 -DestinationPrefix "::/0" -ErrorAction SilentlyContinue |
+            Where-Object { $_.State -eq "Alive" -and $_.NextHop -ne "::" }
+    )
+    $externalReachable = @("pypi.org", "github.com") | Where-Object {
+        Test-NetConnection -ComputerName $_ -Port 443 -InformationLevel Quiet -WarningAction SilentlyContinue
+    }
+    if ($ExpectedState -eq "online") {
+        if ($upAdapters.Count -eq 0 -or $defaultRoutes.Count -eq 0 -or $externalReachable.Count -eq 0) {
+            throw "Guest did not prove real online connectivity"
+        }
+        return "host_attached_guest_route_and_tcp_verified"
+    }
+    if ($upAdapters.Count -ne 0 -or $defaultRoutes.Count -ne 0 -or $externalReachable.Count -ne 0) {
+        throw "Guest did not prove physical NIC disconnection and absence of real connectivity"
+    }
+    return "host_detached_guest_adapter_route_and_tcp_absent"
+}
+
+function Assert-FirmwareBackendOwnership([object]$OwnedProcess) {
+    if ($null -eq $OwnedProcess -or $OwnedProcess.process.HasExited -or $OwnedProcess.jobHandle -eq [IntPtr]::Zero) {
+        throw "Firmware application/backend ownership is no longer live"
+    }
+    $jobIds = @([CleanMachinePathNative]::GetJobProcessIds($OwnedProcess.jobHandle))
+    $listeners = @(Get-NetTCPConnection -LocalAddress "127.0.0.1" -LocalPort $OwnedProcess.port -State Listen -ErrorAction SilentlyContinue)
+    if ($listeners.Count -ne 1 -or [int]$listeners[0].OwningProcess -ne [int]$OwnedProcess.backendProcessId -or
+        $jobIds -notcontains [int]$OwnedProcess.backendProcessId) {
+        throw "Firmware API listener is not owned by the exact installed application Job Object"
+    }
+}
+
+function Get-FirmwareJobProcessIdentity([object]$OwnedProcess) {
+    Assert-FirmwareBackendOwnership $OwnedProcess
+    return @([CleanMachinePathNative]::GetJobProcessIds($OwnedProcess.jobHandle) | Sort-Object | ForEach-Object {
+        $process = Get-Process -Id $_ -ErrorAction Stop
+        "$($_):$($process.StartTime.ToUniversalTime().Ticks)"
+    })
+}
+
+function Invoke-FirmwareJob(
+    [object]$OwnedProcess,
+    [string]$Action,
+    [bool]$RequireFirmwareNode,
+    [int]$TimeoutMinutes = 90
+) {
+    Assert-FirmwareBackendOwnership $OwnedProcess
+    $Port = [int]$OwnedProcess.port
+    $body = @{ yaml = "compile-only.yaml"; action = $Action } | ConvertTo-Json -Compress
+    $started = Invoke-RestMethod "http://127.0.0.1:$Port/api/install" -Method Post -ContentType "application/json" -Body $body -TimeoutSec 10
+    if ([string]$started.job_id -notmatch '^[0-9a-f]{32}$') { throw "Firmware job API returned an invalid job identity" }
+    $deadline = [DateTime]::UtcNow.AddMinutes($TimeoutMinutes)
+    do {
+        if ([DateTime]::UtcNow -ge $deadline) { throw "Firmware $Action job exceeded its bounded deadline" }
+        Start-Sleep -Milliseconds 500
+        Assert-FirmwareBackendOwnership $OwnedProcess
+        $status = Invoke-RestMethod "http://127.0.0.1:$Port/api/jobs/$($started.job_id)" -TimeoutSec 5
+    } while ($status.job.state -in @("queued", "running"))
+    if ($status.job.state -ne "success" -or $status.job.exit_code -ne 0) {
+        throw "Firmware $Action job did not finish successfully"
+    }
+    if ($RequireFirmwareNode -and $status.job.firmware_node -ne "ecd-clean-machine") {
+        throw "Firmware job did not produce the unambiguous approved fixture firmware_node mapping"
+    }
+    return $status.job
+}
+
+function Assert-FirmwareDownloads([object]$OwnedProcess, [string]$AppDataRoot) {
+    Assert-FirmwareBackendOwnership $OwnedProcess
+    $Port = [int]$OwnedProcess.port
+    $nodeRoot = Join-Path $AppDataRoot "b\ecd-clean-machine"
+    if (-not (Test-Path -LiteralPath $nodeRoot -PathType Container)) { throw "Mapped firmware build node is missing" }
+    Assert-OwnedTreeSafeForRemoval $nodeRoot
+    $hashes = [ordered]@{}
+    foreach ($variant in @("ota", "factory")) {
+        $fileName = if ($variant -eq "factory") { "firmware.factory.bin" } else { "firmware.bin" }
+        $download = Join-Path $GateRoot ("firmware-download-" + [guid]::NewGuid().ToString("N") + ".bin")
+        try {
+            $uri = "http://127.0.0.1:$Port/api/firmware?yaml=compile-only.yaml&variant=$variant"
+            Invoke-WebRequest -UseBasicParsing -Uri $uri -OutFile $download -TimeoutSec 30 | Out-Null
+            $downloadHash = (Get-FileHash -LiteralPath $download -Algorithm SHA256).Hash.ToLowerInvariant()
+            $matchingBuildFiles = @(Get-ChildItem -LiteralPath $nodeRoot -File -Recurse -Filter $fileName | Where-Object {
+                (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() -eq $downloadHash
+            })
+            if ($matchingBuildFiles.Count -ne 1) {
+                throw "Downloaded $variant firmware does not map uniquely to the exact build output"
+            }
+            $hashes[$variant] = $downloadHash
+        } finally {
+            if (Test-Path -LiteralPath $download) { Remove-Item -LiteralPath $download -Force }
+        }
+    }
+    return $hashes
+}
+
+function Start-FirmwareApplication([string]$InstalledExecutable) {
+    $script:LifecycleInstallRoot = $script:FirmwareInstallRoot
+    $internetSettings = Get-ItemProperty -LiteralPath "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -ErrorAction SilentlyContinue
+    if ($null -ne $internetSettings -and
+        ([int]$internetSettings.ProxyEnable -eq 1 -or [int]$internetSettings.AutoDetect -eq 1 -or
+         -not [string]::IsNullOrWhiteSpace([string]$internetSettings.AutoConfigURL))) {
+        throw "Firmware evidence forbids per-user proxy, PAC, and automatic proxy discovery settings"
+    }
+    return Start-LifecycleApplication $InstalledExecutable $script:FirmwareWorkspaceRoot $script:FirmwareAppDataRoot $false $true
+}
+
+function Write-FirmwareCheckpoint([string]$Path, [object]$Checkpoint, [string]$StatePath, [object]$State) {
+    Write-JsonAtomic $Path $Checkpoint
+    $State | Add-Member -NotePropertyName checkpointSha256 -NotePropertyValue ((Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()) -Force
+    Write-FirmwareOwnedState $StatePath $State
+}
+
+function Assert-FirmwareStateBindings(
+    [object]$State,
+    [object]$Checkpoint,
+    [object]$Register,
+    [string]$RunId,
+    [string]$RegisterHash,
+    [string]$MatrixHash,
+    [object]$CleanVm
+) {
+    if ($State.schemaVersion -ne 1 -or $State.kind -ne "ecd-firmware-owned-resources" -or
+        $Checkpoint.schemaVersion -ne 1 -or $Checkpoint.kind -ne "ecd-firmware-checkpoint" -or
+        [string]$State.nonce -notmatch '^[0-9a-f]{32}$' -or $Checkpoint.nonce -ne $State.nonce) {
+        throw "Firmware checkpoint is stale, replayed, forged, or mismatched"
+    }
+    $createdAt = [DateTimeOffset]::MinValue
+    if (-not [DateTimeOffset]::TryParse([string]$Checkpoint.createdAtUtc, [ref]$createdAt) -or
+        $createdAt.Offset -ne [TimeSpan]::Zero -or $createdAt -gt [DateTimeOffset]::UtcNow -or
+        $createdAt -lt [DateTimeOffset]::UtcNow.AddDays(-7)) {
+        throw "Firmware checkpoint is stale, replayed, forged, or mismatched"
+    }
+    foreach ($binding in @(
+        @("runId", $RunId), @("sourceCommit", [string]$Register.sourceCommit),
+        @("artifactRegisterSha256", $RegisterHash), @("testKitSha256", [string]$Register.testKitSha256),
+        @("matrixPolicySha256", $MatrixHash), @("installRoot", $script:FirmwareInstallRoot),
+        @("workspaceRoot", $script:FirmwareWorkspaceRoot), @("appDataRoot", $script:FirmwareAppDataRoot),
+        @("cleanVmAttestationSha256", [string]$CleanVm.sha256), @("hostRunNonce", [string]$CleanVm.runNonce)
+    )) {
+        if ([string]$State.($binding[0]) -ne [string]$binding[1] -or
+            [string]$Checkpoint.($binding[0]) -ne [string]$binding[1]) {
+            throw "Firmware checkpoint binding is mismatched: $($binding[0])"
+        }
+    }
+}
+
+function Assert-OwnedTreeSafeForRemoval([string]$Root) {
+    $pending = New-Object Collections.Generic.Stack[string]
+    $pending.Push($Root)
+    while ($pending.Count -gt 0) {
+        $directory = $pending.Pop()
+        Assert-NoReparsePath $directory "Owned cleanup directory"
+        Assert-NoAlternateStreams $directory "Owned cleanup directory"
+        foreach ($entry in @(Get-ChildItem -LiteralPath $directory -Force)) {
+            if (($entry.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+                throw "Owned cleanup tree contains a reparse point"
+            }
+            Assert-NoAlternateStreams $entry.FullName "Owned cleanup entry"
+            if ($entry.PSIsContainer) { $pending.Push($entry.FullName) }
+        }
+    }
+}
+
+function Remove-OwnedFirmwareRoot([string]$Root, [string]$Category, [string]$RunId, [string]$Nonce) {
+    if (-not (Test-Path -LiteralPath $Root)) { return }
+    Assert-OwnedLifecycleRoot $Root $Category $RunId $Nonce
+    Assert-OwnedTreeSafeForRemoval $Root
+    Remove-Item -LiteralPath $Root -Recurse -Force
+}
+
+function New-FirmwareReport(
+    [string]$ReportScenario,
+    [object]$Register,
+    [object]$Observed,
+    [string]$MatrixEntry,
+    [string]$RunId,
+    [string]$RegisterHash,
+    [string]$MatrixHash,
+    [DateTime]$StartedAt,
+    [object[]]$Checks,
+    [object]$CleanVm,
+    [object]$State,
+    [string]$NetworkState,
+    [string]$Result = ""
+) {
+    $script:LifecycleNetworkState = $NetworkState
+    $report = New-LifecycleReport $Register $Observed $MatrixEntry $RunId $RegisterHash $MatrixHash $StartedAt $Checks $CleanVm.sha256 $CleanVm.runNonce
+    $report.scenario = $ReportScenario
+    if ($Result) { $report.result = $Result }
+    elseif ($ContractTest) { $report.result = "not_run" }
+    $report.Add("otaFirmwareSha256", [string]$State.otaFirmwareSha256)
+    $report.Add("factoryFirmwareSha256", [string]$State.factoryFirmwareSha256)
+    $report.Add("finalFixtureSha256", [string]$State.finalFixtureSha256)
+    $networkAttestations = [ordered]@{
+        onlineInitialSha256 = [string]$State.onlineInitialNetworkAttestationSha256
+        onlineRebootSha256 = [string]$State.onlineRebootNetworkAttestationSha256
+    }
+    if ($ReportScenario -eq "FirmwareOffline") {
+        $networkAttestations.Add("offlineDisconnectedSha256", [string]$State.offlineNetworkAttestationSha256)
+        $networkAttestations.Add("onlineRestoredSha256", [string]$State.restoredNetworkAttestationSha256)
+    }
+    $report.Add("networkAttestations", $networkAttestations)
+    return $report
+}
+
+function Get-FirmwareRequiredChecks([string]$ReportScenario) {
+    if ($ReportScenario -eq "FirmwareOnline") {
+        return @(
+            "artifact_identity", "preflight_receipt", "clean_vm_attestation", "host_network_online", "root_ownership",
+            "isolated_roots", "fresh_cache_build", "approved_fixture", "silent_per_user_install", "installed_application_hash", "installed_resources", "immutable_install_tree",
+            "first_online_compile", "firmware_node_mapping", "firmware_download_hashes", "cache_replay", "application_restart",
+            "reboot_resume", "reboot_replay", "graceful_close"
+        )
+    }
+    return @(
+        "artifact_identity", "preflight_receipt", "clean_vm_attestation", "host_network_offline", "guest_connectivity_absent",
+        "checkpoint_binding", "offline_cache_replay", "offline_firmware_hashes", "graceful_close", "host_network_restored",
+        "real_compile_cancel", "canceled_state", "fixture_unchanged", "no_job_descendants", "final_cleanup"
+    )
+}
+
+function Write-SanitizedFirmwareFailureReport(
+    [string]$ReportScenario, [object]$Register, [object]$Observed, [string]$MatrixEntry, [string]$RunId,
+    [string]$RegisterHash, [string]$MatrixHash, [object]$CleanVm, [object]$State, [bool]$ReplaceExisting
+) {
+    $requiredChecks = @(Get-FirmwareRequiredChecks $ReportScenario)
+    $failureChecks = for ($index = 0; $index -lt $requiredChecks.Count; $index++) {
+        if ($index -eq 0) {
+            [ordered]@{ name = $requiredChecks[$index]; status = "fail"; summary = "Firmware scenario did not produce valid release evidence" }
+        } else {
+            [ordered]@{ name = $requiredChecks[$index]; status = "not_run"; reasonCode = "dependent_firmware_evidence_unavailable"; summary = "Dependent firmware evidence was not accepted" }
+        }
+    }
+    if ($null -eq $State) { $State = [ordered]@{} }
+    $failureNetworkState = if ($ContractTest) { "contract_test_not_observed" } else { "failure_not_release_evidence" }
+    $failureReport = New-FirmwareReport $ReportScenario $Register $Observed $MatrixEntry $RunId $RegisterHash $MatrixHash ([DateTime]::UtcNow) $failureChecks $CleanVm $State $failureNetworkState "fail"
+    Assert-Report ([pscustomobject]$failureReport) $Register $Observed $MatrixEntry $RunId
+    if ($ReplaceExisting) { Write-JsonAtomic $ReportPath $failureReport }
+    else { Write-NewJsonFile $ReportPath $failureReport }
+}
+
+function Remove-BoundFirmwareFailureReport(
+    [string]$ReportScenario, [object]$Register, [object]$Observed, [string]$MatrixEntry, [string]$RunId
+) {
+    if (-not (Test-Path -LiteralPath $ReportPath -PathType Leaf)) { return }
+    $previousReport = Read-JsonObject $ReportPath "Previous firmware failure report"
+    Assert-Report $previousReport $Register $Observed $MatrixEntry $RunId
+    if ($previousReport.scenario -eq $ReportScenario -and $previousReport.result -eq "fail") {
+        Remove-Item -LiteralPath $ReportPath -Force
+    }
+}
+
+function Invoke-FirmwareScenario([object]$Register, [object]$Observed, [string]$MatrixEntry, [string]$RunId, [string]$RegisterHash, [string]$MatrixHash) {
+    if (-not $FirmwareStage) { throw "FirmwareStage is required for firmware scenarios" }
+    if (($Scenario -eq "FirmwareOnline" -and $FirmwareStage -notin @("OnlineBegin", "RebootResume")) -or
+        ($Scenario -eq "FirmwareOffline" -and $FirmwareStage -notin @("OfflineReplay", "Cancel"))) {
+        throw "FirmwareStage does not match the selected firmware scenario"
+    }
+    if (-not $ContractTest -and $ContractFirmwareFault) { throw "ContractFirmwareFault is forbidden for production evidence" }
+    $account = Get-AccountContext
+    if (-not $ContractTest -and ($account.isElevated -or $account.isAdministratorMember -or -not $account.isInteractive)) {
+        throw "Firmware scenarios must run in an interactive session as a non-administrator standard user"
+    }
+    Assert-FirmwareRoots
+    Assert-LifecycleArtifactSet $Register
+    $firmwareLock = $null
+    try {
+        $firmwareLock = [IO.File]::Open(
+            (Join-Path $GateRoot "firmware-execution.lock"),
+            [IO.FileMode]::OpenOrCreate,
+            [IO.FileAccess]::ReadWrite,
+            [IO.FileShare]::None
+        )
+    } catch {
+        throw "Another firmware phase invocation owns this gate run"
+    }
+    $cleanVm = Assert-CleanVmAttestation $Register $MatrixEntry "Firmware"
+    Remove-BoundFirmwareFailureReport $Scenario $Register $Observed $MatrixEntry $RunId
+    $mayWriteFailureReport = -not (Test-Path -LiteralPath $ReportPath)
+    $statePath = Join-Path $GateRoot "firmware-owned-resources.json"
+    $checkpointPath = Join-Path $GateRoot "firmware-checkpoint.json"
+    $fixtureSource = Join-Path $TestKitRoot "fixtures\compile-only.yaml"
+    $fixtureDestination = Join-Path $script:FirmwareWorkspaceRoot "compile-only.yaml"
+    $installedExecutable = Join-Path $script:FirmwareInstallRoot ([string]$Register.application.file)
+    $ownedProcess = $null
+    $phaseClaimed = $false
+    $scenarioFailure = $null
+    $state = $null
+    $reportWrittenThisInvocation = $false
+    $cleanupErrors = New-Object Collections.Generic.List[string]
+    try {
+        if ($FirmwareStage -eq "OnlineBegin") {
+            if ((Test-Path -LiteralPath $statePath) -or (Test-Path -LiteralPath $checkpointPath) -or
+                (Test-Path -LiteralPath $script:FirmwareInstallRoot) -or (Test-Path -LiteralPath $script:FirmwareWorkspaceRoot) -or
+                (Test-Path -LiteralPath $script:FirmwareAppDataRoot)) {
+                throw "Firmware OnlineBegin requires new, absent owned roots and state"
+            }
+            $networkAttestation = Assert-HostNetworkAttestation $Register $MatrixEntry $RunId $cleanVm "online_initial" $true
+            $nonce = [guid]::NewGuid().ToString("N")
+            $state = [ordered]@{
+                schemaVersion = 1; kind = "ecd-firmware-owned-resources"; state = "online_begin_claimed"; runId = $RunId
+                sourceCommit = $Register.sourceCommit; artifactRegisterSha256 = $RegisterHash; testKitSha256 = $Register.testKitSha256
+                matrixPolicySha256 = $MatrixHash; nonce = $nonce; installRoot = $script:FirmwareInstallRoot
+                workspaceRoot = $script:FirmwareWorkspaceRoot; appDataRoot = $script:FirmwareAppDataRoot
+                cleanVmAttestationSha256 = $cleanVm.sha256; hostRunNonce = $cleanVm.runNonce
+                onlineInitialNetworkAttestationSha256 = $networkAttestation.sha256
+                onlineInitialNetworkControlNonce = $networkAttestation.controlNonce
+            }
+            Write-FirmwareOwnedState $statePath $state
+            $phaseClaimed = $true
+            $networkState = Assert-GuestNetworkState "online"
+            $state | Add-Member -NotePropertyName onlineInitialNetworkState -NotePropertyValue $networkState -Force
+            Write-FirmwareOwnedState $statePath $state
+            New-OwnedLifecycleRoot $script:FirmwareInstallRoot "install" $RunId $nonce
+            New-OwnedLifecycleRoot $script:FirmwareWorkspaceRoot "workspace" $RunId $nonce
+            New-OwnedLifecycleRoot $script:FirmwareAppDataRoot "app-data" $RunId $nonce
+            if ($ContractFirmwareFault -eq "CleanupReparsePoint") {
+                $reparseTarget = Join-Path $GateRoot "firmware-reparse-target"
+                New-Item -ItemType Directory -Path $reparseTarget | Out-Null
+                [IO.File]::WriteAllText((Join-Path $reparseTarget "sentinel.txt"), "must survive")
+                $junction = Join-Path $script:FirmwareWorkspaceRoot "external-junction"
+                $junctionProcess = Start-Process -FilePath (Join-Path $env:SystemRoot "System32\cmd.exe") -ArgumentList @("/d", "/c", "mklink", "/J", $junction, $reparseTarget) -Wait -PassThru -WindowStyle Hidden
+                if ($junctionProcess.ExitCode -ne 0 -or -not (Test-Path -LiteralPath $junction)) { throw "Could not create synthetic cleanup reparse point" }
+                throw "Synthetic firmware scenario failure with a cleanup reparse point"
+            }
+            Assert-Hash $fixtureSource $Register.fixtureSha256 "approved compile-only fixture" | Out-Null
+            Copy-Item -LiteralPath $fixtureSource -Destination $fixtureDestination
+            Assert-Hash $fixtureDestination $Register.fixtureSha256 "copied compile-only fixture" | Out-Null
+            if ((Test-Path -LiteralPath (Join-Path $script:FirmwareAppDataRoot "p")) -or
+                (Test-Path -LiteralPath (Join-Path $script:FirmwareAppDataRoot "b"))) {
+                throw "Firmware OnlineBegin requires empty, absent PlatformIO cache and build roots"
+            }
+            if ($ContractTest) {
+                Copy-Item -LiteralPath (Join-Path $ArtifactRoot ([string]$Register.application.file)) -Destination $installedExecutable
+                [IO.File]::WriteAllText((Join-Path $script:FirmwareInstallRoot "uninstall.exe"), "synthetic")
+                $downloads = [ordered]@{ ota = (("1" * 64) -join ""); factory = (("2" * 64) -join "") }
+                if ($ContractFirmwareFault -eq "FirmwareNodeMismatch") {
+                    throw "Firmware job did not produce the unambiguous approved fixture firmware_node mapping"
+                }
+                if ($ContractFirmwareFault -eq "FirmwareHashMismatch") {
+                    throw "Downloaded ota firmware does not map uniquely to the exact build output"
+                }
+                if ($ContractFirmwareFault -eq "CleanupFirstResourceFailure") {
+                    throw "Synthetic firmware scenario failure before independent cleanup"
+                }
+            } else {
+                Invoke-Nsis $Installer @("/S", "/D=$script:FirmwareInstallRoot") "Firmware silent per-user install"
+                Assert-Hash $installedExecutable $Register.application.sha256 "Firmware installed application" | Out-Null
+                $script:StartupInstallRoot = $script:FirmwareInstallRoot
+                Assert-StartupInstalledResources $Register | Out-Null
+            }
+            $installIdentity = Get-TreeIdentity $script:FirmwareInstallRoot
+            $state | Add-Member -NotePropertyName installTreeSha256 -NotePropertyValue $installIdentity.aggregateSha256
+            $state | Add-Member -NotePropertyName installTreeEntryCount -NotePropertyValue $installIdentity.fileCount
+            Write-FirmwareOwnedState $statePath $state
+            if (-not $ContractTest) {
+                $ownedProcess = Start-FirmwareApplication $installedExecutable
+                Invoke-FirmwareJob $ownedProcess "compile" $true | Out-Null
+                $downloads = Assert-FirmwareDownloads $ownedProcess $script:FirmwareAppDataRoot
+                Invoke-FirmwareJob $ownedProcess "compile" $true | Out-Null
+                $cacheDownloads = Assert-FirmwareDownloads $ownedProcess $script:FirmwareAppDataRoot
+                if ($cacheDownloads.ota -ne $downloads.ota -or $cacheDownloads.factory -ne $downloads.factory) {
+                    throw "Cache replay firmware hashes changed"
+                }
+                Stop-LifecycleApplicationGracefully $ownedProcess; $ownedProcess = $null
+                $ownedProcess = Start-FirmwareApplication $installedExecutable
+                Invoke-FirmwareJob $ownedProcess "compile" $true | Out-Null
+                $restartDownloads = Assert-FirmwareDownloads $ownedProcess $script:FirmwareAppDataRoot
+                if ($restartDownloads.ota -ne $downloads.ota -or $restartDownloads.factory -ne $downloads.factory) {
+                    throw "Application restart replay firmware hashes changed"
+                }
+                Stop-LifecycleApplicationGracefully $ownedProcess; $ownedProcess = $null
+            }
+            Assert-TreeIdentity $installIdentity $script:FirmwareInstallRoot "Firmware immutable install tree"
+            $state | Add-Member -NotePropertyName otaFirmwareSha256 -NotePropertyValue ([string]$downloads.ota)
+            $state | Add-Member -NotePropertyName factoryFirmwareSha256 -NotePropertyValue ([string]$downloads.factory)
+            $checkpoint = [ordered]@{
+                schemaVersion = 1; kind = "ecd-firmware-checkpoint"; state = "awaiting_reboot"; createdAtUtc = [DateTime]::UtcNow.ToString("o")
+                runId = $RunId; sourceCommit = $Register.sourceCommit; artifactRegisterSha256 = $RegisterHash
+                testKitSha256 = $Register.testKitSha256; matrixPolicySha256 = $MatrixHash; nonce = $nonce
+                installRoot = $script:FirmwareInstallRoot; workspaceRoot = $script:FirmwareWorkspaceRoot; appDataRoot = $script:FirmwareAppDataRoot
+                cleanVmAttestationSha256 = $cleanVm.sha256; hostRunNonce = $cleanVm.runNonce; bootIdentityBefore = Get-BootIdentity
+                fixtureSha256 = $Register.fixtureSha256; otaFirmwareSha256 = $downloads.ota; factoryFirmwareSha256 = $downloads.factory
+            }
+            $state.state = "awaiting_reboot"
+            Write-FirmwareCheckpoint $checkpointPath $checkpoint $statePath $state
+            Write-Host "[info] Firmware online checkpoint persisted; perform a real system reboot and resume the same run"
+            return
+        }
+
+        if (-not (Test-Path -LiteralPath $statePath -PathType Leaf) -or -not (Test-Path -LiteralPath $checkpointPath -PathType Leaf)) {
+            throw "Firmware checkpoint is missing"
+        }
+        $state = Read-JsonObject $statePath "Firmware owned-resource state"
+        if ([string]$state.checkpointSha256 -notmatch $sha256Pattern) { throw "Firmware checkpoint is stale, replayed, forged, or mismatched" }
+        Assert-Hash $checkpointPath ([string]$state.checkpointSha256) "Firmware checkpoint" | Out-Null
+        $checkpoint = Read-JsonObject $checkpointPath "Firmware checkpoint"
+        Assert-FirmwareStateBindings $state $checkpoint $Register $RunId $RegisterHash $MatrixHash $cleanVm
+        if ($state.state -eq "completed" -or $checkpoint.state -eq "completed" -or
+            $state.state -like "*_claimed" -or $checkpoint.state -like "*_claimed") {
+            throw "Firmware checkpoint is stale, replayed, forged, or mismatched"
+        }
+        Assert-OwnedLifecycleRoot $script:FirmwareInstallRoot "install" $RunId ([string]$state.nonce)
+        Assert-OwnedLifecycleRoot $script:FirmwareWorkspaceRoot "workspace" $RunId ([string]$state.nonce)
+        Assert-OwnedLifecycleRoot $script:FirmwareAppDataRoot "app-data" $RunId ([string]$state.nonce)
+        Assert-Hash $installedExecutable $Register.application.sha256 "firmware application before phase execution" | Out-Null
+        Assert-TreeIdentity ([ordered]@{ fileCount = $state.installTreeEntryCount; aggregateSha256 = $state.installTreeSha256 }) $script:FirmwareInstallRoot "Firmware immutable install tree before phase execution"
+        Assert-Hash $fixtureDestination $Register.fixtureSha256 "firmware fixture before resume" | Out-Null
+
+        if ($FirmwareStage -eq "RebootResume") {
+            if ($state.state -ne "awaiting_reboot" -or $checkpoint.state -ne "awaiting_reboot") {
+                throw "Firmware reboot checkpoint is stale, replayed, forged, or mismatched"
+            }
+            $bootIdentityAfter = Get-BootIdentity
+            if ($bootIdentityAfter -eq $checkpoint.bootIdentityBefore) { throw "Firmware RebootResume requires a real system reboot" }
+            $networkAttestation = Assert-HostNetworkAttestation $Register $MatrixEntry $RunId $cleanVm "online_reboot" $true
+            if (-not $ContractTest -and $networkAttestation.controlNonce -eq $state.onlineInitialNetworkControlNonce) {
+                throw "Host network attestation nonce was replayed across firmware phases"
+            }
+            $checkpoint.state = "reboot_claimed"; $state.state = "reboot_claimed"
+            $checkpoint | Add-Member -NotePropertyName bootIdentityAfter -NotePropertyValue $bootIdentityAfter
+            $checkpoint | Add-Member -NotePropertyName onlineRebootNetworkAttestationSha256 -NotePropertyValue $networkAttestation.sha256
+            $state | Add-Member -NotePropertyName onlineRebootNetworkAttestationSha256 -NotePropertyValue $networkAttestation.sha256 -Force
+            $state | Add-Member -NotePropertyName onlineRebootNetworkControlNonce -NotePropertyValue $networkAttestation.controlNonce -Force
+            Write-FirmwareCheckpoint $checkpointPath $checkpoint $statePath $state
+            $phaseClaimed = $true
+            $networkState = Assert-GuestNetworkState "online"
+            $state | Add-Member -NotePropertyName onlineRebootNetworkState -NotePropertyValue $networkState -Force
+            Write-FirmwareCheckpoint $checkpointPath $checkpoint $statePath $state
+            if (-not $ContractTest) {
+                $ownedProcess = Start-FirmwareApplication $installedExecutable
+                Invoke-FirmwareJob $ownedProcess "compile" $true | Out-Null
+                $downloads = Assert-FirmwareDownloads $ownedProcess $script:FirmwareAppDataRoot
+                if ($downloads.ota -ne $state.otaFirmwareSha256 -or $downloads.factory -ne $state.factoryFirmwareSha256) {
+                    throw "System reboot replay firmware hashes changed"
+                }
+                Stop-LifecycleApplicationGracefully $ownedProcess; $ownedProcess = $null
+            }
+            Assert-TreeIdentity ([ordered]@{ fileCount = $state.installTreeEntryCount; aggregateSha256 = $state.installTreeSha256 }) $script:FirmwareInstallRoot "Post-reboot firmware immutable install tree"
+            $state | Add-Member -NotePropertyName onlineCompletedAtUtc -NotePropertyValue ([DateTime]::UtcNow.ToString("o")) -Force
+            $checkpoint.state = "awaiting_offline"; $state.state = "awaiting_offline"
+            Write-FirmwareCheckpoint $checkpointPath $checkpoint $statePath $state
+            $evidence = if ($ContractTest) { "Contract simulation" } else { "Production execution" }
+            $requiredChecks = @(Get-FirmwareRequiredChecks "FirmwareOnline")
+            $checks = @($requiredChecks | ForEach-Object {
+                if ($ContractTest) {
+                    [ordered]@{ name = $_; status = "not_run"; reasonCode = "contract_test_no_production_execution"; summary = "$evidence did not execute the production FirmwareOnline check: $_" }
+                } else {
+                    [ordered]@{ name = $_; status = "pass"; summary = "$evidence verified the FirmwareOnline contract: $_" }
+                }
+            })
+            $finalFixtureSha256 = Assert-Hash $fixtureDestination $Register.fixtureSha256 "firmware fixture after reboot replay"
+            $state | Add-Member -NotePropertyName finalFixtureSha256 -NotePropertyValue $finalFixtureSha256 -Force
+            Write-FirmwareOwnedState $statePath $state
+            $report = New-FirmwareReport "FirmwareOnline" $Register $Observed $MatrixEntry $RunId $RegisterHash $MatrixHash ([DateTime]::UtcNow) $checks $cleanVm $state $networkState
+            Assert-Report ([pscustomobject]$report) $Register $Observed $MatrixEntry $RunId
+            Write-NewJsonFile $ReportPath $report
+            $reportWrittenThisInvocation = $true
+            Write-Host $(if ($ContractTest) { "[info] FirmwareOnline production execution: NOT RUN" } else { "[info] FirmwareOnline scenario: PASS" })
+            return
+        }
+
+        if ($FirmwareStage -eq "OfflineReplay") {
+            if ($state.state -ne "awaiting_offline" -or $checkpoint.state -ne "awaiting_offline") {
+                throw "Firmware offline checkpoint is stale, replayed, forged, or mismatched"
+            }
+            $networkAttestation = Assert-HostNetworkAttestation $Register $MatrixEntry $RunId $cleanVm "offline_disconnected" $false
+            if (-not $ContractTest -and $networkAttestation.controlNonce -in @($state.onlineInitialNetworkControlNonce, $state.onlineRebootNetworkControlNonce)) {
+                throw "Host network attestation nonce was replayed across firmware phases"
+            }
+            $checkpoint.state = "offline_claimed"; $state.state = "offline_claimed"
+            $checkpoint | Add-Member -NotePropertyName offlineNetworkAttestationSha256 -NotePropertyValue $networkAttestation.sha256
+            $state | Add-Member -NotePropertyName offlineNetworkAttestationSha256 -NotePropertyValue $networkAttestation.sha256 -Force
+            $state | Add-Member -NotePropertyName offlineNetworkControlNonce -NotePropertyValue $networkAttestation.controlNonce -Force
+            Write-FirmwareCheckpoint $checkpointPath $checkpoint $statePath $state
+            $phaseClaimed = $true
+            $networkState = Assert-GuestNetworkState "offline"
+            $state | Add-Member -NotePropertyName offlineNetworkState -NotePropertyValue $networkState -Force
+            Write-FirmwareCheckpoint $checkpointPath $checkpoint $statePath $state
+            if ($ContractFirmwareFault -eq "OfflineConnectivityOverclaim") {
+                throw "Guest did not prove physical NIC disconnection and absence of real connectivity"
+            }
+            if (-not $ContractTest) {
+                $ownedProcess = Start-FirmwareApplication $installedExecutable
+                Invoke-FirmwareJob $ownedProcess "compile" $true | Out-Null
+                $downloads = Assert-FirmwareDownloads $ownedProcess $script:FirmwareAppDataRoot
+                if ($downloads.ota -ne $state.otaFirmwareSha256 -or $downloads.factory -ne $state.factoryFirmwareSha256) {
+                    throw "Offline replay firmware hashes changed"
+                }
+                Stop-LifecycleApplicationGracefully $ownedProcess; $ownedProcess = $null
+            }
+            Assert-Hash $fixtureDestination $Register.fixtureSha256 "firmware fixture after offline replay" | Out-Null
+            Assert-TreeIdentity ([ordered]@{ fileCount = $state.installTreeEntryCount; aggregateSha256 = $state.installTreeSha256 }) $script:FirmwareInstallRoot "Offline firmware immutable install tree"
+            $state | Add-Member -NotePropertyName offlineCompletedAtUtc -NotePropertyValue ([DateTime]::UtcNow.ToString("o")) -Force
+            $checkpoint.state = "awaiting_cancel"; $state.state = "awaiting_cancel"
+            Write-FirmwareCheckpoint $checkpointPath $checkpoint $statePath $state
+            Write-Host "[info] Firmware offline checkpoint persisted; restore the host-controlled NIC before Cancel"
+            return
+        }
+
+        if ($state.state -ne "awaiting_cancel" -or $checkpoint.state -ne "awaiting_cancel") {
+            throw "Firmware cancel checkpoint is stale, replayed, forged, or mismatched"
+        }
+        $networkAttestation = Assert-HostNetworkAttestation $Register $MatrixEntry $RunId $cleanVm "online_restored" $true
+        if (-not $ContractTest -and $networkAttestation.controlNonce -in @(
+            $state.onlineInitialNetworkControlNonce, $state.onlineRebootNetworkControlNonce, $state.offlineNetworkControlNonce
+        )) {
+            throw "Host network attestation nonce was replayed across firmware phases"
+        }
+        $checkpoint.state = "cancel_claimed"; $state.state = "cancel_claimed"
+        $checkpoint | Add-Member -NotePropertyName restoredNetworkAttestationSha256 -NotePropertyValue $networkAttestation.sha256
+        $state | Add-Member -NotePropertyName restoredNetworkAttestationSha256 -NotePropertyValue $networkAttestation.sha256 -Force
+        $state | Add-Member -NotePropertyName restoredNetworkControlNonce -NotePropertyValue $networkAttestation.controlNonce -Force
+        Write-FirmwareCheckpoint $checkpointPath $checkpoint $statePath $state
+        $phaseClaimed = $true
+        $networkState = Assert-GuestNetworkState "online"
+        $state | Add-Member -NotePropertyName restoredNetworkState -NotePropertyValue $networkState -Force
+        Write-FirmwareCheckpoint $checkpointPath $checkpoint $statePath $state
+        if (-not $ContractTest) {
+            $ownedProcess = Start-FirmwareApplication $installedExecutable
+            Invoke-FirmwareJob $ownedProcess "clean" $false 10 | Out-Null
+            $cancelBaseline = @(Get-FirmwareJobProcessIdentity $ownedProcess)
+            $body = @{ yaml = "compile-only.yaml"; action = "compile" } | ConvertTo-Json -Compress
+            Assert-FirmwareBackendOwnership $ownedProcess
+            $started = Invoke-RestMethod "http://127.0.0.1:$($ownedProcess.port)/api/install" -Method Post -ContentType "application/json" -Body $body -TimeoutSec 10
+            $cancelDeadline = [DateTime]::UtcNow.AddMinutes(5)
+            $observedRealCompile = $false
+            do {
+                if ([DateTime]::UtcNow -ge $cancelDeadline) { break }
+                Assert-FirmwareBackendOwnership $ownedProcess
+                $status = Invoke-RestMethod "http://127.0.0.1:$($ownedProcess.port)/api/jobs/$($started.job_id)" -TimeoutSec 5
+                $currentJobIdentity = @(Get-FirmwareJobProcessIdentity $ownedProcess)
+                $newJobIdentity = @($currentJobIdentity | Where-Object { $cancelBaseline -cnotcontains $_ })
+                $newJobIds = @($newJobIdentity | ForEach-Object { [int]($_ -split ':', 2)[0] })
+                $jobChildren = @(Get-CimInstance Win32_Process | Where-Object {
+                    $newJobIds -contains [int]$_.ProcessId -and [string]$_.CommandLine -match '(?i)(esphome|platformio|pio\s|scons|cmake|ninja)'
+                })
+                if ($status.job.state -eq "running" -and $jobChildren.Count -gt 0) { $observedRealCompile = $true; break }
+                if ($status.job.state -notin @("queued", "running")) { break }
+                Start-Sleep -Milliseconds 50
+            } while ($true)
+            if (-not $observedRealCompile) { throw "Cancel phase did not observe a real running compile child" }
+            Assert-FirmwareBackendOwnership $ownedProcess
+            Invoke-RestMethod "http://127.0.0.1:$($ownedProcess.port)/api/jobs/$($started.job_id)/cancel" -Method Post -TimeoutSec 10 | Out-Null
+            do {
+                Start-Sleep -Milliseconds 100
+                Assert-FirmwareBackendOwnership $ownedProcess
+                $status = Invoke-RestMethod "http://127.0.0.1:$($ownedProcess.port)/api/jobs/$($started.job_id)" -TimeoutSec 5
+            } while ($status.job.state -in @("queued", "running") -and [DateTime]::UtcNow -lt $cancelDeadline)
+            if ($status.job.state -ne "canceled") { throw "Real compile cancel did not reach canceled state" }
+            $descendantDeadline = [DateTime]::UtcNow.AddSeconds(30)
+            do {
+                $remainingJobIdentity = @(Get-FirmwareJobProcessIdentity $ownedProcess)
+                if (($remainingJobIdentity -join "`n") -ceq ($cancelBaseline -join "`n")) { break }
+                Start-Sleep -Milliseconds 100
+            } while ([DateTime]::UtcNow -lt $descendantDeadline)
+            if (($remainingJobIdentity -join "`n") -cne ($cancelBaseline -join "`n")) { throw "Compile cancel did not restore the exact pre-compile Job Object process baseline" }
+            Assert-Hash $fixtureDestination $Register.fixtureSha256 "firmware fixture after cancel" | Out-Null
+            Stop-LifecycleApplicationGracefully $ownedProcess; $ownedProcess = $null
+            $uninstaller = Join-Path $script:FirmwareInstallRoot "uninstall.exe"
+            if (-not (Test-Path -LiteralPath $uninstaller -PathType Leaf)) { throw "Firmware installation has no uninstaller" }
+            Invoke-Nsis $uninstaller @("/S") "Firmware final uninstall"
+            Complete-LifecycleUninstall $script:FirmwareInstallRoot $RunId ([string]$state.nonce) "Firmware final uninstall did not remove the install root"
+        } else {
+            Assert-OwnedTreeSafeForRemoval $script:FirmwareInstallRoot
+            foreach ($entry in @(Get-ChildItem -LiteralPath $script:FirmwareInstallRoot -Force | Where-Object { $_.Name -ne $lifecycleRootMarkerName })) {
+                Remove-Item -LiteralPath $entry.FullName -Recurse -Force
+            }
+            Complete-LifecycleUninstall $script:FirmwareInstallRoot $RunId ([string]$state.nonce) "Firmware contract uninstall did not remove the install root"
+        }
+        Remove-OwnedFirmwareRoot $script:FirmwareWorkspaceRoot "workspace" $RunId ([string]$state.nonce)
+        Remove-OwnedFirmwareRoot $script:FirmwareAppDataRoot "app-data" $RunId ([string]$state.nonce)
+        $state | Add-Member -NotePropertyName finalFixtureSha256 -NotePropertyValue $Register.fixtureSha256 -Force
+        $state | Add-Member -NotePropertyName completedAtUtc -NotePropertyValue ([DateTime]::UtcNow.ToString("o")) -Force
+        $state.state = "completed"; $checkpoint.state = "completed"
+        Write-FirmwareCheckpoint $checkpointPath $checkpoint $statePath $state
+        $evidence = if ($ContractTest) { "Contract simulation" } else { "Production execution" }
+        $requiredChecks = @(Get-FirmwareRequiredChecks "FirmwareOffline")
+        $checks = @($requiredChecks | ForEach-Object {
+            if ($ContractTest) {
+                [ordered]@{ name = $_; status = "not_run"; reasonCode = "contract_test_no_production_execution"; summary = "$evidence did not execute the production FirmwareOffline check: $_" }
+            } else {
+                [ordered]@{ name = $_; status = "pass"; summary = "$evidence verified the FirmwareOffline contract: $_" }
+            }
+        })
+        $finalNetworkState = if ($ContractTest) { "contract_test_not_observed" } else { "host_detached_guest_connectivity_absent_then_host_restored_guest_online" }
+        $report = New-FirmwareReport "FirmwareOffline" $Register $Observed $MatrixEntry $RunId $RegisterHash $MatrixHash ([DateTime]::UtcNow) $checks $cleanVm $state $finalNetworkState
+        Assert-Report ([pscustomobject]$report) $Register $Observed $MatrixEntry $RunId
+        Write-NewJsonFile $ReportPath $report
+        $reportWrittenThisInvocation = $true
+        Write-Host $(if ($ContractTest) { "[info] FirmwareOffline production execution: NOT RUN" } else { "[info] FirmwareOffline scenario: PASS" })
+    } catch { $scenarioFailure = $_ } finally {
+        if ($ownedProcess) { try { Stop-OwnedLifecycleProcess $ownedProcess } catch { $cleanupErrors.Add($_.Exception.Message) } }
+        if ($scenarioFailure -and $phaseClaimed -and (Test-Path -LiteralPath $statePath -PathType Leaf)) {
+            try {
+                $cleanupState = Read-JsonObject $statePath "Firmware cleanup state"
+                if ($cleanupState.runId -ne $RunId -or $cleanupState.sourceCommit -ne $Register.sourceCommit -or
+                    $cleanupState.artifactRegisterSha256 -ne $RegisterHash -or $cleanupState.testKitSha256 -ne $Register.testKitSha256 -or
+                    $cleanupState.matrixPolicySha256 -ne $MatrixHash -or [string]$cleanupState.nonce -notmatch '^[0-9a-f]{32}$') {
+                    throw "Firmware cleanup ownership state is invalid"
+                }
+                $cleanupRoots = @(
+                    @($script:FirmwareInstallRoot, "install"), @($script:FirmwareWorkspaceRoot, "workspace"), @($script:FirmwareAppDataRoot, "app-data")
+                )
+                for ($cleanupIndex = 0; $cleanupIndex -lt $cleanupRoots.Count; $cleanupIndex++) {
+                    $root = $cleanupRoots[$cleanupIndex]
+                    try {
+                        if ($cleanupIndex -eq 0 -and $ContractFirmwareFault -eq "CleanupFirstResourceFailure") {
+                            throw "Synthetic first firmware cleanup resource failed"
+                        }
+                        Remove-OwnedFirmwareRoot $root[0] $root[1] $RunId ([string]$cleanupState.nonce)
+                    } catch { $cleanupErrors.Add($_.Exception.Message) }
+                }
+                $cleanupState.state = if ($cleanupErrors.Count -eq 0) { "failed_cleaned" } else { "failed_cleanup_incomplete" }
+                $cleanupState | Add-Member -NotePropertyName failedAtUtc -NotePropertyValue ([DateTime]::UtcNow.ToString("o")) -Force
+                Write-FirmwareOwnedState $statePath $cleanupState
+            } catch { $cleanupErrors.Add($_.Exception.Message) }
+        }
+        if ($firmwareLock -and -not $scenarioFailure -and $cleanupErrors.Count -eq 0) {
+            $firmwareLock.Dispose()
+            $firmwareLock = $null
+        }
+    }
+    if (($scenarioFailure -or $cleanupErrors.Count -gt 0) -and $mayWriteFailureReport) {
+        try {
+            Write-SanitizedFirmwareFailureReport $Scenario $Register $Observed $MatrixEntry $RunId $RegisterHash $MatrixHash $cleanVm $state $reportWrittenThisInvocation
+        } catch {
+            $cleanupErrors.Add("Sanitized firmware failure report could not be written")
+        }
+    }
+    if ($firmwareLock) { $firmwareLock.Dispose() }
+    if ($scenarioFailure) {
+        if ($cleanupErrors.Count -gt 0) { Write-Warning ("Firmware cleanup also failed:`n- " + ($cleanupErrors -join "`n- ")) }
+        throw $scenarioFailure
+    }
+    if ($cleanupErrors.Count -gt 0) { throw ("Firmware cleanup failed:`n- " + ($cleanupErrors -join "`n- ")) }
+}
+
 function Assert-Report([object]$Report, [object]$Register, [object]$Observed, [string]$MatrixEntry, [string]$ExpectedRunId = "") {
     if ($Report.schemaVersion -ne 1 -or $Report.scenario -notin @("Preflight", "Lifecycle", "Startup", "FirmwareOnline", "FirmwareOffline", "Capabilities")) {
         throw "Report schema identity is invalid"
     }
+    $allowedReportProperties = @(
+        "schemaVersion", "scenario", "startedAtUtc", "endedAtUtc", "result", "sourceCommit", "productVersion",
+        "candidateKind", "candidateStatus", "artifactId", "artifactName", "archiveDigest", "sha256SumsSha256",
+        "provenanceSha256", "installerSha256", "applicationSha256", "runtimeIdentity", "resourceIdentity",
+        "runtimeManifestSha256", "runtimePayloadSha256", "resourceLayoutSha256", "resourcePayloadSha256",
+        "inventorySha256", "noticesSha256", "fixtureSha256", "testKitSourceSha", "testKitSha256",
+        "artifactRegisterSha256", "matrixPolicySha256", "authenticodeStatus", "osCaption", "osEdition", "osVersion",
+        "osBuild", "architecture", "accountType", "isElevated", "webView2Version", "networkState",
+        "workspaceRootCategory", "appDataRootCategory", "matrixEntryId", "evidenceClass", "gateRunId", "checks"
+    )
+    if ($Report.scenario -in @("Lifecycle", "Startup", "FirmwareOnline", "FirmwareOffline")) {
+        $allowedReportProperties += @("cleanVmAttestationSha256", "hostRunNonce")
+    }
+    if ($Report.scenario -eq "Startup") {
+        $allowedReportProperties += @("acceptedWarnings", "blockingChecksPassed", "blockingChecksTotal", "outcome")
+    }
+    if ($Report.scenario -in @("FirmwareOnline", "FirmwareOffline")) {
+        $allowedReportProperties += @("otaFirmwareSha256", "factoryFirmwareSha256", "finalFixtureSha256", "networkAttestations")
+    }
+    $unexpectedReportProperties = @(Get-ReportFieldNames $Report | Where-Object { $allowedReportProperties -cnotcontains $_ })
+    if ($unexpectedReportProperties.Count -gt 0) { throw "Report contains fields outside the sanitized schema allowlist" }
     if ($ExpectedReportScenario -and $Report.scenario -ne $ExpectedReportScenario) { throw "Report scenario does not match the expected scenario" }
     if (-not (Test-ExactStatus ([string]$Report.result))) { throw "Report result status is invalid" }
     foreach ($property in @(
@@ -2357,10 +3150,44 @@ function Assert-Report([object]$Report, [object]$Register, [object]$Observed, [s
     )) {
         if ($Report.PSObject.Properties.Name -notcontains $property) { throw "Report is missing required field: $property" }
     }
-    if ($Report.scenario -in @("Lifecycle", "Startup")) {
+    if ($Report.scenario -in @("Lifecycle", "Startup", "FirmwareOnline", "FirmwareOffline")) {
         foreach ($property in @("cleanVmAttestationSha256", "hostRunNonce")) {
             if ($Report.PSObject.Properties.Name -notcontains $property -or [string]::IsNullOrWhiteSpace([string]$Report.$property)) {
                 throw "$($Report.scenario) report is missing required field: $property"
+            }
+        }
+    }
+    if ($Report.scenario -in @("FirmwareOnline", "FirmwareOffline")) {
+        foreach ($property in @("otaFirmwareSha256", "factoryFirmwareSha256", "finalFixtureSha256")) {
+            $firmwareEvidenceValue = [string]$Report.$property
+            $validFailureEvidence = [string]::IsNullOrWhiteSpace($firmwareEvidenceValue) -or
+                $firmwareEvidenceValue -match $sha256Pattern -or ($ContractTest -and $firmwareEvidenceValue -eq "contract_test")
+            if ($Report.PSObject.Properties.Name -notcontains $property -or
+                ($Report.result -eq "fail" -and -not $validFailureEvidence) -or
+                ($Report.result -ne "fail" -and $firmwareEvidenceValue -notmatch $sha256Pattern)) {
+                throw "$($Report.scenario) report is missing valid firmware evidence field: $property ('$([string]$Report.$property)')"
+            }
+        }
+        if ($Report.PSObject.Properties.Name -notcontains "networkAttestations" -or $null -eq $Report.networkAttestations) {
+            throw "$($Report.scenario) report is missing network attestation hashes"
+        }
+        $expectedNetworkAttestationProperties = if ($Report.scenario -eq "FirmwareOnline") {
+            @("onlineInitialSha256", "onlineRebootSha256")
+        } else {
+            @("onlineInitialSha256", "onlineRebootSha256", "offlineDisconnectedSha256", "onlineRestoredSha256")
+        }
+        $actualNetworkAttestationProperties = @(Get-ReportFieldNames $Report.networkAttestations)
+        if ($actualNetworkAttestationProperties.Count -ne $expectedNetworkAttestationProperties.Count -or
+            @($actualNetworkAttestationProperties | Where-Object { $expectedNetworkAttestationProperties -cnotcontains $_ }).Count -gt 0) {
+            throw "$($Report.scenario) report network attestations contain fields outside the sanitized schema allowlist"
+        }
+        if ($Report.result -eq "fail") {
+            foreach ($attestationName in $expectedNetworkAttestationProperties) {
+                $attestationValue = [string]$Report.networkAttestations.$attestationName
+                if (-not ([string]::IsNullOrWhiteSpace($attestationValue) -or $attestationValue -match $sha256Pattern -or
+                    ($ContractTest -and $attestationValue -eq "contract_test"))) {
+                    throw "$($Report.scenario) failure report contains invalid network evidence"
+                }
             }
         }
     }
@@ -2415,6 +3242,19 @@ function Assert-Report([object]$Report, [object]$Register, [object]$Observed, [s
             "foreign_listener_8099", "forced_primary_job_cleanup", "abandoned_guard_takeover",
             "interrupted_job_reconciliation", "graceful_close", "startup_guard_timeout", "final_cleanup"
         )
+    } elseif ($Report.scenario -eq "FirmwareOnline") {
+        @(
+            "artifact_identity", "preflight_receipt", "clean_vm_attestation", "host_network_online", "root_ownership",
+            "isolated_roots", "fresh_cache_build", "approved_fixture", "silent_per_user_install", "installed_application_hash", "installed_resources", "immutable_install_tree",
+            "first_online_compile", "firmware_node_mapping", "firmware_download_hashes", "cache_replay", "application_restart",
+            "reboot_resume", "reboot_replay", "graceful_close"
+        )
+    } elseif ($Report.scenario -eq "FirmwareOffline") {
+        @(
+            "artifact_identity", "preflight_receipt", "clean_vm_attestation", "host_network_offline", "guest_connectivity_absent",
+            "checkpoint_binding", "offline_cache_replay", "offline_firmware_hashes", "graceful_close", "host_network_restored",
+            "real_compile_cancel", "canceled_state", "fixture_unchanged", "no_job_descendants", "final_cleanup"
+        )
     } else {
         @("scenario_implementation")
     }
@@ -2425,8 +3265,8 @@ function Assert-Report([object]$Report, [object]$Register, [object]$Observed, [s
             throw "Report pass contains a non-pass required check: $requiredCheck"
         }
     }
-    if ($Report.scenario -eq "Startup" -and $checks.Count -ne $required.Count) {
-        throw "Startup report must contain exactly the 20 required checks"
+    if ($Report.scenario -in @("Startup", "FirmwareOnline", "FirmwareOffline") -and $checks.Count -ne $required.Count) {
+        throw "$($Report.scenario) report must contain exactly its required checks"
     }
     if ($Report.scenario -eq "Startup") {
         if ($null -eq $Report.acceptedWarnings) { throw "Startup report is missing acceptedWarnings" }
@@ -2448,12 +3288,40 @@ function Assert-Report([object]$Report, [object]$Register, [object]$Observed, [s
         @($checks | Where-Object { -not ([string]$_.summary).StartsWith("Contract simulation", [StringComparison]::Ordinal) }).Count -gt 0) {
         throw "Contract-test Startup summaries must be labelled Contract simulation"
     }
+    if ($ContractTest -and $Report.scenario -in @("FirmwareOnline", "FirmwareOffline") -and $Report.result -eq "not_run" -and
+        @($checks | Where-Object { -not ([string]$_.summary).StartsWith("Contract simulation", [StringComparison]::Ordinal) }).Count -gt 0) {
+        throw "Contract-test firmware summaries must be labelled Contract simulation"
+    }
+    if ($ContractTest) {
+        $isContractFirmware = $Report.scenario -in @("FirmwareOnline", "FirmwareOffline")
+        $isContractFirmwareNotRun = $isContractFirmware -and ($Report.result -eq "not_run")
+        if ($isContractFirmware -and $Report.result -notin @("fail", "not_run")) {
+            throw "Contract-test firmware report must remain NOT RUN"
+        }
+        if ($isContractFirmware -and $Report.networkState -ne "contract_test_not_observed") {
+            throw "Contract-test firmware report overclaims production network evidence"
+        }
+        if ($isContractFirmwareNotRun) {
+            foreach ($attestationName in @(Get-ReportFieldNames $Report.networkAttestations)) {
+                if ([string]$Report.networkAttestations.$attestationName -ne "contract_test") {
+                    throw "Contract-test firmware report overclaims production network evidence"
+                }
+            }
+        }
+    }
     foreach ($check in $checks) {
+        $unexpectedCheckProperties = @(Get-ReportFieldNames $check | Where-Object { @("name", "status", "summary", "reasonCode") -cnotcontains $_ })
+        if ($unexpectedCheckProperties.Count -gt 0) { throw "Report check contains fields outside the sanitized schema allowlist" }
         if (-not (Test-ExactStatus ([string]$check.status)) -or [string]::IsNullOrWhiteSpace([string]$check.summary)) {
             throw "Report check contract is invalid"
         }
         if ($check.status -eq "not_run" -and [string]::IsNullOrWhiteSpace([string]$check.reasonCode)) {
             throw "Report not_run check requires a reason code"
+        }
+        if ($ContractTest -and $Report.scenario -in @("FirmwareOnline", "FirmwareOffline") -and
+            $Report.result -eq "not_run" -and
+            ($check.status -ne "not_run" -or $check.reasonCode -ne "contract_test_no_production_execution")) {
+            throw "Contract-test firmware checks must remain NOT RUN with the production-execution reason code"
         }
     }
     if ($Report.result -eq "pass" -and @($checks | Where-Object { $_.status -ne "pass" }).Count -gt 0) {
@@ -2510,6 +3378,73 @@ function Assert-Report([object]$Report, [object]$Register, [object]$Observed, [s
         if (($ContractTest -and ($Report.cleanVmAttestationSha256 -ne "contract_test" -or $Report.hostRunNonce -ne "contract_test")) -or
             (-not $ContractTest -and ($Report.cleanVmAttestationSha256 -notmatch $sha256Pattern -or $Report.hostRunNonce -notmatch $sha256Pattern))) {
             throw "Startup report attestation fields do not match its evidence class"
+        }
+    }
+    if ($Report.scenario -in @("FirmwareOnline", "FirmwareOffline") -and $Report.result -in @("pass", "not_run")) {
+        $statePath = Join-Path $GateRoot "firmware-owned-resources.json"
+        $checkpointPath = Join-Path $GateRoot "firmware-checkpoint.json"
+        $state = Read-JsonObject $statePath "Firmware owned-resource state"
+        Assert-Hash $checkpointPath ([string]$state.checkpointSha256) "Firmware checkpoint" | Out-Null
+        $checkpoint = Read-JsonObject $checkpointPath "Firmware checkpoint"
+        $allowedStates = if ($Report.scenario -eq "FirmwareOnline") { @("awaiting_offline", "awaiting_cancel", "completed") } else { @("completed") }
+        if ($state.schemaVersion -ne 1 -or $state.kind -ne "ecd-firmware-owned-resources" -or
+            $state.state -notin $allowedStates -or $checkpoint.state -notin $allowedStates -or
+            $state.runId -ne $Report.gateRunId -or $checkpoint.runId -ne $Report.gateRunId -or
+            $state.sourceCommit -ne $Report.sourceCommit -or $checkpoint.sourceCommit -ne $Report.sourceCommit -or
+            $state.artifactRegisterSha256 -ne $Report.artifactRegisterSha256 -or
+            $checkpoint.artifactRegisterSha256 -ne $Report.artifactRegisterSha256 -or
+            $state.matrixPolicySha256 -ne $Report.matrixPolicySha256 -or
+            $checkpoint.matrixPolicySha256 -ne $Report.matrixPolicySha256 -or
+            $state.testKitSha256 -ne $Report.testKitSha256 -or $checkpoint.testKitSha256 -ne $Report.testKitSha256 -or
+            $state.cleanVmAttestationSha256 -ne $Report.cleanVmAttestationSha256 -or
+            $checkpoint.cleanVmAttestationSha256 -ne $Report.cleanVmAttestationSha256 -or
+            $state.hostRunNonce -ne $Report.hostRunNonce -or $checkpoint.hostRunNonce -ne $Report.hostRunNonce -or
+            $state.otaFirmwareSha256 -ne $Report.otaFirmwareSha256 -or
+            $state.factoryFirmwareSha256 -ne $Report.factoryFirmwareSha256 -or
+            $state.finalFixtureSha256 -ne $Report.finalFixtureSha256 -or
+            [string]::IsNullOrWhiteSpace([string]$state.onlineCompletedAtUtc)) {
+            throw "$($Report.scenario) PASS report does not have a completed bound firmware state"
+        }
+        $expectedNetworkState = if ($ContractTest) {
+            "contract_test_not_observed"
+        } elseif ($Report.scenario -eq "FirmwareOnline") {
+            "host_attached_guest_route_and_tcp_verified"
+        } else {
+            "host_detached_guest_connectivity_absent_then_host_restored_guest_online"
+        }
+        if ($Report.networkState -ne $expectedNetworkState -or
+            $Report.networkAttestations.onlineInitialSha256 -ne $state.onlineInitialNetworkAttestationSha256 -or
+            $Report.networkAttestations.onlineRebootSha256 -ne $state.onlineRebootNetworkAttestationSha256 -or
+            [string]::IsNullOrWhiteSpace([string]$Report.networkAttestations.onlineInitialSha256) -or
+            [string]::IsNullOrWhiteSpace([string]$Report.networkAttestations.onlineRebootSha256)) {
+            throw "$($Report.scenario) report network evidence does not match its bound state"
+        }
+        $expectedNetworkAttestationProperties = if ($Report.scenario -eq "FirmwareOnline") {
+            @("onlineInitialSha256", "onlineRebootSha256")
+        } else {
+            @("onlineInitialSha256", "onlineRebootSha256", "offlineDisconnectedSha256", "onlineRestoredSha256")
+        }
+        $actualNetworkAttestationProperties = @(Get-ReportFieldNames $Report.networkAttestations)
+        if ($actualNetworkAttestationProperties.Count -ne $expectedNetworkAttestationProperties.Count -or
+            @($actualNetworkAttestationProperties | Where-Object { $expectedNetworkAttestationProperties -cnotcontains $_ }).Count -gt 0) {
+            throw "$($Report.scenario) report network attestations contain fields outside the sanitized schema allowlist"
+        }
+        if ($Report.scenario -eq "FirmwareOffline" -and
+            ($Report.networkAttestations.offlineDisconnectedSha256 -ne $state.offlineNetworkAttestationSha256 -or
+             $Report.networkAttestations.onlineRestoredSha256 -ne $state.restoredNetworkAttestationSha256 -or
+             [string]::IsNullOrWhiteSpace([string]$Report.networkAttestations.offlineDisconnectedSha256) -or
+             [string]::IsNullOrWhiteSpace([string]$Report.networkAttestations.onlineRestoredSha256))) {
+            throw "FirmwareOffline report network evidence does not match its bound state"
+        }
+        if ($Report.scenario -eq "FirmwareOffline" -and
+            ((Test-Path -LiteralPath ([string]$state.installRoot)) -or
+             (Test-Path -LiteralPath ([string]$state.workspaceRoot)) -or
+             (Test-Path -LiteralPath ([string]$state.appDataRoot)))) {
+            throw "FirmwareOffline PASS report has remaining owned scenario roots"
+        }
+        if (($ContractTest -and ($Report.cleanVmAttestationSha256 -ne "contract_test" -or $Report.hostRunNonce -ne "contract_test")) -or
+            (-not $ContractTest -and ($Report.cleanVmAttestationSha256 -notmatch $sha256Pattern -or $Report.hostRunNonce -notmatch $sha256Pattern))) {
+            throw "$($Report.scenario) report attestation fields do not match its evidence class"
         }
     }
 }
@@ -2583,6 +3518,10 @@ if ($Scenario -ne "Preflight") {
     }
     if ($Scenario -eq "Startup") {
         Invoke-StartupScenario $register $observed $matrixEntry $runId $registerHash $matrixHash
+        exit 0
+    }
+    if ($Scenario -in @("FirmwareOnline", "FirmwareOffline")) {
+        Invoke-FirmwareScenario $register $observed $matrixEntry $runId $registerHash $matrixHash
         exit 0
     }
     $notRunReport = [ordered]@{

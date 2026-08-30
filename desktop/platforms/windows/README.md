@@ -40,7 +40,7 @@ Current coverage inventory:
 | Candidate identity and provenance | Release build provenance and `SHA256SUMS` | Clean VM must receive an external candidate-bound artifact register | Release orchestrator preflight |
 | Installed lifecycle | Hosted silent install and installed smoke; portable `Lifecycle` orchestration contract | Requires separate exact-artifact execution on every declared clean Windows matrix entry | `Lifecycle` scenario |
 | Startup/process matrix | Hosted simultaneous-start gate; portable installed-artifact `Startup` orchestration contract | Exact-artifact clean-machine execution and manual visible-focus observation remain required | `Startup` scenario |
-| Firmware online/offline | Source manual gate | Installed exact-artifact flow and physical NIC control remain `NOT RUN` | `FirmwareOnline`/`FirmwareOffline` plus host control |
+| Firmware online/offline | Source manual gate; portable installed-artifact firmware orchestration contract | Exact-artifact clean-machine execution with host-controlled physical NIC changes remains `NOT RUN` | `FirmwareOnline`/`FirmwareOffline` plus host control |
 | WebView2, low disk, Defender, physical device | Documentation and partial hosted checks | Dedicated VM snapshots/disks and owner-approved hardware remain `NOT RUN` | Host/manual gates |
 
 The release orchestrator requires absolute paths for a verified candidate root,
@@ -53,10 +53,13 @@ An existing root without its exact marker is rejected and is never cleaned.
 
 Reports use schema version `1` and one status vocabulary:
 `pass`, `fail`, or `not_run`. A top-level `pass` requires every scenario-specific
-check. Every `not_run` check requires a stable reason code. Scenarios other than
-`Preflight`, `Lifecycle`, and `Startup` that are not yet implemented emit `not_run` with
-`scenario_not_implemented`; their presence in the script is not a clean-machine
-PASS.
+check. Every `not_run` check requires a stable reason code. `Preflight`,
+`Lifecycle`, `Startup`, `FirmwareOnline`, and `FirmwareOffline` are implemented
+orchestration scenarios. Other declared scenarios that are not yet implemented
+emit `not_run` with `scenario_not_implemented`; their presence in the script is
+not a clean-machine PASS. Implemented firmware orchestration also remains
+`NOT RUN` until its production phases are executed on the exact installed
+candidate with real host-controlled network transitions.
 
 `Lifecycle` is a two-phase operation. `Begin` re-verifies the complete candidate,
 requires the exact passing Preflight receipt, rejects existing or overlapping
@@ -105,10 +108,12 @@ therefore not applicable to `1.4.0`; future Desktop releases must test manual
 update from the latest previously published supported installer.
 
 The executable contract uses explicit synthetic boot identities only with
-`-ContractTest`; reports retain `evidenceClass=contract_test`. This proves parser,
-ownership, retained synthetic data trees, state-machine, independent cleanup,
-and report behavior. It is not evidence of an NSIS lifecycle or real reboot on a
-clean VM.
+`-ContractTest`; reports retain `evidenceClass=contract_test`. Firmware contract
+reports and every production-only firmware check remain explicitly `not_run`
+with `contract_test_no_production_execution`. This proves parser, ownership,
+retained synthetic data trees, state-machine, independent cleanup, and report
+behavior. It is not evidence of an NSIS lifecycle, physical network control, or
+real reboot on a clean VM.
 
 `Startup` requires separate new install, workspace, and app-data roots plus a
 Startup-specific clean-VM attestation and host nonce. Production execution
@@ -136,6 +141,50 @@ passed; consumers must also inspect `outcome` and `acceptedWarnings`.
 `-ContractTest` exercises only parser, state, ownership, report, and cleanup
 behavior and labels every check as a contract simulation; it does not launch the
 synthetic executable or claim GUI, Job Object, NSIS, or clean-machine evidence.
+
+`FirmwareOnline` and `FirmwareOffline` share one artifact-bound, durable state
+chain and three new, disjoint install/workspace/app-data roots. Production uses
+four explicit phases:
+
+1. `FirmwareOnline` / `OnlineBegin` installs the exact registered candidate,
+   verifies its application and complete installed resources, copies the
+   approved fixture without parsing or logging it, requires absent `p/` and `b/`,
+   performs the first online compile, verifies the exact `ecd-clean-machine`
+   firmware-node mapping, compares OTA and factory API downloads to the mapped
+   build outputs, performs cache replay without `clean`, restarts the application,
+   repeats the replay, closes normally, and persists an awaiting-reboot
+   checkpoint without publishing PASS.
+2. `FirmwareOnline` / `RebootResume` requires a changed Windows boot identity,
+   claims the checkpoint once, repeats compile/download verification, closes
+   normally, and publishes the online report only after persisting the
+   awaiting-offline state.
+3. After the VM host physically disconnects the NIC, `FirmwareOffline` /
+   `OfflineReplay` requires a host network attestation and independently requires
+   the guest to observe no up hardware adapter, no live default IPv4 route, and
+   no external TCP connectivity. It replays compile without `clean`, compares
+   both firmware downloads, closes normally, and persists an awaiting-cancel
+   checkpoint without publishing PASS.
+4. After the host restores the NIC, `FirmwareOffline` / `Cancel` requires a new
+   host attestation and guest online proof. It then performs a separate real
+   compile cancel only after the offline evidence is complete, requires the
+   terminal `canceled` state, no ESPHome/PlatformIO build descendants, unchanged
+   fixture hash, normal application close, uninstall, and marker-verified cleanup
+   of only the three firmware-owned roots.
+
+All production firmware phases require the same `Firmware` clean-VM attestation
+and host run nonce. Every network transition additionally requires a separately
+hashed `ecd-host-network-attestation` bound to the source, artifact register,
+kit, matrix entry, gate run, host run nonce, exact phase, physical attachment
+state, observation time, and a phase-specific network-control nonce. Reused
+phase checkpoints or network-control nonces fail closed. The report contains
+only artifact identities, firmware hashes, fixture hash, network-attestation
+hashes, categorical roots, checks, and environment metadata; it does not contain
+YAML, secrets, private profile paths, raw logs, adapter names, or job output.
+
+Contract mode simulates only these state transitions and failure paths. It uses
+synthetic boot identities, records `contract_test_not_observed` network state,
+does not invoke the installer/application/network/API, and cannot be presented
+as reboot, compile, firmware-download, physical-offline, or cancel evidence.
 
 `desktop/scripts/build-clean-machine-kit.ps1` creates a separate portable test
 artifact from a fixed allowlist read from the exact committed Git archive. The
