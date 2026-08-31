@@ -299,9 +299,11 @@ than implementing a second downloader. The mutable Microsoft Evergreen WebView2
 URL has no stable artifact hash, and the Tauri template checks download and
 process success rather than an ECD-controlled digest or signer rule.
 
-The public package is still unavailable and current artifacts remain for
-development and testing only. See the
-[Windows installation status](../installation/windows.md).
+Users should obtain the promoted installer from the
+[unsigned public Windows 1.4.0 Release](https://github.com/sokolsok/ESPConfig-Designer/releases/tag/windows-1.4.0-unsigned.1).
+Actions artifacts and local builds remain development or pre-promotion inputs;
+they are not the stable user download channel. See the
+[Windows installation guide](../installation/windows.md).
 
 An explicit unsigned release build is available for technical pipeline testing:
 
@@ -314,11 +316,14 @@ The command requires a clean committed source SHA, builds from an isolated Git
 snapshot, recreates dependencies/frontend/resources from locked canonical
 inputs, verifies package and supply-chain contracts, and runs
 `tauri build --bundles nsis` without `--debug`. Its immutable output is marked
-`unsigned technical candidate - not for users` and includes provenance plus
-SHA-256 values for the release application and installer. It does not sign,
+`unsigned technical candidate - not for users` in its build-time provenance and
+includes provenance plus SHA-256 values for the release application and
+installer. It does not sign,
 timestamp, tag, publish, create an updater, produce a final RC, or claim
 byte-for-byte reproducibility. `build:package:dev` remains the separate debug
-NSIS command.
+NSIS command. That internal status truthfully records the pre-promotion build
+stage; an owner-approved GitHub Release can promote the exact verified installer
+bytes without rewriting their existing provenance.
 
 The NSIS configuration explicitly uses `currentUser` install mode. The approved
 data-lifecycle policy keeps the workspace and `%LOCALAPPDATA%\ECD` across

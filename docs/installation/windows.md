@@ -1,22 +1,55 @@
 # Windows Installation Status
 
-ESPConfig Designer for Windows is functional, but it is not a public release.
-Current NSIS packages are unsigned development/test artifacts produced by the
-Desktop Windows gate or a local development build.
+ESPConfig Designer 1.4.0 is available as an unsigned public release for Windows
+11 x64. Windows may display an **Unknown Publisher** warning because the
+installer is not Authenticode-signed. Verify the published SHA-256 before
+installation.
+
+- [Release page](https://github.com/sokolsok/ESPConfig-Designer/releases/tag/windows-1.4.0-unsigned.1)
+- [Direct Windows x64 installer download](https://github.com/sokolsok/ESPConfig-Designer/releases/download/windows-1.4.0-unsigned.1/ESPConfig-Designer-1.4.0-Windows-x64-setup.exe)
+
+```text
+Public availability: YES
+Release type: Unsigned public release
+Hosted installation and smoke: PASS
+Windows 11 clean-machine firmware online/offline/cancel: PASS
+Authenticode: NotSigned
+```
 
 ## Current status
 
-- The installer and installed executable are not Authenticode-signed.
+- The public installer and installed executable are not Authenticode-signed.
 - No trusted timestamp or SmartScreen publisher result exists.
 - No public Desktop updater or update notification is configured.
 - The installer requires network access to bootstrap WebView2 if it is absent.
 - The first firmware compile can require network access for PlatformIO content.
 - A second launch may not reliably restore or focus an already minimized main
   window; see [Known Issues](../../KNOWN_ISSUES.md).
-- Windows 10 clean-machine release coverage and signed release verification are
-  incomplete.
+- Windows 10 clean-machine coverage and signed-release verification are
+  incomplete; this release does not declare full Windows 10 support.
 
-Do not present or redistribute the current package as a released installer.
+### Verified release evidence
+
+On August 31, 2026, the exact unsigned technical candidate for source commit
+`93bc7858d3855fded3e610b6d63dc9b2bf7e16f6` completed the production
+`Preflight`, `FirmwareOnline`, and `FirmwareOffline` clean-machine scenarios on
+Windows 11 Home 25H2 x64 build `26200.8973`. The firmware run ID was
+`f95d2d4f069c436a98a142dfafe6e485`; both final reports and their independent
+report validations passed with no failed checks. The candidate came from GitHub
+Actions run `33369207799`, artifact ID `9750828465`, with archive digest
+`sha256:e0639a8268b011d8dd3d852afdfd29920c7ff17320983f8d1edd2ae57ea640ac`.
+
+The operator retains the evidence archive privately. Its 50-file evidence
+manifest has SHA-256
+`5ed608840e4fb3e88706e0eddbcb6706a57ba09c093a73db03cb3587fe261175`;
+an independent post-archive verification matched every listed file and the
+manifest hash.
+
+This is evidence for only the stated unsigned release artifact, scenario,
+edition, and exact build. It does not complete `Lifecycle`, `Startup`, Windows 11 Pro,
+Windows 10 Home or Pro, WebView2-absent bootstrap, Defender, low-disk,
+physical-device, signing, timestamp, or signed-artifact verification. Those
+gaps are not claimed as PASS by this unsigned public release.
 
 ## Planned support policy for 1.4.0
 
@@ -33,9 +66,10 @@ IoT, and other Windows releases are outside this declaration. A newer monthly
 build may replace a listed baseline at release freeze, but the exact tested
 builds must be recorded before support is declared.
 
-This is a target matrix, not a claim that the current artifact supports it. The
-clean-machine Windows 10 and Windows 11 gates for the final signed artifact are
-`NOT RUN`. Until they pass, Windows Desktop remains development-only.
+This is a target matrix, not a claim that the current artifact supports every
+entry. The complete Windows 10 and Windows 11 matrix for a future signed
+artifact is `NOT RUN`. The public unsigned release claim is limited to the
+verified Windows 11 Home baseline above.
 
 Microsoft ended standard support for Windows 10 22H2 on October 14, 2025. ECD
 plans transitional Windows 10 support through October 12, 2027 at the latest,
@@ -51,13 +85,29 @@ Microsoft publishes the authoritative
 [Windows 10 ESU terms](https://learn.microsoft.com/windows/whats-new/extended-security-updates),
 and [Windows 11 release information](https://learn.microsoft.com/windows/release-health/windows11-release-information).
 
-## Development package installation
+## Install the public package
+
+1. Download the installer and `SHA256SUMS.txt` from the public Release.
+2. Verify the installer with `Get-FileHash -Algorithm SHA256`; the expected hash
+   is `ef9759f7eb42417cbc30ff14893d9f4e6e877ca5379a5d3d4f7568edf3fe8777`.
+3. Run the installer. Windows may show **Unknown Publisher** because
+   `Get-AuthenticodeSignature` reports `NotSigned`.
+4. Keep project workspaces and `%LOCALAPPDATA%\ECD` backed up independently.
+
+The approved public filename is
+`ESPConfig-Designer-1.4.0-Windows-x64-setup.exe`.
+
+## Development packages
 
 The hosted Desktop workflow creates an unsigned debug installer as a short-lived
 development artifact. A manual dispatch can additionally request a non-debug
 unsigned technical candidate; that artifact is retained for three days and is
-explicitly marked as not for users. A local developer can create either class of
-package by following the [Desktop development guide](../development/desktop.md).
+marked as a pre-promotion candidate. A local developer can create either class
+of package by following the [Desktop development guide](../development/desktop.md).
+
+The short-lived Actions artifact is a technical build input, not the approved
+user download channel. The GitHub Release above promotes the exact verified
+installer bytes under a stable public filename without changing their content.
 
 Before testing any development package:
 
@@ -140,12 +190,11 @@ The reinstall, uninstall, and retained-data gates for the current artifact are
 historical installer as evidence for this policy.
 
 There is no auto-updater, update notification, or automatic version discovery.
-For a future public Desktop update after `1.4.0`, obtain the newer signed
-installer from the release channel published at that time, verify its
-Authenticode identity and published SHA-256, close the application, and run the
-installer normally. No public download URL exists yet. `runtime_update.py` is an
-internal immutable payload transaction used for integrity, activation, and
-rollback testing; it is not the public updater and does not download releases.
+Obtain Windows installers manually from the project GitHub Releases, verify the
+published SHA-256 and stated Authenticode status, close the application, and run
+the installer normally. `runtime_update.py` is an internal immutable payload
+transaction used for integrity, activation, and rollback testing; it is not the
+public updater and does not download releases.
 
 Only one application instance runs in a user session. A second launch activates
 the existing window instead of starting another backend. If another application
@@ -165,9 +214,10 @@ The guard has a ten-second fail-closed timeout and reports a native startup erro
 instead of allowing an unguarded instance to continue. A crashed owner leaves no
 stale mutex. The repository configures simultaneous-start tests for the fresh
 debug executable and installed development and unsigned technical packages, but
-the configured workflow is not evidence of a hosted PASS for the current source.
-A new immutable packaged/installed artifact and clean-machine simultaneous-start
-gate remain required before release signing.
+only actual workflow execution is evidence. Hosted installation and smoke for
+source commit `93bc7858d3855fded3e610b6d63dc9b2bf7e16f6` passed. A clean-machine
+simultaneous-start gate for these exact bytes remains `NOT RUN` and would still
+be required for a broader or signed support claim.
 
 A future official plugin fix can be adopted separately. ECD may retain this
 guard as defense in depth or remove it only after separate packaged and installed
@@ -233,18 +283,25 @@ repository-owned non-debug release command, verifies its clean source
 provenance and `NotSigned` application/installer, installs the candidate, checks
 that the installed executable has the expected SHA-256, repeats installed smoke
 and resource verification, and uploads the complete candidate set for three
-days. It performs no signing or publication and is not a public release.
+days. It performs no signing or publication and is not the user download channel.
+
+That short-lived artifact remains a pre-promotion channel. The owner-approved
+GitHub Release is the stable user channel for the exact verified installer.
 
 This is development-package validation, not a signed release gate. The separate
 `desktop/platforms/windows/clean-machine-gate.ps1` performs real firmware
 compile/cache/offline/cancel scenarios only when a prepared `C:\ECDTest`
 fixture, runtime, application payload, and `test.yaml` are already available.
-It is not part of hosted CI and must not be reported as a current hosted PASS.
+It is not part of hosted CI and must not be reported as hosted coverage. Its
+recorded exact-artifact production result is the separate Windows 11 Home PASS
+described above.
 
-## Release requirements
+## Signing and broader support gaps
 
-A public Windows release still requires clean tests of the matrix above and a
-trusted Authenticode signature and timestamp for a frozen non-debug candidate.
+The current public release is explicitly unsigned and limited to the evidence
+stated above. A future signed or broader-support release requires clean tests of
+the applicable matrix and a trusted Authenticode signature and timestamp for a
+frozen non-debug candidate.
 The planned application is to SignPath Foundation; if accepted, the displayed
 Publisher is expected to be `SignPath Foundation`, not the project name. No
 certificate, signing workflow, publisher result, or approval exists yet.
@@ -262,9 +319,9 @@ trusted RFC 3161 timestamp, checked after installation with
 `Get-AuthenticodeSignature` and `signtool verify /pa /all /tw`, and hashed only
 after signing and timestamping. The release page must publish the exact SHA-256
 and source provenance for those final files. SmartScreen reputation is a
-separate observed result and is not guaranteed by a valid signature. The public
-release URL, final Publisher, certificate thumbprint, and artifact hashes remain
-unset until the signed files exist.
+separate observed result and is not guaranteed by a valid signature. The future
+signed Publisher and certificate thumbprint remain unset until signed files
+exist. The current unsigned Release publishes its exact installer hash.
 
 Technical runtime details remain in the
 [Windows platform reference](../../desktop/platforms/windows/README.md).

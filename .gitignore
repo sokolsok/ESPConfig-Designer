@@ -15,6 +15,7 @@ htmlcov/
 /esp-config-designer/frontend/dist/
 
 # Desktop build and packaged resources
+/desktop/debug/
 /desktop/src-tauri/target/
 /desktop/resources/*
 !/desktop/resources/ecd-app/

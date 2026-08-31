@@ -12,10 +12,22 @@ The Tauri application, resource package, unsigned debug NSIS installer, silent
 install, and installed application smoke are covered by hosted Windows CI. An
 explicit manual workflow input also defines a non-debug unsigned technical
 candidate build, provenance/NotSigned checks, install, executable-hash identity,
-installed smoke, and three-day candidate upload. Both paths remain
-development-only: no trusted signing certificate, timestamp, SmartScreen
-release result, public updater, or supported public Windows release has been
-completed.
+installed smoke, and three-day candidate upload. The exact candidate for source
+`93bc7858d3855fded3e610b6d63dc9b2bf7e16f6` was promoted without byte changes
+to the [unsigned public Windows 1.4.0 Release](https://github.com/sokolsok/ESPConfig-Designer/releases/tag/windows-1.4.0-unsigned.1).
+
+```text
+Public availability: YES
+Release type: Unsigned public release
+Hosted installation and smoke: PASS
+Windows 11 clean-machine firmware online/offline/cancel: PASS
+Authenticode: NotSigned
+```
+
+There is no trusted signing certificate, timestamp, SmartScreen publisher
+result, or auto-updater. Windows may show **Unknown Publisher**. The verified
+clean-machine firmware scope is Windows 11 Home 25H2 x64 build `26200.8973`;
+full Windows 10 support is not declared.
 
 The implemented runtime and package are Windows x64 only. Windows ARM64 has no
 runtime, package, or test matrix and is outside the `1.4.0` scope.
@@ -40,8 +52,18 @@ Current coverage inventory:
 | Candidate identity and provenance | Release build provenance and `SHA256SUMS` | Clean VM must receive an external candidate-bound artifact register | Release orchestrator preflight |
 | Installed lifecycle | Hosted silent install and installed smoke; portable `Lifecycle` orchestration contract | Requires separate exact-artifact execution on every declared clean Windows matrix entry | `Lifecycle` scenario |
 | Startup/process matrix | Hosted simultaneous-start gate; portable installed-artifact `Startup` orchestration contract | Exact-artifact clean-machine execution and manual visible-focus observation remain required | `Startup` scenario |
-| Firmware online/offline | Source manual gate; portable installed-artifact firmware orchestration contract | Exact-artifact clean-machine execution with host-controlled physical NIC changes remains `NOT RUN` | `FirmwareOnline`/`FirmwareOffline` plus host control |
+| Firmware online/offline | Source manual gate; portable installed-artifact firmware orchestration contract; exact unsigned artifact production PASS on Windows 11 Home 25H2 x64 build `26200.8973` for commit `93bc7858d3855fded3e610b6d63dc9b2bf7e16f6` | Other declared matrix entries and the final signed artifact remain `NOT RUN` | `FirmwareOnline`/`FirmwareOffline` plus host control |
 | WebView2, low disk, Defender, physical device | Documentation and partial hosted checks | Dedicated VM snapshots/disks and owner-approved hardware remain `NOT RUN` | Host/manual gates |
+
+The recorded firmware production run is
+`f95d2d4f069c436a98a142dfafe6e485`. Its operator evidence archive contains 50
+independently rehashed files and is bound by manifest SHA-256
+`5ed608840e4fb3e88706e0eddbcb6706a57ba09c093a73db03cb3587fe261175`.
+The candidate came from GitHub Actions run `33369207799`, artifact ID
+`9750828465`, archive digest
+`sha256:e0639a8268b011d8dd3d852afdfd29920c7ff17320983f8d1edd2ae57ea640ac`.
+This updates only the firmware row for that exact unsigned artifact and Windows
+entry; it is not a release-matrix or signing PASS.
 
 The release orchestrator requires absolute paths for a verified candidate root,
 its exact NSIS installer, expected source and EXE hashes, a candidate-bound
@@ -170,6 +192,16 @@ four explicit phases:
    terminal `canceled` state, no ESPHome/PlatformIO build descendants, unchanged
    fixture hash, normal application close, uninstall, and marker-verified cleanup
    of only the three firmware-owned roots.
+
+For the recorded VirtualBox execution, runtime cable disconnection left the
+guest's DHCP default route alive even though the adapter reported
+`Disconnected` and external TCP probes failed. Rebooting the guest while the
+host-controlled cable remained disconnected removed that route; only then did
+the required adapter, route, and TCP absence proof pass. Do not weaken or bypass
+the route check. Configure the two operator shared folders as machine mappings
+before the clean-snapshot boot so they survive the required reboots, and start
+the resumed phase immediately to avoid an automatic Windows Update changing the
+exact matrix build.
 
 Marker-verified cleanup rejects every reparse point before recursively removing
 firmware-owned mutable trees. Tool-generated named NTFS streams inside those
@@ -518,20 +550,22 @@ integrity validation, active/previous pointers, activation, and rollback. It is
 an internal tested transaction mechanism, not a complete public updater and not
 a replacement for Tauri/NSIS release signing or discovery.
 
-The public update model for `1.4.0` is a manual install of a newer signed NSIS
-package over the existing per-user installation. There is no automatic version
-discovery, download, notification, or updater UI.
+The public update model for `1.4.0` is a manual install of a newer approved NSIS
+package with its published hash and stated signature status over the existing
+per-user installation. There is no automatic version discovery, download,
+notification, or updater UI.
 
-## Release blockers
+## Gaps beyond the unsigned public release
 
-- unsigned debug installer and installed executable;
+- no Authenticode signature on the public installer or installed executable;
 - no trusted timestamp or SmartScreen publisher verification;
 - no public updater or complete update UX;
 - incomplete clean supported-Windows release matrix;
 - no clean-machine online/offline verification of the configured WebView2
   bootstrapper;
-- first-compile PlatformIO downloads still require network and clean-machine
-  verification;
+- first-compile PlatformIO downloads passed exact-artifact clean-machine
+  verification on the recorded Windows 11 Home baseline, but remain incomplete
+  across the declared release matrix and final signed artifact;
 - no Linux or macOS Desktop runtime/package gates.
 
 The intermittent failure to restore or focus an already minimized primary
@@ -539,8 +573,7 @@ window is not a `1.4.0` signing blocker. It is an accepted warning documented in
 `KNOWN_ISSUES.md`. Duplicate backend/listener creation, primary termination,
 data-safety failures, or incomplete cleanup remain release blockers.
 
-The planned public matrix is Windows 10 22H2 Home and Pro x64 and Windows 11
-25H2 Home and Pro x64. It does not become a support claim until the exact final
-artifact passes the corresponding clean-machine gates.
-
-Do not present the current Windows package as a release.
+The broader target matrix is Windows 10 22H2 Home and Pro x64 and Windows 11
+25H2 Home and Pro x64. It does not become a full support claim until the exact
+artifact passes the corresponding clean-machine gates. The current public claim
+is the narrower Windows 11 Home evidence recorded above.

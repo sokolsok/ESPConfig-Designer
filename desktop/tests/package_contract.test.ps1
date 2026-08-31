@@ -265,6 +265,14 @@ foreach ($documentPath in $publicDocuments) {
 }
 
 $windowsInstallationGuide = Get-Content -LiteralPath (Join-Path $repoRoot "docs\installation\windows.md") -Raw
+$publicReleaseUrl = "https://github.com/sokolsok/ESPConfig-Designer/releases/tag/windows-1.4.0-unsigned.1"
+$publicInstallerUrl = "https://github.com/sokolsok/ESPConfig-Designer/releases/download/windows-1.4.0-unsigned.1/ESPConfig-Designer-1.4.0-Windows-x64-setup.exe"
+Assert-True ($windowsInstallationGuide.Contains($publicReleaseUrl)) "Windows installation guide is missing the approved public Release"
+Assert-True ($windowsInstallationGuide.Contains($publicInstallerUrl)) "Windows installation guide is missing the approved installer download"
+Assert-True ($windowsInstallationGuide.Contains("Public availability: YES")) "Windows installation guide does not identify public availability"
+Assert-True ($windowsInstallationGuide.Contains("Release type: Unsigned public release")) "Windows installation guide does not identify the unsigned release type"
+Assert-True ($windowsInstallationGuide.Contains("Authenticode: NotSigned")) "Windows installation guide is missing the NotSigned status"
+Assert-True ($windowsInstallationGuide.Contains("ef9759f7eb42417cbc30ff14893d9f4e6e877ca5379a5d3d4f7568edf3fe8777")) "Windows installation guide is missing the public installer SHA-256"
 $desktopPredecessorPolicy = "Desktop predecessor update applicability for 1.4.0: not applicable."
 Assert-True ($windowsInstallationGuide.Contains($desktopPredecessorPolicy)) "Windows installation policy does not explicitly remove a predecessor update from 1.4.0 scope"
 $mandatoryFirstReleaseLifecycle = 'Same-version reinstall,\s+uninstall data preservation, and reinstall with retained data remain mandatory\s+for `1\.4\.0`\.'

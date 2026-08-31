@@ -10,8 +10,7 @@ frontend, Flask backend, and schema catalog power three deployment variants:
 
 - a Home Assistant add-on with ingress;
 - a standalone Docker service;
-- a Windows Desktop application, currently available only as an unsigned
-  Windows x64 development build.
+- a Windows Desktop application with an unsigned public Windows x64 release.
 
 [Watch the tutorial](https://youtu.be/CrP15p8e_z8).
 
@@ -19,7 +18,7 @@ frontend, Flask backend, and schema catalog power three deployment variants:
 
 | Area | Home Assistant add-on | Standalone Docker | Windows Desktop |
 |---|---|---|---|
-| Status | Supported | Supported; image availability depends on publication | Development only, unsigned |
+| Status | Supported | Supported; image availability depends on publication | Unsigned public release for Windows 11 x64 |
 | Access | Home Assistant ingress | Direct HTTP, port `8099` by default | Local Tauri window and loopback backend |
 | Authentication | Home Assistant ingress session | Basic Auth by default or an external trusted layer | Local application |
 | Project storage | `/config/ecd` or `/config/esphome` | `/config/ecd` or `/config/esphome` in the bind mount | Local workspace; `%USERPROFILE%\Documents\ecd_workspace` by default |
@@ -63,16 +62,27 @@ updates, and Watchtower.
 
 ### Windows Desktop
 
-There is no public Windows release yet. The current NSIS package is an unsigned
-development/test artifact and must not be presented or redistributed as a
-release. See the [Windows installation status](docs/installation/windows.md) or
-the [Desktop development guide](docs/development/desktop.md). Accepted release
-limitations are listed in [Known Issues](KNOWN_ISSUES.md).
+ESPConfig Designer 1.4.0 is available as an unsigned public release for Windows
+11 x64. Windows may display an **Unknown Publisher** warning because the
+installer is not Authenticode-signed. Verify the published SHA-256 before
+installation.
 
-The planned `1.4.0` target is Windows 10 22H2 Home and Pro x64 and Windows 11
-25H2 Home and Pro x64, subject to final clean-machine verification. Windows
-ARM64 is outside the release scope. No Windows version is publicly supported by
-the current unsigned debug package.
+[Open the Windows 1.4.0 release](https://github.com/sokolsok/ESPConfig-Designer/releases/tag/windows-1.4.0-unsigned.1)
+or [download the Windows x64 installer directly](https://github.com/sokolsok/ESPConfig-Designer/releases/download/windows-1.4.0-unsigned.1/ESPConfig-Designer-1.4.0-Windows-x64-setup.exe).
+
+```text
+Public availability: YES
+Release type: Unsigned public release
+Hosted installation and smoke: PASS
+Windows 11 clean-machine firmware online/offline/cancel: PASS
+Authenticode: NotSigned
+```
+
+The exact clean-machine firmware result covers Windows 11 Home 25H2 x64 build
+`26200.8973`. Full Windows 10 support is not declared. Windows ARM64 is outside
+the release scope. See the [Windows installation guide](docs/installation/windows.md),
+the [Desktop development guide](docs/development/desktop.md), and
+[Known Issues](KNOWN_ISSUES.md).
 
 ## Features
 
@@ -140,11 +150,10 @@ Do not expose the standalone service directly to the Internet. Change the
 default Basic Auth password before using it on a LAN, or put the application
 behind another trusted authentication layer.
 
-The Windows development installer is not signed. No trusted Authenticode
-certificate, timestamp, SmartScreen release result, or public updater is
-configured. The planned release uses manual updates; final download location,
-publisher verification, and installer hashes will be published only after a
-signed artifact exists.
+The public Windows installer is not signed. Windows may identify it as
+**Unknown Publisher**. No trusted Authenticode certificate, timestamp,
+SmartScreen publisher result, or auto-updater is configured. Windows updates
+are manual; verify the SHA-256 published with each installer before running it.
 
 ## Relationship with ESPHome and Home Assistant
 
