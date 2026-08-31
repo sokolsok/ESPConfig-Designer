@@ -432,6 +432,12 @@ snapshot identity, retain it, and reject consumed nonces; VM
 snapshot rollback and a malicious same-user process rewriting all local state
 are not prevented by adjacent local hashes.
 
+Firmware-owned PlatformIO and build trees are mutable tool output. Their cleanup
+rejects reparse points before recursive removal but permits named NTFS streams,
+which remain attached to and are deleted with their files. Immutable inputs,
+installed resources, attestations, markers, state, and checkpoints continue to
+reject alternate streams.
+
 The final report carries that attestation hash and run nonce and is not published
 until checkpoint and owned state are both `completed`. Failures after owned-root
 or Resume-checkpoint claim are finalized as `failed_cleaned` or

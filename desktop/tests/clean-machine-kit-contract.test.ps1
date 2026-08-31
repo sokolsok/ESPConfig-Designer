@@ -133,7 +133,9 @@ Assert-True ($orchestratorSource.Contains('firmware_node') -and $orchestratorSou
 Assert-True ($orchestratorSource.Contains('/api/firmware') -and $orchestratorSource.Contains('variant=$variant') -and $orchestratorSource.Contains('@("ota", "factory")')) "Firmware flow must download both OTA and factory artifacts through the product API"
 Assert-True ($firmwareScenarioBody.Contains('/cancel')) "Firmware flow must exercise the product job-cancel API"
 Assert-True ($firmwareScenarioBody.Contains('Assert-Hash $fixtureDestination $Register.fixtureSha256 "firmware fixture after reboot replay"')) "Firmware online evidence must remeasure the fixture after reboot replay compilation"
-Assert-True ($firmwareScenarioBody.Contains('Assert-OwnedTreeSafeForRemoval $script:FirmwareInstallRoot')) "Firmware contract uninstall must reject reparse points and alternate streams"
+Assert-True ($firmwareScenarioBody.Contains('Assert-OwnedTreeSafeForRemoval $script:FirmwareInstallRoot')) "Firmware contract uninstall must reject reparse points"
+$ownedTreeCleanupBody = [regex]::Match($orchestratorSource, '(?s)function Assert-OwnedTreeSafeForRemoval\b.*?(?=\r?\nfunction )').Value
+Assert-True ($ownedTreeCleanupBody.Contains('ReparsePoint') -and -not $ownedTreeCleanupBody.Contains('Assert-NoAlternateStreams')) "Mutable owned-tree cleanup must reject traversal without rejecting tool-generated alternate streams"
 Assert-True ($firmwareScenarioBody.Contains('Assert-Hash $installedExecutable $Register.application.sha256 "firmware application before phase execution"')) "Every resumed firmware phase must verify the installed application before execution"
 Assert-True ($firmwareScenarioBody.Contains('"Firmware immutable install tree before phase execution"')) "Every resumed firmware phase must verify the complete install tree before execution"
 
@@ -577,6 +579,15 @@ try {
     Assert-True (Test-Path -LiteralPath $reparseSentinel -PathType Leaf) "Firmware cleanup traversed a reparse point into an external sentinel"
     Assert-True (-not (Test-Path -LiteralPath (Join-Path $root "firmware-install-cleanup-reparse"))) "Unsafe workspace cleanup blocked independent install cleanup"
     Assert-True (-not (Test-Path -LiteralPath (Join-Path $root "firmware-appdata-cleanup-reparse"))) "Unsafe workspace cleanup blocked independent app-data cleanup"
+
+    $firmwareAlternateStreamGate = New-PassingContractGate "firmware-cleanup-generated-alternate-stream"
+    $firmwareAlternateStreamArguments = Get-FirmwareArguments $firmwareAlternateStreamGate "cleanup-generated-alternate-stream" "OnlineBegin" "FirmwareOnline" "firmware-generated-alternate-stream-before"
+    Invoke-Gate ($firmwareAlternateStreamArguments + @("-ContractFirmwareFault", "GeneratedAlternateStream")) $false "Synthetic firmware scenario failure after generated alternate stream"
+    $firmwareAlternateStreamState = Get-Content -LiteralPath (Join-Path $firmwareAlternateStreamGate "firmware-owned-resources.json") -Raw | ConvertFrom-Json
+    Assert-True ($firmwareAlternateStreamState.state -eq "failed_cleaned") "Generated toolchain alternate stream prevented marker-verified firmware cleanup"
+    Assert-True (-not (Test-Path -LiteralPath (Join-Path $root "firmware-install-cleanup-generated-alternate-stream"))) "Generated alternate stream cleanup left the install root"
+    Assert-True (-not (Test-Path -LiteralPath (Join-Path $root "firmware-workspace-cleanup-generated-alternate-stream"))) "Generated alternate stream cleanup left the workspace root"
+    Assert-True (-not (Test-Path -LiteralPath (Join-Path $root "firmware-appdata-cleanup-generated-alternate-stream"))) "Generated alternate stream cleanup left the app-data root"
 
     $startupStatePath = Join-Path $startupGate "startup-owned-resources.json"
     $startupOwnerPath = Join-Path $startupGate ".ecd-clean-machine-owner.json"

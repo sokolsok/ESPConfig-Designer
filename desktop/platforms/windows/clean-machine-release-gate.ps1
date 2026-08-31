@@ -41,7 +41,7 @@ param(
         "CleanupFirstResourceFailure", "RootCreatedAfterAbsentCheck", "MutableInstallDirectoryWrite",
         "UninstallRemovesEmptyWorkspaceDirectory", "UnicodeRootCreatedBeforeClaim"
     )][string]$ContractLifecycleFault = "",
-    [ValidateSet("", "FirmwareNodeMismatch", "FirmwareHashMismatch", "OfflineConnectivityOverclaim", "CleanupFirstResourceFailure", "CleanupReparsePoint")]
+    [ValidateSet("", "FirmwareNodeMismatch", "FirmwareHashMismatch", "OfflineConnectivityOverclaim", "CleanupFirstResourceFailure", "CleanupReparsePoint", "GeneratedAlternateStream")]
     [string]$ContractFirmwareFault = "",
     [switch]$ContractTest
 )
@@ -2626,12 +2626,10 @@ function Assert-OwnedTreeSafeForRemoval([string]$Root) {
     while ($pending.Count -gt 0) {
         $directory = $pending.Pop()
         Assert-NoReparsePath $directory "Owned cleanup directory"
-        Assert-NoAlternateStreams $directory "Owned cleanup directory"
         foreach ($entry in @(Get-ChildItem -LiteralPath $directory -Force)) {
             if (($entry.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
                 throw "Owned cleanup tree contains a reparse point"
             }
-            Assert-NoAlternateStreams $entry.FullName "Owned cleanup entry"
             if ($entry.PSIsContainer) { $pending.Push($entry.FullName) }
         }
     }
@@ -2790,6 +2788,12 @@ function Invoke-FirmwareScenario([object]$Register, [object]$Observed, [string]$
             New-OwnedLifecycleRoot $script:FirmwareInstallRoot "install" $RunId $nonce
             New-OwnedLifecycleRoot $script:FirmwareWorkspaceRoot "workspace" $RunId $nonce
             New-OwnedLifecycleRoot $script:FirmwareAppDataRoot "app-data" $RunId $nonce
+            if ($ContractFirmwareFault -eq "GeneratedAlternateStream") {
+                $generatedFile = Join-Path $script:FirmwareAppDataRoot "generated-toolchain.cmake"
+                [IO.File]::WriteAllText($generatedFile, "generated")
+                Set-Content -LiteralPath $generatedFile -Stream "cmake_mode_t" -Value "100644"
+                throw "Synthetic firmware scenario failure after generated alternate stream"
+            }
             if ($ContractFirmwareFault -eq "CleanupReparsePoint") {
                 $reparseTarget = Join-Path $GateRoot "firmware-reparse-target"
                 New-Item -ItemType Directory -Path $reparseTarget | Out-Null

@@ -171,6 +171,13 @@ four explicit phases:
    fixture hash, normal application close, uninstall, and marker-verified cleanup
    of only the three firmware-owned roots.
 
+Marker-verified cleanup rejects every reparse point before recursively removing
+firmware-owned mutable trees. Tool-generated named NTFS streams inside those
+trees do not redirect traversal and are removed with their owning files, so they
+are not treated as unsafe cleanup paths. Artifact, kit, attestation, ownership,
+state, checkpoint, and immutable-install validation retains the strict
+no-alternate-stream contract.
+
 All production firmware phases require the same `Firmware` clean-VM attestation
 and host run nonce. Every network transition additionally requires a separately
 hashed `ecd-host-network-attestation` bound to the source, artifact register,
