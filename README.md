@@ -151,6 +151,7 @@ changelog.
 - [Schema authoring quick guide](docs/HOW_TO_CREATE_SCHEMA.md)
 - [Extended schema authoring reference](docs/HOW_TO_CREATE_SCHEMA_EXTENDED.md)
 - [Changelog](CHANGELOG.md)
+- [Code signing policy](docs/CODE_SIGNING_POLICY.md)
 
 ## Security
 
@@ -162,6 +163,15 @@ The public Windows installer is not signed. Windows may identify it as
 **Unknown Publisher**. No trusted Authenticode certificate, timestamp,
 SmartScreen publisher result, or auto-updater is configured. Windows updates
 are manual; verify the SHA-256 published with each installer before running it.
+
+## Code signing policy
+
+See the project [Code signing policy](docs/CODE_SIGNING_POLICY.md).
+
+ESPConfig Designer is applying for free code signing provided by
+[SignPath.io](https://about.signpath.io), certificate by
+[SignPath Foundation](https://signpath.org). The currently published Windows
+1.4.0 release remains unsigned.
 
 ## Relationship with ESPHome and Home Assistant
 

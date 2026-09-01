@@ -254,6 +254,7 @@ $publicDocuments = @(
     (Join-Path $repoRoot "README.md"),
     (Join-Path $repoRoot "CHANGELOG.md"),
     (Join-Path $repoRoot "esp-config-designer\CHANGELOG.md"),
+    (Join-Path $repoRoot "docs\CODE_SIGNING_POLICY.md"),
     (Join-Path $repoRoot "docs\installation\windows.md"),
     (Join-Path $repoRoot "docs\development\desktop.md"),
     (Join-Path $desktopRoot "README.md"),
@@ -264,6 +265,21 @@ foreach ($documentPath in $publicDocuments) {
     Assert-True (-not $documentSource.Contains("R&D/")) "Public documentation references private R&D material: $documentPath"
     Assert-True (-not $documentSource.Contains("C:\Users\")) "Public documentation contains a machine-local user path: $documentPath"
 }
+
+$rootReadme = Get-Content -LiteralPath (Join-Path $repoRoot "README.md") -Raw
+$codeSigningPolicyPath = Join-Path $repoRoot "docs\CODE_SIGNING_POLICY.md"
+Assert-True (Test-Path -LiteralPath $codeSigningPolicyPath -PathType Leaf) "Code signing policy is missing"
+$codeSigningPolicy = Get-Content -LiteralPath $codeSigningPolicyPath -Raw
+Assert-True ($rootReadme.Contains("## Code signing policy")) "Root README is missing the required Code signing policy heading"
+Assert-True ($rootReadme.Contains("[Code signing policy](docs/CODE_SIGNING_POLICY.md)")) "Root README is missing the code signing policy link"
+Assert-True ($codeSigningPolicy.Contains("Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org)")) "Code signing policy is missing the required SignPath attribution"
+foreach ($role in @("Authors and committers", "Reviewers", "Approvers")) {
+    Assert-True ($codeSigningPolicy.Contains("$role`: [Sebastian Sokołowski (@sokolsok)](https://github.com/sokolsok)")) "Code signing policy is missing the assigned role: $role"
+}
+Assert-True ($codeSigningPolicy.Contains("does not collect or transmit telemetry, analytics, usage statistics, crash reports, or advertising identifiers")) "Code signing policy is missing the no-telemetry statement"
+Assert-True ($codeSigningPolicy.Contains("fonts.googleapis.com") -and $codeSigningPolicy.Contains("fonts.gstatic.com") -and $codeSigningPolicy.Contains("cdn.jsdelivr.net")) "Code signing policy does not disclose automatic external UI resource requests"
+Assert-True (-not $codeSigningPolicy.Contains("will not transfer any information to other networked systems unless specifically requested")) "Code signing policy contains a false no-automatic-transfer statement"
+Assert-True ($codeSigningPolicy.Contains("currently published Windows 1.4.0 release is unsigned")) "Code signing policy does not preserve the current unsigned status"
 
 $windowsInstallationGuide = Get-Content -LiteralPath (Join-Path $repoRoot "docs\installation\windows.md") -Raw
 $publicReleaseUrl = "https://github.com/sokolsok/ESPConfig-Designer/releases/tag/windows-1.4.0-unsigned.1"
