@@ -263,6 +263,11 @@ jobs:
             if ((Get-FileHash -Algorithm SHA256 -LiteralPath $artifactPath).Hash -ne $artifact.sha256) { throw "Candidate artifact hash does not match provenance: $($artifact.file)" }
             $signature = Get-AuthenticodeSignature -LiteralPath $artifactPath
             if ($artifact.signatureStatus -ne "NotSigned" -or $signature.Status -ne "NotSigned") { throw "Candidate artifact must be NotSigned: $($artifact.file)" }
+            $versionInfo = (Get-Item -LiteralPath $artifactPath).VersionInfo
+            if ($artifact.versionInfo.productName -ne "ESPConfig Designer" -or $versionInfo.ProductName -ne $artifact.versionInfo.productName) { throw "Candidate ProductName is invalid: $($artifact.file)" }
+            if ($artifact.versionInfo.productVersion -ne $version -or $versionInfo.ProductVersion -ne $artifact.versionInfo.productVersion) { throw "Candidate ProductVersion is invalid: $($artifact.file)" }
+            if ($artifact.versionInfo.fileVersion -ne $version -or $versionInfo.FileVersion -ne $artifact.versionInfo.fileVersion) { throw "Candidate FileVersion is invalid: $($artifact.file)" }
+            if ($artifact.versionInfo.originalFilename -ne "" -or ([string]$versionInfo.OriginalFilename) -ne $artifact.versionInfo.originalFilename) { throw "Candidate OriginalFilename is invalid: $($artifact.file)" }
           }
           foreach ($sidecar in @("SHA256SUMS", "UNSIGNED-NOT-FOR-USERS.txt", "inventory.json", "THIRD-PARTY-NOTICES.md")) {
             if (-not (Test-Path -LiteralPath (Join-Path $candidateRoot $sidecar) -PathType Leaf)) { throw "Candidate sidecar is missing: $sidecar" }

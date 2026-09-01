@@ -25,6 +25,24 @@ not stored in the repository or distributed with the application. Upstream
 third-party binaries may be included in a release package but are not signed as
 project-owned binaries.
 
+### Windows artifact metadata
+
+Before production signing is enabled, the SignPath artifact configuration must
+reject either project-owned PE file (the NSIS installer or the Desktop
+application executable) unless its version resource has exactly these values:
+
+- `ProductName`: `ESPConfig Designer`;
+- `ProductVersion`: the canonical release version from `VERSION`;
+- `FileVersion`: the same canonical release version;
+- `OriginalFilename`: empty for the `1.4.0` artifact contract.
+
+The release build records these fields in candidate provenance and fails before
+producing a candidate when either PE differs. The Windows workflow independently
+compares provenance with both candidate files, and the post-install package gate
+checks the installed application executable. SignPath must enforce the same
+constraints rather than relying only on filenames supplied with a signing
+request.
+
 ## Privacy
 
 ESPConfig Designer does not collect or transmit telemetry, analytics, usage statistics, crash reports, or advertising identifiers.

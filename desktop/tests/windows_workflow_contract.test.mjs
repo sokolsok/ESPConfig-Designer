@@ -39,6 +39,12 @@ test("unsigned release candidate is installed and matched to the packaged execut
   assert.match(workflow, /tauri-smoke\.test\.ps1[^\r\n]*-UseExecutableResources/);
   assert.match(workflow, /verify-resources\.ps1[^\r\n]*-ResourcesRoot/);
   assert.match(workflow, /Get-AuthenticodeSignature[\s\S]*?NotSigned/);
+  assert.match(workflow, /VersionInfo/);
+  assert.match(workflow, /ProductName/);
+  assert.match(workflow, /ESPConfig Designer/);
+  assert.match(workflow, /ProductVersion/);
+  assert.match(workflow, /FileVersion/);
+  assert.match(workflow, /OriginalFilename/);
   assert.match(workflow, /unsigned-technical-candidate-not-for-users/);
   assert.match(workflow, /retention-days: [1-7]\b/);
 });

@@ -18,6 +18,7 @@ import { fileURLToPath } from "node:url";
 
 export const RELEASE_TAURI_ARGUMENTS = ["build", "--bundles", "nsis"];
 const CANDIDATE_STATUS = "unsigned technical candidate - not for users";
+const PRODUCT_NAME = "ESPConfig Designer";
 const SHA256_PATTERN = /^[0-9a-f]{64}$/;
 const SOURCE_SHA_PATTERN = /^[0-9a-f]{40}$/;
 const RUNTIME_METADATA_PROJECTIONS = new Set([
@@ -53,6 +54,20 @@ export function selectSingleArtifact(paths, label) {
 export function assertVersionedInstaller(fileName, productVersion) {
   if (!fileName.includes(`_${productVersion}_`) || !fileName.endsWith("-setup.exe")) {
     throw new Error(`Release installer does not contain canonical product version ${productVersion}`);
+  }
+}
+
+export function assertWindowsVersionInfo(versionInfo, productVersion, role) {
+  const expected = {
+    productName: PRODUCT_NAME,
+    productVersion,
+    fileVersion: productVersion,
+    originalFilename: "",
+  };
+  for (const [field, value] of Object.entries(expected)) {
+    if (versionInfo?.[field] !== value) {
+      throw new Error(`${role} PE metadata ${field} must be ${JSON.stringify(value)}, found ${JSON.stringify(versionInfo?.[field])}`);
+    }
   }
 }
 
@@ -113,7 +128,7 @@ export function createProvenance({
     kind: "ecd-windows-unsigned-technical-candidate",
     status: CANDIDATE_STATUS,
     product: {
-      name: "ESPConfig Designer",
+      name: PRODUCT_NAME,
       version: productVersion,
     },
     source: {
@@ -142,8 +157,8 @@ export function validateProvenance(provenance) {
   if (provenance.status !== CANDIDATE_STATUS) {
     throw new Error("Unsigned candidate status is invalid");
   }
-  if (!provenance.product?.version) {
-    throw new Error("Product version is missing from provenance");
+  if (provenance.product?.name !== PRODUCT_NAME || !provenance.product?.version) {
+    throw new Error("Product identity is missing or invalid in provenance");
   }
   if (!SOURCE_SHA_PATTERN.test(provenance.source?.commit || "")) {
     throw new Error("Source commit is missing or invalid in provenance");
@@ -182,6 +197,7 @@ export function validateProvenance(provenance) {
     if (matches[0].signatureStatus !== "NotSigned") {
       throw new Error(`${role} must be NotSigned`);
     }
+    assertWindowsVersionInfo(matches[0].versionInfo, provenance.product.version, role);
   }
 }
 
@@ -359,6 +375,19 @@ function authenticodeStatus(path) {
   });
 }
 
+function windowsVersionInfo(path, productVersion, role) {
+  const command = [
+    "$info = (Get-Item -LiteralPath $env:ECD_ARTIFACT_PATH).VersionInfo",
+    "[ordered]@{ productName = [string]$info.ProductName; productVersion = [string]$info.ProductVersion; fileVersion = [string]$info.FileVersion; originalFilename = [string]$info.OriginalFilename } | ConvertTo-Json -Compress",
+  ].join("; ");
+  const versionInfo = JSON.parse(run("powershell.exe", ["-NoProfile", "-Command", command], {
+    cwd: dirname(path),
+    env: { ...process.env, ECD_ARTIFACT_PATH: path },
+  }));
+  assertWindowsVersionInfo(versionInfo, productVersion, role);
+  return versionInfo;
+}
+
 function toolVersions(desktopRoot, tauriScript, npmScript) {
   const tools = {
     node: process.version,
@@ -411,12 +440,14 @@ function writeCandidate({
       file: basename(stagedApplication),
       sha256: sha256(stagedApplication),
       signatureStatus: authenticodeStatus(stagedApplication),
+      versionInfo: windowsVersionInfo(stagedApplication, provenanceInputs.productVersion, "application-exe"),
     },
     {
       role: "nsis-installer",
       file: basename(stagedInstaller),
       sha256: sha256(stagedInstaller),
       signatureStatus: authenticodeStatus(stagedInstaller),
+      versionInfo: windowsVersionInfo(stagedInstaller, provenanceInputs.productVersion, "nsis-installer"),
     },
   ];
   const provenance = createProvenance({
@@ -446,7 +477,12 @@ function writeCandidate({
   writeFileSync(checksumsPath, `${checksums}\n`, "ascii");
   for (const artifact of artifacts) {
     const path = join(stagingRoot, artifact.file);
-    if (sha256(path) !== artifact.sha256 || authenticodeStatus(path) !== "NotSigned") {
+    const finalVersionInfo = windowsVersionInfo(path, provenanceInputs.productVersion, artifact.role);
+    if (
+      sha256(path) !== artifact.sha256 ||
+      authenticodeStatus(path) !== "NotSigned" ||
+      JSON.stringify(finalVersionInfo) !== JSON.stringify(artifact.versionInfo)
+    ) {
       throw new Error(`Final unsigned artifact changed during candidate finalization: ${artifact.file}`);
     }
   }

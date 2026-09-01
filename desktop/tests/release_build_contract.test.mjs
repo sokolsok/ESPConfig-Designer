@@ -9,6 +9,7 @@ import {
   assertCleanSource,
   assertNoStaleArtifacts,
   assertVersionedInstaller,
+  assertWindowsVersionInfo,
   createProvenance,
   isExcludedRuntimePayloadEntry,
   makeFilesReadOnly,
@@ -20,6 +21,15 @@ import {
 
 const SHA = "0123456789abcdef0123456789abcdef01234567";
 const HASH = "a".repeat(64);
+
+function validVersionInfo() {
+  return {
+    productName: "ESPConfig Designer",
+    productVersion: "1.4.0",
+    fileVersion: "1.4.0",
+    originalFilename: "",
+  };
+}
 
 test("release and debug commands remain distinct", () => {
   assert.deepEqual(RELEASE_TAURI_ARGUMENTS, ["build", "--bundles", "nsis"]);
@@ -92,6 +102,19 @@ test("release installer must carry the canonical product version", () => {
   );
 });
 
+test("Windows artifacts must carry the canonical PE metadata", () => {
+  assert.doesNotThrow(() => assertWindowsVersionInfo(validVersionInfo(), "1.4.0", "application-exe"));
+  for (const [field, value] of [
+    ["productName", "Wrong Product"],
+    ["productVersion", "1.3.3"],
+    ["fileVersion", "1.3.3"],
+    ["originalFilename", "esp-config-designer-desktop.exe"],
+  ]) {
+    const metadata = { ...validVersionInfo(), [field]: value };
+    assert.throws(() => assertWindowsVersionInfo(metadata, "1.4.0", "application-exe"), /PE metadata/i);
+  }
+});
+
 function validProvenance() {
   return createProvenance({
     productVersion: "1.4.0",
@@ -118,8 +141,8 @@ function validProvenance() {
       noticesSha256: HASH,
     },
     artifacts: [
-      { role: "application-exe", file: "esp-config-designer-desktop.exe", sha256: HASH, signatureStatus: "NotSigned" },
-      { role: "nsis-installer", file: "ESPConfig Designer_1.4.0_x64-setup.exe", sha256: HASH, signatureStatus: "NotSigned" },
+      { role: "application-exe", file: "esp-config-designer-desktop.exe", sha256: HASH, signatureStatus: "NotSigned", versionInfo: validVersionInfo() },
+      { role: "nsis-installer", file: "ESPConfig Designer_1.4.0_x64-setup.exe", sha256: HASH, signatureStatus: "NotSigned", versionInfo: validVersionInfo() },
     ],
   });
 }
@@ -161,6 +184,10 @@ test("provenance rejects missing required fields and final unsigned hashes", () 
   const missingSignatureStatus = validProvenance();
   delete missingSignatureStatus.artifacts[0].signatureStatus;
   assert.throws(() => validateProvenance(missingSignatureStatus), /application-exe must be NotSigned/i);
+
+  const missingVersionInfo = validProvenance();
+  delete missingVersionInfo.artifacts[0].versionInfo;
+  assert.throws(() => validateProvenance(missingVersionInfo), /PE metadata/i);
 
   const signedInstaller = validProvenance();
   signedInstaller.artifacts[1].signatureStatus = "Valid";

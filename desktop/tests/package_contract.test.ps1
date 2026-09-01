@@ -33,6 +33,9 @@ Assert-True (-not $releaseScriptSource.Contains('npm.cmd')) "Release build must 
 Assert-True (-not $releaseScriptSource.Contains('tauri.cmd')) "Release build must not execute the Windows Tauri command shim through spawnSync"
 $configPath = Join-Path $desktopRoot "src-tauri\tauri.conf.json"
 $config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
+$canonicalVersion = (Get-Content -LiteralPath (Join-Path $repoRoot "VERSION") -Raw).Trim()
+Assert-True ($config.productName -eq "ESPConfig Designer") "Tauri productName must remain ESPConfig Designer"
+Assert-True ($config.version -eq $canonicalVersion) "Tauri version must match the canonical product version"
 $configuredCsp = [string]$config.app.security.csp
 Assert-True ($configuredCsp -eq "default-src 'none'") "Bundled Tauri assets must remain fail-closed; the loopback UI receives CSP from Flask"
 $cargoManifestSource = Get-Content -LiteralPath (Join-Path $desktopRoot "src-tauri\Cargo.toml") -Raw
@@ -280,6 +283,10 @@ Assert-True ($codeSigningPolicy.Contains("does not collect or transmit telemetry
 Assert-True ($codeSigningPolicy.Contains("fonts.googleapis.com") -and $codeSigningPolicy.Contains("fonts.gstatic.com") -and $codeSigningPolicy.Contains("cdn.jsdelivr.net")) "Code signing policy does not disclose automatic external UI resource requests"
 Assert-True (-not $codeSigningPolicy.Contains("will not transfer any information to other networked systems unless specifically requested")) "Code signing policy contains a false no-automatic-transfer statement"
 Assert-True ($codeSigningPolicy.Contains("currently published Windows 1.4.0 release is unsigned")) "Code signing policy does not preserve the current unsigned status"
+foreach ($metadataField in @("ProductName", "ProductVersion", "FileVersion", "OriginalFilename")) {
+    Assert-True ($codeSigningPolicy.Contains("``$metadataField``")) "Code signing policy is missing the SignPath artifact constraint: $metadataField"
+}
+Assert-True ($codeSigningPolicy -match 'SignPath must enforce the same\s+constraints') "Code signing policy does not require SignPath artifact metadata enforcement"
 
 $windowsInstallationGuide = Get-Content -LiteralPath (Join-Path $repoRoot "docs\installation\windows.md") -Raw
 $publicReleaseUrl = "https://github.com/sokolsok/ESPConfig-Designer/releases/tag/windows-1.4.0-unsigned.1"
@@ -328,6 +335,11 @@ if ($InstallRoot) {
     $resolvedInstallRoot = [System.IO.Path]::GetFullPath($InstallRoot)
     $installedExecutable = Join-Path $resolvedInstallRoot "esp-config-designer-desktop.exe"
     Assert-True (Test-Path -LiteralPath $installedExecutable -PathType Leaf) "Installed Desktop executable is missing"
+    $installedVersionInfo = (Get-Item -LiteralPath $installedExecutable).VersionInfo
+    Assert-True ($installedVersionInfo.ProductName -eq $config.productName) "Installed Desktop ProductName does not match the Tauri product name"
+    Assert-True ($installedVersionInfo.ProductVersion -eq $config.version) "Installed Desktop ProductVersion does not match the Tauri product version"
+    Assert-True ($installedVersionInfo.FileVersion -eq $config.version) "Installed Desktop FileVersion does not match the Tauri product version"
+    Assert-True ([string]::IsNullOrEmpty($installedVersionInfo.OriginalFilename)) "Installed Desktop OriginalFilename must remain empty for the 1.4.0 artifact contract"
     $installedSignature = Get-AuthenticodeSignature -LiteralPath $installedExecutable
     Assert-True ($installedSignature.Status -eq "NotSigned") "Installed Desktop executable must be NotSigned"
     if ($ExpectedExecutableSha256) {
