@@ -16,9 +16,11 @@ $pythonManifestPath = Join-Path $windowsRoot "python-manifest.json"
 $requirementsLockPath = Join-Path $windowsRoot "requirements-runtime.lock"
 $inventoryPath = Join-Path $desktopRoot "supply-chain\inventory.json"
 $noticesPath = Join-Path $desktopRoot "supply-chain\THIRD-PARTY-NOTICES.md"
+$licenseEvidencePath = Join-Path $desktopRoot "supply-chain\license-evidence.json"
+$resvgLicensePath = Join-Path $desktopRoot "supply-chain\licenses\resvg_py-0.3.2.LICENSE"
 $integrityScript = Join-Path $windowsRoot "artifact-integrity.ps1"
 
-foreach ($requiredPath in @($pythonManifestPath, $requirementsLockPath, $inventoryPath, $noticesPath, $integrityScript)) {
+foreach ($requiredPath in @($pythonManifestPath, $requirementsLockPath, $inventoryPath, $noticesPath, $licenseEvidencePath, $resvgLicensePath, $integrityScript)) {
     Assert-True (Test-Path -LiteralPath $requiredPath -PathType Leaf) "Supply-chain input is missing: $requiredPath"
 }
 
@@ -90,7 +92,24 @@ try {
 }
 
 $inventory = Get-Content -LiteralPath $inventoryPath -Raw | ConvertFrom-Json
+$licenseEvidence = Get-Content -LiteralPath $licenseEvidencePath -Raw | ConvertFrom-Json
 Assert-True ($inventory.schemaVersion -eq 1 -and $inventory.kind -eq "ecd-release-input-inventory") "Supply-chain inventory contract is invalid"
+Assert-True ($licenseEvidence.schemaVersion -eq 1 -and $licenseEvidence.kind -eq "ecd-license-evidence") "License evidence contract is invalid"
+
+$desktopManifest = Get-Content -LiteralPath (Join-Path $desktopRoot "src-tauri\Cargo.toml") -Raw
+Assert-True ($desktopManifest -match '(?m)^license = "MIT"$') "Desktop Cargo package must declare MIT licensing"
+
+$resvgEvidence = @($licenseEvidence.evidence | Where-Object {
+    $_.ecosystem -eq "pypi" -and $_.name -eq "resvg_py" -and $_.version -eq "0.3.2"
+})
+Assert-True ($resvgEvidence.Count -eq 1) "Expected exactly one resvg_py 0.3.2 license evidence record"
+Assert-True ($resvgEvidence[0].artifactSha256 -eq "7c459cdb4d1d0a5d9dbfee711f84fbf4551fba08754d21e085b3bd356f851fe1") "resvg_py evidence must pin the wheel SHA-256"
+Assert-True ($resvgEvidence[0].license -eq "MIT") "resvg_py evidence must identify the MIT license"
+Assert-True ($resvgEvidence[0].licenseFile -eq "desktop/supply-chain/licenses/resvg_py-0.3.2.LICENSE") "resvg_py evidence must reference the tracked license text"
+Assert-True ($resvgEvidence[0].licenseFileSha256 -eq "753a9e3c09cece8584467a0f605e065005c2a5e5c6da4f0cbb0493d2d52b96f6") "resvg_py evidence must pin the license text SHA-256"
+$resvgLicenseHash = (Get-FileHash -LiteralPath $resvgLicensePath -Algorithm SHA256).Hash.ToLowerInvariant()
+Assert-True ($resvgLicenseHash -eq $resvgEvidence[0].licenseFileSha256) "Tracked resvg_py license text does not match its evidence hash"
+
 foreach ($scope in @("python", "npm", "cargo", "native", "github-actions")) {
     Assert-True (@($inventory.scopes) -contains $scope) "Supply-chain inventory scope is missing: $scope"
 }
@@ -117,6 +136,9 @@ foreach ($lockedLine in $lockLines) {
 $npmSupplyChainContract = Join-Path $PSScriptRoot "npm-supply-chain-contract.test.mjs"
 & node --test $npmSupplyChainContract
 Assert-True ($LASTEXITCODE -eq 0) "Supply-chain inventory does not match the npm lockfiles"
+$licenseEvidenceContract = Join-Path $PSScriptRoot "license-evidence-contract.test.mjs"
+& node --test $licenseEvidenceContract
+Assert-True ($LASTEXITCODE -eq 0) "License evidence fail-closed contract failed"
 foreach ($lockedCargo in @(
     @{ name = "tauri"; version = "2.11.5" },
     @{ name = "tauri-runtime-wry"; version = "2.11.4" },
@@ -125,6 +147,12 @@ foreach ($lockedCargo in @(
 )) {
     Assert-True (@($inventory.components | Where-Object { $_.scope -eq "cargo" -and $_.name -eq $lockedCargo.name -and $_.version -eq $lockedCargo.version }).Count -eq 1) "Resolved Cargo input changed: $($lockedCargo.name)"
 }
+$desktopComponent = @($inventory.components | Where-Object { $_.scope -eq "cargo" -and $_.name -eq "esp-config-designer-desktop" })
+Assert-True ($desktopComponent.Count -eq 1 -and $desktopComponent[0].license -eq "MIT") "Desktop Cargo inventory component must declare MIT licensing"
+$resvgComponent = @($inventory.components | Where-Object { $_.scope -eq "python" -and $_.name -eq "resvg_py" -and $_.version -eq "0.3.2" })
+Assert-True ($resvgComponent.Count -eq 1 -and $resvgComponent[0].license -eq "MIT") "resvg_py inventory component must declare MIT licensing"
+Assert-True ($resvgComponent[0].integrity.algorithm -eq "SHA-256" -and $resvgComponent[0].integrity.value -eq $resvgEvidence[0].artifactSha256) "resvg_py inventory and evidence artifact hashes must match"
+Assert-True (@($resvgComponent[0].provenance) -contains "desktop/supply-chain/license-evidence.json#evidence/resvg_py@0.3.2") "resvg_py inventory component must cite its license evidence"
 $inventorySource = Get-Content -LiteralPath $inventoryPath -Raw
 foreach ($forbiddenValue in @("R&D/", "frontend/dist", "desktop/resources/ecd-app", "workspace.json", "devices.json", "secrets.yaml", "C:\\Users\\")) {
     Assert-True (-not $inventorySource.Contains($forbiddenValue)) "Supply-chain inventory contains private, mutable, generated, or machine-local data: $forbiddenValue"

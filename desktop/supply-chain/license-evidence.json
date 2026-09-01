@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "kind": "ecd-license-evidence",
+  "evidence": [
+    {
+      "ecosystem": "pypi",
+      "name": "resvg_py",
+      "version": "0.3.2",
+      "artifactSha256": "7c459cdb4d1d0a5d9dbfee711f84fbf4551fba08754d21e085b3bd356f851fe1",
+      "license": "MIT",
+      "licenseFile": "desktop/supply-chain/licenses/resvg_py-0.3.2.LICENSE",
+      "licenseFileSha256": "753a9e3c09cece8584467a0f605e065005c2a5e5c6da4f0cbb0493d2d52b96f6"
+    }
+  ]
+}

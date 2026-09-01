@@ -3,6 +3,7 @@ name = "esp-config-designer-desktop"
 version = "1.4.0"
 description = "ESPConfig Designer desktop shell"
 authors = ["ESPConfig Designer"]
+license = "MIT"
 edition = "2021"
 
 [build-dependencies]

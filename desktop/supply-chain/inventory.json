@@ -1918,7 +1918,7 @@
       "source": null,
       "artifact": null,
       "integrity": null,
-      "license": null,
+      "license": "MIT",
       "publisher": "ESPConfig Designer",
       "provenance": [
         "cargo workspace package desktop/src-tauri/Cargo.toml#esp-config-designer-desktop@1.4.0",
@@ -1928,8 +1928,7 @@
       "unavailable": {
         "source": "This is the local workspace package and has no external package source.",
         "artifact": "This package is not a crates.io registry artifact.",
-        "integrity": "Cargo.lock does not record a checksum for this package source.",
-        "license": "Cargo package metadata does not declare a license."
+        "integrity": "Cargo.lock does not record a checksum for this package source."
       }
     },
     {
@@ -9907,7 +9906,7 @@
       "license": null,
       "publisher": "actions",
       "provenance": [
-        ".github/workflows/desktop-windows.yml:84"
+        ".github/workflows/desktop-windows.yml:90"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -9929,7 +9928,7 @@
       "license": null,
       "publisher": "actions",
       "provenance": [
-        ".github/workflows/desktop-windows.yml:44"
+        ".github/workflows/desktop-windows.yml:50"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -9951,7 +9950,7 @@
       "license": null,
       "publisher": "actions",
       "provenance": [
-        ".github/workflows/docker-standalone.yml:54"
+        ".github/workflows/docker-standalone.yml:56"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -9973,7 +9972,7 @@
       "license": null,
       "publisher": "actions",
       "provenance": [
-        ".github/workflows/docker.yml:43"
+        ".github/workflows/docker.yml:45"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -10061,7 +10060,7 @@
       "license": null,
       "publisher": "actions",
       "provenance": [
-        ".github/workflows/desktop-windows.yml:51"
+        ".github/workflows/desktop-windows.yml:57"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -10083,7 +10082,7 @@
       "license": null,
       "publisher": "actions",
       "provenance": [
-        ".github/workflows/docker-standalone.yml:57"
+        ".github/workflows/docker-standalone.yml:59"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -10105,7 +10104,7 @@
       "license": null,
       "publisher": "actions",
       "provenance": [
-        ".github/workflows/docker.yml:46"
+        ".github/workflows/docker.yml:48"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -10193,7 +10192,7 @@
       "license": null,
       "publisher": "actions",
       "provenance": [
-        ".github/workflows/desktop-windows.yml:220"
+        ".github/workflows/desktop-windows.yml:226"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -10215,7 +10214,7 @@
       "license": null,
       "publisher": "actions",
       "provenance": [
-        ".github/workflows/desktop-windows.yml:288"
+        ".github/workflows/desktop-windows.yml:294"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -10237,7 +10236,7 @@
       "license": null,
       "publisher": "docker",
       "provenance": [
-        ".github/workflows/docker-standalone.yml:122"
+        ".github/workflows/docker-standalone.yml:124"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -10259,7 +10258,7 @@
       "license": null,
       "publisher": "docker",
       "provenance": [
-        ".github/workflows/docker-standalone.yml:89"
+        ".github/workflows/docker-standalone.yml:91"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -10303,7 +10302,7 @@
       "license": null,
       "publisher": "docker",
       "provenance": [
-        ".github/workflows/docker-standalone.yml:114"
+        ".github/workflows/docker-standalone.yml:116"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -10325,7 +10324,7 @@
       "license": null,
       "publisher": "docker",
       "provenance": [
-        ".github/workflows/docker-standalone.yml:86"
+        ".github/workflows/docker-standalone.yml:88"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -10369,7 +10368,7 @@
       "license": null,
       "publisher": "docker",
       "provenance": [
-        ".github/workflows/docker-standalone.yml:70"
+        ".github/workflows/docker-standalone.yml:72"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -10391,7 +10390,7 @@
       "license": null,
       "publisher": "docker",
       "provenance": [
-        ".github/workflows/docker.yml:69"
+        ".github/workflows/docker.yml:71"
       ],
       "usage": "build-only",
       "unavailable": {
@@ -13759,15 +13758,18 @@
         "algorithm": "SHA-256",
         "value": "7c459cdb4d1d0a5d9dbfee711f84fbf4551fba08754d21e085b3bd356f851fe1"
       },
-      "license": null,
+      "license": "MIT",
       "publisher": "baseplate-admin <61817579+baseplate-admin@users.noreply.github.com>",
       "provenance": [
         "desktop/platforms/windows/requirements-runtime.lock",
+        "desktop/supply-chain/license-evidence.json#evidence/resvg_py@0.3.2",
         "pip report metadata for resvg_py@0.3.2"
       ],
       "usage": "shipped",
-      "unavailable": {
-        "license": "The pip resolution metadata does not declare a license expression or recognized license classifier."
+      "licenseEvidence": {
+        "artifactSha256": "7c459cdb4d1d0a5d9dbfee711f84fbf4551fba08754d21e085b3bd356f851fe1",
+        "licenseFile": "desktop/supply-chain/licenses/resvg_py-0.3.2.LICENSE",
+        "licenseFileSha256": "753a9e3c09cece8584467a0f605e065005c2a5e5c6da4f0cbb0493d2d52b96f6"
       },
       "repository": "https://github.com/baseplate-admin/resvg-py"
     },

@@ -4,6 +4,7 @@
 *.bat text eol=crlf
 *.cmd text eol=crlf
 *.ps1 text eol=crlf
+desktop/supply-chain/licenses/resvg_py-0.3.2.LICENSE binary
 
 # Unix and container entry points must remain executable-friendly
 *.sh text eol=lf

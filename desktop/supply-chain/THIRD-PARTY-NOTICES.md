@@ -78,7 +78,7 @@ CPython is shipped in the desktop package. Its manifest records both the reposit
 | PyYAML | 6.0.3 | MIT | shipped |
 | reedsolo | 1.7.0 | Public Domain | shipped |
 | requests | 2.34.2 | Apache-2.0 | shipped |
-| resvg_py | 0.3.2 | Unknown | shipped |
+| resvg_py | 0.3.2 | MIT | shipped |
 | rich-click | 1.9.8 | MIT | shipped |
 | rich | 15.0.0 | MIT | shipped |
 | ruamel.yaml.clib | 0.2.15 | MIT | shipped |
@@ -309,7 +309,7 @@ The two npm lockfiles contain 89 non-root package records. Entries marked build-
 | equivalent | 1.0.2 | Apache-2.0 OR MIT | shipped |
 | erased-serde | 0.4.10 | MIT OR Apache-2.0 | shipped |
 | errno | 0.3.14 | MIT OR Apache-2.0 | shipped |
-| esp-config-designer-desktop | 1.4.0 | Unknown | shipped |
+| esp-config-designer-desktop | 1.4.0 | MIT | shipped |
 | event-listener-strategy | 0.5.4 | Apache-2.0 OR MIT | shipped |
 | event-listener | 5.4.2 | Apache-2.0 OR MIT | shipped |
 | fastrand | 2.4.1 | Apache-2.0 OR MIT | shipped |

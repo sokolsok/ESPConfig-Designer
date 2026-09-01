@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -85,6 +86,66 @@ function pythonLicense(metadata) {
   return null;
 }
 
+function licenseEvidenceKey(ecosystem, name, version, artifactSha256) {
+  const normalizedName = ecosystem === "pypi" ? normalizePythonName(name) : name.toLowerCase();
+  return `${ecosystem}\0${normalizedName}\0${version}\0${artifactSha256.toLowerCase()}`;
+}
+
+export function validateLicenseEvidence(document, readLicenseFile, provenance) {
+  if (document.schemaVersion !== 1 || document.kind !== "ecd-license-evidence" || !Array.isArray(document.evidence)) {
+    fail("License evidence contract is invalid");
+  }
+  const records = new Map();
+  for (const entry of document.evidence) {
+    if (entry.ecosystem !== "pypi" || !entry.name || !entry.version || !entry.license || !entry.licenseFile) {
+      fail("License evidence must identify a PyPI package, version, license, and license file");
+    }
+    if (!/^[0-9a-f]{64}$/.test(entry.artifactSha256 ?? "") || !/^[0-9a-f]{64}$/.test(entry.licenseFileSha256 ?? "")) {
+      fail(`License evidence has an invalid SHA-256 for ${entry.name}@${entry.version}`);
+    }
+    const actualLicenseHash = createHash("sha256").update(readLicenseFile(entry.licenseFile)).digest("hex");
+    if (actualLicenseHash !== entry.licenseFileSha256) {
+      fail(`License file SHA-256 mismatch for ${entry.name}@${entry.version}`);
+    }
+    const key = licenseEvidenceKey(entry.ecosystem, entry.name, entry.version, entry.artifactSha256);
+    if (records.has(key)) fail(`Duplicate license evidence for ${entry.name}@${entry.version}`);
+    records.set(key, { ...entry, provenance: `${provenance}#evidence/${entry.name}@${entry.version}` });
+  }
+  return { records, used: new Set() };
+}
+
+function loadLicenseEvidence(path) {
+  return validateLicenseEvidence(readJson(path), (licenseFile) => {
+    const fullPath = resolve(repoRoot, licenseFile);
+    if (repoPath(fullPath) !== licenseFile) fail(`License evidence path is not repository-relative: ${licenseFile}`);
+    return readFileSync(fullPath);
+  }, repoPath(path));
+}
+
+export function applyLicenseEvidence(registry, values) {
+  const key = licenseEvidenceKey(values.ecosystem, values.name, values.version, values.artifactSha256);
+  const evidence = registry.records.get(key);
+  if (!evidence) return { license: values.declaredLicense, provenance: [], extra: {} };
+  if (values.declaredLicense) fail(`License evidence is no longer needed for ${values.name}@${values.version}`);
+  registry.used.add(key);
+  return {
+    license: evidence.license,
+    provenance: [evidence.provenance],
+    extra: {
+      licenseEvidence: {
+        artifactSha256: evidence.artifactSha256,
+        licenseFile: evidence.licenseFile,
+        licenseFileSha256: evidence.licenseFileSha256,
+      },
+    },
+  };
+}
+
+export function assertAllLicenseEvidenceUsed(registry) {
+  const unused = [...registry.records.entries()].filter(([key]) => !registry.used.has(key)).map(([, entry]) => `${entry.name}@${entry.version}`);
+  if (unused.length) fail(`Unused or unmatched license evidence: ${unused.join(", ")}`);
+}
+
 function component(values, reasons = {}) {
   const record = {
     ecosystem: values.ecosystem,
@@ -113,7 +174,7 @@ function component(values, reasons = {}) {
   return record;
 }
 
-function pythonComponents(reportPath, runtimeLockPath, bootstrapLockPath) {
+function pythonComponents(reportPath, runtimeLockPath, bootstrapLockPath, licenseEvidence) {
   const runtime = parseRequirementsLock(runtimeLockPath);
   if (runtime.length !== 98) fail(`Expected 98 Python runtime packages, found ${runtime.length}`);
   const bootstrap = parseRequirementsLock(bootstrapLockPath);
@@ -123,7 +184,7 @@ function pythonComponents(reportPath, runtimeLockPath, bootstrapLockPath) {
   if (byName.size !== report.install.length) fail("pip report contains duplicate normalized package names");
 
   const bootstrapNames = new Set(bootstrap.map((entry) => normalizePythonName(entry.name)));
-  return runtime.map((locked) => {
+  const records = runtime.map((locked) => {
     const entry = byName.get(normalizePythonName(locked.name));
     if (!entry) fail(`pip report is missing ${locked.name}`);
     const metadata = entry.metadata ?? {};
@@ -132,10 +193,17 @@ function pythonComponents(reportPath, runtimeLockPath, bootstrapLockPath) {
     if (reportHash !== locked.sha256) fail(`SHA-256 mismatch for ${locked.name}`);
     const url = entry.download_info?.url ?? null;
     const urls = metadataUrls(metadata);
-    const license = pythonLicense(metadata);
+    const evidence = applyLicenseEvidence(licenseEvidence, {
+      ecosystem: "pypi",
+      name: metadata.name,
+      version: metadata.version,
+      artifactSha256: locked.sha256,
+      declaredLicense: pythonLicense(metadata),
+    });
     const publisher = metadata.author_email?.trim() || metadata.author?.trim() || null;
     const provenance = [repoPath(runtimeLockPath), `pip report metadata for ${metadata.name}@${metadata.version}`];
     if (bootstrapNames.has(normalizePythonName(locked.name))) provenance.push(repoPath(bootstrapLockPath));
+    provenance.push(...evidence.provenance);
     return component({
       ecosystem: "pypi",
       scope: "python",
@@ -144,11 +212,11 @@ function pythonComponents(reportPath, runtimeLockPath, bootstrapLockPath) {
       source: url,
       artifact: url ? decodeURIComponent(new URL(url).pathname.split("/").pop()) : null,
       integrity: { algorithm: "SHA-256", value: locked.sha256 },
-      license,
+      license: evidence.license,
       publisher,
       provenance,
       usage: "shipped",
-      extra: { repository: urls.repository ?? urls.source ?? urls["source code"] ?? null },
+      extra: { repository: urls.repository ?? urls.source ?? urls["source code"] ?? null, ...evidence.extra },
     }, {
       source: "The pip resolution report does not identify a download URL.",
       artifact: "The pip resolution report does not identify an artifact.",
@@ -156,6 +224,8 @@ function pythonComponents(reportPath, runtimeLockPath, bootstrapLockPath) {
       publisher: "The pip resolution metadata does not declare an author or author email.",
     });
   });
+  assertAllLicenseEvidenceUsed(licenseEvidence);
+  return records;
 }
 
 function npmName(packagePath) {
@@ -398,7 +468,8 @@ function main() {
   const { pipReport } = parseArguments(process.argv.slice(2));
   const runtimeLock = resolve(desktopRoot, "platforms/windows/requirements-runtime.lock");
   const bootstrapLock = resolve(desktopRoot, "platforms/windows/requirements-bootstrap.lock");
-  const python = pythonComponents(pipReport, runtimeLock, bootstrapLock);
+  const licenseEvidence = loadLicenseEvidence(resolve(outputRoot, "license-evidence.json"));
+  const python = pythonComponents(pipReport, runtimeLock, bootstrapLock, licenseEvidence);
   const npm = npmComponents([
     resolve(desktopRoot, "package-lock.json"),
     resolve(repoRoot, "esp-config-designer/frontend/package-lock.json"),
@@ -416,4 +487,4 @@ function main() {
   console.log(JSON.stringify({ counts, unknownLicenses }, null, 2));
 }
 
-main();
+if (resolve(process.argv[1] ?? "") === scriptPath) main();
