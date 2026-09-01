@@ -17,10 +17,11 @@ pinned portable runtime into generated `desktop/resources/ecd-app/` resources.
 Mutable app data stays under `%LOCALAPPDATA%\ECD`; project data stays in the
 selected workspace.
 
-The current Windows package is an unsigned development/test build, not a public
-release. It is x64-only; Windows ARM64 is outside the `1.4.0` scope. The planned
-Windows 10/11 support matrix remains conditional on clean-machine tests of the
-future signed release artifact.
+ESPConfig Designer 1.4.0 is available as an unsigned public Windows 11 x64
+release. Windows may display `Unknown Publisher` because the installer is not
+Authenticode-signed. The exact clean-machine firmware scope is Windows 11 Home
+25H2 x64 build `26200.8973`; full Windows 10 support is not declared. Windows
+ARM64 is outside the `1.4.0` scope.
 
 ## Start here
 

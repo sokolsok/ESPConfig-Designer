@@ -119,6 +119,7 @@ esp-config-designer/
   backend/                shared Flask backend
   frontend/               shared Vue 3 and Vite frontend
   shared/schema-catalog/  canonical schemas and catalogs
+  CHANGELOG.md            Home Assistant projection of the product changelog
   config.json             Home Assistant add-on metadata
   Dockerfile              Home Assistant add-on image
   Dockerfile.standalone   standalone image
@@ -129,10 +130,17 @@ docker/                   standalone Compose files
 docs/                     installation, development, and authoring
 scripts/                  repository contracts and shared gates
 VERSION                   canonical product version
+CHANGELOG.md              canonical product changelog
 ```
 
 Generated frontend `dist`, Desktop resources, portable runtime, Cargo `target`,
 dependency directories, and local Docker state are not source trees.
+
+The root `CHANGELOG.md` is the only changelog source. After editing it, run
+`node scripts/sync-changelog.mjs` to update the tracked Home Assistant projection.
+The version contract requires both files to be byte-for-byte identical so the
+Supervisor can display release notes without creating a second maintained
+changelog.
 
 ## Documentation
 

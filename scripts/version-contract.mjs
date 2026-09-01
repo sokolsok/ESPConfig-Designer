@@ -64,7 +64,20 @@ export async function validateVersionTree(root, options = {}) {
   add("desktop/src-tauri/tauri.conf.json version", tauri.version);
 
   const changelog = await readText(repositoryRoot, "CHANGELOG.md");
+  let addonChangelog;
+  try {
+    addonChangelog = await readText(repositoryRoot, "esp-config-designer/CHANGELOG.md");
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      throw new Error("Home Assistant changelog projection is missing; run node scripts/sync-changelog.mjs");
+    }
+    throw error;
+  }
+  if (addonChangelog !== changelog) {
+    throw new Error("Home Assistant changelog projection differs from CHANGELOG.md; run node scripts/sync-changelog.mjs");
+  }
   add("CHANGELOG.md latest heading", /^##\s+([^\s]+)\s*$/m.exec(changelog)?.[1]);
+  add("esp-config-designer/CHANGELOG.md latest heading", /^##\s+([^\s]+)\s*$/m.exec(addonChangelog)?.[1]);
 
   if (options.releaseTag) add("release tag", options.releaseTag === `v${version}` ? version : options.releaseTag);
 

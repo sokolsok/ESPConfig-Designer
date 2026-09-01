@@ -1,6 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { syncChangelog } from "./sync-changelog.mjs";
 import { validateVersionTree } from "./version-contract.mjs";
 
 const SEMVER = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
@@ -79,6 +80,7 @@ async function main() {
     }));
 
     await Promise.all(updates.map(([path, content]) => writeFile(path, content, "utf8")));
+    await syncChangelog(repositoryRoot);
     console.log(`Synchronized product version ${version}.`);
 
     const result = await validateVersionTree(repositoryRoot);

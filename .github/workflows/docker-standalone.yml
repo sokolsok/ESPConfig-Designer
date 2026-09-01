@@ -9,7 +9,9 @@ on:
     paths:
       - "esp-config-designer/**"
       - "scripts/docker-runtime-gate.sh"
+      - "scripts/sync-changelog.mjs"
       - "scripts/version-contract.mjs"
+      - "scripts/tests/versionContract.test.mjs"
       - "VERSION"
       - "CHANGELOG.md"
       - ".github/workflows/docker-standalone.yml"

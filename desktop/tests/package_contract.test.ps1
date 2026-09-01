@@ -253,6 +253,7 @@ Assert-True ([string]::IsNullOrWhiteSpace([string]$windowsBundle.timestampUrl)) 
 $publicDocuments = @(
     (Join-Path $repoRoot "README.md"),
     (Join-Path $repoRoot "CHANGELOG.md"),
+    (Join-Path $repoRoot "esp-config-designer\CHANGELOG.md"),
     (Join-Path $repoRoot "docs\installation\windows.md"),
     (Join-Path $repoRoot "docs\development\desktop.md"),
     (Join-Path $desktopRoot "README.md"),
