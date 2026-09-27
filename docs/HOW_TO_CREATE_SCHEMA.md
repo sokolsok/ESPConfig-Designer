@@ -22,11 +22,15 @@ A good schema should make the Builder easy to use while still matching the struc
 
 ## Where Schemas Belong
 
-Component schemas are stored in the frontend public schema directory.
+Component schemas are stored in the canonical
+`esp-config-designer/shared/schema-catalog/schemas/components/` directory.
 
 The component catalog is responsible for telling the Builder where each schema file is located. When adding a new component, the schema file and the catalog entry must both exist.
 
 The project data should not be treated as the source of truth for schema paths. The catalog is the place where components are registered.
+
+The frontend build projects this canonical tree to the existing browser paths,
+so runtime URLs such as `/schemas/...` do not include `shared/schema-catalog`.
 
 ---
 

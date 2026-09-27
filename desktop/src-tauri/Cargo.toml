@@ -1,0 +1,23 @@
+[package]
+name = "esp-config-designer-desktop"
+version = "1.4.0"
+description = "ESPConfig Designer desktop shell"
+authors = ["ESPConfig Designer"]
+license = "MIT"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2.2.0", features = [] }
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri = { version = "2.5.0", features = [] }
+tauri-plugin-dialog = "2.2.0"
+tauri-plugin-opener = "=2.2.6"
+
+[target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
+tauri-plugin-single-instance = "=2.4.3"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "=0.60.2", features = ["Win32_Foundation", "Win32_System_Threading", "Win32_UI_WindowsAndMessaging"] }

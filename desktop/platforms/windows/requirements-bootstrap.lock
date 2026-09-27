@@ -1,0 +1,8 @@
+# Build support required before the two pinned sdists in requirements-runtime.lock.
+# All artifacts are selected for CPython 3.13 x64 on Windows.
+packaging==26.2 \
+    --hash=sha256:5fc45236b9446107ff2415ce77c807cee2862cb6fac22b8a73826d0693b0980e
+setuptools==82.0.0 \
+    --hash=sha256:70b18734b607bd1da571d097d236cfcfacaf01de45717d59e6e04b96877532e0
+wheel==0.47.0 \
+    --hash=sha256:212281cab4dff978f6cedd499cd893e1f620791ca6ff7107cf270781e587eced

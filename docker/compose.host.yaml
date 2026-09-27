@@ -1,0 +1,3 @@
+services:
+  esp-config-designer:
+    network_mode: host

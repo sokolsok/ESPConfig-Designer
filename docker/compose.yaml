@@ -3,7 +3,6 @@ services:
     image: ghcr.io/sokolsok/esp-config-designer:latest
     container_name: esp-config-designer
     restart: unless-stopped
-    network_mode: host
 
     environment:
       TZ: ${TZ:-Europe/Warsaw}
@@ -19,8 +18,3 @@ services:
       - ./data:/data
       - ./build:/build
       - /etc/localtime:/etc/localtime:ro
-
-    # Required for the "Serial port (HA Server)" install mode.
-    devices:
-      - /dev/ttyUSB0:/dev/ttyUSB0
-      - /dev/ttyACM0:/dev/ttyACM0

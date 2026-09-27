@@ -1,13 +1,50 @@
-__pycache__/
-*.pyc
-esp-config-designer-frontend/node_modules/
-esp-config-designer-frontend/dist/
-esp-config-designer-frontend/runtime/
-tests/
-!esp-config-designer/tests/
-!esp-config-designer/tests/**
-esp-config-designer/tests/**/__pycache__/
-esp-config-designer/tests/**/*.pyc
-scripts/
-.github/workflows/validate.yml
-R&D/
+# Python
+**/__pycache__/
+*.py[cod]
+.venv/
+venv/
+.coverage
+coverage/
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node.js and frontend output
+**/node_modules/
+/esp-config-designer/frontend/dist/
+
+# Desktop build and packaged resources
+/desktop/debug/
+/desktop/src-tauri/target/
+/desktop/resources/*
+!/desktop/resources/ecd-app/
+/desktop/resources/ecd-app/*
+!/desktop/resources/ecd-app/README.txt
+
+# Local Docker state
+/docker/.env
+/docker/config/
+/docker/data/
+/docker/build/
+
+# Local environment files
+.env
+.env.*
+!.env.example
+!**/.env.example
+!/esp-config-designer/frontend/.env.local
+
+# Private working notes
+/R&D/
+
+# Reports and temporary files
+*.log
+*.tmp
+*.bak
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,6 @@
+esphome==2026.6.4
+platformio==6.1.19
+flask==3.1.2
+pyserial==3.5
+setuptools==82.0.0
+wheel==0.47.0

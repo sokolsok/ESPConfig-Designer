@@ -1,0 +1,33 @@
+{
+  "name": "esp-config-designer-frontend",
+  "private": true,
+  "version": "1.4.0",
+  "type": "module",
+  "scripts": {
+    "check:catalog": "node ../shared/schema-catalog-contract.mjs",
+    "generate:actions": "node scripts/generate-action-definitions.js",
+    "check:actions": "node scripts/generate-action-definitions.js --check",
+    "test": "npm run check:catalog && npm run check:actions && node --test --test-concurrency=1 --import=./tests/register-extensionless-js-loader.mjs && node --test ../shared/tests/schemaCatalogContract.test.mjs",
+    "test:capabilities": "node --test tests/runtimeCapabilities.test.mjs",
+    "test:diagnostics": "node --test tests/runtimeDiagnostics.test.mjs",
+    "dev": "node scripts/start-dev.js",
+    "migrate:dev-runtime": "node scripts/migrate-dev-runtime.js --dry-run",
+    "migrate:dev-runtime:apply": "node scripts/migrate-dev-runtime.js --apply",
+    "serve": "vite",
+    "build": "npm run check:catalog && vite build && node ../shared/schema-catalog-contract.mjs --projection dist",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@mdi/svg": "^7.4.47",
+    "@tauri-apps/plugin-opener": "2.2.6",
+    "esptool-js": "^0.6.0",
+    "highlight.js": "^11.11.1",
+    "js-yaml": "^5.3.0",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.7",
+    "vite": "^8.1.3"
+  }
+}

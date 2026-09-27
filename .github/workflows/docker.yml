@@ -1,0 +1,79 @@
+name: Docker and Home Assistant gates
+
+on:
+  pull_request:
+    paths:
+      - "esp-config-designer/**"
+      - "docker/**"
+      - "scripts/docker-runtime-gate.sh"
+      - "scripts/sync-changelog.mjs"
+      - "scripts/version-contract.mjs"
+      - "scripts/tests/versionContract.test.mjs"
+      - "VERSION"
+      - "CHANGELOG.md"
+      - ".github/workflows/docker.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "esp-config-designer/**"
+      - "docker/**"
+      - "scripts/docker-runtime-gate.sh"
+      - "scripts/sync-changelog.mjs"
+      - "scripts/version-contract.mjs"
+      - "scripts/tests/versionContract.test.mjs"
+      - "VERSION"
+      - "CHANGELOG.md"
+      - ".github/workflows/docker.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - linux/amd64
+          - linux/arm64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22.14.0"
+
+      - name: Verify repository contracts
+        run: |
+          node scripts/version-contract.mjs
+          node --test scripts/tests/versionContract.test.mjs docker/tests/composeContract.test.mjs
+
+      - name: Validate Compose variants
+        env:
+          ECD_SERIAL_DEVICE: /dev/null
+        run: |
+          docker compose -f docker/compose.yaml config --quiet
+          docker compose -f docker/compose.yaml -f docker/compose.host.yaml config --quiet
+          docker compose -f docker/compose.yaml -f docker/compose.bridge.yaml config --quiet
+          docker compose -f docker/compose.yaml -f docker/compose.host.yaml -f docker/compose.serial.yaml config --quiet
+          docker compose -f docker/compose.yaml -f docker/compose.bridge.yaml -f docker/compose.serial.yaml config --quiet
+          docker compose -f docker/compose.yaml -f docker/compose.host.yaml -f docker/compose.watchtower.yaml config --quiet
+          docker compose -f docker/compose.yaml -f docker/compose.bridge.yaml -f docker/compose.watchtower.yaml config --quiet
+
+      - name: Set up QEMU
+        if: matrix.platform == 'linux/arm64'
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
+        with:
+          image: tonistiigi/binfmt@sha256:1b804311fe87047a4c96d38b4b3ef6f62fca8cd125265917a9e3dc3c996c39e6 # qemu-v9.2.2
+          platforms: arm64
+
+      - name: Build and run both images on ${{ matrix.platform }}
+        env:
+          DOCKER_PLATFORM: ${{ matrix.platform }}
+        run: bash scripts/docker-runtime-gate.sh
